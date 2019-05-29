@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:security="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title>用户维护</title>
+    <meta charset="utf-8"/>
+</head>
+<body>
+<section th:fragment="content">
+    <section class="content-header">
+        <h1>用户维护
+            <small>系统用户</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> 权限功能</a></li>
+            <li class="active">用户维护</li>
+        </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="box box-primary">
+                    <div class="box-body box-profile">
+                        <div id="tree"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">用户列表</h3>
+                    </div>
+                    <div class="box-body">
+                        <form id="searchForm" class="form-inline" method="post">
+                            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                            <div class="form-group col-md-4 col-sm-12 ">
+                                <label class="col-sm-4 control-label">登录名称：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="lnm" maxlength="50">
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4 col-sm-12 ">
+                                <label class="col-sm-4 control-label">真实姓名：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="nm" maxlength="50">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">登录状态：</label>
+                                <div class="col-sm-8">
+                                    <select class="select2-type select2-choice" id="status" name="status" style="width: 100%;">
+                                        <option value="">请选择</option>
+                                        <option value="0">正常</option>
+                                        <option value="1">禁用</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="text-center operateBox">
+                                <input id="select" class="btn btn-primary" th:if="${#authorization.expression('hasRole(''sys:user:view'')')}" type="button" value="查询"/>
+                                <input id="add" class="btn btn-primary" th:if="${#authorization.expression('hasRole(''sys:user:edit'')')}"  type="button" value="新增"/>
+                                <input id="deleteBatch" class="btn btn-primary" th:if="${#authorization.expression('hasRole(''sys:user:edit'')')}" type="button" value="批量删除"/>
+                            </div>
+                        </form>
+                        <div id="dict_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                            <div class="row">
+                                <div class="col-sm-6"></div>
+                                <div class="col-sm-6"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table id="userTable" class="table table-bordered table-hover dataTable"
+                                           role="grid" aria-describedby="dict_info">
+                                        <thead>
+                                        <tr>
+                                            <th style="width:30px; padding:10px 0 10px 10px">
+                                                <input type="checkbox" id="checkAll">
+                                            </th>
+                                            <th>登录名称</th>
+                                            <th>真实姓名</th>
+                                            <th>电话</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="modifyModal" tabindex="-1" role="dialog" data-backdrop="static" style="overflow:scroll;">
+        <form id="modifyForm" class="modalForm" role="form" method="post">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span></button>
+                        <h4 class="modal-title" id="modifyModalLabel">用户添加</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input id="id" name="id" type="hidden" value="">
+                        <input id="sysUserInfo.id" name="sysUserInfo.id" type="hidden" value="">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">登录名称：</span>
+                                <input type="text" class="form-control" id="lnm" name="lnm" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">登陆密码：</span>
+                                <input type="password" class="form-control" id="pw" name="pw" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">确认密码：</span>
+                                <input type="password" class="form-control" id="pwr" name="pwr" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">姓名：</span>
+                                <input type="text" class="form-control" id="sysUserInfo.name" name="sysUserInfo.name" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon r-border">性别：</span>
+                                &nbsp;男：
+                                <input type="radio" name="sysUserInfo.sex" value="0">
+                                女：
+                                <input type="radio" name="sysUserInfo.sex" value="1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">电话：</span>
+                                <input type="text" class="form-control" id="sysUserInfo.sex" name="sysUserInfo.tel" maxlength="50">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">机构：</span>
+                                <input id="officeidsStr" name="officeidsStr" type="hidden" class="form-control">
+                                <input id="officeName" name="officeName" type="text" class="form-control" readonly>
+                                <!-- 菜单的下拉树 -->
+                                <div id="officeTree" class="treeBox" style="width: 85%; left: 14%; display: none;"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">所属角色：</span>
+                                <select class="select2-type select2-choice js-example-basic-multiple" id="roleIds"
+                                        name="roleIds" style="width: 100%;" multiple="multiple" data-placeholder="请选择角色">
+                                    <option value="">请选择</option>
+                                    <option th:each="role:${roleList}" th:value="${role.id}"
+                                            th:text="${role.name}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon r-border">是否可登录：</span>
+                                <div class="switch switch-small" style="margin-left: 10px;">
+                                    <input name="statusCheck" type="checkbox" class="checkbox">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon r-border">备注：</span>
+                                <div class="switch switch-small" style="margin-left: 10px;">
+                                    <textarea class="form-control" style="width:100%" rows="3" name="remarks"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                        <button id="save" type="button" class="btn btn-primary" data-type="save">保存</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+<script type="text/javascript">
+
+    var userTable = null;
+    var officeTree = null;
+    var order = {};
+    var parentOrder={};
+    var association = null;
+
+    /* 页面加载完操作 */
+    $(document).ready(function () {
+        /* 数据初始化 */
+        //初始化下拉选
+        $("#searchForm").find(".select2-type").select2();
+        //初始化表格
+        userTable = initDataTable();
+
+        //初始化左侧树
+        treeSysOffice();
+
+        $('body').click(function () {
+            $("#modifyForm").find("#officeTree").hide();
+        });
+
+        /* 搜索按钮事件 */
+        //查询
+        $("#select").on("click", function () {
+            userTable.ajax.reload(null,true);
+        });
+
+        //新增
+        $("#add").on("click", function () {
+            var modifyModal = $("#modifyModal");
+            modifyModal.modal({
+                keyboard: false
+            })
+            modifyModal.find(".select2-type").select2();
+            //修改模态框的保存按钮名称,属性 type=save 新增 update 修改
+            modifyModal.find("[id='save']").data("type", "save");
+            modifyModal.find("[id='save']").text("保存");
+            modifyModal.find("[id='modifyModalLabel']").text("用户新增");
+            //下拉树
+            treeSysArea();
+            modifyModal.find("[id='officeName']").click(function () {
+                $("#officeTree").show();
+                return false;
+            });
+            $("#officeTree").click(function () {
+                return false;
+            });
+            //from 表单验证
+            formValidator(modifyModal);
+            //模态框按钮事件 保存or修改
+            saveOrUpdate(modifyModal);
+        });
+
+        //批量删除
+        $("#deleteBatch").on("click", function () {
+            base_confirm('确认要批量删除用户吗?',function () {
+                var ids = '';
+                //获取所有选中的check 然后ajax 成功后返回信息 并刷新页面
+                $("input[name='checklist']").prop("checked", function (i, one) {
+                    if (one) {
+                        if (ids == '') {
+                            ids += this.value;
+                        } else {
+                            ids += ',' + this.value;
+                        }
+                    }
+                });
+                if (ids != '') {
+                    ajaxDelect(ids);
+                } else {
+                    base_alert('未选中任何一条数据');
+                }
+            })
+        })
+    });
+
+    function treeSysOffice() {
+        //ajax 请求数据排序
+        $.ajax({
+            async: false,
+            url: urlPath + '/sys/sysOffice/treeSysOffice',
+            type: 'POST',
+            dataType: 'json',
+            success: function (data, status) {
+                if (data.status = 'success') {
+                    officeTree = data.list;
+                    nodeMap(officeTree, order);
+                    $('#tree').treeview({
+                        levels: 1,
+                        data: officeTree,
+                        onNodeSelected: function (event, node) {
+                            association = node.value;
+                            userTable.destroy();
+                            userTable = initDataTable();
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    function treeSysArea() {
+        $('#officeTree').treeview({
+            levels: 1,
+            data: officeTree,
+            showCheckbox: true,
+            multiSelect: true,
+            onNodeChecked: function (event, node) {
+                var textInput = $("#modifyForm input[name='officeName']");
+                var idInput = $("#modifyForm input[name='officeidsStr']");
+                var str = textInput.val();
+                var ids = idInput.val();
+                if (str.length > 0) {
+                    textInput.val(str + node.text + ',');
+                    idInput.val(ids + node.value + ',');
+                } else {
+                    textInput.val(node.text + ',');
+                    idInput.val(node.value + ',');
+                }
+            },
+            onNodeUnchecked: function (event, node) {
+                var textInput = $("#modifyForm input[name='officeName']");
+                var idInput = $("#modifyForm input[name='officeidsStr']");
+                var str = textInput.val();
+                var ids = idInput.val();
+                textInput.val(str.replace(node.text + ",", ""));
+                idInput.val(ids.replace(node.value + ",", ""));
+            }
+        });
+    }
+
+    function nodeMap(nodes, order) {
+        for (var i = 0; i < nodes.length; i++) {
+            order[nodes[i].value] = nodes[i].order;
+            parentOrder[nodes[i].value]=nodes[i].parentId;
+            if (nodes[i].nodes != undefined) {
+                nodeMap(nodes[i].nodes, order);
+            }
+        }
+    }
+
+    function initDataTable() {
+        var option = {
+            columnDefs: [{
+                orderable: false,
+                targets: 0,
+                render: function (data, type, row, meta) {
+                    return '<input type="checkbox" name="checklist" value="' + row.id + '" />'
+                }
+            },{
+                orderable: false,
+                targets: 4,
+                render: function (data, type, row, meta) {
+                    var status = row.status;
+                    return status == 0 ? '正常' : "禁用";
+                }
+            }, {
+                orderable: false,
+                targets: 5,
+                render: function (data, type, row, meta) {
+                    var isEdit = [[${#authorization.expression('hasRole(''sys:user:edit'')')}]];
+                    var option = "";
+                    if (isEdit) {
+                        option+= '<a href="#" id="update" name="update" data-id="' + row.id + '" >修改</a>'
+                            + '  <a href="#" id="delete" name="delete" data-id="' + row.id + '" >删除</a>';
+                    }
+                    option+='  <a href="#" id="check" name="check" data-id="' + row.id + '" >查看</a>';
+                    return option;
+                }
+            }],//第一列与最后一列禁止排序
+            order: [ [0, null] ],//第一列排序图标改为默认
+            ajax: {
+                url: urlPath + '/sys/sysUser/dataList',
+                data: function (d) {
+                    //添加额外的数据请求参数
+                    var form = $("#searchForm");
+                    d.lnm = form.find("input[name = 'lnm']").val();
+                    d["sysUserInfo.name"] = form.find("input[name = 'nm']").val();
+                    d.tel = form.find("input[name = 'tel']").val();
+                    d.status = form.find("select[name = 'status']").val();
+                    if(association!=null){
+                        d.association = association;
+                    }
+                }
+            },
+            columns: [
+                {},
+                {data: 'lnm', name: 'lnm'},
+                {data: 'sysUserInfo.name', name: 'sys_user_info.name'},
+                {data: 'sysUserInfo.tel', name: 'sys_user_info.tel'},
+                {},
+                {}
+            ],
+            fnDrawCallback: function () {//加载完成后 初始化<a>操作
+                //checkbox全选
+                $("#checkAll").prop("checked", false);
+                $("#checkAll").on("click", function () {
+                    if ($(this).prop("checked") === true) {
+                        $("input[name='checklist']").prop("checked", $(this).prop("checked"));
+                        $('#userTable tbody tr').addClass('selected');
+                    } else {
+                        $("input[name='checklist']").prop("checked", false);
+                        $('#userTable tbody tr').removeClass('selected');
+                    }
+                });
+
+                $("a[name='update']").map(function (i, one) {
+                    //绑定修改事件
+                    $(one).on("click", function () {
+                        //ajax 查询后台数据 放到模态框 修改模态框的保存按钮属性
+                        $.ajax({
+                            url: urlPath + '/sys/sysUser/selectSysUser',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {id: $(this).data("id")},
+                            success: function (data, status) {
+                                if (data.status == 'success') {
+                                    var modifyModal = $("#modifyModal");
+                                    modifyModal.modal({
+                                        keyboard: false
+                                    })
+                                    var form = modifyModal.find(".modalForm");
+                                    var resultData = data.list[0];
+                                    form.find(".select2-type").select2();
+                                    form.find("input[name='id']").val(resultData.id);
+                                    //下拉树
+                                    treeSysArea();
+                                    form.find("[id='officeName']").click(function () {
+                                        $("#officeTree").show();
+                                        return false;
+                                    });
+
+                                    for(var i=0;i<resultData.sysUserOfficeList.length;i++){
+                                        $('#officeTree').treeview('checkNode', [ order[resultData.sysUserOfficeList[i].officeId], { silent: false } ]);
+                                        if(order[parentOrder[resultData.sysUserOfficeList[i].officeId]]!=undefined){
+                                            $('#officeTree').treeview('expandNode', [ order[parentOrder[resultData.sysUserOfficeList[i].officeId]], { silent: false } ]);
+                                        }
+                                    }
+
+                                    $("#officeTree").click(function () {
+                                        return false;
+                                    });
+                                    form.find("input[name='pw']").val("******");
+                                    form.find("input[name='pw']").on("click", function () {
+                                        clear('pw');
+                                    });
+                                    form.find("input[name='pwr']").val("******");
+                                    form.find("input[name='pwr']").on("click", function () {
+                                        clear('pwr');
+                                    });
+                                    form.find("input[name='lnm']").val(resultData.lnm);
+                                    form.find("input[name='sysUserInfo.id']").val(resultData.noId);
+                                    form.find("input[name='sysUserInfo.name']").val(resultData.sysUserInfo.name);
+                                    form.find("input[name='sysUserInfo.tel']").val(resultData.sysUserInfo.tel);
+                                    form.find("input[name='statusCheck']").attr("checked", resultData.status == "0" ? true : false);
+                                    form.find("input[name='sysUserInfo.sex']").eq(resultData.sysUserInfo.sex).attr("checked", 'checked');
+                                    form.find("textarea[name='remarks']").text(resultData.remarks);
+                                    //修改模态框的保存按钮名称,属性 type=save 新增 update 修改
+                                    modifyModal.find("[id='save']").data("type", "update");
+                                    modifyModal.find("[id='save']").text("修改");
+                                    modifyModal.find("[id='modifyModalLabel']").text("用户修改");
+
+                                    //用户角色选中
+                                    var ids = [];
+                                    $(resultData.sysUserRoleList).each(function (i, e) {
+                                        ids.push(e.roleId);
+                                    });
+                                    form.find("select[name='roleIds']").val(ids).trigger("change");
+                                    //from 表单验证
+                                    formValidator(modifyModal);
+                                    //模态框按钮事件 保存or修改
+                                    saveOrUpdate(modifyModal);
+                                } else {
+                                    //操作失败 弹出提示信息
+                                    base_alert_time(data.msg, 1000);
+                                }
+                            }
+                        });
+                    })
+                });
+
+                $("a[name='delete']").map(function (i, one) {
+                    //绑定修改事件
+                    $(one).on("click", function () {
+                        base_confirm('确认要删除该用户吗?',function () {
+                            //获取所有选中的id 然后ajax 成功后返回信息 并刷新页面
+                            var ids = $(one).data("id");
+                            ajaxDelect(ids);
+                        })
+                    })
+                });
+
+                $("a[name='check']").map(function (i, one) {
+                    //绑定修改事件
+                    $(one).on("click", function () {
+                        var modifyModal = $("#modifyModal");
+                        modifyModal.modal({
+                            keyboard: false
+                        })
+                        modifyModal.find("[id='save']").remove();
+                        //ajax 查询后台数据 放到模态框 修改模态框的保存按钮属性
+                        $.ajax({
+                            url: urlPath + '/sys/sysUser/selectSysUser',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {id: $(this).data("id")},
+                            success: function (data, status) {
+                                if (data.status == 'success') {
+                                    var form = modifyModal.find(".modalForm");
+                                    var resultData = data.list[0];
+                                    form.find(".select2-type").select2();
+                                    form.find("input[name='id']").val(resultData.id);
+                                    //下拉树
+                                    treeSysArea();
+                                    form.find("[id='officeName']").click(function () {
+                                        $("#officeTree").show();
+                                        return false;
+                                    });
+                                    for(var i=0;i<resultData.sysUserOfficeList.length;i++){
+                                        $('#officeTree').treeview('checkNode', [ order[resultData.sysUserOfficeList[i].officeId], { silent: false } ]);
+                                        if(order[parentOrder[resultData.sysUserOfficeList[i].officeId]]!=undefined){
+                                            $('#officeTree').treeview('expandNode', [ order[parentOrder[resultData.sysUserOfficeList[i].officeId]], { silent: false } ]);
+                                        }
+                                    }
+                                    $("#officeTree").click(function () {
+                                        return false;
+                                    });
+                                    form.find("input[name='pw']").val("******");
+                                    form.find("input[name='pw']").on("click", function () {
+                                        clear('pw');
+                                    });
+                                    form.find("input[name='pwr']").val("******");
+                                    form.find("input[name='pwr']").on("click", function () {
+                                        clear('pwr');
+                                    });
+                                    form.find("input[name='lnm']").val(resultData.lnm);
+                                    form.find("input[name='sysUserInfo.id']").val(resultData.noId);
+                                    form.find("input[name='sysUserInfo.name']").val(resultData.sysUserInfo.name);
+                                    form.find("input[name='sysUserInfo.tel']").val(resultData.sysUserInfo.tel);
+                                    form.find("input[name='statusCheck']").attr("checked", resultData.status == "0" ? true : false);
+                                    form.find("input[name='sysUserInfo.sex']").eq(resultData.sysUserInfo.sex).attr("checked", 'checked');
+                                    form.find("textarea[name='remarks']").text(resultData.remarks);
+                                    //修改模态框的保存按钮名称,属性 type=save 新增 update 修改
+                                    modifyModal.find("[id='modifyModalLabel']").text("用户查看");
+
+                                    //用户角色选中
+                                    var ids = [];
+                                    $(resultData.sysUserRoleList).each(function (i, e) {
+                                        ids.push(e.roleId);
+                                    });
+                                    form.find("select[name='roleIds']").val(ids).trigger("change");
+                                    form.find("input").attr("disabled", true);
+                                    form.find("select").attr("disabled", true);
+                                    form.find("textarea").attr("disabled", true);
+                                } else {
+                                    //操作失败 弹出提示信息
+                                    base_alert_time(data.msg, 1000);
+                                }
+                            }
+                        });
+                    })
+                });
+            }
+        };
+        userTable = initOriginalTable('userTable', option);
+        return userTable;
+    }
+
+    function formValidator(div) {
+        div.find('.modalForm').bootstrapValidator({
+            // I am validating Bootstrap form
+            framework: 'bootstrap',
+
+            // Feedback icons
+            icon: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                lnm: {
+                    message: '登录名称验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '登录名称不能为空'
+                        }
+                    }
+                },
+                pw: {
+                    message: '登陆密码验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '登陆密码不能为空'
+                        }
+                    }
+                },
+                pwr: {
+                    message: '确认密码验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '登陆密码不能为空'
+                        },
+                        identical: {
+                            field: 'pw',
+                            message: '*两次输入密码不一致'
+                        }
+                    }
+                },
+                nm: {
+                    message: '真实姓名验证失败',
+                    validators: {}
+                },
+                officeId: {
+                    message: '机构验证失败',
+                    trigger: "change",
+                    validators: {
+                        notEmpty: {
+                            message: '机构不能为空'
+                        }
+                    }
+                },
+                tel: {
+                    message: '电话验证失败',
+                    validators: {}
+                },
+                roleIds: {
+                    message: '用户角色验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '用户角色不能为空'
+                        }
+                    }
+                },
+                status: {
+                    message: '是否可登录验证失败',
+                    validators: {}
+                },
+            }
+        });
+    }
+
+    function saveOrUpdate(div) {
+        div.find("#save").on("click", function () {
+            var form = div.find('.modalForm');
+            var button = $(this);
+            var bootstrapValidator = form.data('bootstrapValidator');
+            bootstrapValidator.validate();
+            if (bootstrapValidator.isValid()) {
+                //数据操作方式
+                var opType = button.data("type");
+                //查找是select2的字段并赋值
+                var obj = {};
+                obj.opType = opType;
+                if(form.find("input[name='statusCheck']").is(':checked')){
+                    obj.status = 0;
+                }else{
+                    obj.status = 1;
+                }
+                $.ajax({
+                    url: urlPath + '/sys/sysUser/modify',
+                    type: 'POST',
+                    data: $.param(obj) + "&" + form.serialize(),
+                    success: function (data, status) {
+                        if (data.status == 'success') {
+                            //操作成功 弹出提示信息 然后关闭弹出框 重新刷新list 页面
+                            base_alert_success_time(data.msg, 1000, function () {
+                                div.modal('hide');
+                                //ajax 重新加载  第一个参数是回调函数 第二个参数是否 分页重置
+                                userTable.ajax.reload(null, false);
+                            })
+                        } else {
+                            //操作失败 弹出提示信息
+                            base_alert_time(data.msg, 1000);
+                        }
+                    }
+                });
+            }
+        })
+    }
+
+    function ajaxDelect(ids) {
+        $.ajax({
+            url: urlPath + '/sys/sysUser/deleteSysUser',
+            type: 'POST',
+            dataType: 'json',
+            data: {'ids': ids,'virtual':'true'},
+            success: function (data, status) {
+                if (data.status == 'success') {
+                    //操作成功 弹出提示信息 重新刷新list 页面
+                    base_alert_success_time(data.msg, 1000, function () {
+                        userTable.ajax.reload(null, false);
+                    })
+                } else {
+                    //操作失败 弹出提示信息
+                    base_alert_time(data.msg, 1000);
+                }
+            }
+        });
+    }
+
+    function clear(id) {
+        $("#" + id).val("");
+    }
+</script>
+</body>
+</html>

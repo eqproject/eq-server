@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:security="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title>文件维护</title>
+    <meta charset="utf-8"/>
+</head>
+<body>
+<section th:fragment="content">
+    <section class="content-header">
+        <h1>文件维护
+            <small>系统文件信息</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> 权限功能</a></li>
+            <li class="active">文件维护</li>
+        </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">文件列表</h3>
+                    </div>
+                    <div class="box-body">
+                        <form id="searchForm" class="form-inline" method="post">
+                            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                            <div class="form-group col-md-4 col-sm-12">
+                                <label class="col-sm-4 control-label" >文件名称：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" id="fileName" name="fileName"  maxlength="50">
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4 col-sm-12">
+                                <label class="col-sm-3 control-label" >文件大小：</label>
+                                <div class="col-sm-9">
+                                    <select class=" form-control select2-type select2-choice" id="compare" name="compare" style="width: 30%;">
+                                        <option th:each="type:${compareTypeList}" th:value="${type.value}" th:text="${type.label}"></option>
+                                    </select>
+                                    <input type="text" class="form-control" id="size" name="size" maxlength="50"  style="width: 30%;">
+                                    <select class=" form-control select2-type select2-choice" id="unit" name="unit" style="width: 30%;">
+                                        <option th:each="type:${sizeTypeList}" th:value="${type.value}" th:text="${type.label}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4 col-sm-12">
+                                <label class="col-sm-4 control-label">文件类型：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" id="fileType" name="fileType" maxlength="50">
+                                </div>
+                            </div>
+                            <div class="text-center operateBox">
+                                <input id="select" class="btn btn-primary"  th:if="${#authorization.expression('hasRole(''sys:file:view'')')}" type="button" value="查询"/>
+                                <input id="add" class="btn btn-primary" th:if="${#authorization.expression('hasRole(''sys:file:edit'')')}" type="button" value="新增"/>
+                                <input id="deleteBatch" class="btn btn-primary" th:if="${#authorization.expression('hasRole(''sys:file:edit'')')}" type="button" value="批量删除"/>
+                            </div>
+                        </form>
+                        <div id="dict_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                            <div class="row">
+                                <div class="col-sm-6"></div>
+                                <div class="col-sm-6"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table id="fileTable" class="table table-bordered table-hover dataTable"
+                                           role="grid" aria-describedby="dict_info">
+                                        <thead>
+                                        <tr>
+                                            <th style="width:30px; padding:10px 0 10px 10px">
+                                                <input type="checkbox" id="checkAll">
+                                            </th>
+                                            <th>文件名称</th>
+                                            <th>文件大小</th>
+                                            <th>文件类型</th>
+                                            <th>相对路径</th>
+                                            <th>相对访问路径</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="modifyModal" tabindex="-1" role="dialog" data-backdrop="static">
+        <form id="modifyForm" class="modalForm" role="form" method="post">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span></button>
+                        <h4 class="modal-title" id="modifyModalLabel">文件添加</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input id="id" name="id" type="hidden" value="">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">请选择文件：</span>
+                                <input id="input-id" name="fileName" type="file" class="file" data-preview-file-type="text" placeholder="请选择">
+                                <div class="input-group-btn" name="downDiv">
+                                    <a class="btn btn-default" name="downFile" onclick="downLoadFile(this)">
+                                        <i class="fa fa-cloud-download"></i>
+                                        <span class="hidden-xs">下载</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                        <button id="save" type="button" class="btn btn-primary" data-type="save">保存</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+<script type="text/javascript">
+
+    var fileTable = null;
+
+    /* 页面加载完操作 */
+    $(document).ready(function () {
+        /* 数据初始化 */
+        //初始化下拉选
+        $("#searchForm").find(".select2-type").select2();
+        //初始化表格
+        fileTable = initDataTable();
+
+        /* 搜索按钮事件 */
+        //查询
+        $("#select").on("click", function () {
+            fileTable.ajax.reload(null,true);
+        })
+
+        //新增
+        $("#add").on("click", function () {
+            var modifyModal = $("#modifyModal");
+            modifyModal.modal({
+                keyboard: false
+            });
+            modifyModal.find("div[name='downDiv']").remove();
+            //上传插件
+            initFilePlugSingle('input-id',{});
+
+            //修改模态框的保存按钮名称,属性 type=save 新增 update 修改
+            modifyModal.find("[id='save']").data("type", "save");
+            modifyModal.find("[id='save']").text("保存");
+            modifyModal.find("[id='myModalLabel']").text("文件新增");
+            //from 表单验证
+            formValidator(modifyModal);
+            //模态框按钮事件 保存or修改
+            saveOrUpdate(modifyModal);
+        })
+
+        //批量删除
+        $("#deleteBatch").on("click", function () {
+            base_confirm('确认要批量删除文件吗?',function () {
+                var ids = '';
+                //获取所有选中的check 然后ajax 成功后返回信息 并刷新页面
+                $("input[name='checklist']").prop("checked", function (i, one) {
+                    if (one) {
+                        if (ids == '') {
+                            ids += this.value;
+                        } else {
+                            ids += ',' + this.value;
+                        }
+                    }
+                });
+                if (ids != '') {
+                    ajaxDelect(ids);
+                } else {
+                    base_alert('未选中任何一条数据');
+                }
+            })
+        })
+    });
+
+    function initDataTable() {
+        var option = {
+            columnDefs: [{
+                orderable: false,
+                targets: 0,
+                render: function (data, type, row, meta) {
+                    return '<input type="checkbox" name="checklist" value="' + row.id + '" />'
+                }
+            }, {
+                targets: 2,
+                render: function (data, type, row, meta) {
+                    return fileSizeUnit(data);
+                }
+            },{
+                orderable: false,
+                targets: 6,
+                render: function (data, type, row, meta) {
+                    var isEdit = [[${#authorization.expression('hasRole(''sys:file:edit'')')}]];
+                    if (isEdit) {
+                        return '<a href="#" id="update" name="update" data-id="' + row.id + '" data-toggle="modal" data-target="#myModal" >修改</a>'
+                            + '  <a href="#" id="delete" name="delete" data-id="' + row.id + '" >删除</a>';
+                    } else {
+                        return '';
+                    }
+                }
+            }],//第一列与最后一列禁止排序
+            order: [ [0, null] ],//第一列排序图标改为默认
+            ajax: {
+                url: urlPath + '/sys/sysFile/dataList',
+                data: function (d) {
+                    //添加额外的数据请求参数
+                    var form = $("#searchForm");
+                    d.fileName = form.find("input[name = 'fileName']").val();
+                    d.fileSize = fileSizeLong(form.find("input[name = 'size']").val(),form.find("select[name = 'unit'] option:selected").text());
+                    d.fileType = form.find("input[name = 'fileType']").val();
+                    d.compare = form.find("select[name = 'compare']").val();
+                }
+            },
+            columns: [
+                {},
+                {data: 'fileName', name: 'file_name'},
+                {data: 'fileSize', name: 'file_size'},
+                {data: 'fileType', name: 'file_type'},
+                {data: 'location', name: 'location'},
+                {data: 'url', name: 'url'},
+                {}
+            ],
+            fnDrawCallback: function () {//加载完成后 初始化<a>操作
+                //checkbox全选
+                $("#checkAll").prop("checked", false);
+                $("#checkAll").on("click", function () {
+                    if ($(this).prop("checked") === true) {
+                        $("input[name='checklist']").prop("checked", $(this).prop("checked"));
+                        $('#dictTable tbody tr').addClass('selected');
+                    } else {
+                        $("input[name='checklist']").prop("checked", false);
+                        $('#dictTable tbody tr').removeClass('selected');
+                    }
+                });
+
+                $("a[name='update']").map(function (i, one) {
+                    //绑定修改事件
+                    $(one).on("click", function () {
+                        //ajax 查询后台数据 放到模态框 修改模态框的保存按钮属性
+                        $.ajax({
+                            url: urlPath + '/sys/sysFile/selectSysFile',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {id: $(this).data("id")},
+                            success: function (data, status) {
+                                if (data.status == 'success') {
+                                    var modifyModal = $("#modifyModal");
+                                    modifyModal.modal({
+                                        keyboard: false
+                                    })
+                                    var form = modifyModal.find(".modalForm");
+                                    var resultData = data.list[0];
+                                    modifyModal.find("input[name='id']").val(resultData.id);
+                                    //上传插件
+                                    initFilePlugSingle('input-id',{
+                                        required:true,
+                                        initialCaption:resultData.fileName,
+                                        initialPreview:[
+                                            resultData.url
+                                        ],
+                                        initialPreviewAsData: false
+                                    })
+                                    modifyModal.find("a[name='downFile']").attr("url",urlPath+resultData.url);
+                                    modifyModal.find("[id='save']").data("type", "update");
+                                    modifyModal.find("[id='save']").text("修改");
+                                    modifyModal.find("[id='modifyModalLabel']").text("文件修改");
+                                    //from 表单验证
+                                    formValidator(modifyModal);
+                                    //模态框按钮事件 保存or修改
+                                    saveOrUpdate(modifyModal);
+                                } else {
+                                    //操作失败 弹出提示信息
+                                    base_alert_time(data.msg, 1000);
+                                }
+                            }
+                        });
+                    })
+                });
+
+                $("a[name='delete']").map(function (i, one) {
+                    //绑定修改事件
+                    $(one).on("click", function () {
+                        base_confirm('确认要删除该文件吗?',function () {
+                            //获取所有选中的id 然后ajax 成功后返回信息 并刷新页面
+                            var ids = $(one).data("id");
+                            ajaxDelect(ids);
+                        })
+                    })
+                });
+            }
+        }
+        fileTable = initOriginalTable('fileTable', option);
+        return fileTable;
+    }
+
+    function formValidator(div) {
+        div.find('.modalForm').bootstrapValidator({
+            // I am validating Bootstrap form
+            framework: 'bootstrap',
+
+            // Feedback icons
+            icon: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                fileName: {
+                    message: '文件验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '文件不能为空'
+                        },
+                    }
+                }
+            }
+        });
+    }
+
+    function saveOrUpdate(div) {
+        div.find("#save").on("click", function () {
+            var form = div.find('.modalForm');
+            var button = $(this);
+            var bootstrapValidator = form.data('bootstrapValidator');
+            bootstrapValidator.validate();
+            if (bootstrapValidator.isValid()) {
+                //数据操作方式
+                var opType = button.data("type");
+                var formData = new FormData();
+                //查找是select2的字段并赋值
+                formData.append('opType', opType);
+                formData.append('id', form.find("input[id='id']").val());
+                var files = form.find("input[id='input-id']")[0].files;
+                for (var i = 0; i < files.length; i++) {
+                    formData.append('file', files[i],files[i].name);
+                }
+                $.ajax({
+                    url: urlPath + '/sys/sysFile/modify',
+                    type: 'POST',
+                    dataType : 'json',
+                    processData : false,
+                    contentType : false,
+                    data: formData,
+                    success: function (data, status) {
+                        if (data.status == 'success') {
+                            //操作成功 弹出提示信息 然后关闭弹出框 重新刷新list 页面
+                            base_alert_success_time(data.msg, 1000, function () {
+                                div.modal('hide');
+                                //ajax 重新加载  第一个参数是回调函数 第二个参数是否 分页重置
+                                fileTable.ajax.reload(null, false);
+                            })
+                        } else {
+                            //操作失败 弹出提示信息
+                            base_alert_time(data.msg, 1000);
+                        }
+                    }
+                });
+            }
+        })
+    }
+
+    function ajaxDelect(ids) {
+        $.ajax({
+            url: urlPath + '/sys/sysFile/deleteSysFile',
+            type: 'POST',
+            dataType: 'json',
+            data: {'ids': ids,'virtual':'true'},
+            success: function (data, status) {
+                if (data.status == 'success') {
+                    //操作成功 弹出提示信息 重新刷新list 页面
+                    base_alert_success_time(data.msg, 1000, function () {
+                        fileTable.ajax.reload(null, false);
+                    })
+                } else {
+                    //操作失败 弹出提示信息
+                    base_alert_time(data.msg, 1000);
+                }
+            }
+        });
+    }
+
+    function downLoadFile(obj){
+        if($(obj).attr("url")!=''){
+            window.location.href=$(obj).attr("url");
+        }else{
+            base_alert_time("附件不存在",1000);
+        }
+    }
+</script>
+</body>
+</html>

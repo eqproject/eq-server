@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bubi.basic.modules.sys.dao.SqlMapper">
+	<select id="superManagerSelect" parameterType="String" resultType="java.util.Map"> 
+		${value} 
+	</select>
+	
+	<insert id="superManagerInsert" parameterType="String" > 
+		${value} 
+	</insert>
+	
+	<delete id="superManagerDelete" parameterType="String">
+	    ${value}
+	</delete>
+
+	<update id="createNewTableFromTable">
+		create table ${newTableName} like ${oldTableName}
+	</update>
+
+	<!--<update id="createPrimaryKey">
+		alter table  ${newTableName} add constraint ${newTableName}_PK primary key ( id )
+	</update>
+
+	<update id="createPrimaryKeyAdd">
+		alter table  ${newTableName} alter column id set generated always as identity ( start with 1 increment by 1 minvalue -9223372036854775808 maxvalue 9223372036854775807 cache 20 )
+	</update>-->
+</mapper>

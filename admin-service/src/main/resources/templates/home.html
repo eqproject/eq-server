@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:security="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<title>基础管理系统</title>
+<meta charset="utf-8" />
+<section th:replace="common/layout :: layout(${contextPath})" />
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">
+		<section th:replace="common/content :: head (userInfo=${userInfo})"></section>
+		<section th:replace="common/content :: left (${userInfo})"></section>
+		<section th:fragment="content">
+			<!-- Content Wrapper. Contains page content -->
+			<div class="content-wrapper" id="mainDiv">
+				<!-- Content Header (Page header) -->
+			</div>
+		</section>
+		<section th:replace="common/content :: footer"></section>
+	</div>
+	<!-- 用于简化页面操作  -->
+	<script th:inline="javascript">
+        urlPath = [[${contextPath}]];
+		$(function() {
+			//首页默认加载
+			//loadPage("/a/business/remind");
+            refreshDictionary();
+            modalRest($("#modalDiv"),null,"modalDiv");
+			$("a").on("click",function(i,one){
+				href = $(this).data("url");
+				if(href==undefined||href==''||href=='#'||href==(urlPath+'/')){
+					return;
+				}else{
+				    console.log(urlPath+href);
+					loadPage(urlPath+href,$("#mainDiv"));
+					$("ul.treeview-menu li").removeClass("active");
+					$(this).parent().addClass("active");
+				}		
+			});
+		});
+	</script>
+</body>
+
+</html>

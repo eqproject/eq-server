@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>serviceImpl</name>
+	<filePath>${serviceImplLocation}</filePath>
+	<fileName>${className}ServiceImpl.java</fileName>
+	<content><![CDATA[
+/**
+ *  该类有generator 自动生成
+ * Copyright &copy; 2017-2018 All rights reserved.
+ */
+package ${serviceImplPackage};
+
+import ${entityPackage}.${className};
+import ${daoPackage}.${className}Mapper;
+import ${entityPackage}.${className}Example;
+import ${servicePackage}.${className}Service;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import cn.bubi.basic.common.annotation.AutowiredService;
+import cn.bubi.basic.common.base.ServiceImplExtend;
+
+import java.util.Map;
+
+/**
+ * ${functionName}ServiceImpl
+ * @author ${author}
+ * @version ${version}
+ */
+@Service
+@Transactional
+@AutowiredService
+public class ${className}ServiceImpl extends ServiceImplExtend<${className}Mapper, ${className}, ${className}Example> implements ${className}Service {
+
+	@Override
+	public ${className}Example getExampleFromEntity(${className} ${className?uncap_first}, Map<String, Object> params) {
+		${className}Example example = new ${className}Example();
+		${className}Example.Criteria ca = example.or();
+		if(${className?uncap_first}==null){
+			return example;
+		}
+		String orderName = null;
+		String orderDir = null;
+		if(params!=null){
+			orderDir = (String)params.get("orderDir");
+			orderName = (String)params.get("orderName");
+		}
+		if(orderName!=null&&!"".equals(orderName)){
+			example.setOrderByClause(orderName+" "+orderDir);
+		}else{
+			example.setOrderByClause("id asc");
+		}
+		<#list tableColumnList as c>
+			 <#if c.selectType?? >
+			 	<#if c.selectType == "like" >
+		if(StringLowUtils.isNotBlank(${className?uncap_first}.get${c.javaColumnName?cap_first}())){
+			ca.and${c.javaColumnName?cap_first}Like("%"+${className?uncap_first}.get${c.javaColumnName?cap_first}()+"%");
+		}
+			 	</#if>
+			 <#elseif c.javaType == "String">
+		if(StringLowUtils.isNotBlank(${className?uncap_first}.get${c.javaColumnName?cap_first}())){
+			ca.and${c.javaColumnName?cap_first}EqualTo(${className?uncap_first}.get${c.javaColumnName?cap_first}());
+		}
+			 <#else>
+		if(${className?uncap_first}.get${c.javaColumnName?cap_first}()!=null){
+			ca.and${c.javaColumnName?cap_first}EqualTo(${className?uncap_first}.get${c.javaColumnName?cap_first}());
+		}
+			</#if>
+		</#list>
+		return example;
+	}
+
+}]]>
+    </content>
+</template>

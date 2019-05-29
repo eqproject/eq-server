@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache name="spring_boot_auto_ehcache">
+    <diskStore path="java.io.tmpdir"/>
+	<defaultCache
+            maxElementsInMemory="10000"
+            eternal="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            overflowToDisk="true"
+            maxElementsOnDisk="10000000"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LRU"
+            />
+    <!-- 系统缓存信息 -->
+   	<cache name="SysCache" maxElementsInMemory="100" eternal="true" overflowToDisk="false"/>
+   	<!-- 用户登录信息 -->
+   	<cache name="UserCache" maxElementsInMemory="10" eternal="true" overflowToDisk="false"/>
+</ehcache>

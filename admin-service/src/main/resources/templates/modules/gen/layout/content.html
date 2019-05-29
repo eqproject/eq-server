@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8" />
+</head>
+<body>
+	<div class="wrapper">
+		<section th:fragment="head">
+
+			<nav class="navbar navbar-default navbar-static-top" id="navbar">
+				<div class="container">
+					<!-- Brand and toggle get grouped for better mobile display -->
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<a class="navbar-brand" href="#">代码生成</a>
+					</div>
+
+					<!-- Collect the nav links, forms, and other content for toggling -->
+					<div class="collapse navbar-collapse" id="navbar-collapse">
+						<ul class="nav navbar-nav">
+							<li class="active"><a href="#" class="nav-menu" data-url="/gen/genDB">数据库配置 </a></li>
+							<li><a href="#" class="nav-menu" data-url="/gen/genPlan">代码生成配置</a></li>
+							<!--<li class="dropdown">
+								<a href="#" class="dropdown-toggle nav-menu" data-toggle="dropdown" role="button" >代码生成配置 <span class="caret"></span></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="#">Action</a></li>
+									<li><a href="#">Another action</a></li>
+									<li><a href="#">Something else here</a></li>
+									<li role="separator" class="divider"></li>
+									<li><a href="#">Separated link</a></li>
+									<li role="separator" class="divider"></li>
+									<li><a href="#">One more separated link</a></li>
+								</ul>
+							</li>-->
+						</ul>
+						<!--<form class="navbar-form navbar-left" role="search">
+							<div class="form-group">
+								<input type="text" class="form-control" placeholder="Search" />
+							</div>
+						</form>-->
+					</div><!-- /.navbar-collapse -->
+				</div><!-- /.container-fluid -->
+			</nav>
+		</section>
+
+		<section th:fragment="content">	</section>
+
+		<section th:fragment="footer">
+			<footer class="main-footer" style="margin-left: 0px">
+				<div class="container">
+					<div class="pull-right hidden-xs">
+						<b>Version</b> 2.4.0
+					</div>
+					<strong>Copyright © 2017-2018 <a href="#">北京鲁邦斯特信息技术有限公司</a>.</strong> All rights
+					reserved.
+				</div>
+			</footer>
+		</section>
+	</div>
+</body>
+</html>

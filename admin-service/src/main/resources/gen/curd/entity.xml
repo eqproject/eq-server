@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>entity</name>
+	<filePath>${entityLocation}</filePath>
+	<fileName>${className}.java</fileName>
+	<content><![CDATA[
+/**
+ *  该类由generator 自动生成
+ * Copyright &copy; 2017-2018 All rights reserved.
+ */
+package ${entityPackage};
+
+<#if ifInheritBaseEntity>
+import cn.bubi.basic.common.base.BaseEntity;
+</#if>
+<#if entityPackageImportList??&&(entityPackageImportList?size>0)>
+    <#list entityPackageImportList as import>
+        <#if import == "Date" >
+import java.util.Date;
+        <#elseif import == "ExcelResources">
+import cn.bubi.basic.common.util.excel.ExcelResources;
+        </#if>
+    </#list>
+</#if>
+
+/**
+ * ${functionName}Entity
+ * @author ${author}
+ * @version ${version}
+ */
+public class ${className} <#if ifInheritBaseEntity>extends BaseEntity</#if> {
+
+	private static final long serialVersionUID = 1L;
+	<#-- 生成字段属性 -->
+	<#list tableColumnList as c>
+		<#if ifInheritBaseEntity>
+		    <#if c.javaColumnName != "remarks" && c.javaColumnName != "createBy" && c.javaColumnName != "createDate"
+		        && c.javaColumnName != "updateBy" && c.javaColumnName != "updateDate" && c.javaColumnName != "delFlag">
+	private ${c.javaType} ${c.javaColumnName};		<#if c.columnComment??>// ${c.columnComment}</#if>
+	        </#if>
+		<#else>
+	private ${c.javaType} ${c.javaColumnName};		<#if c.columnComment??>// ${c.columnComment}</#if>
+		</#if>
+	</#list>
+
+	<#-- 构造方法 -->
+	public ${className}() {
+		super();
+	}
+
+	<#-- 生成get和set方法 -->
+	<#list tableColumnList as c>
+		<#-- 如果有导入导出 -->
+		<#if c.ifImport || c.ifExport>
+	@ExcelResources( title = "${c.title}"<#if c.order??>, order = "${c.order}"</#if><#if c.type??>, type = "${c.type}"</#if><#if c.dateFormat??>, dateFormat = "${c.dateFormat}"</#if><#if c.dictionary??>, dictionary = "${c.dictionary}"</#if>
+	    <#if c.sqlList?? && c.sqlList?size > 0>, sqlList = {<#list c.sqlList as sql>"${sql}",</#list>}</#if>)
+	    </#if>
+	public ${c.javaType} get${c.javaColumnName?cap_first}() {
+		return ${c.javaColumnName};
+	}
+
+	public void set${c.javaColumnName?cap_first}(${c.javaType} ${c.javaColumnName}) {
+		this.${c.javaColumnName} = ${c.javaColumnName};
+	}
+
+	</#list>
+}]]>
+    </content>
+</template>

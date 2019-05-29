@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:security="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<title>代码生成系统</title>
+<meta charset="utf-8" />
+<!--<head th:replace="modules/gen/layout/layout" />-->
+</head>
+<body class="hold-transition skin-blue layout-boxed sidebar-mini">
+	<div class="wrapper">
+		<section th:replace="modules/gen/layout/content :: head" style="height: 10%"></section>
+		<section th:fragment="content">
+			<!-- Content Wrapper. Contains page content -->
+			<div id="mainDiv" style="height: 100%">
+				<!-- Content -->
+			</div>
+		</section>
+		<section th:replace="modules/gen/layout/content :: footer"></section>
+	</div>
+	<script th:inline="javascript">
+		$(function() {
+			//首页默认加载
+			loadPage(urlPath+"/gen/genDB",$("#mainDiv"));
+			
+			$("#navbar .nav-menu").on("click",function(i,one){
+				href = $(this).data("url");
+				if(href==undefined||href==''||href=='#'||href==('/')){
+					return;
+				}else{
+					loadPage(urlPath+href,$("#mainDiv"));
+					$("#navbar ul.navbar-nav li").removeClass("active");
+					$(this).parent().addClass("active");
+				}		
+			});
+		});
+	</script>
+</body>
+
+</html>

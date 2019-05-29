@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:security="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title>菜单维护</title>
+    <meta charset="utf-8"/>
+</head>
+<body>
+<section th:fragment="content">
+    <section class="content-header">
+        <h1>菜单维护
+            <small>系统菜单</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> 权限功能</a></li>
+            <li class="active">菜单维护</li>
+        </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">菜单列表</h3>
+                    </div>
+                    <div class="box-body">
+                        <form id="searchForm" class="form-inline" method="post">
+                            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                            <div class="form-group col-md-4 col-sm-12 ">
+                                <label  class="col-md-4 col-sm-4 control-label">菜单名称：</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input type="text" class="form-control" id="name" name="name" maxlength="50" style="width: 100%;"/>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4 col-sm-12 ">
+                                <label class="col-sm-4 control-label">菜单编码：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" id="code" name="code" maxlength="50" style="width: 100%;"/>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4 col-sm-12 ">
+                                <label class="col-sm-4 control-label">是否隐藏：</label>
+                                <div class="col-sm-8">
+                                    <select class="select2-type select2-choice" id="isShow" name="isShow" style="width: 100%;">
+                                        <option value="">请选择</option>
+                                        <option value="0">隐藏</option>
+                                        <option value="1">显示</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4 col-sm-12 ">
+                                <label class="col-sm-4 control-label">菜单状态：</label>
+                                <div class="col-sm-8">
+                                    <select class="select2-type select2-choice" id="status" name="status"  style="width: 100%;">
+                                        <option value="">请选择</option>
+                                        <option value="0">启用</option>
+                                        <option value="1">禁用</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="text-center operateBox row">
+                                <input id="select" class="btn btn-primary"  type="button" th:if="${#authorization.expression('hasRole(''sys:menu:view'')')}" value="查询"/>
+                                <input id="add" class="btn btn-primary" type="button" th:if="${#authorization.expression('hasRole(''sys:menu:edit'')')}" value="新增"/>
+                            </div>
+                        </form>
+                        <div id="dict_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                            <div class="row">
+                                <div class="col-sm-6"></div>
+                                <div class="col-sm-6"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12" id="tableDiv">
+                                    <table id="menuTable" class="table table-bordered table-hover dataTable"
+                                           role="grid" aria-describedby="menu_info">
+                                        <thead>
+                                        <tr role="row">
+                                            <th>菜单名称</th>
+                                            <th>菜单编码</th>
+                                            <th>访问路径</th>
+                                            <th>是否停用</th>
+                                            <th>是否隐藏</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="treeTableList"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="modifyModal" tabindex="-1" role="dialog" data-backdrop="static">
+        <form id="modifyForm" class="modalForm" role="form" method="post">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span></button>
+                        <h4 class="modal-title" id="modifyModalLabel">菜单添加</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input id="id" name="id" type="hidden" value=""/>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">菜单名称：</span>
+                                <input type="text" class="form-control" id="name" name="name" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">菜单编码：</span>
+                                <input type="text" class="form-control" id="code" name="code" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group parentTree">
+                                <span class="input-group-addon">上级菜单：</span>
+                                <input id="parentId" name="parentId" type="hidden" class="form-control"/>
+                                <input id="parentName" name="parentName" type="text" class="form-control" readonly/>
+                                <!-- 菜单的下拉树 -->
+                                <div id="menuTree" class="treeBox" style="display:none"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">访问路径：</span>
+                                <input type="text" class="form-control" id="href" name="href" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">icon：</span>
+                                <input type="text" class="form-control" id="icon" name="icon" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon r-border">是否隐藏：</span>
+                                <div class="switch switch-small" style="margin-left: 10px;">
+                                    <input id="isShow" name="isShow" type="checkbox" class="checkbox"/>
+                                </div>
+
+                                <span class="input-group-addon r-border">是否停用：</span>
+                                <div class="switch switch-small" style="margin-left: 10px;">
+                                    <input id="status" name="status" type="checkbox" class="checkbox"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">权限标识：</span>
+                                <input type="text" class="form-control" id="permission" name="permission"
+                                       maxlength="50"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                        <button id="save" type="button" class="btn btn-primary" data-type="save">保存</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+<script type="text/javascript">
+
+    var cloneTable = $('#menuTable').clone();//table 的一个副本
+    var menuTree = null;
+    var order = {};//缓存树的排序
+
+    /* 页面加载完操作 */
+    $(document).ready(function () {
+        /* 数据初始化 */
+        //初始化下拉选
+        $("#searchForm").find(".select2-type").select2();
+        //初始化表格
+        initTreeTable();
+
+        /* 搜索按钮事件 */
+        //查询
+        $("#select").on("click", function () {
+            initTreeTable();
+        });
+
+        $('body').click(function () {
+            $("#modifyForm").find("#menuTree").hide();
+        });
+
+        //新增
+        $("#add").on("click", function () {
+            var modifyModal = $("#modifyModal");
+            modifyModal.modal({
+                keyboard: false
+            })
+            modifyModal.find(".select2-type").select2();
+            //修改模态框的保存按钮名称,属性 type=save 新增 update 修改
+            modifyModal.find("[id='save']").data("type", "save");
+            modifyModal.find("[id='save']").text("保存");
+            modifyModal.find("[id='modifyModalLabel']").text("菜单新增");
+            //下拉树
+            treeMenu();
+            modifyModal.find("[id='parentName']").click(function () {
+                $("#menuTree").show();
+                event.stopPropagation();
+                return false;
+            });
+            $("#menuTree").click(function () {
+                return false;
+            });
+            //from 表单验证
+            formValidator(modifyModal);
+            //模态框按钮事件 保存or修改
+            saveOrUpdate(modifyModal);
+        })
+    });
+
+    function treeTable(){
+        $("#menuTable").treetable({
+            expandable: true,
+            clickableNodeNames:true,
+            onInitialized:function () {
+                $("#menuTable").css('display','inline-table');
+                $("#menuTable tbody tr:first td:first").trigger('click');
+            }
+        });
+        //选中高亮
+        $("#menuTable tbody").on("mousedown", "tr", function() {
+            $(".bg-aqua").not(this).removeClass("bg-aqua");
+            $(this).toggleClass("bg-aqua");
+        });
+    }
+
+    function initTreeTable(){
+        //查询参数处理
+        var obj = {};
+        var form = $("#searchForm");
+        obj.name = form.find("input[name='name']").val();
+        obj.code = form.find("input[name='code']").val();
+        if(form.find("select[name='isShow']").val()!=''){
+            obj.isShow = form.find("select[name='isShow']").val();
+        }
+        if(form.find("select[name='status']").val()!=''){
+            obj.status = form.find("select[name='status']").val();
+        }
+        //ajax 请求数据排序
+        $.ajax({
+            url: urlPath+'/sys/sysMenu/dataList',
+            type: 'POST',
+            dataType:'json',
+            data: $.param(obj),
+            success: function (data, status) {
+                if(data.status='success'){
+                    menuTree=data.list;
+                    var ids =[];
+                    var rootIds =[];//根节点
+                    for (var i=0; i<menuTree.length; i++){
+                        ids.push(menuTree[i].id);
+                    }
+                    ids = ',' + ids.join(',') + ',';
+                    for (var i=0; i<menuTree.length; i++){
+                        if (ids.indexOf(','+menuTree[i].parentId+',') == -1){
+                            if ((','+rootIds.join(',')+',').indexOf(','+menuTree[i].parentId+',') == -1){
+                                rootIds.push(menuTree[i].parentId);
+                            }
+                        }
+                    }
+                    var tbody = "";
+                    for (var j=0; j<rootIds.length; j++){
+                        tbody += addRow(rootIds[j], menuTree)
+                    }
+
+                    $("#menuTable").remove();
+                    var myClone = cloneTable.clone(true);
+                    $('#tableDiv').append(myClone);
+                    $("#menuTable tbody").html(tbody);
+                    treeTable();
+
+                    //表格按钮事件
+                    $("a[name='update']").map(function(i,one){
+                        //绑定修改事件
+                        $(one).on("click",function(){
+                            //ajax 查询后台数据 放到模态框 修改模态框的保存按钮属性
+                            $.ajax({
+                                url: urlPath+'/sys/sysMenu/selectSysMenu',
+                                type: 'POST',
+                                dataType:'json',
+                                data:{id:$(this).data("id")},
+                                success: function (data, status) {
+                                    if(data.status=='success'){
+                                        var modifyModal = $("#modifyModal");
+                                        modifyModal.modal({
+                                            keyboard: false
+                                        })
+                                        var form = modifyModal.find(".modalForm");
+                                        var resultData = data.list[0];
+                                        form.find(".select2-type").select2();
+                                        form.find("input[name='id']").val(resultData.id);
+                                        form.find("input[name='parentId']").val(resultData.parentId);
+                                        form.find("input[name='name']").val(resultData.name);
+                                        form.find("input[name='sort']").val(resultData.sort);
+                                        form.find("input[name='href']").val(resultData.href);
+                                        form.find("input[name='icon']").val(resultData.icon);
+                                        form.find("input[name='status']").attr("checked",resultData.status=="1"?true:false);
+                                        form.find("input[name='code']").val(resultData.code);
+                                        form.find("input[name='isShow']").attr("checked",resultData.isShow=="0"?true:false);
+                                        form.find("input[name='permission']").val(resultData.permission);
+
+                                        //修改模态框的保存按钮名称,属性 type=save 新增 update 修改
+                                        modifyModal.find("[id='save']").data("type","update");
+                                        modifyModal.find("[id='save']").text("修改");
+                                        modifyModal.find("[id='modifyModalLabel']").text("菜单修改");
+
+                                        //下拉树
+                                        treeMenu();
+                                        modifyModal.find("[id='parentName']").click(function(){
+                                            $("#menuTree").show();
+                                            event.stopPropagation();
+                                            return false;
+                                        });
+                                        if(order[resultData.parentId]!=undefined){
+                                            $('#menuTree').treeview('selectNode', order[resultData.parentId]);
+                                        }
+                                        $("#menuTree").click(function () {
+                                            return false;
+                                        });
+
+                                        //from 表单验证
+                                        formValidator(modifyModal);
+                                        //模态框按钮事件 保存or修改
+                                        saveOrUpdate(modifyModal);
+                                    }else{
+                                        //操作失败 弹出提示信息
+                                        base_alert_time(data.msg,1000);
+                                    }
+                                }
+                            });
+                        })
+                    });
+
+                    $("a[name='delete']").map(function(i,one){
+                        //绑定修改事件
+                        $(one).on("click",function(){
+                            base_confirm('确认要删除该菜单吗?',function () {
+                                //获取所有选中的id 然后ajax 成功后返回信息 并刷新页面
+                                var ids = $(one).data("id");
+                                ajaxDelect(ids);
+                            })
+                        })
+                    });
+
+                    $("a[name='addChild']").map(function(i,one){
+                        //绑定修改事件
+                        $(one).on("click",function(){
+                            var modifyModal = $("#modifyModal");
+                            modifyModal.modal({
+                                keyboard: false
+                            })
+                            modifyModal.find(".select2-type").select2();
+                            //修改模态框的保存按钮名称,属性 type=save 新增 update 修改
+                            modifyModal.find("[id='save']").data("type","save");
+                            modifyModal.find("[id='save']").text("保存");
+                            modifyModal.find("[id='modifyModalLabel']").text("菜单新增");
+
+                            //下拉树
+                            treeMenu();
+                            modifyModal.find("[id='parentName']").click(function(){
+                                $("#menuTree").show();
+                                event.stopPropagation();
+                                return false;
+                            });
+                            $("#menuTree").click(function () {
+                                return false;
+                            });
+                            //from 表单验证
+                            formValidator(modifyModal);
+                            //模态框按钮事件 保存or修改
+                            saveOrUpdate(modifyModal);
+
+                            var parentId = $(one).data("parentid");
+                            if(order[parentId]!=undefined){
+                                $('#menuTree').treeview('selectNode', order[parentId]);
+                            }
+                        })
+                    });
+
+                    $("a[name='check']").map(function(i,one){
+                        //绑定修改事件
+                        $(one).on("click",function(){
+                            var modifyModal = $("#modifyModal");
+                            modifyModal.modal({
+                                keyboard: false
+                            })
+                            modifyModal.find("[id='save']").remove();
+
+                            //ajax 查询后台数据 放到模态框 修改模态框的保存按钮属性
+                            $.ajax({
+                                url: urlPath+'/sys/sysMenu/selectSysMenu',
+                                type: 'POST',
+                                dataType:'json',
+                                data:{id:$(this).data("id")},
+                                success: function (data, status) {
+                                    if(data.status=='success'){
+                                        var form = modifyModal.find(".modalForm");
+                                        var resultData = data.list[0];
+                                        form.find(".select2-type").select2();
+                                        form.find("input[name='id']").val(resultData.id);
+                                        form.find("input[name='parentId']").val(resultData.parentId);
+                                        form.find("input[name='name']").val(resultData.name);
+                                        form.find("input[name='sort']").val(resultData.sort);
+                                        form.find("input[name='href']").val(resultData.href);
+                                        form.find("input[name='icon']").val(resultData.icon);
+                                        form.find("input[name='status']").attr("checked",resultData.status=="1"?true:false);
+                                        form.find("input[name='code']").val(resultData.code);
+                                        form.find("input[name='isShow']").attr("checked",resultData.isShow=="0"?true:false);
+                                        form.find("input[name='permission']").val(resultData.permission);
+
+                                        //修改模态框的保存按钮名称,属性 type=save 新增 update 修改
+                                        modifyModal.find("[id='save']").data("type","update");
+                                        modifyModal.find("[id='save']").text("修改");
+                                        modifyModal.find("[id='modifyModalLabel']").text("菜单修改");
+
+                                        //下拉树
+                                        treeMenu();
+                                        modifyModal.find("[id='parentName']").click(function(){
+                                            $("#menuTree").show();
+                                            event.stopPropagation();
+                                            return false;
+                                        });
+                                        if(order[resultData.parentId]!=undefined){
+                                            $('#menuTree').treeview('selectNode', order[resultData.parentId]);
+                                        }
+                                        $("#menuTree").click(function () {
+                                            return false;
+                                        });
+
+                                        form.find("input").attr("disabled", true);
+                                        form.find("select").attr("disabled", true);
+                                    }else{
+                                        //操作失败 弹出提示信息
+                                        base_alert_time(data.msg,1000);
+                                    }
+                                }
+                            });
+                        })
+                    });
+                }
+            }
+        });
+    }
+
+    function addRow(rootId, menuTree){
+        var tr='';
+        for(var i=0;i<menuTree.length;i++){
+            if(rootId == menuTree[i].parentId){
+
+                tr+='<tr data-tt-id ="'+menuTree[i].id+'" data-tt-parent-id="'+menuTree[i].parentId+'">';
+                if(menuTree[i].name==null){
+                    menuTree[i].name='';
+                }
+                tr +='  <td nowrap>'+menuTree[i].name+'</td>';
+                if(menuTree[i].code==null){
+                    menuTree[i].code='';
+                }
+                tr +='  <td nowrap>'+menuTree[i].code+'</td>';
+                if(menuTree[i].href==null){
+                    menuTree[i].href='';
+                }
+                tr +='  <td nowrap>'+menuTree[i].href+'</td>';
+                if(menuTree[i].status==null){
+                    menuTree[i].status='';
+                }else if(menuTree[i].status=='0'){
+                    menuTree[i].status='启用';
+                }else if(menuTree[i].status=='1'){
+                    menuTree[i].status='禁用';
+                }
+                tr +='  <td nowrap>'+menuTree[i].status+'</td>';
+                if(menuTree[i].isShow==null){
+                    menuTree[i].isShow='';
+                }else if(menuTree[i].isShow=='0'){
+                    menuTree[i].isShow='隐藏';
+                }else if(menuTree[i].isShow=='1'){
+                    menuTree[i].isShow='显示';
+                }
+                tr +='  <td nowrap>'+menuTree[i].isShow+'</td>';
+                tr +='  <td nowrap>';
+                var isEdit = [[${#authorization.expression('hasRole(''sys:menu:edit'')')}]];
+                if(isEdit) {
+                    if (menuTree[i].parentId != 0) {
+                        tr += '      <a href="#" id="update" name="update" data-id="' + menuTree[i].id + '" >修改</a>';
+                        tr += '      <a href="#" id="delete" name="delete" data-id="' + menuTree[i].id + '" >删除</a>';
+                    }
+                    tr += '      <a href="#" id="addChild" name="addChild" data-parentName="' + menuTree[i].name + '" data-parentId="' + menuTree[i].id + '" >添加下级菜单</a>';
+                }
+                tr += '      <a href="#" id="check" name="check" data-id="' + menuTree[i].id + '" >查看</a>';
+                tr +='  </td></tr>';
+                tr += addRow(menuTree[i].id,menuTree);
+            }
+        }
+        return tr;
+    }
+
+    function treeMenu(){
+        //ajax 请求数据排序
+        $.ajax({
+            async: false,
+            url: urlPath+'/sys/sysMenu/treeSysMenu',
+            type: 'POST',
+            dataType:'json',
+            success: function (data, status) {
+                if(data.status='success'){
+                    menuTree=data.list;
+                    nodeMap(menuTree,order);
+                    $('#menuTree').treeview({
+                        levels: 1,
+                        data: menuTree,
+                        onNodeSelected: function(event, node) {
+                            $("#menuTree").hide();
+                            $("#modifyForm input[name='parentName']").val(node.text).trigger("change");
+                            $("#modifyForm input[name='parentId']").val(node.value).trigger("change");
+                            //return false;
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    function nodeMap(nodes,order){
+        for(var i=0;i<nodes.length;i++){
+            order[nodes[i].value]=nodes[i].order;
+            if(nodes[i].nodes!=undefined){
+                nodeMap(nodes[i].nodes,order);
+            }
+        }
+    }
+
+    function formValidator(div){
+        div.find('.modalForm').bootstrapValidator({
+            // I am validating Bootstrap form
+            framework: 'bootstrap',
+
+            // Feedback icons
+            icon: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                name: {
+                    message: '菜单名称验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '菜单名称不能为空'
+                        }
+                    }
+                },
+                code: {
+                    message: '菜单编码验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '菜单编码不能为空'
+                        },
+                        remote: {
+                            url: urlPath + "/sys/sysMenu/codeValid",
+                            message: '机构代码不可用',//提示消息
+                            delay: 1000,//每输入一个字符，就发ajax请求，服务器压力还是太大，设置2秒发送一次ajax（默认输入一个字符，提交一次，服务器压力太大）
+                            type: 'POST',//请求方式
+                            dataType: "json",
+                            data: function (validator) {
+                                return {
+                                    id: $('#modifyForm').find("input[name='id']").val(),
+                                };
+                            }
+                        },
+                    }
+                },
+                parentName: {
+                    message: '上级菜单验证失败',
+                    trigger:"change",
+                    validators: {
+                        notEmpty: {
+                            message: '上级菜单不能为空'
+                        }
+                    }
+                },
+                href: {
+                    message: '访问路劲验证失败',
+                    validators: {
+                    }
+                },
+                icon: {
+                    message: 'icon验证失败',
+                    validators: {
+                    }
+                },
+                sort: {
+                    message: '排序验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '排序不能为空'
+                        }
+                    }
+                },
+                isShow: {
+                    message: '是否隐藏验证失败',
+                    validators: {
+                    }
+                },
+                status: {
+                    message: '是否停用验证失败',
+                    validators: {
+                    }
+                },
+                permission: {
+                    message: '权限标识验证失败',
+                    validators: {
+                    }
+                },
+            }
+        });
+    }
+
+    function saveOrUpdate(div){
+        div.find("#save").on("click",function(){
+            var form = div.find('.modalForm');
+            var button = $(this);
+            var bootstrapValidator = form.data('bootstrapValidator');
+            bootstrapValidator.validate();
+            if(bootstrapValidator.isValid()){
+                //数据操作方式
+                var opType = button.data("type");
+                //查找是select2的字段并赋值
+                var obj = {};
+                obj.opType = opType;
+
+                obj.id = form.find("input[name='id']").val();
+                obj.name = form.find("input[name='name']").val();
+                obj.code = form.find("input[name='code']").val();
+                obj.parentId = form.find("input[name='parentId']").val();
+                obj.href = form.find("input[name='href']").val();
+                obj.icon = form.find("input[name='icon']").val();
+                obj.sort = form.find("input[name='sort']").val();
+                obj.code = form.find("input[name='code']").val();
+                obj.permission = form.find("input[name='permission']").val();
+                if(form.find("input[name='isShow']").is(':checked')){
+                    obj.isShow = 0;
+                }else{
+                    obj.isShow = 1;
+                }
+                if(form.find("input[name='status']").is(':checked')){
+                    obj.status = 1;
+                }else{
+                    obj.status = 0;
+                }
+                $.ajax({
+                    url: urlPath+'/sys/sysMenu/modify',
+                    type: 'POST',
+                    data: $.param(obj),
+                    success: function (data, status) {
+                        if(data.status=='success'){
+                            //操作成功 弹出提示信息 然后关闭弹出框 重新刷新list 页面
+                            base_alert_success_time(data.msg,1000,function(){
+                                div.modal('hide');
+                                initTreeTable();
+                            })
+                        }else{
+                            //操作失败 弹出提示信息
+                            base_alert_time(data.msg,1000);
+                        }
+                    }
+                });
+            } else {
+                base_alert_success_time("正在验证，请稍等！", 2000,function () {
+                    button.trigger("click");
+                });
+            }
+        })
+    }
+
+    function ajaxDelect(ids){
+        $.ajax({
+            url: urlPath+'/sys/sysMenu/deleteSysMenu',
+            type: 'POST',
+            dataType:'json',
+            data:{'ids':ids,'virtual':'true'},
+            success: function (data, status) {
+                if(data.status=='success'){
+                    //操作成功 弹出提示信息 重新刷新list 页面
+                    base_alert_success_time(data.msg,1000,function(){
+                        initTreeTable();
+                    })
+                }else{
+                    //操作失败 弹出提示信息
+                    base_alert_time(data.msg,1000);
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

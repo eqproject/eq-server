@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:security="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+	<meta charset="utf-8" />
+    <title>数据库中的表</title>
+    <style>
+        .parentArea{position:relative; z-index:999}
+        .parentArea .treeBox{ position:absolute;top:30px; left:99px;width:471px; /* display:none; */}
+        .parentOffice{position:relative; z-index:9999}
+        .parentOffice .treeBox{ position:absolute;top:30px; left:99px;width:471px; /* display:none; */}
+
+        .projectMeitain .form-group{float:left;width:32%;margin-right:1%}
+        .projectDialogCon{clear:both;margin:20px 0; overflow:hidden;}
+        .projectDialogCon .p-dialogLeft{float:left;}
+        .projectDialogCon .p-dialogRight{float:right;border-left:1px solid #ddd;}
+        .projectDialogCon h2{font-size:16px; font-weight: bold}
+        .projectDialogCon h3{font-size: 14px;}
+        .projectDialogCon ul{margin:0;padding:0;}
+        .projectDialogCon li{list-style: none;}
+        .treeviewDialog{height:550px;overflow-y:auto;padding:5px;}
+        .btnBox{margin-bottom:10px;}
+        .gsConBox{height:270px;border:1px solid #ddd;overflow-y:auto;padding:10px;}
+        .gsConBox ul li{margin:5px;padding: 5px 10px;margin:5px 0;}
+        .gsConBox ul li.cur{ background: #3c8dbc;  color: #fff;}
+    </style>
+</head>
+<body >
+<section th:fragment="tableModal">
+        <section th:fragment="content" class="content">
+            <input type="hidden" id="planId" name="genPlan" th:value="${genPlan.id}" />
+            <!-- Main content -->
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-body">
+                            <form id="modalSearchForm" class="form-inline" method="post">
+                                <div class="form-group col-md-6 col-sm-12 " style="width:50%">
+                                    <label  class="col-md-4 control-label">方案名称：</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input type="text" class="form-control" id="modalName" name="modalName" style="width: 100%"/>
+                                    </div>
+                                </div>
+                                <div class="text-center operateBox">
+                                    <input id="modalSelect" class="btn btn-primary" type="button" value="查询" />
+                                    <input id="modalAdd" class="btn btn-primary" type="button" value="新增"/>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="box">
+                        <div class="box-header">
+                            <h3 class="box-title"></h3>
+                        </div>
+                        <div class="box-body">
+                            <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                                <div class="row">
+                                    <div class="col-sm-6"></div>
+                                    <div class="col-sm-6"></div>
+                                </div>
+                                <div class="row" style="width:100%">
+                                    <div class="col-sm-12">
+                                        <table id="genTableModal" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                                            <thead>
+                                                <tr role="row">
+                                                    <th tabindex="0" rowspan="1" colspan="1" >方案名称</th>
+                                                    <th tabindex="0" rowspan="1" colspan="1" >数据库名称</th>
+                                                    <th tabindex="0" rowspan="1" colspan="1" >表名称</th>
+                                                    <th tabindex="0" rowspan="1" colspan="1" >类名称</th>
+                                                    <th tabindex="0" rowspan="1" colspan="1" >功能名称</th>
+                                                    <th tabindex="0" rowspan="1" colspan="1" >操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <script th:inline="javascript">
+                                var tableModal = null;
+                                tableModal = initTableModal();
+                                function initTableModal() {
+                                    var option ={
+                                        columnDefs: [{
+                                            orderable: false,
+                                            targets: 5,
+                                            render: function(data, type, row, meta) {
+                                                return '<a href="#" id="modalUpdate" name="modalUpdate" data-id="'+row.id+'" >修改</a>'
+                                                    +'  <a href="#" id="modalDelete" name="modalDelete" data-id="'+row.id+'" >删除</a>'
+                                                    +'  <a href="#" id="codeMake" name="codeMake" data-id="'+row.id+'" >代码生成</a>';
+                                            }
+                                        }],//第一列与最后一列禁止排序
+                                        order: [ [0, null] ],//第一列排序图标改为默认
+                                        ajax: {
+                                            url: urlPath+'/gen/genTableModal/dataList',
+                                            data: function ( d ) {
+                                                //添加额外的数据请求参数
+                                                var form = $("#modalSearchForm");
+                                                d.modalName = form.find("input[name = 'modalName']").val();
+                                                d.planId = $("input[name = 'genPlan']").val();
+                                            }
+                                        },
+                                        columns: [
+                                            { data: 'modalName' , name: 'modal_name' },
+                                            { data: 'dbMangerName' , name: 'dbMangerName' },
+                                            { data: 'tableName' , name: 'table_name' },
+                                            { data: 'className' , name: 'class_name' },
+                                            { data: 'functionName' , name: 'function_name' },
+                                            {},
+                                        ],
+                                        fnDrawCallback: function (){
+                                            //修改
+                                            $("a[name='modalUpdate']").map(function(i,one){
+                                                $(one).on("click",function(){
+                                                    $.ajax({
+                                                        url: urlPath+'/gen/genTableModal/selectGenTableModal',
+                                                        type: 'POST',
+                                                        dataType:'json',
+                                                        data:{id:$(this).data("id")},
+                                                        success: function (data, status) {
+                                                            if(data.status=='success'){
+
+                                                                var tableModifyModal = $("#tableModifyModal");
+                                                                tableModifyModal.modal({
+                                                                    keyboard: false
+                                                                })
+                                                                tableModifyModal.find(".select2-type").select2();
+                                                                var form = tableModifyModal.find(".modalForm");
+                                                                var resultData = data.list[0];
+                                                                form.find("input[name='id']").val(resultData.id);
+                                                                form.find("input[name='modalName']").val(resultData.modalName);
+                                                                form.find("select[name='dbId']").val(resultData.dbId).trigger("change");
+                                                                form.find("select[name='tableName']").val(resultData.tableName).trigger("change");
+                                                                form.find("input[name='className']").val(resultData.className);
+                                                                form.find("input[name='functionName']").val(resultData.functionName);
+                                                                form.find("input[name='moduleName']").val(resultData.moduleName);
+                                                                form.find("input[name='ifInheritBaseCheck']").attr("checked", resultData.ifInheritBase == "0" ? true : false);
+                                                                form.find("select[name='category']").val(resultData.category).trigger("change");
+                                                                form.find("input[name='author']").val(resultData.author);
+                                                                form.find("input[name='version']").val(resultData.version);
+
+                                                                console.log(resultData.pageSetting);
+                                                                var setting = $.parseJSON(resultData.pageSetting);
+                                                                console.log(setting);
+                                                                if(setting.buttonSectionList==null||setting.buttonSectionList==undefined||setting.buttonSectionList.length<0){
+                                                                    //初始化页面按钮配置
+                                                                    form.find("input[name='buttonOptionSetting']").map(function (i,one) {
+                                                                        //根据按钮类型返回按钮数据
+                                                                        var type = $(one).data("type");
+                                                                        var json = dataByButtonType(type);
+                                                                        $(one).data("json",json);
+                                                                    })
+                                                                }else{
+                                                                    //初始化页面按钮配置
+                                                                    form.find("input[name='buttonOptionSetting']").map(function (i,one) {
+                                                                        $(one).data("json",setting.buttonSectionList[i]);
+                                                                    })
+                                                                }
+                                                                if(setting.selectSectionList!=null&&setting.selectSectionList!=undefined&&setting.selectSectionList.length>0){
+                                                                    for(var i=0;i<setting.selectSectionList.length;i++){
+                                                                        var child = $(bascDiv(setting.selectSectionList[i]));
+                                                                        child.find("input").eq(0).data("json",setting.selectSectionList[i]);
+                                                                        $("#selectOption").append(child);
+                                                                    }
+
+
+                                                                }
+                                                                if(setting.dataTableSectionList!=null&&setting.dataTableSectionList!=undefined&&setting.dataTableSectionList.length>0){
+                                                                    for(var i=0;i<setting.dataTableSectionList.length;i++){
+                                                                        var child = $(bascDiv(setting.dataTableSectionList[i]));
+                                                                        child.find("input").eq(0).data("json",setting.dataTableSectionList[i]);
+                                                                        $("#tableOption").append(child);
+                                                                    }
+
+                                                                }
+
+                                                                //修改模态框的保存按钮名称,属性 type=save 新增 update 修改
+                                                                tableModifyModal.find("[id='save']").data("type","update");
+                                                                tableModifyModal.find("[id='save']").text("修改");
+                                                                tableModifyModal.find("[id='tableModifyModalLabel']").text("方案修改");
+                                                                //from 表单验证
+                                                                formValidatorModal(tableModifyModal);
+                                                                //模态框按钮事件 保存or修改
+                                                                saveOrUpdateModal(tableModifyModal);
+                                                            }else{
+                                                                //操作失败 弹出提示信息
+                                                                base_alert_time(data.msg,1000);
+                                                            }
+                                                        }
+                                                    });
+                                                })
+                                            })
+
+                                            //删除
+                                            $("a[name='modalDelete']").map(function(i,one){
+                                                //绑定修改事件
+                                                $(one).on("click",function(){
+                                                    base_confirm('确认要删除该计划吗？',function () {
+                                                        //获取所有选中的id 然后ajax 成功后返回信息 并刷新页面
+                                                        var ids = $(one).data("id");
+                                                        ajaxDelectModal(ids);
+                                                    })
+                                                })
+                                            });
+
+                                            //代码生成
+                                            $("a[name='codeMake']").map(function(i,one){
+                                                $(one).on("click",function(){
+                                                    base_confirm('代码生成会覆盖原有的文件，确定要代码生成吗？',function () {
+                                                        $.ajax({
+                                                            url: urlPath+'/gen/genTableModal/codeMake',
+                                                            type: 'POST',
+                                                            dataType:'json',
+                                                            data:{id:$(one).data("id"),"planId":$("#planId").val()},
+                                                            success: function (data, status) {
+                                                                base_alert_time(data.msg,1000);
+                                                            }
+                                                        });
+                                                    })
+                                                })
+                                            });
+
+                                        }
+                                    };
+                                    return initOriginalTable('genTableModal',option);
+                                }
+
+                                function refreshTableModal() {
+                                    //ajax 重新加载  第一个参数是回调函数 第二个参数是否 分页重置
+                                    tableModal.ajax.reload(null,false);
+                                }
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模态框（Modal） -->
+            <div class="modal fade" id="tableModifyModal" name="tableModifyModal" tabindex="-1" role="dialog" data-backdrop="static"
+                 style="overflow-x: hidden; overflow-y: auto;">
+                <form id="tableModifyForm" class="modalForm" role="form" method="post">
+                    <div class="modal-dialog" style="width: 1200px">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" >
+                                    <span aria-hidden="true">×</span></button>
+                                <h4 class="modal-title" id="tableModifyModalLabel">方案新增</h4>
+                            </div>
+                            <div class="modal-body row">
+                                <input id="id" name="id" type="hidden" value=""/>
+                                <div class="form-group col-md-4 col-sm-6">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">方案名称：</span>
+                                        <input type="text" class="form-control" id="modalName" name="modalName" maxlength="50"/>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-4 col-sm-6">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">数据库连接名称：</span>
+                                        <select class="select2-type select2-choice" id="dbId" name="dbId" style="width: 100%;" onchange="findDBTable(this)">
+                                            <option value="">请选择</option>
+                                            <option th:each="type:${genDBList}" th:value="${type.id}" th:text="${type.name}"></option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-4 col-sm-6">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">表名称：</span>
+                                        <select class="select2-type select2-choice" id="tableName" name="tableName" style="width: 100%;" onchange="findDBTableColumn(this)">
+                                            <option value="">请选择</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-4 col-sm-6">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">类名称：</span>
+                                        <input type="text" class="form-control" id="className" name="className" maxlength="50"/>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-4 col-sm-6">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">功能名称：</span>
+                                        <input type="text" class="form-control" id="functionName" name="functionName" maxlength="50"/>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-4 col-sm-6">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">模块名称：</span>
+                                        <input type="text" class="form-control" id="moduleName" name="moduleName" maxlength="50"/>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-4 col-sm-6">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">生成方式：</span>
+                                        <select class="select2-type select2-choice" id="category" name="category" style="width: 100%;">
+                                            <option value="curd">CURD</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-4 col-sm-6">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">作者：</span>
+                                        <input type="text" class="form-control" id="author" name="author" maxlength="50"/>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-4 col-sm-6">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">版本：</span>
+                                        <input type="text" class="form-control" id="version" name="version" maxlength="50"/>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-4 col-sm-6">
+                                    <div class="input-group">
+                                        <span class="input-group-addon r-border">不继承基本实体：</span>
+                                        <div class="switch switch-small" style="margin-left: 10px;margin-bottom:0;width: 100%">
+                                            <input id="ifInheritBaseCheck" name="ifInheritBaseCheck" type="checkbox" class="checkbox">
+                                        </div>
+                                    </div>
+                                </div>
+                                <br/>
+                                <div class="projectDialogCon">
+                                    <div class="col-sm-4 p-dialogLeft">
+                                        <h2>表字段</h2>
+                                        <div class="treeviewDialog">
+                                            <div id="tableCoulumList" class="treeview">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-8 p-dialogRight">
+                                        <h2>查询项</h2>
+                                        <div class="gsConBox" id="selectOption"></div>
+                                    </div>
+                                    <div class="col-sm-8 p-dialogRight">
+                                        <h2>按钮项</h2>
+                                        <div class="gsConBox" id="buttonOption">
+                                            <div class="list-group-item node-modelTree" >查询<input type="button" name="buttonOptionSetting" value="设置" data-type="1" onclick="buttonSetting(this)"><input type="button" value="删除" onclick="removeSetting(this)"></div>
+                                            <div class="list-group-item node-modelTree" >新增<input type="button" name="buttonOptionSetting" value="设置" data-type="2" onclick="buttonSetting(this)"><input type="button" value="删除" onclick="removeSetting(this)"></div>
+                                            <div class="list-group-item node-modelTree" >批量删除<input type="button" name="buttonOptionSetting" value="设置" data-type="3" onclick="buttonSetting(this)"><input type="button" value="删除" onclick="removeSetting(this)"></div>
+                                            <div class="list-group-item node-modelTree" >导入<input type="button" name="buttonOptionSetting" value="设置" data-type="4" onclick="buttonSetting(this)"><input type="button" value="删除" onclick="removeSetting(this)"></div>
+                                            <div class="list-group-item node-modelTree" >导出<input type="button" name="buttonOptionSetting" value="设置" data-type="5" onclick="buttonSetting(this)"><input type="button" value="删除" onclick="removeSetting(this)"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-8 p-dialogRight">
+                                        <h2>dataTable列表项</h2>
+                                        <div class="gsConBox" id="tableOption"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                                <button id="save" type="button" class="btn btn-primary">保存</button>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                </form>
+            </div><!-- /.modal -->
+
+            <!-- 查询项modal-->
+            <div class="modal fade" id="selectSettingModal" name="selectSettingModal" tabindex="-1" role="dialog" data-backdrop="static">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" >
+                                <span aria-hidden="true">×</span></button>
+                            <h4 class="modal-title" id="selectSettingModalLabel">查询项设置</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">查询名称：</span>
+                                    <input type="text" class="form-control" id="selectName" name="selectName" maxlength="50"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">查询方式：</span>
+                                    <select class="select2-type select2-choice" id="selectType" name="selectType" style="width: 100%;" >
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">显示方式：</span>
+                                    <select class="select2-type select2-choice" id="showType" name="showType" style="width: 100%;" >
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">数据字典：</span>
+                                    <select class="select2-type select2-choice" id="dictionaryDate" name="dictionaryDate" style="width: 100%;" >
+                                        <option value="">请选择</option>
+                                        <option th:each="type:${dictTypeList}" th:value="${type.type}" th:text="${type.description}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                            <button id="save" type="button" class="btn btn-primary">保存</button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+
+            <!-- 查询项modal-->
+            <div class="modal fade" id="buttonSettingModal" name="buttonSettingModal" tabindex="-1" role="dialog" data-backdrop="static">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" >
+                                <span aria-hidden="true">×</span></button>
+                            <h4 class="modal-title" id="buttonSettingModalLabel">按钮项设置</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">按钮名称：</span>
+                                    <input type="text" class="form-control" id="buttonName" name="buttonName" maxlength="50"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">按钮类型：</span>
+                                    <select class="select2-type select2-choice" id="buttonType" name="buttonType" style="width: 100%;" >
+                                        <option value="1">查询</option>
+                                        <option value="2">新增</option>
+                                        <option value="3">批量删除</option>
+                                        <option value="4">导入</option>
+                                        <option value="5">导出</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">按钮权限：</span>
+                                    <input type="text" class="form-control" id="buttonPermission" name="buttonPermission" maxlength="50"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                            <button id="save" type="button" class="btn btn-primary">保存</button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+
+            <!-- 查询项modal-->
+            <div class="modal fade" id="dataSettingModal" name="dataSettingModal" tabindex="-1" role="dialog" data-backdrop="static">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" >
+                                <span aria-hidden="true">×</span></button>
+                            <h4 class="modal-title" id="dataSettingModalLabel">数据项设置</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">列名称：</span>
+                                    <input type="text" class="form-control" id="dataName" name="dataName" maxlength="50"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                            <button id="save" type="button" class="btn btn-primary">保存</button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+        </section>
+    <script th:inline="javascript">
+        <![CDATA[
+
+        //数据源对应的展示类型 查询方式
+        var showTypeList = null;
+        var selectTypeList = null;
+
+        $(document).ready(function () {
+
+            /* 搜索按钮事件 */
+            //查询
+            $("#modalSelect").on("click",function(){
+                refreshTableModal();
+            });
+
+            //新增
+            $("#modalAdd").on("click",function(){
+                var tableModifyModal = $("#tableModifyModal");
+                tableModifyModal.modal({
+                    keyboard: false
+                })
+                tableModifyModal.find(".select2-type").select2();
+
+                //初始化页面按钮配置
+                tableModifyModal.find("input[name='buttonOptionSetting']").map(function (i,one) {
+                    //根据按钮类型返回按钮数据
+                    var type = $(one).data("type");
+                    var json = dataByButtonType(type);
+                    $(one).data("json",json);
+                })
+
+                //修改模态框的保存按钮名称,属性 type=save 新增 update 修改
+                tableModifyModal.find("[id='save']").data("type","save");
+                tableModifyModal.find("[id='save']").text("保存");
+                tableModifyModal.find("[id='tableModifyModalLabel']").text("计划新增");
+                //from 表单验证
+                formValidatorModal(tableModifyModal);
+                //模态框按钮事件 保存or修改
+                saveOrUpdateModal(tableModifyModal);
+            });
+
+
+        });
+
+        function formValidatorModal(div) {
+            div.find('.modalForm').bootstrapValidator({
+                // I am validating Bootstrap form
+                framework: 'bootstrap',
+
+                // Feedback icons
+                icon: {
+                    valid: 'glyphicon glyphicon-ok',
+                    invalid: 'glyphicon glyphicon-remove',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                fields: {
+                    modalName: {
+                        message: '方案名称验证失败',
+                        validators: {
+                            notEmpty: {
+                                message: '方案名称不能为空'
+                            },
+                        }
+                    },
+                    dbManagerName: {
+                        message: '数据库连接名称验证失败',
+                        validators: {
+                            notEmpty: {
+                                message: '数据库连接名称不能为空'
+                            },
+                        }
+                    },
+                    tableName: {
+                        message: '表名称验证失败',
+                        validators: {
+                            notEmpty: {
+                                message: '表名称不能为空'
+                            },
+                        }
+                    },
+                    className: {
+                        message: '类名称验证失败',
+                        validators: {
+                            notEmpty: {
+                                message: '类名称不能为空'
+                            },
+                        }
+                    },
+                    functionName: {
+                        message: '功能名称验证失败',
+                        validators: {
+                            notEmpty: {
+                                message: '功能名称不能为空'
+                            },
+                        }
+                    },
+                    moduleName: {
+                        message: '模块名称验证失败',
+                        validators: {
+                            notEmpty: {
+                                message: '模块名称不能为空'
+                            },
+                        }
+                    },
+                    ifInheritBase: {
+                        message: '是否继承基本实体验证失败',
+                        validators: {
+                            notEmpty: {
+                                message: '是否继承基本实体不能为空'
+                            },
+                        }
+                    },
+                    category: {
+                        message: '生成方式验证失败',
+                        validators: {
+                            notEmpty: {
+                                message: '生成方式不能为空'
+                            },
+                        }
+                    },
+                    author: {
+                        message: '作者验证失败',
+                        validators: {
+                            notEmpty: {
+                                message: '作者不能为空'
+                            },
+                        }
+                    },
+                    version: {
+                        message: '版本验证失败',
+                        validators: {
+                            notEmpty: {
+                                message: '版本不能为空'
+                            },
+                        }
+                    },
+                }
+            })
+        }
+
+        function saveOrUpdateModal(div){
+            div.find("#save").on("click",function(){
+                var form = div.find('.modalForm');
+                var button = $(this);
+                var bootstrapValidator = form.data('bootstrapValidator');
+                bootstrapValidator.validate();
+                if(bootstrapValidator.isValid()){
+                    //数据操作方式
+                    var opType = button.data("type");
+                    //查找是select2的字段并赋值
+                    var obj = {};
+                    obj.opType = opType;
+                    var chkbox = form.find("input[name='ifInheritBaseCheck']");
+                    if (chkbox[0].checked) {
+                        obj.ifInheritBase=0;
+                    }else{
+                        obj.ifInheritBase=1;
+                    }
+                    obj.planId = $("input[name='genPlan']").val();
+                    obj.selectSectionList = [];
+                    $("#selectOption").children().map(function (i,one) {
+                        var input = $(one).find("input").eq(0);
+                        var json = input.data("json");
+                        obj['selectSectionList['+i+'].name'] = json.name;
+                        obj['selectSectionList['+i+'].elementType'] = json.elementType;
+                        obj['selectSectionList['+i+'].sqlName'] = json.sqlName;
+                        obj['selectSectionList['+i+'].selectName'] = json.selectName;
+                        obj['selectSectionList['+i+'].selectType'] = json.selectType;
+                        obj['selectSectionList['+i+'].showType'] = json.showType;
+                        obj['selectSectionList['+i+'].dictionaryDate'] = json.dictionaryDate;
+                    })
+                    obj.buttonSectionList= [];
+                    $("#buttonOption").children().map(function (i,one) {
+                        var input = $(one).find("input").eq(0);
+                        var json = input.data("json");
+                        obj['buttonSectionList['+i+'].elementType'] = json.elementType;
+                        obj['buttonSectionList['+i+'].buttonName'] = json.buttonName;
+                        obj['buttonSectionList['+i+'].buttonPermission'] = json.buttonPermission;
+                        obj['buttonSectionList['+i+'].buttonType'] = json.buttonType;
+                    })
+                    obj.dataTableSectionList= [];
+                    $("#tableOption").children().map(function (i,one) {
+                        var input = $(one).find("input").eq(0);
+                        var json = input.data("json");
+                        obj['dataTableSectionList['+i+'].elementType'] = json.elementType;
+                        obj['dataTableSectionList['+i+'].sqlName'] = json.sqlName;
+                        obj['dataTableSectionList['+i+'].name'] = json.name;
+                        obj['dataTableSectionList['+i+'].dataName'] = json.dataName;
+                    })
+                    //console.log(obj);
+                    $.ajax({
+                        url: urlPath+'/gen/genTableModal/modify',
+                        type: 'POST',
+                        data: $.param(obj) + '&' + form.serialize(),
+                        success: function (data, status) {
+                            if(data.status=='success'){
+                                //操作成功 弹出提示信息 然后关闭弹出框 重新刷新list 页面
+                                base_alert_success_time(data.msg,1000,function(){
+                                    div.modal('hide');
+                                    refreshTableModal();
+                                })
+                            }else{
+                                //操作失败 弹出提示信息
+                                base_alert_time(data.msg,1000);
+                            }
+                        }
+                    });
+                }
+            })
+        }
+
+        function ajaxDelectModal(ids) {
+            $.ajax({
+                url: urlPath+'/gen/genTableModal/deleteGenTableModal',
+                type: 'POST',
+                dataType: 'json',
+                data: {'ids': ids,'virtual':'true'},
+                success: function (data, status) {
+                    if (data.status == 'success') {
+                        //操作成功 弹出提示信息 重新刷新list 页面
+                        base_alert_success_time(data.msg, 1000, function () {
+                            refreshTableModal();
+                        })
+                    } else {
+                        //操作失败 弹出提示信息
+                        base_alert_time(data.msg, 1000);
+                    }
+                }
+            })
+        }
+        
+        function findDBTable(obj) {
+            $.ajax({
+                url: urlPath+'/gen/genDB/tableAll',
+                type: 'POST',
+                dataType: 'json',
+                async:false,
+                data: {'id': $(obj).val()},
+                success: function (data, status) {
+                    if (data.status == 'success') {
+                        selectTypeList = data.object.selectType.fieldList;
+                        showTypeList = data.object.showType.fieldList;
+                        var html ='<option value="">请选择</option>';
+                        for(var i=0;i<data.list.length;i++){
+                            html+='<option value="'+data.list[i].tableName+'">'+data.list[i].tableName+'</option>'
+                        }
+                        $("#tableModifyModal").find("select[id='tableName']").html(html);
+                    } else {
+                        //操作失败 弹出提示信息
+                        base_alert_time(data.msg, 1000);
+                    }
+                }
+            })
+        }
+        
+        function findDBTableColumn(obj) {
+            var name = $("#tableModifyModal").find("select[name='dbId'] option:selected").text();
+            var dbId = $("#tableModifyModal").find("select[name='dbId']").val();
+            $.ajax({
+                url: urlPath+'/gen/genDB/tableColumnAll',
+                type: 'POST',
+                dataType: 'json',
+                async:false,
+                data: {'dbMangerName': name,tableName:$(obj).val(),dbId:dbId},
+                success: function (data, status) {
+                    if (data.status == 'success') {
+                        console.log(data.list);
+                        var html ='<div class="list-group" id="columnList">';
+                        for(var i=0;i<data.list.length;i++){
+                            html+='<div class="list-group-item node-modelTree" data-type="'+data.list[i].dataType+'" data-comments="'+data.list[i].columnComment+'">'+data.list[i].columnName+'</div>';
+                        }
+                        html+= '</div>';
+                        $("#tableCoulumList").html(html);
+                        //添加拖拽
+                        dragDrop();
+                    } else {
+                        //操作失败 弹出提示信息
+                        base_alert_time(data.msg, 1000);
+                    }
+                }
+            })
+        }
+        
+        function dragDrop() {
+            dragula([columnList, selectOption,buttonOption,tableOption],{copy: true,copySortSource:true,
+                accepts:function(el, target, source, sibling){
+                    var targetId = ($(target).attr("id"));
+                    var sourceId = ($(source).attr("id"));
+                    if(sourceId=='buttonOption'){
+                        return false;
+                    }
+                    return true;
+                }
+            }).on('drag', function (el,source) {
+                //console.log(el);
+            }).on('drop', function (el,target,source,sibling) {
+                var targetId = ($(target).attr("id"));
+                var sourceId = ($(source).attr("id"));
+                //搜索项name 不能有重复 因为搜索的名称与验证保存有关 如有特殊请手动修改页面
+                var name = tranformName($(el).html());
+                if($(target).find("input[name='"+name+"']").length>0){
+                    $(el).remove();
+                    base_alert_time("该元素已经存在", 1000);
+                }else{
+                    if(targetId =='selectOption'&&sourceId =='columnList'){
+                        //数据库类型
+                        var type = $(el).data("type");
+                        //根据类型找出对应的显示方式 查询方式 然后把结果写到隐藏区域
+                        // varchar 数据 查询方式 ==  显示方式文本框
+                        var json = {};
+                        json.sqlName = $(el).html();
+                        json.name=name;
+                        json.elementType=1;
+                        json.selectName=$(el).data("comments");
+                        json.selectType='==';
+                        json.showType="input"
+                        if(type=='timestamp'||type=='datetime'){
+                            json.showType="date"
+                        }
+                        var input = $("<input type='button'value='设置' name='"+name+"' onclick='selectSetting(this)'/>");
+                        var del = $("<input type='button'value='删除' onclick='removeSetting(this)'/>");
+                        input.data("json",json);
+                        $(el).html(name);
+                        $(el).append(input);
+                        $(el).append(del);
+                    }else if(sourceId=='buttonOption'){
+                        return false;
+                    }else if(targetId =='tableOption'&&sourceId =='columnList'){
+                        //数据库类型
+                        var type = $(el).data("type");
+                        var json = {};
+                        json.name=name;
+                        json.sqlName = $(el).html();
+                        json.elementType=3;
+                        json.dataName = $(el).data("comments");
+                        var input = $("<input type='button'value='设置' name='"+name+"' onclick='dataSetting(this)'/>");
+                        var del = $("<input type='button'value='删除' onclick='removeSetting(this)'/>");
+                        input.data("json",json);
+                        $(el).html(name);
+                        $(el).append(input);
+                        $(el).append(del);
+                    }
+                }
+            });
+        }
+        
+        function selectSetting(obj) {
+            var selectSettingModal = $("#selectSettingModal");
+            selectSettingModal.modal({
+                keyboard: false
+            });
+            selectSettingModal.find("select[id='selectType']").html(makeSelectType());
+            selectSettingModal.find("select[id='showType']").html(makeShowType());
+            selectSettingModal.find(".select2-type").select2();
+            //默认选中
+            var json = $(obj).data("json");
+            selectSettingModal.find("input[id='selectName']").val(json.selectName);
+            selectSettingModal.find("select[id='selectType']").val(json.selectType).trigger("change");
+            selectSettingModal.find("select[id='showType']").val(json.showType).trigger("change");
+            //保存事件
+            selectSettingModal.find("[id='save']").on('click',function () {
+                var json = {};
+                json.name=name;
+                json.selectName=selectSettingModal.find("input[id='selectName']").val();
+                json.selectType=selectSettingModal.find("select[id='selectType']").val();
+                json.showType=selectSettingModal.find("select[id='showType']").val();
+                json.dictionaryDate = selectSettingModal.find("select[id='dictionaryDate']").val();
+                $(obj).data("json",json);
+                selectSettingModal.modal('hide');
+            });
+        }
+        
+        function buttonSetting(obj) {
+            var buttonSettingModal = $("#buttonSettingModal");
+            buttonSettingModal.modal({
+                keyboard: false
+            });
+            buttonSettingModal.find(".select2-type").select2();
+            //根据按钮类型返回按钮数据
+            var json = $(obj).data("json");
+            buttonSettingModal.find("input[id='buttonName']").val(json.buttonName);
+            buttonSettingModal.find("select[id='buttonType']").val(json.buttonType).trigger("change");
+            buttonSettingModal.find("input[id='buttonPermission']").val(json.buttonPermission);
+            //保存事件
+            buttonSettingModal.find("[id='save']").on('click',function () {
+                var json = {};
+                json.buttonName=buttonSettingModal.find("input[id='buttonName']").val();
+                json.buttonType=buttonSettingModal.find("select[id='buttonType']").val();
+                json.buttonPermission=buttonSettingModal.find("input[id='buttonPermission']").val();
+                $(obj).data("json",json);
+                buttonSettingModal.modal('hide');
+            });
+        }
+        
+        function dataSetting(obj) {
+            var dataSettingModal = $("#dataSettingModal");
+            dataSettingModal.modal({
+                keyboard: false
+            });
+            dataSettingModal.find(".select2-type").select2();
+            //根据按钮类型返回按钮数据
+            var json = $(obj).data("json");
+            dataSettingModal.find("input[id='dataName']").val(json.dataName);
+            //保存事件
+            dataSettingModal.find("[id='save']").on('click',function () {
+                json.dataName=dataSettingModal.find("input[id='dataName']").val();
+                $(obj).data("json",json);
+                dataSettingModal.modal('hide');
+            });
+        }
+
+        function bascDiv(obj) {
+            var html = "";
+            html+='<div class="list-group-item node-modelTree" data-type="varchar" data-comments="部门代码">'+obj.sqlName;
+            html+='    <input type="button" value="设置" name="'+obj.name+'" onclick="';
+            if(obj.elementType==1) {
+                html += ' selectSetting(this)';
+            }else if(obj.elementType==3){
+                html += ' dataSetting(this)';
+            }
+            html+=' ">';
+            html+='    <input type="button" value="删除" onclick="removeSetting(this)">';
+            html+='</div>';
+            return html;
+        }
+        
+        function dataByButtonType(type) {
+            var json ={};
+            json.elementType=2;
+            switch(type){
+                case 1:
+                    json.buttonName='查询';
+                    json.buttonType='1';
+                    json.buttonPermission='modal:class:view';
+                    break;
+                case 2:
+                    json.buttonName='新增';
+                    json.buttonType='2';
+                    json.buttonPermission='modal:class:edit';
+                    break;
+                case 3:
+                    json.buttonName='批量删除';
+                    json.buttonType='3';
+                    json.buttonPermission='modal:class:edit';
+                    break;
+                case 4:
+                    json.buttonName='导入';
+                    json.buttonType='4';
+                    json.buttonPermission='modal:class:import';
+                    break;
+                case 5:
+                    json.buttonName='导出';
+                    json.buttonType='5';
+                    json.buttonPermission='modal:class:export';
+                    break;
+            }
+            return json;
+        }
+
+        function removeSetting(obj) {
+            $(obj).closest("div").remove();
+        }
+        
+        function makeSelectType() {
+            var html ='<option value="">请选择</option>';
+            for(var i=0;i<selectTypeList.length;i++){
+                html+='<option value="'+selectTypeList[i].value+'">'+selectTypeList[i].label+'</option>';
+            }
+            return html;
+        }
+
+        function makeShowType() {
+            var html ='<option value="">请选择</option>';
+            for(var i=0;i<showTypeList.length;i++){
+                html+='<option value="'+showTypeList[i].value+'">'+showTypeList[i].label+'</option>';
+            }
+            return html;
+        }
+
+        ]]>
+    </script>
+</section>
+</body>
+</html>

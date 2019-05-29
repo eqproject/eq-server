@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>service</name>
+	<filePath>${serviceLocation}</filePath>
+	<fileName>${className}Service.java</fileName>
+	<content><![CDATA[
+/**
+ *  该类有generator 自动生成
+ * Copyright &copy; 2017-2018 All rights reserved.
+ */
+package ${servicePackage};
+
+import ${entityPackage}.${className};
+import ${entityPackage}.${className}Example;
+import cn.bubi.basic.common.base.ServiceExtend;
+
+/**
+ * ${functionName}Service
+ * @author ${author}
+ * @version ${version}
+ */
+public interface ${className}Service extends ServiceExtend<${className},${className}Example> {
+
+}
+]]>
+    </content>
+</template>

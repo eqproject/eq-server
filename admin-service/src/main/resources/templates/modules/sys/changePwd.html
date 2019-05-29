@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  xmlns:security="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+	<title>密码修改</title>
+	<meta charset="utf-8"/>
+</head>
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="pwdModal" tabindex="-1" role="dialog" data-backdrop="static">
+    <form id="pwdForm" class="modalForm" role="form" method="post">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span></button>
+                    <h4 class="modal-title" id="modifyModalLabel">密码修改</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" th:value="${userId}" name="userId" id="userId"/>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">原密码：</span>
+                            <input type="password" class="form-control pwd" name="oldPwd" placeholder="请输入原密码">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">密码：</span>
+                            <input type="password" class="form-control pwd" name="pw" placeholder="请输入密码">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">确认密码：</span>
+                            <input type="password" class="form-control pwd" name="rePwd" placeholder="请再次输入密码">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                    <button id="save" type="button" class="btn btn-primary" data-type="save">保存</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script th:inline="javascript">
+	$(function() {
+        var pwdModal = $("#pwdModal");
+        pwdModal.modal({
+            keyboard: false
+        })
+
+		formValidatorPwd(pwdModal);
+        saveOrUpdatePwd(pwdModal);
+	});
+	function formValidatorPwd(div) {
+        div.find('.modalForm').bootstrapValidator({
+            // I am validating Bootstrap form
+            framework: 'bootstrap',
+
+            // Feedback icons
+            icon: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+			fields : {
+				oldPwd:{
+                    message : '原密码错误',
+					validators : {
+						notEmpty : {
+							message : '请填写原密码'
+						},
+                        remote : {
+                            url : urlPath+'/sys/sysUser/validPwd?id='+$("#userId").val(),
+                            message : '原密码错误',
+                            delay:1000,//设置多久验证一次，默认是每输入一个字符就验证。
+                            type:'GET'
+                        }
+					}
+				},
+				pw:{
+                    message:'密码非法',
+                    validators:{
+                        notEmpty:{
+                            message:'密码不能为空'
+                        },
+                        stringLength:{
+                            max:20,
+                            message:'密码长度不超过20位'
+                        },
+                        identical:{ //相同性检测
+                            field:'rePwd',//需要验证的field
+                            message:'两次密码输入不一致'
+                        },
+                        regexp:{//基于正则表达是的验证
+                            regexp:/^[a-zA-Z0-9_\.]+$/,
+                            message:'密码由数字字母下划线和.组成'
+                        }
+                    }
+                },
+                rePwd:{
+                    message:'密码非法',
+                    validators:{
+                        notEmpty:{
+                            message:'密码不能为空'
+                        },
+                        identical:{
+                            field:'pw',
+                            message:'两次密码输入不一致'
+                        },
+                    }
+                }
+			}
+		})
+    }
+
+    function saveOrUpdatePwd(div) {
+        div.find("#save").on("click", function () {
+            var form = div.find('.modalForm');
+            var button = $(this);
+            var bootstrapValidator = form.data('bootstrapValidator');
+            bootstrapValidator.validate();
+            if (bootstrapValidator.isValid()) {
+                $.ajax({
+                    url: urlPath + '/sys/sysUser/saveNewPwd',
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function (data, status) {
+                        if (data.status == 'success') {
+                            div.modal('hide');
+                            base_alert_time(data.msg, 1000);
+                            base_alert_success_time(data.msg, 1000,function () {
+                                window.location.href = urlPath+"/logout";
+                            })
+                        } else {
+                            //操作失败 弹出提示信息
+                            base_alert_time(data.msg, 1000);
+                        }
+                    }
+                });
+            }
+        })
+    }
+</script>
+</body>
+</html>

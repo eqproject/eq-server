@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">
+		<section th:fragment="head (userInfo)">
+			<header class="main-header">
+				<!-- Logo -->
+				<a th:href="@{/}" class="logo">
+					<!-- mini logo for sidebar mini 50x50 pixels -->
+					<span class="logo-mini">
+						<img alt="" th:src="@{/static/common/img/logo.png}" width="40px" height="35px" />
+					</span>
+					<span class="logo-lg">基础管理系统</span>
+				</a>
+
+				<!-- Header Navbar: style can be found in header.less -->
+				<nav class="navbar navbar-static-top">
+					<!-- Sidebar toggle button-->
+					<a th:href="@{#}" class="sidebar-toggle" data-toggle="push-menu" role="button">
+						<span class="sr-only">Toggle navigation</span>
+					</a>
+					<!-- Navbar Right Menu -->
+					<div class="navbar-custom-menu">
+						<ul class="nav navbar-nav">
+							<!-- Messages: style can be found in dropdown.less-->
+							<li class="dropdown index-menu">
+					            <a th:href="@{/}">
+					                <i class="glyphicon glyphicon-home"></i>
+					            </a>
+					        </li>
+							<li class="dropdown user user-menu">
+                                <a th:href="@{#}" class="dropdown-toggle" data-toggle="dropdown">
+                                    <img th:src="@{/static/common/img/user2-160x160.jpg}" class="user-image" />
+                                    <span class="hidden-xs"	th:text="${userInfo.user.lnm}"></span>
+							    </a>
+								<ul class="dropdown-menu">
+									<!-- User image -->
+									<li class="user-header">
+                                        <img id="user-header" th:src="@{/static/common/img/user2-160x160.jpg}" class="img-circle" alt="User Image" />
+										<p th:text="${userInfo.user.lnm}"></p>
+                                    </li>
+									<li class="user-footer">
+										<div class="pull-left">
+											<a id="systemsettingBtn" th:onclick="'javascript:changePwd('+${userInfo.user.id}+');'" class="btn btn-default btn-flat">修改密码</a>
+											<script th:inline="javascript">
+                                                function changePwd(id) {
+                                                    loadPage(urlPath+"/changePwd?userId=" + id,$("#changePwdPage"));
+                                                }
+											</script>
+										</div>
+										<div class="pull-right">
+											<a th:href="@{/logout}" class="btn btn-default btn-flat">注销</a>
+										</div>
+									</li>
+								</ul>
+                            </li>
+						</ul>
+					</div>
+				</nav>
+			</header>
+			<div id="modalDiv">
+				<div id="changePwdPage"></div>
+				<section th:replace="modules/sys/fileUpload :: fileUpload"></section>
+			</div>
+		</section>
+		<section th:fragment="left (userInfo)">
+			<!-- 		导航 -->
+			<!-- Left side column. contains the logo and sidebar -->
+			<aside class="main-sidebar">
+				<section class="sidebar">
+					<ul class="sidebar-menu" data-widget="tree">
+						<li class="header">导航</li>
+						<li th:class="${menu.hasChildMenu eq true}?'treeview':''" th:each="menu,menuIndex:${userInfo.menuList}" th:if="${menu.isShow=='1'}">
+                            <a	th:attr="data-url=(${menu.href}?${menu.href}:'#')" href="#">
+                                <i th:class="${menu.icon}?${menu.icon}:'fa fa-share'"></i>
+                                <span th:text="${menu.name}"></span>
+                                <span class="pull-right-container" th:if="${menu.hasChildMenu eq true}">
+                                    <i class="fa fa-angle-left pull-right"></i>
+							    </span>
+						    </a>
+							<ul class="treeview-menu" th:if="${menu.hasChildMenu eq true}">
+								<li th:each="menu1,menuIndex1:${menu.childMenuList}" th:if="${menu1.isShow=='1'}" th:class="${menu1.hasChildMenu eq true}?'treeview':''">
+                                    <a th:attr="data-url=(${menu1.href}?${menu1.href}:'#')" href="#">
+                                        <i th:class="${menu1.icon}?${menu1.icon}:'fa fa-angle-right'"></i>
+										<span th:text="${menu1.name}"></span>
+                                        <span class="pull-right-container" th:if="${menu1.hasChildMenu eq true}">
+                                            <i class="fa fa-angle-left pull-right"></i>
+									    </span>
+								    </a>
+									<ul class="treeview-menu" th:if="${menu1.hasChildMenu eq true}">
+										<li th:each="menu2,menuIndex2:${menu1.childMenuList}" th:if="${menu2.isShow=='1'}" th:class="${menu2.hasChildMenu eq true}?'treeview':''">
+                                            <a th:attr="data-url=(${menu2.href}?${menu2.href}:'#')" href="#">
+                                                <i class="fa fa-circle-o"></i>
+                                                <span th:text="${menu2.name}"></span>
+												<span class="pull-right-container" th:if="${menu2.hasChildMenu eq true}">
+                                                    <i class="fa fa-angle-left pull-right"></i>
+											    </span>
+										    </a>
+											<ul class="treeview-menu" th:if="${menu2.hasChildMenu eq true}">
+												<li th:each="menu3,menuIndex3:${menu2.childMenuList}" th:if="${menu3.isShow=='1'}" th:class="${menu3.hasChildMenu eq true}?'treeview':''">
+                                                    <a th:attr="data-url=(${menu3.href}?${menu3.href}:'#')"  href="#">
+                                                        <i class="fa fa-circle-o"></i>
+                                                        <span th:text="${menu3.name}"></span>
+														<span class="pull-right-container" th:if="${menu3.hasChildMenu eq true}">
+                                                            <i class="fa fa-angle-left pull-right"></i>
+													    </span>
+												    </a>
+													<ul class="treeview-menu" th:if="${menu3.hasChildMenu eq true}">
+														<li th:each="menu4,menuIndex4:${menu3.childMenuList}" th:if="${menu4.isShow=='1'}" th:class="${menu4.hasChildMenu eq true}?'treeview':''">
+                                                            <a th:attr="data-url=(${menu4.href}?${menu4.href}:'#')"  href="#">
+                                                                <i class="fa fa-circle-o"></i>
+                                                                <span th:text="${menu4.name}"></span>
+                                                                <span class="pull-right-container" th:if="${not #lists.isEmpty(menu4.childMenuList)}">
+                                                                    <i class="fa fa-angle-left pull-right"></i>
+															    </span>
+                                                            </a>
+                                                        </li>
+													</ul>
+                                                </li>
+											</ul>
+                                        </li>
+									</ul>
+                                </li>
+							</ul>
+                        </li>
+					</ul>
+				</section>
+			</aside>
+		</section>
+
+		<section th:fragment="content">	</section>
+
+		<section th:fragment="footer">
+			<!-- /.content-wrapper -->
+			<footer class="main-footer">
+				<div class="pull-right hidden-xs">
+					<b>Version</b> 2.0.0
+				</div>
+				<strong>Copyright © 2017-2018 <a href="#">北京鲁邦斯特信息技术有限公司</a>.
+				</strong> All rights reserved.
+			</footer>
+		</section>
+	</div>
+</body>
+</html>

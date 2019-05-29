@@ -1,0 +1,71 @@
+/*footer*/
+.footerBox{text-align:center;margin-top:50px;}
+.footerBox p{text-align:center}
+/*page searchform*/
+div.dataTables_filter{padding:10px; text-align:left}
+div.dataTables_filter input[type="text"],div.dataTables_filter input[type="select"]{width:100%;margin-left:0}
+.form-inline .control-label{padding:6px 15px;}
+.form-inline .form-group{margin-bottom:10px; width:33%;}
+.select2-container--default .select2-selection--single{border:1px solid #d2d6de;border-radius:0;height:34px; }
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #e4e4e4;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    cursor: default;
+    float: left;
+    margin-right: 5px;
+    margin-top: 5px;
+    padding: 0 5px;
+    color: #555;
+}
+
+
+.form-horizontal .form-group{margin-left:0;margin-right:0}
+.operateBox {margin:20px 0;clear:both;}
+.datepicker {
+   padding:6px 12px;
+   border-radius: 0;
+}
+.form-inline #bussinessClass,.form-inline .selectBox,.form-inline .form-control{width: 100%;}
+.cBox{padding:5px 0px 0px 10px;}
+.borderGroup{width:100%;float:left;border:1px solid #ccc;padding:6px 12px; height:34px;}
+
+/*閿熸枻鎷烽敓鏂ゆ嫹鎸囬敓鏂ゆ嫹閿熸枻鎷烽敓鏂ゆ嫹閿燂拷*/
+.dictMsg .control-label{padding:6px 0px}
+.dictMsg h5{ border-left:5px solid #ddd;padding-left:5px}
+
+.form-signin .form-control-feedback{right:10px;}
+
+.checkboxDiv{border-left:1px solid #ddd;padding:6px 12px;display: inline-block}
+
+@media only screen and (min-width :375px) and (max-width:767px){
+	.form-inline .form-group{margin-bottom:10px; width:100%;}
+	
+}
+/* 璁剧疆缂哄皯鐨勫彸渚ц竟妗�*/
+.r-border:first-child{border-right:1px solid #d2d6de;}
+/* 涓嬫媺鏍戞牱寮�*/
+.parentTree{position:relative; z-index:9999}
+.parentTree .treeBox{ position:absolute;top:30px; left:99px;width:471px; /* display:none; */}
+
+/**/
+.form-twoColum .form-group{width:49%}
+.form-twoColum .dateInput{ width:47%;}
+.form-twoColum .cLine{width:4%;display:inline-block;text-align:center}
+
+
+.form-inline .input-group .input-group-addon, .form-inline .input-group .input-group-btn{ width:41%;}
+.form-inline .form-group{width:31%;float:left;margin:0px 1% 10px;}
+.form-inline .form-group .checkbox{height:25px;border-left:1px solid #ddd;}
+.form-inline .aloneBox{width:97%;float:none;clear:both;}
+.form-inline .aloneBox .input-group,.form-inline .aloneBox .input-group textarea{width:100%;}
+.form-inline .aloneBox .input-group .input-group-addon{width:13%;}
+.form-inline .input-group{width:100%;position:relative;}
+.modalBox{width:1000px;}
+.treeBox {position: absolute;width:59%;top:40px;left:41%;z-index: 999;}
+
+.moreConBox{width:100%;}
+.moreConBox tr td{width:170px;}
+.moreConBox tr td:first-child {width:400px;}
+.moreConBox tr td:nth-of-type(3) {width:100px;}
+.moreConBox tr td:nth-of-type(7) {width:300px;}

@@ -1,0 +1,12 @@
+接入方式：HTTP-57SMS协议(0169-SMS-软维接口-HTTP)
+下发地址：http://120.77.53.47:7862/sms?action=send
+报告地址：http://120.77.53.47:7862/sms?action=report
+上行地址：http://120.77.53.47:7862/sms?action=mo
+余额地址：http://120.77.53.47:7862/sms?action=overage
+
+账号：900592
+客户端登录密码：rFA6ex
+接口密码：cWE5D4
+接入码：106905
+最大流量：200条/秒
+最大连接数：1

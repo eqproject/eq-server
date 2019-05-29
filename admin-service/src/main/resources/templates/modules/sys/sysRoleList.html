@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:security="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title>角色维护</title>
+    <meta charset="utf-8"/>
+</head>
+<body>
+<section th:fragment="content">
+    <section class="content-header">
+        <h1>角色维护
+            <small>系统角色信息</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> 权限功能</a></li>
+            <li class="active">角色维护</li>
+        </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">角色列表</h3>
+                    </div>
+                    <div class="box-body">
+                        <form id="searchForm" class="form-inline" method="post">
+                            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                            <div class="form-group col-md-4 col-sm-12">
+                                <label class="col-sm-4 control-label">角色名称：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" id="name" name="name" maxlength="50">
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4 col-sm-12">
+                                <label class="col-sm-4 control-label">角色类型：</label>
+                                <div class="col-sm-8">
+                                    <select class="select2-type select2-choice" id="type" style="width: 100%;">
+                                        <option value="">请选择</option>
+                                        <option th:each="roleType:${roleTypeList}" th:value="${roleType.value}"
+                                                th:text="${roleType.label}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label" for="type">角色状态：</label>
+                                <div class="col-sm-8">
+                                    <select class="select2-type select2-choice" id="status" name="status"
+                                            style="width: 100%;">
+                                        <option value="">请选择</option>
+                                        <option value="0">启用</option>
+                                        <option value="1">禁用</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="text-center operateBox">
+                                <input id="select" class="btn btn-primary" th:if="${#authorization.expression('hasRole(''sys:role:view'')')}" type="button" value="查询"/>
+                                <input id="add" class="btn btn-primary" th:if="${#authorization.expression('hasRole(''sys:role:edit'')')}" type="button" value="新增"/>
+                            </div>
+                        </form>
+                        <div id="dict_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                            <div class="row">
+                                <div class="col-sm-6"></div>
+                                <div class="col-sm-6"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table id="roleTable" class="table table-bordered table-hover dataTable"
+                                           role="grid" aria-describedby="dict_info">
+                                        <thead>
+                                        <tr>
+                                            <th>角色名称</th>
+                                            <th>角色类型</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="modifyModal" tabindex="-1" role="dialog" data-backdrop="static">
+        <form id="modifyForm" class="modalForm" role="form" method="post">
+            <div class="modal-dialog" style="width:700px">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span></button>
+                        <h4 class="modal-title" id="modifyModalLabel">角色添加</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input id="id" name="id" type="hidden" value="">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">角色名称：</span>
+                                <input type="text" class="form-control" id="name" name="name" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">角色类型：</span>
+                                <select class="select2-type select2-choice" id="type" name="type" style="width: 100%;">
+                                    <option value="">请选择</option>
+                                    <option th:each="roleType:${roleTypeList}" th:value="${roleType.value}"
+                                            th:text="${roleType.label}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon r-border">是否禁用：</span>
+                                <div class="switch switch-small" style="margin-left: 10px;">
+                                    <input id="status" name="status" type="checkbox" class="checkbox">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box">
+                            <div class="box-body">
+                                <div id="child_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                                    <div class="row">
+                                        <div class="col-sm-6"></div>
+                                        <div class="col-sm-6"></div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12" id="tableDiv">
+                                            <table id="menuTable" class="table table-bordered table-hover dataTable"
+                                                   role="grid" aria-describedby="menu_info">
+                                                <thead>
+                                                <tr role="row">
+                                                    <th>菜单名称</th>
+                                                    <th>菜单编码</th>
+                                                    <th>是否隐藏</th>
+                                                    <th>权限标识</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody id="treeTableList"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                        <button id="save" type="button" class="btn btn-primary" data-type="save">确定</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+<script type="text/javascript">
+
+    var roleTable = null;
+    var cloneTable = $('#menuTable').clone();//table 的一个副本
+
+    /* 页面加载完操作 */
+    $(document).ready(function () {
+        /* 数据初始化 */
+        //初始化下拉选
+        $("#searchForm").find(".select2-type").select2();
+        //初始化表格
+        roleTable = initDataTable();
+
+        /* 搜索按钮事件 */
+        //查询
+        $("#select").on("click", function () {
+            roleTable.ajax.reload();
+        });
+
+        //新增
+        $("#add").on("click", function () {
+            var modifyModal = $("#modifyModal");
+            modifyModal.modal({
+                keyboard: false
+            })
+            initTreeTable();
+            modifyModal.find(".select2-type").select2();
+            //修改模态框的保存按钮名称,属性 type=save 新增 update 修改
+            modifyModal.find("[id='save']").data("type", "save");
+            modifyModal.find("[id='save']").text("保存");
+            modifyModal.find("[id='modifyModalLabel']").text("角色新增");
+            //from 表单验证
+            formValidator(modifyModal);
+            //模态框按钮事件 保存or修改
+            saveOrUpdate(modifyModal);
+        });
+    });
+
+    function addRow(rootId, menuTree) {
+        var tr = '';
+        for (var i = 0; i < menuTree.length; i++) {
+            if (rootId == menuTree[i].parentId) {
+
+                tr += '<tr data-tt-id ="' + menuTree[i].id + '" data-tt-parent-id="' + menuTree[i].parentId + '">';
+                if (menuTree[i].name == null) {
+                    menuTree[i].name = '';
+                }
+                tr += '  <td nowrap><input type="checkbox" name="chkbox">' + menuTree[i].name + '</td>';
+                if (menuTree[i].sort == null) {
+                    menuTree[i].sort = '';
+                }
+                tr += '  <td nowrap>' + menuTree[i].code + '</td>';
+                if (menuTree[i].isShow == null) {
+                    menuTree[i].isShow = '';
+                }
+                tr += '  <td nowrap>' + menuTree[i].isShow + '</td>';
+                if (menuTree[i].permission == null) {
+                    menuTree[i].permission = '';
+                }
+                tr += '  <td nowrap>' + menuTree[i].permission + '</td>';
+                tr += '  </tr>';
+                tr += addRow(menuTree[i].id, menuTree);
+            }
+        }
+        return tr;
+    }
+
+    function initDataTable() {
+        var option = {
+            columnDefs: [{
+                targets: 1,
+                render: function (data, type, row, meta) {
+                    return dictionary['roleType'][data] || data;
+                }
+            }, {
+                orderable: false,
+                targets: 2,
+                render: function (data, type, row, meta) {
+                    var returnhtml = "";
+                    var isEdit = [[${#authorization.expression('hasRole(''sys:role:edit'')')}]];
+                    if (isEdit) {
+                        returnhtml += '<a href="#" id="update" name="update" data-id="' + row.id + '">修改</a>'
+                            + '  <a href="#" id="delete" name="delete" data-id="' + row.id + '" >删除</a>';
+                    }
+                    returnhtml += ' <a href="#" id="check" name="check" data-id="' + row.id + '"> 查看</a>';
+                    return returnhtml;
+
+                }
+            }],//第一列与最后一列禁止排序
+            order: [ [0, null] ],//第一列排序图标改为默认
+            ajax: {
+                url: urlPath + '/sys/sysRole/dataList',
+                data: function (d) {
+                    //添加额外的数据请求参数
+                    var form = $("#searchForm");
+                    d.name = form.find("input[name = 'name']").val();
+                    d.type = form.find("select[id='type']").val();
+                    d.status = form.find("select[name='status']").val();
+                }
+            },
+            columns: [
+                {data: 'name', name: 'name'},
+                {data: 'type', name: 'type'},
+                {}
+            ],
+            fnDrawCallback: function () {//加载完成后 初始化<a>操作
+
+                $("a[name='update']").map(function (i, one) {
+                    //绑定修改事件
+                    $(one).on("click", function () {
+                        //ajax 查询后台数据 放到模态框 修改模态框的保存按钮属性
+                        initTreeTable();
+                        $.ajax({
+                            url: urlPath + '/sys/sysRole/selectSysRole',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {id: $(this).data("id")},
+                            success: function (data, status) {
+                                if (data.status == 'success') {
+                                    var modifyModal = $("#modifyModal");
+                                    modifyModal.modal({
+                                        keyboard: false
+                                    })
+                                    var form = modifyModal.find(".modalForm");
+                                    var resultData = data.list[0];
+                                    form.find(".select2-type").select2();
+                                    form.find("input[name='id']").val(resultData.id);
+                                    form.find("input[name='name']").val(resultData.name);
+                                    form.find("select[id='type']").val(resultData.type).trigger("change");
+                                    form.find("input[name='status']").attr("checked", resultData.status == "1" ? true : false);
+
+                                    //修改模态框的保存按钮名称,属性 type=save 新增 update 修改
+                                    modifyModal.find("[id='save']").data("type", "update");
+                                    modifyModal.find("[id='save']").text("修改");
+                                    modifyModal.find("[id='modifyModalLabel']").text("角色修改");
+                                    checkMenu(resultData.sysRoleMenuList);
+                                    //from 表单验证
+                                    formValidator(modifyModal);
+                                    //模态框按钮事件 保存or修改
+                                    saveOrUpdate(modifyModal);
+                                } else {
+                                    //操作失败 弹出提示信息
+                                    base_alert_time(data.msg, 1000);
+                                }
+                            }
+                        });
+                    })
+                });
+
+                $("a[name='check']").map(function (i, one) {
+                    //绑定查看事件
+                    $(one).on("click", function () {
+                        var modifyModal = $("#modifyModal");
+                        modifyModal.modal({
+                            keyboard: false
+                        })
+                        modifyModal.find("[id='save']").remove();
+                        //ajax 查询后台数据 放到模态框 修改模态框的保存按钮属性
+                        initTreeTable();
+                        $.ajax({
+                            url: urlPath + '/sys/sysRole/selectSysRole',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {id: $(this).data("id")},
+                            success: function (data, status) {
+                                if (data.status == 'success') {
+
+                                    var form = modifyModal.find(".modalForm");
+                                    var resultData = data.list[0];
+                                    form.find(".select2-type").select2();
+                                    form.find("input[name='id']").val(resultData.id);
+                                    form.find("input[name='name']").val(resultData.name);
+                                    form.find("select[id='type']").val(resultData.type).trigger("change");
+                                    form.find("input[name='status']").attr("checked", resultData.status == "1" ? true : false);
+
+                                    //修改模态框的保存按钮名称,属性 type=save 新增 update 修改
+                                    modifyModal.find("[id='modifyModalLabel']").text("角色查看");
+                                    checkMenu(resultData.sysRoleMenuList);
+                                    form.find("input").attr("disabled", true);
+                                    form.find("select").attr("disabled", true);
+                                } else {
+                                    //操作失败 弹出提示信息
+                                    base_alert_time(data.msg, 1000);
+                                }
+                            }
+                        });
+                    })
+                });
+
+                $("a[name='delete']").map(function (i, one) {
+                    $(one).on("click",function(){
+                        base_confirm('确认要删除该角色吗?',function () {
+                            //获取所有选中的id 然后ajax 成功后返回信息 并刷新页面
+                            var ids = $(one).data("id");
+                            ajaxDelect(ids);
+                        })
+                    })
+                });
+            }
+        };
+        roleTable = initOriginalTable('roleTable', option);
+        return roleTable;
+    }
+
+    function treeTable() {
+        $("#menuTable").treetable({
+            expandable: true,
+            expandLevel: 2,
+            // initialState :"expanded"
+        });
+        //选中高亮
+        $("#menuTable tbody").on("mousedown", "tr", function () {
+            $(".bg-aqua").not(this).removeClass("bg-aqua");
+            $(this).toggleClass("bg-aqua");
+        });
+        //复选框事件
+        $("input[name='chkbox']").map(function (i, one) {
+            //绑定修改事件
+            $(one).on("click", function () {
+                var tr = $(one).closest("tr");
+                var chkbox = tr.find("input[name='chkbox']");
+                var ttid = tr.data("ttId");
+                //遍历所有的tr
+                $("#menuTable tbody tr").map(function (i, one) {
+                    if (ttid == $(one).data("ttParentId")) {
+                        var child = $(one).find("input[name='chkbox']");
+                        if (chkbox[0].checked) {
+                            $(child).prop("checked", true);
+                        } else {
+                            $(child).prop("checked", false);
+                        }
+                    }
+                })
+            })
+        });
+
+    }
+
+    function initTreeTable() {
+        //查询参数处理
+        var obj = {};
+        var form = $("#searchForm");
+        obj.name = form.find("input[name='name']").val();
+        obj.code = form.find("input[name='code']").val();
+        obj.permission = form.find("input[name='permission']").val();
+        //ajax 请求数据排序
+        $.ajax({
+            async: false,
+            url: urlPath + '/sys/sysMenu/dataList',
+            type: 'POST',
+            dataType: 'json',
+            data: $.param(obj),
+            success: function (data, status) {
+                if (data.status = 'success') {
+                    menuTree = data.list;
+                    var ids = [];
+                    rootIds = [];//根节点
+
+                    for (var i = 0; i < menuTree.length; i++) {
+                        ids.push(menuTree[i].id);
+                    }
+                    ids = ',' + ids.join(',') + ',';
+                    for (var i = 0; i < menuTree.length; i++) {
+                        if (ids.indexOf(',' + menuTree[i].parentId + ',') == -1) {
+                            if ((',' + rootIds.join(',') + ',').indexOf(',' + menuTree[i].parentId + ',') == -1) {
+                                rootIds.push(menuTree[i].parentId);
+                            }
+                        }
+                    }
+                    var tbody = "";
+                    for (var j = 0; j < rootIds.length; j++) {
+                        tbody += addRow(rootIds[j], menuTree)
+                    }
+
+                    $("#menuTable").remove();
+                    var myClone = cloneTable.clone(true);
+                    $('#tableDiv').append(myClone);
+                    $("#menuTable tbody").html(tbody);
+
+                    treeTable();
+                }
+            }
+        });
+    }
+
+    function checkMenu(data) {
+        $("#menuTable tbody tr").map(function (j, one) {
+            var child = $(one).find("input[name='chkbox']");
+            $(child).prop("checked", false);
+        });
+        if (data != null) {
+            for (var i = 0; i < data.length; i++) {
+                $("#menuTable tbody tr").map(function (j, one) {
+                    if ($(one).data("ttId") == data[i].menuId) {
+                        var child = $(one).find("input[name='chkbox']");
+                        $(child).prop("checked", true);
+                    }
+                })
+            }
+        }
+    }
+
+    function formValidator(div) {
+        div.find('.modalForm').bootstrapValidator({
+            // I am validating Bootstrap form
+            framework: 'bootstrap',
+
+            // Feedback icons
+            icon: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                name: {
+                    message: '角色名称验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '角色名称不能为空'
+                        }
+                    }
+                },
+                enname: {
+                    message: '英文名称验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '英文名称不能为空'
+                        }
+                    }
+                },
+                type: {
+                    message: '角色类型验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '角色类型不能为空'
+                        }
+                    }
+                },
+                dataScope: {
+                    message: '数据范围验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '数据范围不能为空'
+                        }
+                    }
+                },
+                code: {
+                    message: '编码验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '编码不能为空'
+                        }
+                    }
+                },
+                status: {
+                    message: '是否可用验证失败',
+                    validators: {}
+                },
+            }
+        });
+    }
+
+    function saveOrUpdate(div) {
+        div.find("#save").on("click", function () {
+            var form = div.find('.modalForm');
+            var button = $(this);
+            var bootstrapValidator = form.data('bootstrapValidator');
+            bootstrapValidator.validate();
+            if (bootstrapValidator.isValid()) {
+                //数据操作方式
+                var opType = button.data("type");
+                //查找是select2的字段并赋值
+                var obj = {};
+                obj.opType = opType;
+                //遍历出选择的菜单
+                var menuIds = '';
+                $("#menuTable tbody tr").map(function (j, one) {
+                    var chkbox = $(one).find("input[name='chkbox']");
+                    if (chkbox[0].checked) {
+                        if (menuIds == '') {
+                            menuIds += $(one).data("ttId");
+                        } else {
+                            menuIds += ',' + $(one).data("ttId");
+                        }
+                    }
+                });
+                obj.menuIds = menuIds;
+                obj.id = form.find("input[name='id']").val();
+                obj.name = form.find("input[name='name']").val();
+                obj.enname = form.find("input[name='enname']").val();
+                obj.type = form.find("select[id='type']").val();
+                obj.dataScope = form.find("select[id='dataScope']").val();
+                obj.code = form.find("input[name='code']").val();
+                obj.sort = form.find("input[name='sort']").val();
+                obj.code = form.find("input[name='code']").val();
+                if (form.find("input[name='status']").is(':checked')) {
+                    obj.status = 1;
+                } else {
+                    obj.status = 0;
+                }
+                $.ajax({
+                    url: urlPath + '/sys/sysRole/modify',
+                    type: 'POST',
+                    data: $.param(obj),
+                    success: function (data, status) {
+                        if (data.status == 'success') {
+                            //操作成功 弹出提示信息 然后关闭弹出框 重新刷新list 页面
+                            base_alert_success_time(data.msg, 1000, function () {
+                                div.modal('hide');
+                                //ajax 重新加载  第一个参数是回调函数 第二个参数是否 分页重置
+                                roleTable.ajax.reload(null, false);
+                            })
+                        } else {
+                            //操作失败 弹出提示信息
+                            base_alert_time(data.msg, 1000);
+                        }
+                    }
+                });
+
+            }
+        })
+    }
+
+    function ajaxDelect(ids) {
+        $.ajax({
+            url: urlPath + '/sys/sysRole/deleteSysRole',
+            type: 'POST',
+            dataType: 'json',
+            data: {'ids': ids,'virtual':'true'},
+            success: function (data, status) {
+                if (data.status == 'success') {
+                    //操作成功 弹出提示信息 重新刷新list 页面
+                    base_alert_success_time(data.msg, 1000, function () {
+                        roleTable.ajax.reload(null, false);
+                    })
+                } else {
+                    //操作失败 弹出提示信息
+                    base_alert_time(data.msg, 1000);
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

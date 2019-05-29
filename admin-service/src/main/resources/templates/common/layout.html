@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+    <section th:fragment="layout (urlPath)">
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <title>基础管理系统</title>
+        <meta name="_csrf" th:content="${_csrf.token}"/>
+        <!-- default header name is X-CSRF-TOKEN -->
+        <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" />
+
+        <link rel="stylesheet" th:href="@{/webjars/AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css}"/>
+
+        <!--图标 字库-->
+        <link rel="stylesheet" th:href="@{/webjars/AdminLTE/bower_components/font-awesome/css/font-awesome.css}"/>
+        <link rel="stylesheet" th:href="@{/webjars/AdminLTE/bower_components/Ionicons/css/ionicons.min.css}"/>
+        <!-- Theme style -->
+        <link rel="stylesheet" th:href="@{/webjars/AdminLTE/dist/css/AdminLTE.css}"/>
+        <!-- AdminLTE Skins. Choose a skin from the css/skins
+             folder instead of downloading all of them to reduce the load. -->
+        <link rel="stylesheet" th:href="@{/webjars/AdminLTE/dist/css/skins/_all-skins.min.css}"/>
+
+        <link rel="stylesheet" th:href="@{/webjars/AdminLTE/bower_components/select2/dist/css/select2.css}"/>
+
+        <!-- Date Picker -->
+        <link rel="stylesheet" th:href="@{/webjars/AdminLTE/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css}"/>
+        <!-- Daterange picker -->
+        <link rel="stylesheet" th:href="@{/webjars/AdminLTE/bower_components/bootstrap-daterangepicker/daterangepicker.css}"/>
+        <!-- bootstrap fileinput -->
+        <link rel="stylesheet" th:href="@{/webjars/bootstrap-fileinput/css/fileinput.min.css}"/>
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+          <!-- DataTables -->
+        <link rel="stylesheet" th:href="@{/webjars/AdminLTE/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css}"/>
+
+        <link rel="stylesheet" th:href="@{/webjars/bootstrapvalidator/css/bootstrapValidator.min.css}"/>
+
+        <link rel="stylesheet" th:href="@{/webjars/github-com-craftpip-jquery-confirm/dist/jquery-confirm.min.css}"/>
+
+        <!-- 拖拽插件 -->
+        <link rel="stylesheet" th:href="@{/webjars/dragula/dist/dragula.css}"/>
+
+        <!--公共样式-->
+        <link rel="stylesheet" th:href="@{/static/common/css/common.css}"/>
+
+        <script th:src="@{/webjars/AdminLTE/bower_components/jquery/dist/jquery.min.js}"></script>
+        <!-- jQuery UI 1.11.4 -->
+        <script th:src="@{/webjars/AdminLTE/bower_components/jquery-ui/jquery-ui.min.js}"></script>
+        <script>
+            $.widget.bridge('uibutton', $.ui.button);
+        </script>
+        <script th:src="@{/webjars/AdminLTE/bower_components/bootstrap/dist/js/bootstrap.min.js}" ></script>
+
+        <script th:src="@{/webjars/AdminLTE/bower_components/datatables.net/js/jquery.dataTables.js}"></script>
+        <script th:src="@{/webjars/AdminLTE/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js}"></script>
+
+        <!-- daterangepicker -->
+        <script th:src="@{/webjars/AdminLTE/bower_components/moment/min/moment.min.js}"></script>
+        <script th:src="@{/webjars/AdminLTE/bower_components/bootstrap-daterangepicker/daterangepicker.js}"></script>
+        <!-- datepicker -->
+        <script th:src="@{/webjars/AdminLTE/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js}"></script>
+        <script th:src="@{/webjars/AdminLTE/bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.zh-CN.min.js}"></script>
+
+        <script th:src="@{/webjars/AdminLTE/2.4.2/bower_components/select2/dist/js/select2.min.js}"></script>
+
+        <!-- treeTables -->
+        <link rel="stylesheet" th:href="@{/static/plugins/jQuery-treetable/jquery.treetable.css}" />
+        <link rel="stylesheet" th:href="@{/static/plugins/bootstrap-treeview/bootstrap-treeview.min.css}" />
+        <script th:src="@{/static/plugins/jQuery-treetable/jquery.treetable.js}"></script>
+        <script th:src="@{/static/plugins/bootstrap-treeview/bootstrap-treeview.min.js}"></script>
+
+        <script th:src="@{/webjars/bootstrapvalidator/js/bootstrapValidator.min.js}"></script>
+
+        <script th:src="@{/webjars/github-com-craftpip-jquery-confirm/dist/jquery-confirm.min.js}"></script>
+
+        <!-- bootstrap fileinput -->
+        <script th:src="@{webjars/bootstrap-fileinput/js/fileinput.min.js}"></script>
+        <script th:src="@{webjars/bootstrap-fileinput/js/locales/zh.js}"></script>
+
+        <!-- 拖拽插件 -->
+        <script th:src="@{/webjars/dragula/dist/dragula.js}"></script>
+
+        <!-- AdminLTE App -->
+        <script th:src="@{/webjars/AdminLTE/dist/js/adminlte.min.js}"></script>
+        <!-- AdminLTE for demo purposes -->
+        <script th:src="@{/webjars/AdminLTE/dist/js/demo.js}"></script>
+
+        <!-- 用于简化页面操作  -->
+        <script th:src="@{/static/common/js/common.js}"></script>
+        <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+        <!--<script>
+            window.ga=function(){ga.q.push(arguments)};ga.q=[];ga.l=+new Date;
+            ga('create','UA-XXXXX-Y','auto');ga('send','pageview')
+        </script>
+        <script src="https://www.google-analytics.com/analytics.js" async="async" defer="defer"></script>-->
+    </section>
+</body>
+</html>

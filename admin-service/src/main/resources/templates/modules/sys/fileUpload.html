@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  xmlns:security="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+	<title>文件上传</title>
+	<meta charset="utf-8"/>
+</head>
+<section th:fragment="fileUpload">
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="fileUploadModal" tabindex="-1" role="dialog" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span></button>
+                <h4 class="modal-title" id="modifyModalLabel">文件导入</h4>
+            </div>
+            <div class="modal-body">
+                <form id="downTemplateForm" class="form-inline" action="" method="post">
+                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                    <input type="button" class="btn btn-info" id="downTemplateButton" value="下载模板">
+                </form>
+                <br/>
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">选择文件：</span>
+                        <input type="file" class="form-control" name="fileUploadInput" id="fileUploadInput">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    function initFileUpload(uploadUrl,fileName,option,call) {
+        var fileUploadModal = $("#fileUploadModal");
+        fileUploadModal.modal({
+            keyboard: false
+        })
+
+        initFilePlugSingle('fileUploadInput',{
+            uploadUrl:uploadUrl,
+            showUpload:true,
+            uploadAsync: false,
+            showPreview :true,
+            layoutTemplates:{
+                main1: '{preview}\n' +
+                '<div class="input-group {class}">\n' +
+                '  {caption}\n' +
+                '  <div class="input-group-btn">\n' +
+                '    {remove}\n' +
+                '    {cancel}\n' +
+                '    {upload}\n' +
+                '    {browse}\n' +
+                '  </div>\n' +
+                '</div>',
+                preview: '<div class="file-preview {class}">\n' +
+                '    {close}\n' +
+                '    <div class="close fileinput-remove">×</div>\n' +
+                '    <div class="{dropClass}">\n' +
+                '    <div class="file-preview-thumbnails">\n' +
+                '    </div>\n' +
+                '    <div class="clearfix"></div>' +
+                '    <div class="file-preview-status text-center text-success"></div>\n' +
+                '    </div>\n' +
+                '</div>',
+                actionDelete:'',
+                actionUpload:'',
+            },
+            showUploadedThumbs:false,
+        }).on('filebatchuploadsuccess', function(event, data, id, index) {//上传成功之后的处理
+            if(data.response.status=="success"){
+                base_alert_success_time(data.response.msg,1000,function () {
+                    fileUploadModal.modal('hide');
+                    call();
+                });
+            }else{
+                base_alert(data.response.msg);
+            }
+        })
+
+        formValidatorFU(fileUploadModal);
+        //形成模板下载函数 并绑定事件
+        $("#downTemplateButton").on("click",function(){
+            var fun = downTemplate(fileName);
+            fun();
+        });
+    }
+	function formValidatorFU(div) {
+        div.find('.modalForm').bootstrapValidator({
+            // I am validating Bootstrap form
+            framework: 'bootstrap',
+
+            // Feedback icons
+            icon: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+			fields : {
+				oldPwd:{
+                    message : '原密码错误',
+					validators : {
+						notEmpty : {
+							message : '请填写原密码'
+						},
+                        remote : {
+                            url : urlPath+'/sys/sysUser/validPwd?id='+$("#userId").val(),
+                            message : '原密码错误',
+                            delay:1000,//设置多久验证一次，默认是每输入一个字符就验证。
+                            type:'GET'
+                        }
+					}
+				},
+			}
+		})
+    }
+
+    //导出模板
+    function downTemplate(name){
+        return function () {
+            $("#downTemplateForm").attr("action", urlPath+"/sys/sysFile/downloadInside/"+name);
+            $("#downTemplateForm").submit();
+        }
+    }
+</script>
+</section>
+</body>
+</html>

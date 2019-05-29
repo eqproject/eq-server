@@ -1,0 +1,97 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>基础管理系统</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/static/common/css/common.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/static/common/css/style.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/AdminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css}"/>
+    <style>
+         body{height:100%;/* background:#3c8dbc; */ color:#fff;background:url(static/common/img/bg.jpg) center top no-repeat;overflow:hidden; background-size:100%;background-color:#424153}
+         canvas{z-index:-1;position:absolute;}
+        .admin_login dd p.eTips{color:red;float:left;font-weight:600; padding:0;margin:0;text-align:left;padding-left:6px;background:rgba(255,255,255,1);border-radius:6px;}
+        .errorIcon{color:red;float:left}
+        .admin_login dd .eTips::-moz-placeholder { color: red; }
+        .admin_login dd .eTips::-webkit-input-placeholder { color:red; }
+        .admin_login dd .eTips:-ms-input-placeholder { color:red; }
+        @media only screen and (min-width :375px) and (max-width:767px){
+         .admin_login{width:96%;margin:50px auto}
+        }
+    </style>
+    <script th:src="@{/webjars/AdminLTE/bower_components/jquery/dist/jquery.min.js}"></script>
+    <script th:src="@{/static/common/js/verificationNumbers.js}"></script>
+    <script th:src="@{/static/common/js/Particleground.js}"></script>
+    <script>
+        $(document).ready(function() {
+          //粒子背景特效
+          /* $('body').particleground({
+             dotColor: '#06c1ae',
+             lineColor: '#06c1ae'
+          }); */
+          //验证码
+          createCode();
+          $(".submit_btn").click(function(){
+             if(validate()){
+                 $("#login").submit();
+             }else{
+                 $("#J_codetext").addClass("eTips");
+             }
+          });
+
+          $("#checkValidate").click(function(){
+             if(!validate()){
+                 $("#J_codetext").addClass("eTips");
+             }
+          });
+
+          document.onkeydown = function(e){
+              var ev = document.all ? window.event : e;
+              if(ev.keyCode==13) {
+                  if(validate()){
+                        $("#login").submit();
+                    }else{
+                        $("#J_codetext").addClass("eTips");
+                    }
+               }
+          }
+        });
+    </script>
+</head>
+<body>
+    <form th:action="@{/login}" method="post" id="login">
+        <dl class="admin_login">
+            <dt>
+                <strong>基础管理系统</strong>
+                <em>Management System</em>
+            </dt>
+            <dd style="width:100%; background:#fff;border-radius:6px;padding:12px 10px 12px 50px" th:if="${errorMsg!=null}">
+                <i class="glyphicon glyphicon-remove errorIcon"></i>
+                <p class="eTips" th:text="${errorMsg}"></p>
+            </dd>
+            <dd class="">
+                <i class="glyphicon glyphicon-user userIcon"></i>
+                <input type="text" placeholder="账号" class="login_txtbx" name="username"/>
+            </dd>
+            <dd class="pwd_icon">
+                <i class="glyphicon glyphicon-lock pwdIcon"></i>
+                <input type="password" placeholder="密码" class="login_txtbx" name="password"/>
+            </dd>
+            <dd class="val_icon">
+                <div class="checkcode">
+                    <input type="text" id="J_codetext" placeholder="验证码" maxlength="4" class="login_txtbx"/>
+                    <canvas class="J_codeimg" id="myCanvas" onclick="createCode()">对不起，您的浏览器不支持canvas，请下载最新版浏览器!</canvas>
+                </div>
+                <input type="button" value="刷新验证码" class="ver_btn" id = "checkValidate" />
+            </dd>
+            <dd>
+                <input type="button" value="立即登陆" class="submit_btn"/>
+            </dd>
+        </dl>
+    </form>
+    <footer class="footerBox">
+        <strong>Copyright © 2017-2018 <a href="#">北京鲁邦斯特信息技术有限公司</a>.</strong> All rights reserved.
+    </footer>
+</body>
+</html>
