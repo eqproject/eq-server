@@ -11,14 +11,14 @@
 package ${entityPackage};
 
 <#if ifInheritBaseEntity>
-import cn.bubi.basic.common.base.BaseEntity;
+import org.eq.basic.common.base.BaseEntity;
 </#if>
 <#if entityPackageImportList??&&(entityPackageImportList?size>0)>
     <#list entityPackageImportList as import>
         <#if import == "Date" >
 import java.util.Date;
         <#elseif import == "ExcelResources">
-import cn.bubi.basic.common.util.excel.ExcelResources;
+import org.eq.basic.common.util.excel.ExcelResources;
         </#if>
     </#list>
 </#if>

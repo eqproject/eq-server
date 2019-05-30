@@ -10,7 +10,7 @@
  */
 package ${daoPackage};
 
-import cn.bubi.basic.common.base.BaseMapper;
+import org.eq.basic.common.base.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import ${entityPackage}.${className};
 import ${entityPackage}.${className}Example;

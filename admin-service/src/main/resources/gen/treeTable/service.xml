@@ -11,7 +11,7 @@
 package ${packageName}.${moduleName}.service<#if subModuleName != "">.${subModuleName}</#if>;
 
 import ${packageName}.${moduleName}.entity<#if subModuleName != "">.${subModuleName}</#if>.${table.className};
-import cn.bubi.basic.common.base.BaseService;
+import org.eq.basic.common.base.BaseService;
 
 import java.util.List;
 import java.util.Map;

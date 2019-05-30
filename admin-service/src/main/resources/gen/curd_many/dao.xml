@@ -9,7 +9,7 @@
  */
 package ${packageName}.${moduleName}.dao<#if subModuleName != "">.${subModuleName}</#if>;
 
-import cn.bubi.basic.common.base.BaseMapper;
+import org.eq.basic.common.base.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import ${packageName}.${moduleName}.entity<#if subModuleName != "">.${subModuleName}</#if>.${table.className};
 import ${packageName}.${moduleName}.entity<#if subModuleName != "">.${subModuleName}</#if>.${table.className}Example;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.bubi.c2c.auth.dao.UserIdentityAuthMapper">
-    <resultMap id="BaseResultMap" type="cn.bubi.c2c.auth.entity.UserIdentityAuth">
+<mapper namespace="org.eq.modules.auth.dao.UserIdentityAuthMapper">
+    <resultMap id="BaseResultMap" type="org.eq.modules.auth.entity.UserIdentityAuth">
         <id column="id" jdbcType="BIGINT" property="id" />
 	    <result column="identity_card" jdbcType="VARCHAR" property="identityCard" />
 	    <result column="identity_name" jdbcType="VARCHAR" property="identityName" />
@@ -75,7 +75,7 @@
         id,identity_card,identity_name,user_id,auth_result,create_by,create_date
     </sql>
 
-    <select id="selectByExample" parameterType="cn.bubi.c2c.auth.entity.UserIdentityAuthExample" resultMap="BaseResultMap">
+    <select id="selectByExample" parameterType="org.eq.modules.auth.entity.UserIdentityAuthExample" resultMap="BaseResultMap">
         select
         <if test="distinct">
             distinct
@@ -102,14 +102,14 @@
         where id = #{id,jdbcType=BIGINT}
     </delete>
 
-    <delete id="deleteByExample" parameterType="cn.bubi.c2c.auth.entity.UserIdentityAuthExample">
+    <delete id="deleteByExample" parameterType="org.eq.modules.auth.entity.UserIdentityAuthExample">
         delete from user_identity_authentication
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>
     </delete>
 
-    <insert id="insert" parameterType="cn.bubi.c2c.auth.entity.UserIdentityAuth">
+    <insert id="insert" parameterType="org.eq.modules.auth.entity.UserIdentityAuth">
         insert into user_identity_authentication (identity_card,identity_name,user_id,auth_result,create_by,create_date)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -122,7 +122,7 @@
         </trim>
     </insert>
 
-    <insert id="insertSelective" parameterType="cn.bubi.c2c.auth.entity.UserIdentityAuth">
+    <insert id="insertSelective" parameterType="org.eq.modules.auth.entity.UserIdentityAuth">
         insert into user_identity_authentication
         <trim prefix="(" suffix=")" suffixOverrides=",">
             identity_card,
@@ -142,7 +142,7 @@
         </trim>
     </insert>
 
-    <select id="countByExample" parameterType="cn.bubi.c2c.auth.entity.UserIdentityAuthExample" resultType="java.lang.Long">
+    <select id="countByExample" parameterType="org.eq.modules.auth.entity.UserIdentityAuthExample" resultType="java.lang.Long">
         select count(*) from user_identity_authentication
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
@@ -196,7 +196,7 @@
         </if>
     </update>
 
-    <update id="updateByPrimaryKeySelective" parameterType="cn.bubi.c2c.auth.entity.UserIdentityAuth">
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.modules.auth.entity.UserIdentityAuth">
         update user_identity_authentication
         <set>
             <if test="identityCard != null">
@@ -221,7 +221,7 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="cn.bubi.c2c.auth.entity.UserIdentityAuth">
+    <update id="updateByPrimaryKey" parameterType="org.eq.modules.auth.entity.UserIdentityAuth">
         update user_identity_authentication
         set
         <trim  suffixOverrides=",">

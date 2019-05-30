@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.bubi.basic.modules.sys.dao.SysUserMapper">
-    <resultMap id="BaseResultMap" type="cn.bubi.basic.modules.sys.entity.SysUser">
+<mapper namespace="org.eq.basic.modules.sys.dao.SysUserMapper">
+    <resultMap id="BaseResultMap" type="org.eq.basic.modules.sys.entity.SysUser">
         <id column="id" jdbcType="BIGINT" property="id" />
 	    <result column="area_id" jdbcType="BIGINT" property="areaId" />
 	    <result column="office_id" jdbcType="BIGINT" property="officeId" />
@@ -90,7 +90,7 @@
         id,area_id,office_id,depart_id,lnm,pw,nm,sex,status,tel,no_id,type,photo_head,login_ip,login_date,job,create_by,create_date,update_by,update_date,remarks,del_flag
     </sql>
 
-    <select id="selectByExample" parameterType="cn.bubi.basic.modules.sys.entity.SysUserExample" resultMap="BaseResultMap">
+    <select id="selectByExample" parameterType="org.eq.basic.modules.sys.entity.SysUserExample" resultMap="BaseResultMap">
         select
         <if test="distinct">
             distinct
@@ -117,14 +117,14 @@
         where id = #{id,jdbcType=BIGINT}
     </delete>
 
-    <delete id="deleteByExample" parameterType="cn.bubi.basic.modules.sys.entity.SysUserExample">
+    <delete id="deleteByExample" parameterType="org.eq.basic.modules.sys.entity.SysUserExample">
         delete from sys_user
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>
     </delete>
 
-    <insert id="insert" parameterType="cn.bubi.basic.modules.sys.entity.SysUser">
+    <insert id="insert" parameterType="org.eq.basic.modules.sys.entity.SysUser">
         <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
             SELECT LAST_INSERT_ID()
         </selectKey>
@@ -155,7 +155,7 @@
         </trim>
     </insert>
 
-    <insert id="insertSelective" parameterType="cn.bubi.basic.modules.sys.entity.SysUser">
+    <insert id="insertSelective" parameterType="org.eq.basic.modules.sys.entity.SysUser">
         <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
             SELECT LAST_INSERT_ID()
         </selectKey>
@@ -208,7 +208,7 @@
         </trim>
     </insert>
 
-    <select id="countByExample" parameterType="cn.bubi.basic.modules.sys.entity.SysUserExample" resultType="java.lang.Long">
+    <select id="countByExample" parameterType="org.eq.basic.modules.sys.entity.SysUserExample" resultType="java.lang.Long">
         select count(*) from sys_user
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
@@ -322,7 +322,7 @@
         </if>
     </update>
 
-    <update id="updateByPrimaryKeySelective" parameterType="cn.bubi.basic.modules.sys.entity.SysUser">
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.basic.modules.sys.entity.SysUser">
         update sys_user
         <set>
             <if test="areaId != null">
@@ -392,7 +392,7 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="cn.bubi.basic.modules.sys.entity.SysUser">
+    <update id="updateByPrimaryKey" parameterType="org.eq.basic.modules.sys.entity.SysUser">
         update sys_user
         set
         <trim  suffixOverrides=",">
@@ -421,7 +421,7 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <select id="findUserList" parameterType="cn.bubi.basic.modules.sys.entity.SysUser" resultType="cn.bubi.basic.modules.sys.entity.SysUser">
+    <select id="findUserList" parameterType="org.eq.basic.modules.sys.entity.SysUser" resultType="org.eq.basic.modules.sys.entity.SysUser">
         select
         sys_user.id "id",
         sys_user.lnm "lnm",

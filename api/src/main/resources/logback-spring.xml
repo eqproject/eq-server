@@ -64,7 +64,7 @@
 
     <!--mybatis sql日志 日志的级别需要是DEBUG-->
     <!--日志打印的包的范围，及分类日志文件存储 -->
-    <logger name="cn.bubi.*.dao" level="DEBUG" additivity="false"></logger>
+    <logger name="org.eq.*.dao" level="DEBUG" additivity="false"></logger>
 
     <!--控制台和日志文件输出级别-->
     <root level="INFO" additivity = "false">

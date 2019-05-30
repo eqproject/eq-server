@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.bubi.c2c.product.dao.ProductRelationTagMapper">
-    <resultMap id="BaseResultMap" type="cn.bubi.c2c.product.entity.ProductRelationTag">
+<mapper namespace="org.eq.modules.product.dao.ProductRelationTagMapper">
+    <resultMap id="BaseResultMap" type="org.eq.modules.product.entity.ProductRelationTag">
 	    <result column="tag_id" jdbcType="BIGINT" property="tagId" />
 	    <result column="product_id" jdbcType="BIGINT" property="productId" />
     </resultMap>
@@ -70,7 +70,7 @@
         tag_id,product_id
     </sql>
 
-    <select id="selectByExample" parameterType="cn.bubi.c2c.product.entity.ProductRelationTagExample" resultMap="BaseResultMap">
+    <select id="selectByExample" parameterType="org.eq.modules.product.entity.ProductRelationTagExample" resultMap="BaseResultMap">
         select
         <if test="distinct">
             distinct
@@ -85,14 +85,14 @@
         </if>
     </select>
 
-    <delete id="deleteByExample" parameterType="cn.bubi.c2c.product.entity.ProductRelationTagExample">
+    <delete id="deleteByExample" parameterType="org.eq.modules.product.entity.ProductRelationTagExample">
         delete from p_product_tag_relation
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>
     </delete>
 
-    <insert id="insert" parameterType="cn.bubi.c2c.product.entity.ProductRelationTag">
+    <insert id="insert" parameterType="org.eq.modules.product.entity.ProductRelationTag">
         insert into p_product_tag_relation (tag_id,product_id)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -101,7 +101,7 @@
         </trim>
     </insert>
 
-    <insert id="insertSelective" parameterType="cn.bubi.c2c.product.entity.ProductRelationTag">
+    <insert id="insertSelective" parameterType="org.eq.modules.product.entity.ProductRelationTag">
         insert into p_product_tag_relation
         <trim prefix="(" suffix=")" suffixOverrides=",">
             tag_id,
@@ -113,7 +113,7 @@
         </trim>
     </insert>
 
-    <select id="countByExample" parameterType="cn.bubi.c2c.product.entity.ProductRelationTagExample" resultType="java.lang.Long">
+    <select id="countByExample" parameterType="org.eq.modules.product.entity.ProductRelationTagExample" resultType="java.lang.Long">
         select count(*) from p_product_tag_relation
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />

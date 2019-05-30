@@ -17,8 +17,8 @@ import ${servicePackage}.${className}Service;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import cn.bubi.basic.common.annotation.AutowiredService;
-import cn.bubi.basic.common.base.ServiceImplExtend;
+import org.eq.basic.common.annotation.AutowiredService;
+import org.eq.basic.common.base.ServiceImplExtend;
 
 import java.util.Map;
 

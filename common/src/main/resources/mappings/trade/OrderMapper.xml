@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.bubi.c2c.trade.dao.OrderMapper">
+<mapper namespace="org.eq.modules.trade.dao.OrderMapper">
 
-    <resultMap id="BaseResultMap" type="cn.bubi.c2c.trade.entity.Order">
+    <resultMap id="BaseResultMap" type="org.eq.modules.trade.entity.Order">
         <id column="id" jdbcType="BIGINT" property="id" />
 	    <result column="amount" jdbcType="INTEGER" property="amount" />
 	    <result column="code" jdbcType="VARCHAR" property="code" />
@@ -84,7 +84,7 @@
         amount,code,create_by,create_date,description,cancel_desc,id,pay_type,product_id,product_num,remarks,status,type,update_by,update_date
     </sql>
 
-    <select id="selectByExample" parameterType="cn.bubi.c2c.trade.entity.OrderExample" resultMap="BaseResultMap">
+    <select id="selectByExample" parameterType="org.eq.modules.trade.entity.OrderExample" resultMap="BaseResultMap">
         select
         <if test="distinct">
             distinct
@@ -111,14 +111,14 @@
         where id = #{id,jdbcType=BIGINT}
     </delete>
 
-    <delete id="deleteByExample" parameterType="cn.bubi.c2c.trade.entity.OrderExample">
+    <delete id="deleteByExample" parameterType="org.eq.modules.trade.entity.OrderExample">
         delete from user_trade
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>
     </delete>
 
-    <insert id="insert" parameterType="cn.bubi.c2c.trade.entity.Order">
+    <insert id="insert" parameterType="org.eq.modules.trade.entity.Order">
         insert into user_trade (amount,code,create_by,create_date,description,pay_type,product_id,product_num,remarks,cancel_desc,status,type,update_by,update_date)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -139,7 +139,7 @@
         </trim>
     </insert>
 
-    <insert id="insertSelective" parameterType="cn.bubi.c2c.trade.entity.Order">
+    <insert id="insertSelective" parameterType="org.eq.modules.trade.entity.Order">
         insert into user_trade
         <trim prefix="(" suffix=")" suffixOverrides=",">
             amount,
@@ -175,7 +175,7 @@
         </trim>
     </insert>
 
-    <select id="countByExample" parameterType="cn.bubi.c2c.trade.entity.OrderExample" resultType="java.lang.Long">
+    <select id="countByExample" parameterType="org.eq.modules.trade.entity.OrderExample" resultType="java.lang.Long">
         select count(*) from user_trade
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
@@ -261,7 +261,7 @@
         </if>
     </update>
 
-    <update id="updateByPrimaryKeySelective" parameterType="cn.bubi.c2c.trade.entity.Order">
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.modules.trade.entity.Order">
         update user_trade
         <set>
             <if test="amount != null">
@@ -310,7 +310,7 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="cn.bubi.c2c.trade.entity.Order">
+    <update id="updateByPrimaryKey" parameterType="org.eq.modules.trade.entity.Order">
         update user_trade
         set
         <trim  suffixOverrides=",">

@@ -12,7 +12,7 @@ package ${servicePackage};
 
 import ${entityPackage}.${className};
 import ${entityPackage}.${className}Example;
-import cn.bubi.basic.common.base.ServiceExtend;
+import org.eq.basic.common.base.ServiceExtend;
 
 /**
  * ${functionName}Service

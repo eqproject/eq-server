@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.bubi.basic.modules.gen.dao.GenDBMapper">
-    <resultMap id="BaseResultMap" type="cn.bubi.basic.modules.gen.entity.GenDB">
+<mapper namespace="org.eq.basic.modules.gen.dao.GenDBMapper">
+    <resultMap id="BaseResultMap" type="org.eq.basic.modules.gen.entity.GenDB">
         <id column="id" jdbcType="BIGINT" property="id" />
 	    <result column="name" jdbcType="VARCHAR" property="name" />
 	    <result column="dbname" jdbcType="VARCHAR" property="dbname" />
@@ -82,7 +82,7 @@
         id,name,dbname,url,username,password,driver_class_name,type,create_by,create_date,update_by,update_date,remarks,del_flag
     </sql>
 
-    <select id="selectByExample" parameterType="cn.bubi.basic.modules.gen.entity.GenDBExample" resultMap="BaseResultMap">
+    <select id="selectByExample" parameterType="org.eq.basic.modules.gen.entity.GenDBExample" resultMap="BaseResultMap">
         select
         <if test="distinct">
             distinct
@@ -109,14 +109,14 @@
         where id = #{id,jdbcType=BIGINT}
     </delete>
 
-    <delete id="deleteByExample" parameterType="cn.bubi.basic.modules.gen.entity.GenDBExample">
+    <delete id="deleteByExample" parameterType="org.eq.basic.modules.gen.entity.GenDBExample">
         delete from gen_db
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>
     </delete>
 
-    <insert id="insert" parameterType="cn.bubi.basic.modules.gen.entity.GenDB">
+    <insert id="insert" parameterType="org.eq.basic.modules.gen.entity.GenDB">
         insert into gen_db (name,dbname,url,username,password,driver_class_name,type,create_by,create_date,update_by,update_date,remarks,del_flag)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -136,7 +136,7 @@
         </trim>
     </insert>
 
-    <insert id="insertSelective" parameterType="cn.bubi.basic.modules.gen.entity.GenDB">
+    <insert id="insertSelective" parameterType="org.eq.basic.modules.gen.entity.GenDB">
         insert into gen_db
         <trim prefix="(" suffix=")" suffixOverrides=",">
             name,
@@ -170,7 +170,7 @@
         </trim>
     </insert>
 
-    <select id="countByExample" parameterType="cn.bubi.basic.modules.gen.entity.GenDBExample" resultType="java.lang.Long">
+    <select id="countByExample" parameterType="org.eq.basic.modules.gen.entity.GenDBExample" resultType="java.lang.Long">
         select count(*) from gen_db
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
@@ -252,7 +252,7 @@
         </if>
     </update>
 
-    <update id="updateByPrimaryKeySelective" parameterType="cn.bubi.basic.modules.gen.entity.GenDB">
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.basic.modules.gen.entity.GenDB">
         update gen_db
         <set>
             <if test="name != null">
@@ -298,7 +298,7 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="cn.bubi.basic.modules.gen.entity.GenDB">
+    <update id="updateByPrimaryKey" parameterType="org.eq.basic.modules.gen.entity.GenDB">
         update gen_db
         set
         <trim  suffixOverrides=",">

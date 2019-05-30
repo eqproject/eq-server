@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.bubi.basic.modules.gen.dao.GenTableModalMapper">
-    <resultMap id="BaseResultMap" type="cn.bubi.basic.modules.gen.entity.GenTableModal">
+<mapper namespace="org.eq.basic.modules.gen.dao.GenTableModalMapper">
+    <resultMap id="BaseResultMap" type="org.eq.basic.modules.gen.entity.GenTableModal">
         <id column="id" jdbcType="BIGINT" property="id" />
 	    <result column="modal_name" jdbcType="VARCHAR" property="modalName" />
 	    <result column="plan_id" jdbcType="BIGINT" property="planId" />
@@ -87,7 +87,7 @@
         id,modal_name,plan_id,function_name,author,version,class_name,module_name,if_inherit_base,category,db_id,table_name,page_setting,create_by,create_date,update_by,update_date,remarks,del_flag
     </sql>
 
-    <select id="selectByExample" parameterType="cn.bubi.basic.modules.gen.entity.GenTableModalExample" resultMap="BaseResultMap">
+    <select id="selectByExample" parameterType="org.eq.basic.modules.gen.entity.GenTableModalExample" resultMap="BaseResultMap">
         select
         <if test="distinct">
             distinct
@@ -114,14 +114,14 @@
         where id = #{id,jdbcType=BIGINT}
     </delete>
 
-    <delete id="deleteByExample" parameterType="cn.bubi.basic.modules.gen.entity.GenTableModalExample">
+    <delete id="deleteByExample" parameterType="org.eq.basic.modules.gen.entity.GenTableModalExample">
         delete from gen_table_modal
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>
     </delete>
 
-    <insert id="insert" parameterType="cn.bubi.basic.modules.gen.entity.GenTableModal">
+    <insert id="insert" parameterType="org.eq.basic.modules.gen.entity.GenTableModal">
         insert into gen_table_modal (modal_name,plan_id,function_name,author,version,class_name,module_name,if_inherit_base,category,db_id,table_name,page_setting,create_by,create_date,update_by,update_date,remarks,del_flag)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -146,7 +146,7 @@
         </trim>
     </insert>
 
-    <insert id="insertSelective" parameterType="cn.bubi.basic.modules.gen.entity.GenTableModal">
+    <insert id="insertSelective" parameterType="org.eq.basic.modules.gen.entity.GenTableModal">
         insert into gen_table_modal
         <trim prefix="(" suffix=")" suffixOverrides=",">
             modal_name,
@@ -190,7 +190,7 @@
         </trim>
     </insert>
 
-    <select id="countByExample" parameterType="cn.bubi.basic.modules.gen.entity.GenTableModalExample" resultType="java.lang.Long">
+    <select id="countByExample" parameterType="org.eq.basic.modules.gen.entity.GenTableModalExample" resultType="java.lang.Long">
         select count(*) from gen_table_modal
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
@@ -292,7 +292,7 @@
         </if>
     </update>
 
-    <update id="updateByPrimaryKeySelective" parameterType="cn.bubi.basic.modules.gen.entity.GenTableModal">
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.basic.modules.gen.entity.GenTableModal">
         update gen_table_modal
         <set>
             <if test="modalName != null">
@@ -353,7 +353,7 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="cn.bubi.basic.modules.gen.entity.GenTableModal">
+    <update id="updateByPrimaryKey" parameterType="org.eq.basic.modules.gen.entity.GenTableModal">
         update gen_table_modal
         set
         <trim  suffixOverrides=",">
@@ -381,7 +381,7 @@
 
 
 
-    <select id="findTableModal" parameterType="cn.bubi.basic.modules.gen.entity.GenTableModalExample" resultType="cn.bubi.basic.modules.gen.entity.GenTableModal">
+    <select id="findTableModal" parameterType="org.eq.basic.modules.gen.entity.GenTableModalExample" resultType="org.eq.basic.modules.gen.entity.GenTableModal">
         select
         gen_table_modal.id "id",
         modal_name "modalName",

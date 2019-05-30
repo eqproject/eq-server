@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.bubi.basic.modules.sys.dao.SysMenuMapper">
-    <resultMap id="BaseResultMap" type="cn.bubi.basic.modules.sys.entity.SysMenu">
+<mapper namespace="org.eq.basic.modules.sys.dao.SysMenuMapper">
+    <resultMap id="BaseResultMap" type="org.eq.basic.modules.sys.entity.SysMenu">
         <id column="id" jdbcType="BIGINT" property="id" />
 	    <result column="parent_id" jdbcType="BIGINT" property="parentId" />
 	    <result column="parent_ids" jdbcType="VARCHAR" property="parentIds" />
@@ -86,7 +86,7 @@
         id,parent_id,parent_ids,name,href,target,icon,sort,code,status,is_show,permission,create_by,create_date,update_by,update_date,remarks,del_flag
     </sql>
 
-    <select id="selectByExample" parameterType="cn.bubi.basic.modules.sys.entity.SysMenuExample" resultMap="BaseResultMap">
+    <select id="selectByExample" parameterType="org.eq.basic.modules.sys.entity.SysMenuExample" resultMap="BaseResultMap">
         select
         <if test="distinct">
             distinct
@@ -113,14 +113,14 @@
         where id = #{id,jdbcType=BIGINT}
     </delete>
 
-    <delete id="deleteByExample" parameterType="cn.bubi.basic.modules.sys.entity.SysMenuExample">
+    <delete id="deleteByExample" parameterType="org.eq.basic.modules.sys.entity.SysMenuExample">
         delete from sys_menu
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>
     </delete>
 
-    <insert id="insert" parameterType="cn.bubi.basic.modules.sys.entity.SysMenu">
+    <insert id="insert" parameterType="org.eq.basic.modules.sys.entity.SysMenu">
         insert into sys_menu (parent_id,parent_ids,name,href,target,icon,sort,code,status,is_show,permission,create_by,create_date,update_by,update_date,remarks,del_flag)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -144,7 +144,7 @@
         </trim>
     </insert>
 
-    <insert id="insertSelective" parameterType="cn.bubi.basic.modules.sys.entity.SysMenu">
+    <insert id="insertSelective" parameterType="org.eq.basic.modules.sys.entity.SysMenu">
         insert into sys_menu
         <trim prefix="(" suffix=")" suffixOverrides=",">
             parent_id,
@@ -186,7 +186,7 @@
         </trim>
     </insert>
 
-    <select id="countByExample" parameterType="cn.bubi.basic.modules.sys.entity.SysMenuExample" resultType="java.lang.Long">
+    <select id="countByExample" parameterType="org.eq.basic.modules.sys.entity.SysMenuExample" resultType="java.lang.Long">
         select count(*) from sys_menu
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
@@ -284,7 +284,7 @@
         </if>
     </update>
 
-    <update id="updateByPrimaryKeySelective" parameterType="cn.bubi.basic.modules.sys.entity.SysMenu">
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.basic.modules.sys.entity.SysMenu">
         update sys_menu
         <set>
             <if test="parentId != null">
@@ -342,7 +342,7 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="cn.bubi.basic.modules.sys.entity.SysMenu">
+    <update id="updateByPrimaryKey" parameterType="org.eq.basic.modules.sys.entity.SysMenu">
         update sys_menu
         set
         <trim  suffixOverrides=",">

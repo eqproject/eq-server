@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.bubi.basic.modules.sys.dao.SysUserRoleMapper">
-    <resultMap id="BaseResultMap" type="cn.bubi.basic.modules.sys.entity.SysUserRole">
+<mapper namespace="org.eq.basic.modules.sys.dao.SysUserRoleMapper">
+    <resultMap id="BaseResultMap" type="org.eq.basic.modules.sys.entity.SysUserRole">
         <id column="id" jdbcType="BIGINT" property="id" />
 	    <result column="user_id" jdbcType="BIGINT" property="userId" />
 	    <result column="role_id" jdbcType="BIGINT" property="roleId" />
@@ -77,7 +77,7 @@
         id,user_id,role_id,create_by,create_date,update_by,update_date,remarks,del_flag
     </sql>
 
-    <select id="selectByExample" parameterType="cn.bubi.basic.modules.sys.entity.SysUserRoleExample" resultMap="BaseResultMap">
+    <select id="selectByExample" parameterType="org.eq.basic.modules.sys.entity.SysUserRoleExample" resultMap="BaseResultMap">
         select
         <if test="distinct">
             distinct
@@ -104,14 +104,14 @@
         where id = #{id,jdbcType=BIGINT}
     </delete>
 
-    <delete id="deleteByExample" parameterType="cn.bubi.basic.modules.sys.entity.SysUserRoleExample">
+    <delete id="deleteByExample" parameterType="org.eq.basic.modules.sys.entity.SysUserRoleExample">
         delete from sys_user_role
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>
     </delete>
 
-    <insert id="insert" parameterType="cn.bubi.basic.modules.sys.entity.SysUserRole">
+    <insert id="insert" parameterType="org.eq.basic.modules.sys.entity.SysUserRole">
         insert into sys_user_role (user_id,role_id,create_by,create_date,update_by,update_date,remarks,del_flag)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -126,7 +126,7 @@
         </trim>
     </insert>
 
-    <insert id="insertSelective" parameterType="cn.bubi.basic.modules.sys.entity.SysUserRole">
+    <insert id="insertSelective" parameterType="org.eq.basic.modules.sys.entity.SysUserRole">
         insert into sys_user_role
         <trim prefix="(" suffix=")" suffixOverrides=",">
             user_id,
@@ -150,7 +150,7 @@
         </trim>
     </insert>
 
-    <select id="countByExample" parameterType="cn.bubi.basic.modules.sys.entity.SysUserRoleExample" resultType="java.lang.Long">
+    <select id="countByExample" parameterType="org.eq.basic.modules.sys.entity.SysUserRoleExample" resultType="java.lang.Long">
         select count(*) from sys_user_role
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
@@ -212,7 +212,7 @@
         </if>
     </update>
 
-    <update id="updateByPrimaryKeySelective" parameterType="cn.bubi.basic.modules.sys.entity.SysUserRole">
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.basic.modules.sys.entity.SysUserRole">
         update sys_user_role
         <set>
             <if test="userId != null">
@@ -243,7 +243,7 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="cn.bubi.basic.modules.sys.entity.SysUserRole">
+    <update id="updateByPrimaryKey" parameterType="org.eq.basic.modules.sys.entity.SysUserRole">
         update sys_user_role
         set
         <trim  suffixOverrides=",">

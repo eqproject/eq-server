@@ -12,7 +12,7 @@ package ${treeModel.packageName}.${treeModel.moduleName}.service<#if treeModel.s
 
 import ${packageName}.${moduleName}.entity<#if subModuleName != "">.${subModuleName}</#if>.${table.className};
 import ${treeModel.packageName}.${treeModel.moduleName}.entity<#if treeModel.subModuleName != "">.${treeModel.subModuleName}</#if>.${treeModel.table.className};
-import cn.bubi.basic.common.base.BaseService;
+import org.eq.basic.common.base.BaseService;
 
 import java.util.List;
 

@@ -1,1 +1,0 @@
-package cn.bubi.basic.common.config;

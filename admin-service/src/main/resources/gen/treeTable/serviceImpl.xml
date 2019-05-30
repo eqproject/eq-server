@@ -10,18 +10,18 @@
  */
 package ${packageName}.${moduleName}.service<#if subModuleName != "">.${subModuleName}</#if>.impl;
 
-import cn.bubi.basic.common.base.BaseEntity;
+import org.eq.basic.common.base.BaseEntity;
 import ${packageName}.${moduleName}.entity<#if subModuleName != "">.${subModuleName}</#if>.${table.className};
-import cn.bubi.basic.modules.sys.entity.SysUser;
+import org.eq.basic.modules.sys.entity.SysUser;
 import ${packageName}.${moduleName}.entity<#if subModuleName != "">.${subModuleName}</#if>.${table.className}Example;
 import ${packageName}.${moduleName}.dao<#if subModuleName != "">.${subModuleName}</#if>.${table.className}Mapper;
-import cn.bubi.basic.common.base.BaseService;
-import cn.bubi.basic.common.base.BaseServiceImpl;
+import org.eq.basic.common.base.BaseService;
+import org.eq.basic.common.base.BaseServiceImpl;
 import ${packageName}.${moduleName}.service<#if subModuleName != "">.${subModuleName}</#if>.${table.className}Service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import cn.bubi.basic.common.base.BaseTableData;
+import org.eq.basic.common.base.BaseTableData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
