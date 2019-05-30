@@ -73,17 +73,6 @@ public class ProductController extends BaseController {
         params.put("orderName",orderName);
 
 		baseTableData = productService.findDataTableByRecordForPage(product,params);
-		if(baseTableData!=null && baseTableData.getData()!=null){
-            List<Product> datas = baseTableData.getData();
-            for(Product temp : datas){
-                SysUserInfo user = sysUserInfoService.selectByPrimaryKey(temp.getUpdateBy());
-                if(user!=null){
-                    temp.setCreateUserName(user.getName());
-                }else{
-                    temp.setCreateUserName("查无此人");
-                }
-            }
-        }
 		int draw = Integer.parseInt(request.getParameter("draw")==null?"0":request.getParameter("draw"));
 		baseTableData.setDraw(++draw);
 		return baseTableData;
@@ -163,7 +152,6 @@ public class ProductController extends BaseController {
         }else{
             product.setSort(target.getSort()-1);
         }
-        product.setUpdateBy(sysUser.getId());
         product.setUpdateDate(new Date());
 
         int opresult = productService.updateByPrimaryKeySelective(product);
@@ -238,10 +226,8 @@ public class ProductController extends BaseController {
 
 	private Product initProduct(Product product, boolean ifUpdate, SysUser user) {
         if (!ifUpdate) {
-            product.setCreateBy(user.getId());
             product.setCreateDate(new Date());
         }
-        product.setUpdateBy(user.getId());
         product.setUpdateDate(new Date());
         return product;
     }

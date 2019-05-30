@@ -1,4 +1,4 @@
-package org.eq.enums;
+package org.eq.modules.enums;
 
 /**
  * 用户订单状态枚举类

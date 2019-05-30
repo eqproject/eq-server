@@ -118,9 +118,6 @@ public class OrderServiceImpl extends ServiceImplExtend<OrderMapper, Order, Orde
 			if (StringUtils.isNotBlank(order.getProductName())) {
 				criteriaProduct.andProductImgNotLike(order.getProductName());
 			}
-			if (StringUtils.isNotBlank(order.getProductCode())) {
-				criteriaProduct.andCodeEqualTo(order.getProductCode());
-			}
 			List<Product> productList = productService.findListByExample(productExample);
 			if (!CollectionUtils.isEmpty(productList)) {
 				for (Product product : productList) {

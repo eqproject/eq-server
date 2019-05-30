@@ -88,7 +88,7 @@ public abstract class BaseServiceImpl<Mapper, Record, Example> implements BaseSe
             PageInfo pageInfo = new PageInfo((List<Record>) result);
             return pageInfo;
         } catch(Exception e) {
-            this.logger.debug(e.getMessage());
+            this.logger.error(e.getMessage());
         }
         return new PageInfo<>();
     }

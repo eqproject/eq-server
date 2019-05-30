@@ -59,6 +59,31 @@ public class ResponseFactory<T> {
 
 
     /**
+     * 参数错误构建方法
+     * @param errMsg 错误信息
+     * @return
+     */
+    public static  ResponseData paramsError(String errMsg){
+        ResponseData result = initError(errMsg);
+        result.setStatus(ResponseStateEnum.ERROR_PARAMS.getStatus());
+        return result;
+    }
+
+
+    /**
+     * 验证不通过 可包含用户信息
+     * @param errMsg 错误信息
+     * @param <T>
+     * @return
+     */
+    public static <T> ResponseData<T> signError(String errMsg){
+        ResponseData<T> result = initError(errMsg);
+        result.setStatus(ResponseStateEnum.ERROR_SIGN.getStatus());
+        return result;
+    }
+
+
+    /**
      * 构造成功实体
      * @param <T>
      * @return

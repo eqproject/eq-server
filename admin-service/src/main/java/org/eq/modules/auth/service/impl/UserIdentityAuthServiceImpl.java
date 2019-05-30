@@ -56,12 +56,7 @@ public class UserIdentityAuthServiceImpl extends ServiceImplExtend<UserIdentityA
 		if(userIdentityAuth.getUserId()!=null){
 			ca.andUserIdEqualTo(userIdentityAuth.getUserId());
 		}
-		if(StringLowUtils.isNotBlank(userIdentityAuth.getAuthResult())){
-			ca.andAuthResultEqualTo(userIdentityAuth.getAuthResult());
-		}
-		if(userIdentityAuth.getCreateBy()!=null){
-			ca.andCreateByEqualTo(userIdentityAuth.getCreateBy());
-		}
+
 		if(userIdentityAuth.getCreateDate()!=null){
 			ca.andCreateDateEqualTo(userIdentityAuth.getCreateDate());
 		}

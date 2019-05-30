@@ -4,25 +4,19 @@
     <resultMap id="BaseResultMap" type="org.eq.modules.product.entity.Product">
         <id column="id" jdbcType="BIGINT" property="id" />
 	    <result column="name" jdbcType="VARCHAR" property="name" />
-	    <result column="code" jdbcType="VARCHAR" property="code" />
 	    <result column="product_img" jdbcType="VARCHAR" property="productImg" />
-	    <result column="brand" jdbcType="VARCHAR" property="brand" />
-	    <result column="brand_img" jdbcType="VARCHAR" property="brandImg" />
-	    <result column="brand_description" jdbcType="VARCHAR" property="brandDescription" />
-	    <result column="brand_tele" jdbcType="VARCHAR" property="brandTele" />
+	    <result column="product_accept_id" jdbcType="BIGINT" property="productAcceptId" />
+	    <result column="product_issuer_id" jdbcType="BIGINT" property="productIssuerId" />
 	    <result column="unit_price" jdbcType="INTEGER" property="unitPrice" />
-	    <result column="description" jdbcType="VARCHAR" property="description" />
-	    <result column="receive" jdbcType="VARCHAR" property="receive" />
 	    <result column="sort" jdbcType="INTEGER" property="sort" />
 	    <result column="status" jdbcType="INTEGER" property="status" />
-	    <result column="create_by" jdbcType="BIGINT" property="createBy" />
 	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
-	    <result column="update_by" jdbcType="BIGINT" property="updateBy" />
 	    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
 	    <result column="expiration_start" jdbcType="VARCHAR" property="expirationStart" />
 	    <result column="expiration_end" jdbcType="VARCHAR" property="expirationEnd" />
 	    <result column="tag_ids" jdbcType="VARCHAR" property="tagIds" />
 	    <result column="tag_names" jdbcType="VARCHAR" property="tagNames" />
+	    <result column="extend_info" jdbcType="VARCHAR" property="extendInfo" />
 	    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
     </resultMap>
 
@@ -87,7 +81,7 @@
     </sql>
 
     <sql id="Base_Column_List">
-        id,name,code,product_img,brand,brand_img,brand_description,brand_tele,unit_price,description,receive,sort,status,create_by,create_date,update_by,update_date,expiration_start,expiration_end,tag_ids,tag_names,remarks
+        id,name,product_img,product_accept_id,product_issuer_id,unit_price,sort,status,create_date,update_date,expiration_start,expiration_end,tag_ids,tag_names,extend_info,remarks
     </sql>
 
     <select id="selectByExample" parameterType="org.eq.modules.product.entity.ProductExample" resultMap="BaseResultMap">
@@ -125,29 +119,23 @@
     </delete>
 
     <insert id="insert" parameterType="org.eq.modules.product.entity.Product">
-        insert into platform_product (name,code,product_img,brand,brand_img,brand_description,brand_tele,unit_price,description,receive,sort,status,create_by,create_date,update_by,update_date,expiration_start,expiration_end,tag_ids,tag_names,remarks)
+        insert into platform_product (name,product_img,product_accept_id,product_issuer_id,unit_price,sort,status,create_date,update_date,expiration_start,expiration_end,tag_ids,tag_names,extend_info,remarks)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
             #{name,jdbcType=VARCHAR},
-            #{code,jdbcType=VARCHAR},
             #{productImg,jdbcType=VARCHAR},
-            #{brand,jdbcType=VARCHAR},
-            #{brandImg,jdbcType=VARCHAR},
-            #{brandDescription,jdbcType=VARCHAR},
-            #{brandTele,jdbcType=VARCHAR},
+            #{productAcceptId,jdbcType=BIGINT},
+            #{productIssuerId,jdbcType=BIGINT},
             #{unitPrice,jdbcType=INTEGER},
-            #{description,jdbcType=VARCHAR},
-            #{receive,jdbcType=VARCHAR},
             #{sort,jdbcType=INTEGER},
             #{status,jdbcType=INTEGER},
-            #{createBy,jdbcType=BIGINT},
             #{createDate,jdbcType=TIMESTAMP},
-            #{updateBy,jdbcType=BIGINT},
             #{updateDate,jdbcType=TIMESTAMP},
             #{expirationStart,jdbcType=VARCHAR},
             #{expirationEnd,jdbcType=VARCHAR},
             #{tagIds,jdbcType=VARCHAR},
             #{tagNames,jdbcType=VARCHAR},
+            #{extendInfo,jdbcType=VARCHAR},
             #{remarks,jdbcType=VARCHAR},
         </trim>
     </insert>
@@ -156,48 +144,36 @@
         insert into platform_product
         <trim prefix="(" suffix=")" suffixOverrides=",">
             name,
-            code,
             product_img,
-            brand,
-            brand_img,
-            brand_description,
-            brand_tele,
+            product_accept_id,
+            product_issuer_id,
             unit_price,
-            description,
-            receive,
             sort,
             status,
-            create_by,
             create_date,
-            update_by,
             update_date,
             expiration_start,
             expiration_end,
             tag_ids,
             tag_names,
+            extend_info,
             remarks,
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             #{name,jdbcType=VARCHAR},
-            #{code,jdbcType=VARCHAR},
             #{productImg,jdbcType=VARCHAR},
-            #{brand,jdbcType=VARCHAR},
-            #{brandImg,jdbcType=VARCHAR},
-            #{brandDescription,jdbcType=VARCHAR},
-            #{brandTele,jdbcType=VARCHAR},
+            #{productAcceptId,jdbcType=BIGINT},
+            #{productIssuerId,jdbcType=BIGINT},
             #{unitPrice,jdbcType=INTEGER},
-            #{description,jdbcType=VARCHAR},
-            #{receive,jdbcType=VARCHAR},
             #{sort,jdbcType=INTEGER},
             #{status,jdbcType=INTEGER},
-            #{createBy,jdbcType=BIGINT},
             #{createDate,jdbcType=TIMESTAMP},
-            #{updateBy,jdbcType=BIGINT},
             #{updateDate,jdbcType=TIMESTAMP},
             #{expirationStart,jdbcType=VARCHAR},
             #{expirationEnd,jdbcType=VARCHAR},
             #{tagIds,jdbcType=VARCHAR},
             #{tagNames,jdbcType=VARCHAR},
+            #{extendInfo,jdbcType=VARCHAR},
             #{remarks,jdbcType=VARCHAR},
         </trim>
     </insert>
@@ -218,32 +194,17 @@
             <if test="record.name != null">
                 name = #{record.name,jdbcType=VARCHAR},
             </if>
-            <if test="record.code != null">
-                code = #{record.code,jdbcType=VARCHAR},
-            </if>
             <if test="record.productImg != null">
                 product_img = #{record.productImg,jdbcType=VARCHAR},
             </if>
-            <if test="record.brand != null">
-                brand = #{record.brand,jdbcType=VARCHAR},
+            <if test="record.productAcceptId != null">
+                product_accept_id = #{record.productAcceptId,jdbcType=BIGINT},
             </if>
-            <if test="record.brandImg != null">
-                brand_img = #{record.brandImg,jdbcType=VARCHAR},
-            </if>
-            <if test="record.brandDescription != null">
-                brand_description = #{record.brandDescription,jdbcType=VARCHAR},
-            </if>
-            <if test="record.brandTele != null">
-                brand_tele = #{record.brandTele,jdbcType=VARCHAR},
+            <if test="record.productIssuerId != null">
+                product_issuer_id = #{record.productIssuerId,jdbcType=BIGINT},
             </if>
             <if test="record.unitPrice != null">
                 unit_price = #{record.unitPrice,jdbcType=INTEGER},
-            </if>
-            <if test="record.description != null">
-                description = #{record.description,jdbcType=VARCHAR},
-            </if>
-            <if test="record.receive != null">
-                receive = #{record.receive,jdbcType=VARCHAR},
             </if>
             <if test="record.sort != null">
                 sort = #{record.sort,jdbcType=INTEGER},
@@ -251,14 +212,8 @@
             <if test="record.status != null">
                 status = #{record.status,jdbcType=INTEGER},
             </if>
-            <if test="record.createBy != null">
-                create_by = #{record.createBy,jdbcType=BIGINT},
-            </if>
             <if test="record.createDate != null">
                 create_date = #{record.createDate,jdbcType=TIMESTAMP},
-            </if>
-            <if test="record.updateBy != null">
-                update_by = #{record.updateBy,jdbcType=BIGINT},
             </if>
             <if test="record.updateDate != null">
                 update_date = #{record.updateDate,jdbcType=TIMESTAMP},
@@ -275,6 +230,9 @@
             <if test="record.tagNames != null">
                 tag_names = #{record.tagNames,jdbcType=VARCHAR},
             </if>
+            <if test="record.extendInfo != null">
+                extend_info = #{record.extendInfo,jdbcType=VARCHAR},
+            </if>
             <if test="record.remarks != null">
                 remarks = #{record.remarks,jdbcType=VARCHAR},
             </if>
@@ -290,25 +248,19 @@
         <trim  suffixOverrides=",">
             id = #{record.id,jdbcType=BIGINT},
             name = #{record.name,jdbcType=VARCHAR},
-            code = #{record.code,jdbcType=VARCHAR},
             product_img = #{record.productImg,jdbcType=VARCHAR},
-            brand = #{record.brand,jdbcType=VARCHAR},
-            brand_img = #{record.brandImg,jdbcType=VARCHAR},
-            brand_description = #{record.brandDescription,jdbcType=VARCHAR},
-            brand_tele = #{record.brandTele,jdbcType=VARCHAR},
+            product_accept_id = #{record.productAcceptId,jdbcType=BIGINT},
+            product_issuer_id = #{record.productIssuerId,jdbcType=BIGINT},
             unit_price = #{record.unitPrice,jdbcType=INTEGER},
-            description = #{record.description,jdbcType=VARCHAR},
-            receive = #{record.receive,jdbcType=VARCHAR},
             sort = #{record.sort,jdbcType=INTEGER},
             status = #{record.status,jdbcType=INTEGER},
-            create_by = #{record.createBy,jdbcType=BIGINT},
             create_date = #{record.createDate,jdbcType=TIMESTAMP},
-            update_by = #{record.updateBy,jdbcType=BIGINT},
             update_date = #{record.updateDate,jdbcType=TIMESTAMP},
             expiration_start = #{record.expirationStart,jdbcType=VARCHAR},
             expiration_end = #{record.expirationEnd,jdbcType=VARCHAR},
             tag_ids = #{record.tagIds,jdbcType=VARCHAR},
             tag_names = #{record.tagNames,jdbcType=VARCHAR},
+            extend_info = #{record.extendInfo,jdbcType=VARCHAR},
             remarks = #{record.remarks,jdbcType=VARCHAR},
         </trim>
         <if test="_parameter != null">
@@ -322,32 +274,17 @@
             <if test="name != null">
             name = #{name,jdbcType=VARCHAR},
             </if>
-            <if test="code != null">
-            code = #{code,jdbcType=VARCHAR},
-            </if>
             <if test="productImg != null">
             product_img = #{productImg,jdbcType=VARCHAR},
             </if>
-            <if test="brand != null">
-            brand = #{brand,jdbcType=VARCHAR},
+            <if test="productAcceptId != null">
+            product_accept_id = #{productAcceptId,jdbcType=BIGINT},
             </if>
-            <if test="brandImg != null">
-            brand_img = #{brandImg,jdbcType=VARCHAR},
-            </if>
-            <if test="brandDescription != null">
-            brand_description = #{brandDescription,jdbcType=VARCHAR},
-            </if>
-            <if test="brandTele != null">
-            brand_tele = #{brandTele,jdbcType=VARCHAR},
+            <if test="productIssuerId != null">
+            product_issuer_id = #{productIssuerId,jdbcType=BIGINT},
             </if>
             <if test="unitPrice != null">
             unit_price = #{unitPrice,jdbcType=INTEGER},
-            </if>
-            <if test="description != null">
-            description = #{description,jdbcType=VARCHAR},
-            </if>
-            <if test="receive != null">
-            receive = #{receive,jdbcType=VARCHAR},
             </if>
             <if test="sort != null">
             sort = #{sort,jdbcType=INTEGER},
@@ -355,14 +292,8 @@
             <if test="status != null">
             status = #{status,jdbcType=INTEGER},
             </if>
-            <if test="createBy != null">
-            create_by = #{createBy,jdbcType=BIGINT},
-            </if>
             <if test="createDate != null">
             create_date = #{createDate,jdbcType=TIMESTAMP},
-            </if>
-            <if test="updateBy != null">
-            update_by = #{updateBy,jdbcType=BIGINT},
             </if>
             <if test="updateDate != null">
             update_date = #{updateDate,jdbcType=TIMESTAMP},
@@ -379,6 +310,9 @@
             <if test="tagNames != null">
             tag_names = #{tagNames,jdbcType=VARCHAR},
             </if>
+            <if test="extendInfo != null">
+            extend_info = #{extendInfo,jdbcType=VARCHAR},
+            </if>
             <if test="remarks != null">
             remarks = #{remarks,jdbcType=VARCHAR},
             </if>
@@ -391,25 +325,19 @@
         set
         <trim  suffixOverrides=",">
               name = #{name,jdbcType=VARCHAR},
-              code = #{code,jdbcType=VARCHAR},
               product_img = #{productImg,jdbcType=VARCHAR},
-              brand = #{brand,jdbcType=VARCHAR},
-              brand_img = #{brandImg,jdbcType=VARCHAR},
-              brand_description = #{brandDescription,jdbcType=VARCHAR},
-              brand_tele = #{brandTele,jdbcType=VARCHAR},
+              product_accept_id = #{productAcceptId,jdbcType=BIGINT},
+              product_issuer_id = #{productIssuerId,jdbcType=BIGINT},
               unit_price = #{unitPrice,jdbcType=INTEGER},
-              description = #{description,jdbcType=VARCHAR},
-              receive = #{receive,jdbcType=VARCHAR},
               sort = #{sort,jdbcType=INTEGER},
               status = #{status,jdbcType=INTEGER},
-              create_by = #{createBy,jdbcType=BIGINT},
               create_date = #{createDate,jdbcType=TIMESTAMP},
-              update_by = #{updateBy,jdbcType=BIGINT},
               update_date = #{updateDate,jdbcType=TIMESTAMP},
               expiration_start = #{expirationStart,jdbcType=VARCHAR},
               expiration_end = #{expirationEnd,jdbcType=VARCHAR},
               tag_ids = #{tagIds,jdbcType=VARCHAR},
               tag_names = #{tagNames,jdbcType=VARCHAR},
+              extend_info = #{extendInfo,jdbcType=VARCHAR},
               remarks = #{remarks,jdbcType=VARCHAR},
         </trim>
         where id = #{id,jdbcType=BIGINT}

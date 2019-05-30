@@ -1,4 +1,4 @@
-package org.eq.modules.product.vos;
+package org.eq.modules.product.vo;
 
 import lombok.Data;
 import org.eq.modules.common.entitys.SearchBase;
@@ -10,12 +10,6 @@ import org.eq.modules.common.entitys.SearchBase;
  */
 @Data
 public class SearchProductVO extends SearchBase {
-
-    /**
-     * 商品编号
-     */
-    @Deprecated
-    private String productCode;
 
     /**
      * 用户ID

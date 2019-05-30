@@ -4,18 +4,27 @@
  */
 package org.eq.modules.product.service.impl;
 
+import com.github.pagehelper.PageInfo;
 import org.eq.basic.common.annotation.AutowiredService;
+import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
+import org.eq.modules.common.entitys.PageResultBase;
+import org.eq.modules.common.entitys.StaticEntity;
+import org.eq.modules.common.utils.DateUtil;
+import org.eq.modules.enums.ProductStateEnum;
 import org.eq.modules.product.dao.ProductMapper;
 import org.eq.modules.product.entity.Product;
 import org.eq.modules.product.entity.ProductExample;
 import org.eq.modules.product.service.ProductService;
 import org.apache.commons.lang3.StringUtils;
+import org.eq.modules.product.vo.ProductVO;
+import org.eq.modules.product.vo.SearchProductVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +33,7 @@ import java.util.Map;
  * @author kaka
  * @version 2019.05.08
  */
+@SuppressWarnings("all")
 @Service
 @Transactional
 @AutowiredService
@@ -55,39 +65,45 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 			ca.andNameLike("%"+product.getName()+"%");
 		}
 		/**
-		 * 商品编号
-		 */
-		if(StringUtils.isNotBlank(product.getCode())){
-			ca.andCodeEqualTo(product.getCode());
-		}
-		/**
 		 * 商品状态
 		 */
 		if(product.getStatus()!=null){
 			ca.andStatusEqualTo(product.getStatus());
 		}
-
 		return example;
 	}
 
 	@Override
-	public Product getProductBetweenScore(int score, boolean isup) {
-
-		ProductExample example = new ProductExample();
-
-		ProductExample.Criteria ca = example.or();
-
-		if(isup){
-			example.setOrderByClause("sort asc ");
-			ca.andSortGreaterThan(score);
-		}else{
-			example.setOrderByClause("sort desc ");
-			ca.andSortLessThan(score);
+	public PageResultBase<ProductVO> pageSimpeProduct(SearchProductVO searchProductVO) {
+		PageResultBase<ProductVO> result = new PageResultBase<>();
+		if(searchProductVO ==null){
+			searchProductVO = new SearchProductVO();
 		}
-		List<Product> list = this.findListByExample(example);
-		if (list != null && !( list.isEmpty())) {
-			return list.get(0);
+		if(searchProductVO.getPageSize()<0 || searchProductVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
+			searchProductVO.setPageSize(StaticEntity.MAX_PAGE_SIZE);
 		}
+		if(searchProductVO.getPageNum()<=0){
+			searchProductVO.setPageNum(1);
+		}
+		BaseTableData baseTableData = findDataTableByExampleForPage(getExampleFromEntity(null,null),1,100);
+		/*PageInfo pageInfo = this.findListByExampleForPage(getBaseEffectExample(),searchProductVO.getPageNum(),searchProductVO.getPageSize());
+		result.setData(pageInfo.getList());
+		result.setRecordsFiltered(pageInfo.getTotal());
+		result.setRecordsTotal(pageInfo.getTotal());*/
 		return null;
+	}
+
+
+	/**
+	 * 获取基本有效查询条件
+	 * @return
+	 */
+	private ProductExample getBaseEffectExample() {
+		ProductExample example = new ProductExample();
+		ProductExample.Criteria ca = example.or();
+		example.setOrderByClause(" sort desc ");
+		ca.andStatusEqualTo(ProductStateEnum.ONLINE.getState());
+		ca.andExpirationEndGreaterThan(DateUtil.getNowTimeStr());
+		return example;
 	}
 }

@@ -45,9 +45,6 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 		}else{
 			example.setOrderByClause("id asc");
 		}
-		if(user.getId()!=null){
-			ca.andIdEqualTo(user.getId());
-		}
 		if(StringLowUtils.isNotBlank(user.getNickname())){
 			ca.andNicknameLike(user.getNickname());
 		}
@@ -56,12 +53,6 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 			ca.andMobileEqualTo(user.getMobile());
 		}
 
-		if(user.getStatus()!=null){
-			ca.andStatusEqualTo(user.getStatus());
-		}
-		if(user.getDelFlag()!=null){
-			ca.andDelFlagEqualTo(user.getDelFlag());
-		}
 		return example;
 	}
 
@@ -74,7 +65,6 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 			return 0;
 		}
 
-		ca.andIdEqualTo(user.getId());
 		ca.andDelFlagEqualTo(oldDelFlag);
 		return this.updateByExampleSelective(user,example);
 	}

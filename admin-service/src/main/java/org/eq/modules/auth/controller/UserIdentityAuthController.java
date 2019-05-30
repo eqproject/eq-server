@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -182,7 +183,7 @@ public class UserIdentityAuthController extends BaseController {
 	private UserIdentityAuth initUserIdentityAuth(UserIdentityAuth userIdentityAuth, boolean ifUpdate, SysUser user) {
         if (!ifUpdate) {
             userIdentityAuth.setCreateBy(user.getId());
-            userIdentityAuth.setCreateDate(LocalDateTime.now());
+            userIdentityAuth.setCreateDate(new Date());
         }
         return userIdentityAuth;
     }

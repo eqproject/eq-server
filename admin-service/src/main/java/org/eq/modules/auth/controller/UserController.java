@@ -255,13 +255,12 @@ public class UserController extends BaseController {
             result.setMsg("数据查询失败");
             return result;
         }
-        Integer delFlag = user.getDelFlag();
+        Integer delFlag = 0;
 
         user = new User();
         user.setId(id);
         user.setUpdateBy(sysUser.getId());
         user.setUpdateDate(new Date());
-        user.setDelFlag(Integer.valueOf(commond));
         int opresult = userService.updateUserDelFlagById(user,delFlag);
         if(opresult<=0){
             result.setMsg("请稍后重试");

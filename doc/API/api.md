@@ -331,12 +331,11 @@
 
 > | 参数        | 必选  | 类型   | 说明                               |
 > | ----------- | ----- | ------ | ---------------------------------- |
-> | productCode | false | 字符串 | 如果为空，查询全部，不为空查询单个 |
 > |userId | true | 字符串 | 当前查询用户 |
 > | pageSize    | true  | 整形   | 每页大小                           |
 > | pageNum     | true  | 整形   | 页号                               |
 > | sign        | true  | 字符串 | 平台签名                           |
->
+> 
 
 ###### 响应参数
 
@@ -349,19 +348,19 @@
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
 >| pageNum   |int    |  当前页 |
+>| totalNum |int | 总共多少商品 |
 >| productDatas   |Object[]    |商品详情   |
 >productDatas 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
-> | productCode     | true | 字符串 | 商品编号     |
-> | productName     | true | 字符串 | 商品名称     |
-> | unitPrice       | true | 整形   | 面值         |
-> | img             | true | 字符串 | 商品图片     |
-> | desc            | true | 字符串 | 商品介绍     |
-> | receive         | true | 字符串 | 商品提货说明 |
-> | expirationStart | true | 字符串 | 生效时间     |
-> | expirationEnd   | true | 字符串 | 过期时间     |
-> 
+>| productName     | true | 字符串 |
+>| unitPrice       | true | 整形   |
+>| img             | true | 字符串 |
+>| desc            | true | 字符串 |
+>| receive         | true | 字符串 |
+>| expirationStart | true | 字符串 |
+>| expirationEnd   | true | 字符串 |
+>
 ###### 响应实例
 
 ```

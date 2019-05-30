@@ -5,19 +5,19 @@
 package org.eq.modules.product.controller;
 
 import org.eq.basic.common.base.BaseController;
+import org.eq.modules.auth.entity.User;
+import org.eq.modules.common.entitys.PageResultBase;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
-import org.eq.modules.product.entity.Product;
 import org.eq.modules.product.service.ProductService;
-import com.alibaba.fastjson.JSONObject;
-import org.eq.modules.product.vos.SearchProductVO;
+import org.eq.modules.product.vo.PageProductVO;
+import org.eq.modules.product.vo.ProductVO;
+import org.eq.modules.product.vo.SearchProductVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * 商品信息Controller
@@ -41,11 +41,20 @@ public class ProductController extends BaseController {
 	 * @return
 	 */
 	@PostMapping("/platform/effect")
-	public ResponseData<String> platformEffect(SearchProductVO searchProductVO) {
-
-
-
-		return ResponseFactory.success("");
+	public ResponseData<PageProductVO> platformEffect(SearchProductVO searchProductVO) {
+		if(searchProductVO==null){
+			return ResponseFactory.paramsError("参数为空或者用户ID为空");
+		}
+		User user = getUserInfo(searchProductVO.getUserId());
+		if(user==null){
+			return ResponseFactory.signError("用户不存在");
+		}
+		PageProductVO result = new PageProductVO();
+		PageResultBase<ProductVO>  pageResultData =  productService.pageSimpeProduct(searchProductVO);
+		result.setPageNum(searchProductVO.getPageNum());
+		result.setProductDatas(pageResultData.getData());
+		result.setTotalNum(pageResultData.getRecordsTotal());
+		return ResponseFactory.success(result);
 	}
 
 

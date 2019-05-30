@@ -56,18 +56,6 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 			ca.andNameLike("%"+product.getName()+"%");
 		}
 		/**
-		 * 品牌商
-		 */
-		if(StringUtils.isNotBlank(product.getBrand())){
-			ca.andBrandLike("%"+product.getBrand()+"%");
-		}
-		/**
-		 * 商品编号
-		 */
-		if(StringUtils.isNotBlank(product.getCode())){
-			ca.andCodeEqualTo(product.getCode());
-		}
-		/**
 		 * 商品状态
 		 */
 		if(product.getStatus()!=null){

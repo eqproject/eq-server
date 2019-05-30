@@ -1,7 +1,7 @@
 package org.eq.basic.common.config;
 
 import org.eq.basic.common.filter.MyInterceptor;
-import org.eq.modules.common.aop.ApiInterceptor;
+import org.eq.modules.common.fileter.ApiInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
