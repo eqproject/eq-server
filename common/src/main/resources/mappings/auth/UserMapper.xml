@@ -5,16 +5,16 @@
         <id column="id" jdbcType="BIGINT" property="id" />
 	    <result column="name" jdbcType="VARCHAR" property="name" />
 	    <result column="nickname" jdbcType="VARCHAR" property="nickname" />
+	    <result column="password" jdbcType="VARCHAR" property="password" />
+	    <result column="tx_password" jdbcType="VARCHAR" property="txPassword" />
 	    <result column="sex" jdbcType="INTEGER" property="sex" />
+	    <result column="level" jdbcType="VARCHAR" property="level" />
 	    <result column="mobile" jdbcType="VARCHAR" property="mobile" />
-	    <result column="id_card" jdbcType="VARCHAR" property="idCard" />
-	    <result column="status" jdbcType="INTEGER" property="status" />
+	    <result column="auth_status" jdbcType="INTEGER" property="authStatus" />
 	    <result column="birthday" jdbcType="TIMESTAMP" property="birthday" />
 	    <result column="photo_head" jdbcType="VARCHAR" property="photoHead" />
 	    <result column="intro" jdbcType="VARCHAR" property="intro" />
-	    <result column="create_by" jdbcType="BIGINT" property="createBy" />
 	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
-	    <result column="update_by" jdbcType="BIGINT" property="updateBy" />
 	    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
 	    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
 	    <result column="del_flag" jdbcType="INTEGER" property="delFlag" />
@@ -81,7 +81,7 @@
     </sql>
 
     <sql id="Base_Column_List">
-        id,name,nickname,sex,mobile,id_card,status,birthday,photo_head,intro,create_by,create_date,update_by,update_date,remarks,del_flag
+        id,name,nickname,password,tx_password,sex,level,mobile,auth_status,birthday,photo_head,intro,create_date,update_date,remarks,del_flag
     </sql>
 
     <select id="selectByExample" parameterType="org.eq.modules.auth.entity.UserExample" resultMap="BaseResultMap">
@@ -119,21 +119,21 @@
     </delete>
 
     <insert id="insert" parameterType="org.eq.modules.auth.entity.User">
-        insert into user (name,nickname,sex,mobile,id_card,status,birthday,photo_head,intro,create_by,create_date,update_by,update_date,remarks,del_flag)
+        insert into user (name,nickname,password,tx_password,sex,level,mobile,auth_status,birthday,photo_head,intro,create_date,update_date,remarks,del_flag)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
             #{name,jdbcType=VARCHAR},
             #{nickname,jdbcType=VARCHAR},
+            #{password,jdbcType=VARCHAR},
+            #{txPassword,jdbcType=VARCHAR},
             #{sex,jdbcType=INTEGER},
+            #{level,jdbcType=VARCHAR},
             #{mobile,jdbcType=VARCHAR},
-            #{idCard,jdbcType=VARCHAR},
-            #{status,jdbcType=INTEGER},
-            #{birthday,jdbcType=INTEGER},
+            #{authStatus,jdbcType=INTEGER},
+            #{birthday,jdbcType=TIMESTAMP},
             #{photoHead,jdbcType=VARCHAR},
             #{intro,jdbcType=VARCHAR},
-            #{createBy,jdbcType=BIGINT},
             #{createDate,jdbcType=TIMESTAMP},
-            #{updateBy,jdbcType=BIGINT},
             #{updateDate,jdbcType=TIMESTAMP},
             #{remarks,jdbcType=VARCHAR},
             #{delFlag,jdbcType=INTEGER},
@@ -145,16 +145,16 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             name,
             nickname,
+            password,
+            tx_password,
             sex,
+            level,
             mobile,
-            id_card,
-            status,
+            auth_status,
             birthday,
             photo_head,
             intro,
-            create_by,
             create_date,
-            update_by,
             update_date,
             remarks,
             del_flag,
@@ -162,16 +162,16 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             #{name,jdbcType=VARCHAR},
             #{nickname,jdbcType=VARCHAR},
+            #{password,jdbcType=VARCHAR},
+            #{txPassword,jdbcType=VARCHAR},
             #{sex,jdbcType=INTEGER},
+            #{level,jdbcType=VARCHAR},
             #{mobile,jdbcType=VARCHAR},
-            #{idCard,jdbcType=VARCHAR},
-            #{status,jdbcType=INTEGER},
-            #{birthday,jdbcType=INTEGER},
+            #{authStatus,jdbcType=INTEGER},
+            #{birthday,jdbcType=TIMESTAMP},
             #{photoHead,jdbcType=VARCHAR},
             #{intro,jdbcType=VARCHAR},
-            #{createBy,jdbcType=BIGINT},
             #{createDate,jdbcType=TIMESTAMP},
-            #{updateBy,jdbcType=BIGINT},
             #{updateDate,jdbcType=TIMESTAMP},
             #{remarks,jdbcType=VARCHAR},
             #{delFlag,jdbcType=INTEGER},
@@ -189,7 +189,7 @@
         update user
         <set>
             <if test="record.id != null">
-                id = #{record.id,jdbcType=BIGINT},
+                id = #{record.id,jdbcType=INTEGER},
             </if>
             <if test="record.name != null">
                 name = #{record.name,jdbcType=VARCHAR},
@@ -197,20 +197,26 @@
             <if test="record.nickname != null">
                 nickname = #{record.nickname,jdbcType=VARCHAR},
             </if>
+            <if test="record.password != null">
+                password = #{record.password,jdbcType=VARCHAR},
+            </if>
+            <if test="record.txPassword != null">
+                tx_password = #{record.txPassword,jdbcType=VARCHAR},
+            </if>
             <if test="record.sex != null">
                 sex = #{record.sex,jdbcType=INTEGER},
+            </if>
+            <if test="record.level != null">
+                level = #{record.level,jdbcType=VARCHAR},
             </if>
             <if test="record.mobile != null">
                 mobile = #{record.mobile,jdbcType=VARCHAR},
             </if>
-            <if test="record.idCard != null">
-                id_card = #{record.idCard,jdbcType=VARCHAR},
-            </if>
-            <if test="record.status != null">
-                status = #{record.status,jdbcType=INTEGER},
+            <if test="record.authStatus != null">
+                auth_status = #{record.authStatus,jdbcType=INTEGER},
             </if>
             <if test="record.birthday != null">
-                birthday = #{record.birthday,jdbcType=INTEGER},
+                birthday = #{record.birthday,jdbcType=TIMESTAMP},
             </if>
             <if test="record.photoHead != null">
                 photo_head = #{record.photoHead,jdbcType=VARCHAR},
@@ -218,14 +224,8 @@
             <if test="record.intro != null">
                 intro = #{record.intro,jdbcType=VARCHAR},
             </if>
-            <if test="record.createBy != null">
-                create_by = #{record.createBy,jdbcType=BIGINT},
-            </if>
             <if test="record.createDate != null">
                 create_date = #{record.createDate,jdbcType=TIMESTAMP},
-            </if>
-            <if test="record.updateBy != null">
-                update_by = #{record.updateBy,jdbcType=BIGINT},
             </if>
             <if test="record.updateDate != null">
                 update_date = #{record.updateDate,jdbcType=TIMESTAMP},
@@ -246,19 +246,19 @@
         update user
         set
         <trim  suffixOverrides=",">
-            id = #{record.id,jdbcType=BIGINT},
+            id = #{record.id,jdbcType=INTEGER},
             name = #{record.name,jdbcType=VARCHAR},
             nickname = #{record.nickname,jdbcType=VARCHAR},
+            password = #{record.password,jdbcType=VARCHAR},
+            tx_password = #{record.txPassword,jdbcType=VARCHAR},
             sex = #{record.sex,jdbcType=INTEGER},
+            level = #{record.level,jdbcType=VARCHAR},
             mobile = #{record.mobile,jdbcType=VARCHAR},
-            id_card = #{record.idCard,jdbcType=VARCHAR},
-            status = #{record.status,jdbcType=INTEGER},
-            birthday = #{record.birthday,jdbcType=INTEGER},
+            auth_status = #{record.authStatus,jdbcType=INTEGER},
+            birthday = #{record.birthday,jdbcType=TIMESTAMP},
             photo_head = #{record.photoHead,jdbcType=VARCHAR},
             intro = #{record.intro,jdbcType=VARCHAR},
-            create_by = #{record.createBy,jdbcType=BIGINT},
             create_date = #{record.createDate,jdbcType=TIMESTAMP},
-            update_by = #{record.updateBy,jdbcType=BIGINT},
             update_date = #{record.updateDate,jdbcType=TIMESTAMP},
             remarks = #{record.remarks,jdbcType=VARCHAR},
             del_flag = #{record.delFlag,jdbcType=INTEGER},
@@ -277,20 +277,26 @@
             <if test="nickname != null">
             nickname = #{nickname,jdbcType=VARCHAR},
             </if>
+            <if test="password != null">
+            password = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="txPassword != null">
+            tx_password = #{txPassword,jdbcType=VARCHAR},
+            </if>
             <if test="sex != null">
             sex = #{sex,jdbcType=INTEGER},
+            </if>
+            <if test="level != null">
+            level = #{level,jdbcType=VARCHAR},
             </if>
             <if test="mobile != null">
             mobile = #{mobile,jdbcType=VARCHAR},
             </if>
-            <if test="idCard != null">
-            id_card = #{idCard,jdbcType=VARCHAR},
-            </if>
-            <if test="status != null">
-            status = #{status,jdbcType=INTEGER},
+            <if test="authStatus != null">
+            auth_status = #{authStatus,jdbcType=INTEGER},
             </if>
             <if test="birthday != null">
-            birthday = #{birthday,jdbcType=INTEGER},
+            birthday = #{birthday,jdbcType=TIMESTAMP},
             </if>
             <if test="photoHead != null">
             photo_head = #{photoHead,jdbcType=VARCHAR},
@@ -298,14 +304,8 @@
             <if test="intro != null">
             intro = #{intro,jdbcType=VARCHAR},
             </if>
-            <if test="createBy != null">
-            create_by = #{createBy,jdbcType=BIGINT},
-            </if>
             <if test="createDate != null">
             create_date = #{createDate,jdbcType=TIMESTAMP},
-            </if>
-            <if test="updateBy != null">
-            update_by = #{updateBy,jdbcType=BIGINT},
             </if>
             <if test="updateDate != null">
             update_date = #{updateDate,jdbcType=TIMESTAMP},
@@ -326,16 +326,16 @@
         <trim  suffixOverrides=",">
               name = #{name,jdbcType=VARCHAR},
               nickname = #{nickname,jdbcType=VARCHAR},
+              password = #{password,jdbcType=VARCHAR},
+              tx_password = #{txPassword,jdbcType=VARCHAR},
               sex = #{sex,jdbcType=INTEGER},
+              level = #{level,jdbcType=VARCHAR},
               mobile = #{mobile,jdbcType=VARCHAR},
-              id_card = #{idCard,jdbcType=VARCHAR},
-              status = #{status,jdbcType=INTEGER},
-              birthday = #{birthday,jdbcType=INTEGER},
+              auth_status = #{authStatus,jdbcType=INTEGER},
+              birthday = #{birthday,jdbcType=TIMESTAMP},
               photo_head = #{photoHead,jdbcType=VARCHAR},
               intro = #{intro,jdbcType=VARCHAR},
-              create_by = #{createBy,jdbcType=BIGINT},
               create_date = #{createDate,jdbcType=TIMESTAMP},
-              update_by = #{updateBy,jdbcType=BIGINT},
               update_date = #{updateDate,jdbcType=TIMESTAMP},
               remarks = #{remarks,jdbcType=VARCHAR},
               del_flag = #{delFlag,jdbcType=INTEGER},

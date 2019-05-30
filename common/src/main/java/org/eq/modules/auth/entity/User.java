@@ -1,89 +1,151 @@
 package org.eq.modules.auth.entity;
 
-import lombok.Data;
+import org.eq.basic.common.base.BaseEntity;
 
 import java.util.Date;
 
 /**
  * 用户管理Entity
- * @author kaka
- * @version 1.0.1
+ * @author hobe
+ * @version 2019-05-30
  */
-@Data
-public class User  {
+public class User extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-    private Long id;
-    /**
-     * 用户名
-     */
-    private String name;
-    /**
-     * 昵称
-     */
-    private String nickname;
-    /**
-     * 性别(0,未知，1:男;2:女)
-     * @see  org.eq.modules.enums.UserSexEnum;
-     */
-    private Integer sex;
-    /**
-     *  手机号
-     */
-    private String mobile;
-    /**
-     * 身份id
-     */
-    private String idCard;
-    /**
-     * 状态 1:未认证;2:已认证
-     * @see org.eq.modules.enums.UserStateEnum
-     */
-    private Integer status;
+    private Integer id;        // 唯一标识
+    private String name;        // 用户名
+    private String nickname;        // 昵称
+    private String password;        // 登录密码md5(用户id+密码+盐 )
+    private String txPassword;        // 交易密码md5(用户id+交易密码+盐 )
+    private Integer sex;        // 性别(1:男;2:女)
+    private String level;        // 用户等级
+    private String mobile;        // 手机号
+    private Integer authStatus;        // 实名验证状态(1:未认证;2:已认证;)
+    private Date birthday;        // 生日
+    private String photoHead;        // 头像
+    private String intro;        // 简介
 
-    /**
-     * 生日
-     */
-    private Date birthday;
+    public User() {
+        super();
+    }
 
-    /**
-     * 头像
-     */
-    private String photoHead;
-    /**
-     * 简介
-     */
-    private String intro;
+    public Integer getId() {
+        return id;
+    }
 
-    /**
-     * 创建人
-     */
-    private Long createBy;
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-    /**
-     * 创建时间
-     */
-    private Date createDate;
+    public String getName() {
+        return name;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    /**
-     * 更新人
-     */
-    private Long updateBy;
+    public String getNickname() {
+        return nickname;
+    }
 
-    /**
-     * 更新时间
-     */
-    private Date updateDate;
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
 
-    /**
-     * 备注
-     */
-    private String remarks;
+    public String getPassword() {
+        return password;
+    }
 
-    /**
-     *  删除标志
-     *  1 删除  0 通用
-     */
-    private Integer delFlag;
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getTxPassword() {
+        return txPassword;
+    }
+
+    public void setTxPassword(String txPassword) {
+        this.txPassword = txPassword;
+    }
+
+    public Integer getSex() {
+        return sex;
+    }
+
+    public void setSex(Integer sex) {
+        this.sex = sex;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public Integer getAuthStatus() {
+        return authStatus;
+    }
+
+    public void setAuthStatus(Integer authStatus) {
+        this.authStatus = authStatus;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getPhotoHead() {
+        return photoHead;
+    }
+
+    public void setPhotoHead(String photoHead) {
+        this.photoHead = photoHead;
+    }
+
+    public String getIntro() {
+        return intro;
+    }
+
+    public void setIntro(String intro) {
+        this.intro = intro;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
 }

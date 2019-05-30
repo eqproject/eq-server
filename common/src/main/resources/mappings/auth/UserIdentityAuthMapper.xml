@@ -6,9 +6,10 @@
 	    <result column="identity_card" jdbcType="VARCHAR" property="identityCard" />
 	    <result column="identity_name" jdbcType="VARCHAR" property="identityName" />
 	    <result column="user_id" jdbcType="BIGINT" property="userId" />
-	    <result column="auth_result" jdbcType="VARCHAR" property="authResult" />
-	    <result column="create_by" jdbcType="BIGINT" property="createBy" />
+	    <result column="result_status" jdbcType="INTEGER" property="resultStatus" />
+	    <result column="result_msg" jdbcType="VARCHAR" property="resultMsg" />
 	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+	    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
     </resultMap>
 
     <sql id="Example_Where_Clause">
@@ -72,7 +73,7 @@
     </sql>
 
     <sql id="Base_Column_List">
-        id,identity_card,identity_name,user_id,auth_result,create_by,create_date
+        id,identity_card,identity_name,user_id,result_status,result_msg,create_date,update_date
     </sql>
 
     <select id="selectByExample" parameterType="org.eq.modules.auth.entity.UserIdentityAuthExample" resultMap="BaseResultMap">
@@ -81,7 +82,7 @@
             distinct
         </if>
         <include refid="Base_Column_List" />
-        from user_identity_authentication
+        from user_identity_auth
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>
@@ -93,64 +94,67 @@
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
-        from user_identity_authentication
+        from user_identity_auth
         where id = #{id,jdbcType=BIGINT}
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete from user_identity_authentication
+        delete from user_identity_auth
         where id = #{id,jdbcType=BIGINT}
     </delete>
 
     <delete id="deleteByExample" parameterType="org.eq.modules.auth.entity.UserIdentityAuthExample">
-        delete from user_identity_authentication
+        delete from user_identity_auth
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>
     </delete>
 
     <insert id="insert" parameterType="org.eq.modules.auth.entity.UserIdentityAuth">
-        insert into user_identity_authentication (identity_card,identity_name,user_id,auth_result,create_by,create_date)
+        insert into user_identity_auth (identity_card,identity_name,user_id,result_status,result_msg,create_date,update_date)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
             #{identityCard,jdbcType=VARCHAR},
             #{identityName,jdbcType=VARCHAR},
             #{userId,jdbcType=BIGINT},
-            #{authResult,jdbcType=VARCHAR},
-            #{createBy,jdbcType=BIGINT},
+            #{resultStatus,jdbcType=INTEGER},
+            #{resultMsg,jdbcType=VARCHAR},
             #{createDate,jdbcType=TIMESTAMP},
+            #{updateDate,jdbcType=TIMESTAMP},
         </trim>
     </insert>
 
     <insert id="insertSelective" parameterType="org.eq.modules.auth.entity.UserIdentityAuth">
-        insert into user_identity_authentication
+        insert into user_identity_auth
         <trim prefix="(" suffix=")" suffixOverrides=",">
             identity_card,
             identity_name,
             user_id,
-            auth_result,
-            create_by,
+            result_status,
+            result_msg,
             create_date,
+            update_date,
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             #{identityCard,jdbcType=VARCHAR},
             #{identityName,jdbcType=VARCHAR},
             #{userId,jdbcType=BIGINT},
-            #{authResult,jdbcType=VARCHAR},
-            #{createBy,jdbcType=BIGINT},
+            #{resultStatus,jdbcType=INTEGER},
+            #{resultMsg,jdbcType=VARCHAR},
             #{createDate,jdbcType=TIMESTAMP},
+            #{updateDate,jdbcType=TIMESTAMP},
         </trim>
     </insert>
 
     <select id="countByExample" parameterType="org.eq.modules.auth.entity.UserIdentityAuthExample" resultType="java.lang.Long">
-        select count(*) from user_identity_authentication
+        select count(*) from user_identity_auth
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>
     </select>
 
     <update id="updateByExampleSelective" parameterType="map">
-        update user_identity_authentication
+        update user_identity_auth
         <set>
             <if test="record.id != null">
                 id = #{record.id,jdbcType=BIGINT},
@@ -164,14 +168,17 @@
             <if test="record.userId != null">
                 user_id = #{record.userId,jdbcType=BIGINT},
             </if>
-            <if test="record.authResult != null">
-                auth_result = #{record.authResult,jdbcType=VARCHAR},
+            <if test="record.resultStatus != null">
+                result_status = #{record.resultStatus,jdbcType=INTEGER},
             </if>
-            <if test="record.createBy != null">
-                create_by = #{record.createBy,jdbcType=BIGINT},
+            <if test="record.resultMsg != null">
+                result_msg = #{record.resultMsg,jdbcType=VARCHAR},
             </if>
             <if test="record.createDate != null">
                 create_date = #{record.createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.updateDate != null">
+                update_date = #{record.updateDate,jdbcType=TIMESTAMP},
             </if>
         </set>
         <if test="_parameter != null">
@@ -180,16 +187,17 @@
     </update>
 
     <update id="updateByExample" parameterType="map">
-        update user_identity_authentication
+        update user_identity_auth
         set
         <trim  suffixOverrides=",">
             id = #{record.id,jdbcType=BIGINT},
             identity_card = #{record.identityCard,jdbcType=VARCHAR},
             identity_name = #{record.identityName,jdbcType=VARCHAR},
             user_id = #{record.userId,jdbcType=BIGINT},
-            auth_result = #{record.authResult,jdbcType=VARCHAR},
-            create_by = #{record.createBy,jdbcType=BIGINT},
+            result_status = #{record.resultStatus,jdbcType=INTEGER},
+            result_msg = #{record.resultMsg,jdbcType=VARCHAR},
             create_date = #{record.createDate,jdbcType=TIMESTAMP},
+            update_date = #{record.updateDate,jdbcType=TIMESTAMP},
         </trim>
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause" />
@@ -197,7 +205,7 @@
     </update>
 
     <update id="updateByPrimaryKeySelective" parameterType="org.eq.modules.auth.entity.UserIdentityAuth">
-        update user_identity_authentication
+        update user_identity_auth
         <set>
             <if test="identityCard != null">
             identity_card = #{identityCard,jdbcType=VARCHAR},
@@ -208,29 +216,33 @@
             <if test="userId != null">
             user_id = #{userId,jdbcType=BIGINT},
             </if>
-            <if test="authResult != null">
-            auth_result = #{authResult,jdbcType=VARCHAR},
+            <if test="resultStatus != null">
+            result_status = #{resultStatus,jdbcType=INTEGER},
             </if>
-            <if test="createBy != null">
-            create_by = #{createBy,jdbcType=BIGINT},
+            <if test="resultMsg != null">
+            result_msg = #{resultMsg,jdbcType=VARCHAR},
             </if>
             <if test="createDate != null">
             create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateDate != null">
+            update_date = #{updateDate,jdbcType=TIMESTAMP},
             </if>
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
 
     <update id="updateByPrimaryKey" parameterType="org.eq.modules.auth.entity.UserIdentityAuth">
-        update user_identity_authentication
+        update user_identity_auth
         set
         <trim  suffixOverrides=",">
               identity_card = #{identityCard,jdbcType=VARCHAR},
               identity_name = #{identityName,jdbcType=VARCHAR},
               user_id = #{userId,jdbcType=BIGINT},
-              auth_result = #{authResult,jdbcType=VARCHAR},
-              create_by = #{createBy,jdbcType=BIGINT},
+              result_status = #{resultStatus,jdbcType=INTEGER},
+              result_msg = #{resultMsg,jdbcType=VARCHAR},
               create_date = #{createDate,jdbcType=TIMESTAMP},
+              update_date = #{updateDate,jdbcType=TIMESTAMP},
         </trim>
         where id = #{id,jdbcType=BIGINT}
     </update>
