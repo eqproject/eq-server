@@ -1,6 +1,7 @@
 package org.eq.basic.common.config;
 
 import org.eq.basic.common.filter.MyInterceptor;
+import org.eq.modules.common.aop.ApiInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -46,5 +47,6 @@ public class MvcConfig implements WebMvcConfigurer {
         // addPathPatterns 用于添加拦截规则
         // excludePathPatterns 用户排除拦截
         registry.addInterceptor(new MyInterceptor()).addPathPatterns("/**");
+        registry.addInterceptor(new ApiInterceptor()).addPathPatterns("/api/**");
     }
 }
