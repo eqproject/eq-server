@@ -3,7 +3,8 @@ package org.eq.modules.common.cache;
 import org.eq.modules.product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
 
 /**
  * 商品缓存
@@ -15,8 +16,8 @@ public class ProductCache implements  BaseCache{
     @Autowired
     private ProductService productService;
 
-    @Override
+    @PostConstruct
     public void init() {
-        //TODO
+
     }
 }

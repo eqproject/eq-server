@@ -6,11 +6,10 @@ package org.eq.modules.product.controller;
 
 import org.eq.basic.common.base.BaseController;
 import org.eq.modules.auth.entity.User;
-import org.eq.modules.common.entitys.PageResultBase;
+import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
 import org.eq.modules.product.service.ProductService;
-import org.eq.modules.product.vo.PageProductVO;
 import org.eq.modules.product.vo.ProductVO;
 import org.eq.modules.product.vo.SearchProductVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +41,7 @@ public class ProductController extends BaseController {
 	 * @return
 	 */
 	@PostMapping("/platform/effect")
-	public ResponseData<PageProductVO> platformEffect(SearchProductVO searchProductVO) {
+	public ResponseData<PageResultData> platformEffect(SearchProductVO searchProductVO) {
 		if(searchProductVO==null){
 			return ResponseFactory.paramsError("参数为空或者用户ID为空");
 		}
@@ -50,12 +49,8 @@ public class ProductController extends BaseController {
 		if(user==null){
 			return ResponseFactory.signError("用户不存在");
 		}
-		PageProductVO result = new PageProductVO();
-		PageResultBase<ProductVO>  pageResultData =  productService.pageSimpeProduct(searchProductVO);
-		result.setPageNum(searchProductVO.getPageNum());
-		result.setProductDatas(pageResultData.getData());
-		result.setTotalNum(pageResultData.getRecordsTotal());
-		return ResponseFactory.success(result);
+		PageResultData<ProductVO> pageResultData =  productService.pageSimpeProduct(searchProductVO);
+		return ResponseFactory.success(pageResultData);
 	}
 
 
@@ -65,7 +60,7 @@ public class ProductController extends BaseController {
 	 */
 
 	@PostMapping("/user/effect")
-	public ResponseData<PageProductVO> userEffect(SearchProductVO searchProductVO) {
+	public ResponseData<PageResultData> userEffect(SearchProductVO searchProductVO) {
 		if(searchProductVO==null){
 			return ResponseFactory.paramsError("参数为空或者用户ID为空");
 		}
@@ -73,13 +68,9 @@ public class ProductController extends BaseController {
 		if(user==null){
 			return ResponseFactory.signError("用户不存在");
 		}
+		PageResultData<ProductVO> pageResultData =  productService.pageSimpeProduct(searchProductVO);
 
-		PageProductVO result = new PageProductVO();
-		PageResultBase<ProductVO>  pageResultData =  productService.pageSimpeProduct(searchProductVO);
-		result.setPageNum(searchProductVO.getPageNum());
-		result.setProductDatas(pageResultData.getData());
-		result.setTotalNum(pageResultData.getRecordsTotal());
-		return ResponseFactory.success(result);
+		return ResponseFactory.success(pageResultData);
 	}
 
 

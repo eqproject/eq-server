@@ -11,9 +11,9 @@ import java.util.List;
  * @date  2019-05-27
  */
 @Data
-public class PageResultBase<T> {
+public class PageResultData<T> {
 
-    public PageResultBase() {
+    public PageResultData() {
         this.total = 0;
         this.list = new ArrayList<>();
     }

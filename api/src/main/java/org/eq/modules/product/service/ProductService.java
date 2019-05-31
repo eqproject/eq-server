@@ -5,13 +5,11 @@
 package org.eq.modules.product.service;
 
 import org.eq.basic.common.base.ServiceExtend;
-import org.eq.modules.common.entitys.PageResultBase;
+import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.product.entity.Product;
 import org.eq.modules.product.entity.ProductExample;
 import org.eq.modules.product.vo.ProductVO;
 import org.eq.modules.product.vo.SearchProductVO;
-
-import java.util.List;
 
 /**
  * 商品信息Service
@@ -25,6 +23,6 @@ public interface ProductService extends ServiceExtend<Product,ProductExample> {
      * @param searchProductVO
      * @return
      */
-    PageResultBase<ProductVO> pageSimpeProduct(SearchProductVO searchProductVO);
+    PageResultData<ProductVO> pageSimpeProduct(SearchProductVO searchProductVO);
 
 }

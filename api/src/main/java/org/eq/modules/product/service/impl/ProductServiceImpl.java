@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
-import org.eq.modules.common.entitys.PageResultBase;
+import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.common.utils.DateUtil;
 import org.eq.modules.common.utils.ProductUtil;
@@ -81,8 +81,8 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 	}
 
 	@Override
-	public PageResultBase<ProductVO> pageSimpeProduct(SearchProductVO searchProductVO) {
-		PageResultBase<ProductVO> result = new PageResultBase<>();
+	public PageResultData<ProductVO> pageSimpeProduct(SearchProductVO searchProductVO) {
+		PageResultData<ProductVO> result = new PageResultData<>();
 		if(searchProductVO ==null){
 			searchProductVO = new SearchProductVO();
 		}
