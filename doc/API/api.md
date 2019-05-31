@@ -1003,8 +1003,6 @@
 }
 ```
 
-
-
 #### 4、交易订单
 
 ##### 4-01\. 创建交易订单接口
@@ -1025,12 +1023,11 @@
 ###### 请求参数
 > |参数|必选|类型|说明|
 |:-----  |:-------|:-----|----- |
-|uuid       |true    |string  | 防止重复提交|
-|toUserId|true|long  |买家id|
-|orderNo|true|string  |广告订单编号|
-|productCode|true|string|购买商品编码|
-|productNum|true|int  |购买商品数量|
-|salePrice |true|int  |购买商品价格|
+|buyUserId|true|long  |购买用户id|
+|adNo|true|string  |广告订单号|
+|productId|true| long |商品id|
+|orderNum|true|int  |订单数量|
+|salePrice |true|int  |商品售价(单位:分)|
 |serviceFee|true|int  |服务费(单位:分)|
 |type|true|int|订单类型:(1:出售;2:求购)|
 |remarks|false|string|交易描述|
@@ -1040,8 +1037,9 @@
 > |返回字段|字段类型|说明   |
 |:-----   |:-----------|:-------------------------|
 |status   |int    |返回结果状态。0：正常；1：错误。   |
-|errMsg   |string |错误描述   |
-|tradeNo |string| 交易订单号|
+|errMsg   |string |错误描述|
+|data |object|结果对象|
+|-- tradeNo |string| 交易订单号|
 
 
 ###### 接口示例
@@ -1052,7 +1050,9 @@
 {
 	"errMsg": "",
 	"status": 0,
-	"tradeNo": 100
+	data:{
+	   "tradeNo":"woeuirjk1010038388"
+	}
 }
 
 ```
@@ -1075,7 +1075,6 @@
 ###### 请求参数
 > |参数|必选|类型|说明|
 |:-----  |:-------|:-----|----- |
-|uuid       |true    |string  | 防止重复提交|
 |tradeNo |true|string |交易订单编号|
 |sign|true|string|签名|
 
@@ -1084,7 +1083,8 @@
 |:-----   |:-----------|:-------------------------|
 |status   |int    |返回结果状态。0：正常；1：错误。   |
 |errMsg   |string |错误描述   |
-|tradeNo |string| 交易订单号|
+|data |object|结果对象|
+|-- tradeNo |string| 交易订单号|
 
 
 ###### 接口示例
@@ -1095,7 +1095,9 @@
 {
 	"errMsg": "",
 	"status": 0,
-	"tradeNo":"10000000323jk200023994893"
+	 data:{
+	   "tradeNo":"woeuirjk1010038388"
+	}
 }
 
 ```
@@ -1126,18 +1128,18 @@
 |:-----   |:------|:-----------------------------   |
 |status   |int    |返回结果状态。0：正常；1：错误。   |
 |errMsg   |string    |错误描述   |
-|info |object |交易订单商品详情                        |
+|data |object |交易订单商品详情                        |
 |-    product |object |商品信息 |
 |--        productImg |string |图片url |
 |--        name |string |名称|
 |--        unitPrice |int |面值(单位:分)|
 |-    user |object |用户信息 |
-|--        fromUserId |long |卖家用户id|
-|--        fromUserNickName | string |卖家昵称|
-|--        fromUserName | string |卖家名称|
-|--        fromUserAccount |string|卖家收款账户|
-|--        toUserId |long |买家用户id|
-|--        toUserNickName | string |买家昵称|
+|--        sellUserId |long |售卖用户id|
+|--        sellUserNickName | string |卖家昵称|
+|--        sellUserName | string |卖家名称|
+|--        sellUserAccount |string|卖家收款账户|
+|--        buyUserId |long |买家用户id|
+|--        buyUserNickName | string |买家昵称|
 |-    trade |object |交易订单信息 |
 |--        tradeNo|string |交易订单号|
 |--        payNo |string |支付流水号|
@@ -1158,7 +1160,7 @@
 {
 	"errMsg": "",
 	"status": 0,
-	"info": {
+	"data": {
 		"product": {
 			"productImg": "http://product.png",
 			"unitPrice": 200,
@@ -1177,12 +1179,12 @@
 			"status": 1
 		},
 		"user": {
-			"toUserId": 2,
-			"toUserNickName": "买家昵称",
-			"fromUserNickName": "卖家昵称",
-			"fromUserId": 1,
-			"fromUserName":"苏大强",
-			"fromUserAccount":"bitqtZ***ekjkd.com"
+			"buyUserId": 2,
+			"buyUserNickName": "买家昵称",
+			"sellUserNickName": "卖家昵称",
+			"sellUserId": 1,
+			"sellUserName":"苏大强",
+			"sellUserAccount":"bitqtZ***ekjkd.com"
 		}
 	}
 }
@@ -1201,7 +1203,7 @@
 > JSON
 
 ###### HTTP请求方式
-> GET
+> POST
 
 ###### 请求参数
 > |参数|必选|类型|说明|
@@ -1232,13 +1234,13 @@
 
 ```
 
-##### 4-05\.查询待付款/进行中交易订单列表接口
+##### 4-05\.查询待付款交易订单列表接口
 
 ###### 接口功能
->  查询待付款/进行中交易订单列表接口
+>  查询待付款交易订单列表接口
 
 ###### URL
-> [/api/order/trade/list](/api/order/trade/list)
+> [/api/order/trade/paying/list](/api/order/trade/paying/list)
 
 ###### 支持格式
 > JSON
@@ -1252,7 +1254,6 @@
 |userId      |true    |long  | 用户Id|
 |pageNum     |true    |int   |页数             |
 |pageSize    |true    |int   |每页显示数量。 |
-|status   |true    |int  |订单状态:(1:进行中;2:待支付)  |
 |sign       |true    |string   |签名|
 
 ###### 返回字段
@@ -1260,71 +1261,73 @@
 |:-----   |:------|:-----------------------------   |
 |status   |int    |返回结果状态。0：正常；1：错误。   |
 |errMsg   |string    |错误描述   |
-|total  |int | 订单总记录数|
-|list |list |交易订单列表                        |
-|-    product |object |商品信息 |
-|--        productImg |string |图片url |
-|--        name |string |名称|
-|--        unitPrice |int |面值(单位:分)|
-|-    user |object |用户信息 |
-|--        fromUserId |long |卖家用户id|
-|--        fromUserNickName | string |卖家昵称|
-|--        toUserId |long |买家用户id|
-|--        toUserNickName | string |买家昵称|
-|-    trade |object |交易订单信息 |
-|--        tradeNo |string |交易订单号|
-|--        payNo |string |支付流水号|
-|--        amount |string |订单金额(单位:分)|
-|--        orderNum |int |订单数量|
-|--        salePrice |int |商品售价(单位:分)|
-|--        serviceFee |int |服务费(单位:分)|
-|--        status |int |状态:(1:创建;2:待支付;3:取消;4:下线取消;5:支付成功;6:支付失败)|
-|--        createTime |string |交易时间 |
-|--        payTime |string |支付完成时间 |
+|data   |Object|返回结果对象|
+|- total  |int | 订单总记录数|
+|- list |list |交易订单列表|
+|--    product |object |商品信息 |
+|---        productImg |string |图片url |
+|---        name |string |名称|
+|---        unitPrice |int |面值(单位:分)|
+|--    user |object |用户信息 |
+|---        sellUserId |long |售卖用户id|
+|---        sellUserNickName | string |卖家昵称|
+|---        buyUserId |long |买家用户id|
+|---       buyUserNickName | string |买家昵称|
+|--    trade |object |交易订单信息 |
+|---        tradeNo |string |交易订单号|
+|---        payNo |string |支付流水号|
+|---        amount |string |商品售卖价格(单位:分)|
+|---        orderNum |int |订单数量|
+|---        salePrice |int |商品售价(单位:分)|
+|---        serviceFee |int |服务费(单位:分)|
+|---        status |int |状态:(1:待支付)|
+|---        createTime |string |交易时间 |
 
 ###### 接口示例
 
-> 地址：[/api/order/trade/list](/api/order/trade/list)
+> 地址：[/api/order/trade/paying/list)
 ```
 {
 	"errMsg": "",
-	"list": [
-		{
-			"product": {
-				"productImg": "http://product.png",
-				"unitPrice": 100,
-				"name": "东券-001"
-			},
-			"trade": {
-				"tradeNo": "100000001",
-				"payNo": "200000001",
-				"amount": 300,
-				"createTime": "2019-05-16 12:30:28",
-				"payTime": "2019-05-16 12:30:28",
-				"orderNum": 3,
-				"salePrice": 100,
-			   "serviceFee":1,
-				"status": 2
-			},
-			"user": {
-			      "toUserId": 2,
-			      "toUserNickName": "买家昵称",
-			      "fromUserNickName": "卖家昵称",
-			      "fromUserId": 1
+	"status": 0,
+	"data":{
+		"total":1,
+		"list": [
+			{
+				"product": {
+					"productImg": "http://product.png",
+					"unitPrice": 100,
+					"name": "东券-001"
+				},
+				"trade": {
+					"tradeNo": "100000001",
+					"payNo": "200000001",
+					"amount": 300,
+					"createTime": "2019-05-16 12:30:28",
+					"orderNum": 3,
+					"salePrice": 100,
+				   "serviceFee":1,
+					"status":1
+				},
+				"user": {
+				      "buyUserId": 2,
+				      "buyUserNickName": "买家昵称",
+				      "sellUserNickName": "卖家昵称",
+				      "sellUserId": 1
+				}
 			}
-		}
-	],
-	"status": 0
+		]
+	}
 }
 ```
 
-##### 4-06\.查询已完成交易订单列表接口
+##### 4-06\.查询进行中交易订单列表接口
 
 ###### 接口功能
->  查询已完成交易订单列表接口
+>  查询进行中交易订单列表接口
 
 ###### URL
-> [/api/order/trade/finish/list](/api/order/trade/finish/list)
+> [/api/order/trade/porcessing/list](/api/order/trade/porcessing/list)
 
 ###### 支持格式
 > JSON
@@ -1338,7 +1341,6 @@
 |userId      |true    |long  | 用户Id|
 |pageNum     |true    |int   |页数             |
 |pageSize    |true    |int   |每页显示数量。 |
-|status   |true    |int   |订单状态:(1:已完成)  |
 |sign       |true    |string   |签名|
 
 ###### 返回字段
@@ -1346,65 +1348,69 @@
 |:-----   |:------|:-----------------------------   |
 |status   |int    |返回结果状态。0：正常；1：错误。   |
 |errMsg   |string    |错误描述   |
-|total  |int | 订单总记录数|
-|list |list |交易订单列表                        |
-|-    product |object |商品信息 |
-|--        productImg |string |图片url |
-|--        name |string |名称|
-|--        unitPrice |int |面值(单位:分)|
-|-    user |object |用户信息 |
-|--        fromUserId |long |卖家用户id|
-|--        fromUserNickName | string |卖家昵称|
-|--        toUserId |long |买家用户id|
-|--        toUserNickName | string |买家昵称|
-|-    trade |object |交易订单信息 |
-|--        tradeNo |string |交易订单号|
-|--        payNo |string |支付流水号|
-|--        amount |int |订单金额(单位:分)|
-|--        orderNum |int |订单数量|
-|--        salePrice |int |商品售价(单位:分)|
-|--        serviceFee |int |服务费(单位:分)|
-|--        status |int |状态:(1:已完成;)|
-|--        createTime |string |交易时间 |
-|--        payTime |string |支付完成时间 |
-|--        type |string |订单类型:(1:广告出售订单;2:广告求购订单;3:交易出售订单;4:交易求购订单)|
+|data   |object|结果对象 |
+|- total  |int | 订单总记录数|
+|- list |list |交易订单列表                        |
+|--    product |object |商品信息 |
+|---        productImg |string |图片url |
+|---        name |string |名称|
+|---        unitPrice |int |面值(单位:分)|
+|--    user |object |用户信息 |
+|---        sellUserId |long |售卖用户id|
+|---        sellUserNickName | string |卖家昵称|
+|---        buyUserId |long |买家用户id|
+|---        buyUserNickName | string |买家昵称|
+|--    trade |object |交易订单信息 |
+|---        tradeNo |string |交易订单号|
+|---        payNo |string |支付流水号|
+|---        amount |int |商品售卖价格(单位:分)|
+|---        orderNum |int |订单数量|
+|---        salePrice |int |商品售价(单位:分)|
+|---        serviceFee |int |服务费(单位:分)|
+|---        status |int |状态:(4:支付成功;5:支付失败;6:区块链处理中;7:放款中;8:放款失败;)|
+|---        createTime |string |交易时间 |
+|---        payTime |string |支付完成时间 |
 
 ###### 接口示例
 
-> 地址：[/api/order/trade/finish/list](/api/order/trade/finish/list)
+> 地址：[/api/order/trade/porcessing/list)
 ```
 {
 	"errMsg": "",
-	"list": [
-		{
-			"product": {
-				"productImg": "http://product.png",
-				"unitPrice": 100,
-				"name": "东券-001"
-			},
-			"trade": {
-				"tradeNo": "100000001",
-				"payNo": "200000001",
-				"amount": 300,
-				"createTime": "2019-05-16 12:30:28",
-				"payTime": "2019-05-16 12:30:28",
-				"orderNum": 3,
-				"salePrice": 100,
-			   "serviceFee":1,
-				"status":1,
-				"type":1
-			},
-			"user": {
-				"toUserId": 2,
-			    "toUserNickName": "买家昵称",
-			    "fromUserNickName": "卖家昵称",
-			    "fromUserId": 1
-			}
-		}
-	],
 	"status": 0
+	"data":{
+	   "total":1,
+	   "list": [
+				{
+					"product": {
+						"productImg": "http://product.png",
+						"unitPrice": 100,
+						"name": "东券-001"
+					},
+					"trade": {
+						"tradeNo": "100000001",
+						"payNo": "200000001",
+						"amount": 300,
+						"createTime": "2019-05-16 12:30:28",
+						"payTime": "2019-05-16 12:30:28",
+						"orderNum": 3,
+						"salePrice": 100,
+					   "serviceFee":1,
+						"status":4
+					},
+					"user": {
+						"buyUserId": 2,
+					    "buyUserNickName": "买家昵称",
+					    "sellUserNickName": "卖家昵称",
+					    "sellUserId": 1
+					}
+				}
+	 	]
+	}
 }
 ```
+
+
 ##### 4-07\.查询已完成（广告+交易）订单列表接口
 
 ###### 接口功能
