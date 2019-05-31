@@ -237,7 +237,7 @@
 
 #### 2\.商品接口
 
-##### 2-01 导入商品信息
+##### 2-01 导入商品信息（L）
 
 ###### 接口功能
 
@@ -309,7 +309,7 @@
 
 
 
-##### 2-01 获取平台当前可交易商品信息
+##### 2-01 获取平台当前可交易商品信息（L）
 
 ###### 接口功能
 
@@ -347,9 +347,8 @@
 >data 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
->| pageNum   |int    |  当前页 |
->| totalNum |int | 总共多少商品 |
->| productDatas   |Object[]    |商品详情   |
+>| total |int | 总共多少商品 |
+>| list |Object[]    |商品详情   |
 >productDatas 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
@@ -425,19 +424,19 @@
 >data 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
->| pageNum   |int    |  当前页 |
->| productDatas   |Object[]    |商品详情   |
+>| total |int    | 总共个数 |
+>| list   |Object[]    |商品详情   |
 >productDatas 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
-> | productCode     | true | 字符串 | 商品编号     |
-> | productName     | true | 字符串 | 商品名称     |
-> | unitPrice       | true | 整形   | 面值         |
-> | img             | true | 字符串 | 商品图片     |
-> | desc            | true | 字符串 | 商品介绍     |
-> | receive         | true | 字符串 | 商品提货说明 |
-> | expirationStart | true | 字符串 | 生效时间     |
-> | expirationEnd   | true | 字符串 | 过期时间     |
+> |id|true|商品id |
+> | productName     | true | 商品名称 |
+> | unitPrice       | true | 单价 |
+> | img             | true | 图片地址 |
+> | desc            | true | s商品描述 |
+> | receive         | true | 提货说明 |
+> | expirationStart | true | 有效期 |
+> | expirationEnd   | true | 过期时间 |
 > 
 ###### 返回实例
 
@@ -446,10 +445,10 @@
  "status":1,
  "errMsg":"",
  "data":{ 
-   "pageNum":1,
-   "productDatas":[
+   "total":1,
+   "list":[
       	{
-    		"productCode":"1111",
+    		"id":1,
     		"productName":"京东E卡",
      		"unitPrice":12,
      		"img":"htttp://pic.ka.png",
@@ -465,7 +464,7 @@
 
 
 
-##### 2-04 获取用户商品详情
+##### 2-04 获取用户商品详情（L）
 
 ###### 接口功能
 
@@ -487,8 +486,8 @@
 
 > | 参数        | 必选  | 类型   | 说明                               |
 > | ----------- | ----- | ------ | ---------------------------------- |
-> | userId    | true  | 整形   | 用户ID                          |
-> | productCode | true | 字符串 | 商品编号|
+> | userId    | true  | 整型 | 用户ID                          |
+> | id | true | 整型   | 商品id |
 > | sign        | true  | 字符串 | 平台签名                           |
 >
 
@@ -502,11 +501,7 @@
 >data 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
->| productData   |Object  |商品详情   |
->productData 对象
->|返回字段|字段类型|说明                              |
->|:-----   |:------|:-----------------------------   |
-> | productCode      | 字符串 | 商品编号     |
+> | id      | 整型 | 商品id   |
 > | productName     | 字符串 | 商品名称     |
 > | unitPrice       | 整形   | 面值         |
 > | img             | 字符串 | 商品图片     |
@@ -526,9 +521,7 @@
  "status":1,
  "errMsg":"",
  "data":{ 
-   "productData":
-      	{
-    		"productCode":"1111",
+         "id":"1111",
     		"productName":"京东E卡",
      		"unitPrice":12,
      		"img":"htttp://pic.ka.png",
@@ -540,14 +533,14 @@
      		"receive":"提货说明",
      		"expirationStart":"有效期开始时间",
      		"expiration_end":"有效期结束时间"
-   		}
- }
+   		
+     }
 }
 ```
 
 
 
-##### 2-05  查询用户非持有券
+##### 2-05  查询用户非持有券（L）
 
 ###### 接口功能
 
