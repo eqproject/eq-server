@@ -4,7 +4,7 @@
  */
 package org.eq.modules.product.service.impl;
 
-import com.github.pagehelper.PageInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
@@ -16,16 +16,14 @@ import org.eq.modules.product.dao.ProductMapper;
 import org.eq.modules.product.entity.Product;
 import org.eq.modules.product.entity.ProductExample;
 import org.eq.modules.product.service.ProductService;
-import org.apache.commons.lang3.StringUtils;
 import org.eq.modules.product.vo.ProductVO;
 import org.eq.modules.product.vo.SearchProductVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,6 +36,11 @@ import java.util.Map;
 @Transactional
 @AutowiredService
 public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product, ProductExample> implements ProductService {
+
+	@Autowired
+	public ProductServiceImpl(ProductMapper mapper){
+		super.setMapper(mapper);
+	}
 
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Override
