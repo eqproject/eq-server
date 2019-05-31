@@ -4,6 +4,7 @@
  */
 package org.eq.modules.product.service.impl;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.BaseTableData;
@@ -11,6 +12,7 @@ import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.modules.common.entitys.PageResultBase;
 import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.common.utils.DateUtil;
+import org.eq.modules.common.utils.ProductUtil;
 import org.eq.modules.enums.ProductStateEnum;
 import org.eq.modules.product.dao.ProductMapper;
 import org.eq.modules.product.entity.Product;
@@ -24,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -82,18 +86,25 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 		if(searchProductVO ==null){
 			searchProductVO = new SearchProductVO();
 		}
-		if(searchProductVO.getPageSize()<0 || searchProductVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
+		if(searchProductVO.getPageSize()<=0 || searchProductVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
 			searchProductVO.setPageSize(StaticEntity.MAX_PAGE_SIZE);
 		}
 		if(searchProductVO.getPageNum()<=0){
 			searchProductVO.setPageNum(1);
 		}
-		BaseTableData baseTableData = findDataTableByExampleForPage(getExampleFromEntity(null,null),1,100);
-		/*PageInfo pageInfo = this.findListByExampleForPage(getBaseEffectExample(),searchProductVO.getPageNum(),searchProductVO.getPageSize());
-		result.setData(pageInfo.getList());
-		result.setRecordsFiltered(pageInfo.getTotal());
-		result.setRecordsTotal(pageInfo.getTotal());*/
-		return null;
+		BaseTableData baseTableData = findDataTableByExampleForPage(getBaseEffectExample(),searchProductVO.getPageNum(),searchProductVO.getPageSize());
+		if(baseTableData==null || CollectionUtils.isEmpty(baseTableData.getData())){
+			return result;
+		}
+		List<ProductVO> dataList = new ArrayList<>(baseTableData.getData().size());
+		List<Product> pList = baseTableData.getData();
+		for(Product p : pList){
+			dataList.add(ProductUtil.transObj(p));
+		}
+		result.setData(dataList);
+		result.setRecordsFiltered(baseTableData.getRecordsFiltered());
+		result.setRecordsTotal(baseTableData.getRecordsTotal());
+		return result;
 	}
 
 
@@ -109,4 +120,7 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 		ca.andExpirationEndGreaterThan(DateUtil.getNowTimeStr());
 		return example;
 	}
+
+
+
 }

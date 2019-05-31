@@ -309,7 +309,7 @@
 
 
 
-##### 2-02 获取平台当前可交易商品信息
+##### 2-01 获取平台当前可交易商品信息
 
 ###### 接口功能
 
@@ -353,6 +353,7 @@
 >productDatas 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
+>|id|true|主键 |
 >| productName     | true | 字符串 |
 >| unitPrice       | true | 整形   |
 >| img             | true | 字符串 |
@@ -371,14 +372,14 @@
    "pageNum":1,
    "productDatas":[
       	{
-    		"productCode":"1111",
+      	    "id":"1",
     		"productName":"京东E卡",
      		"unitPrice":12,
      		"img":"htttp://pic.ka.png",
      		"desc":"仅限京东平台使用",
      		"receive":"提货说明",
-     		"expirationStart":"有效期开始时间",
-     		"expiration_end":"有效期结束时间"
+     		"expirationStart":"2019-05-31",
+     		"expiration_end":"2022-05-31"
    		}
    ]
  }
@@ -409,12 +410,11 @@
 
 > | 参数        | 必选  | 类型   | 说明                               |
 > | ----------- | ----- | ------ | ---------------------------------- |
-> | productCode | false | 字符串 | 如果为空，查询全部，不为空查询此商品编码下的所有券 |
 > | userId    | true  | 整形   | 用户ID                          |
 > | pageSize    | true  | 整形   | 每页大小                           |
 > | pageNum     | true  | 整形   | 页号                               |
 > | sign        | true  | 字符串 | 平台签名                           |
->
+> 
 
 ###### 响应参数
 >|返回字段|字段类型|说明                              |

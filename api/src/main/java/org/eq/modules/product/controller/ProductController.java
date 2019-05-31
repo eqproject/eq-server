@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author kaka
  * @version 2019.05.08
  */
+@SuppressWarnings("all")
 @RestController
 @RequestMapping(value = "/api/product")
 public class ProductController extends BaseController {
@@ -49,6 +50,30 @@ public class ProductController extends BaseController {
 		if(user==null){
 			return ResponseFactory.signError("用户不存在");
 		}
+		PageProductVO result = new PageProductVO();
+		PageResultBase<ProductVO>  pageResultData =  productService.pageSimpeProduct(searchProductVO);
+		result.setPageNum(searchProductVO.getPageNum());
+		result.setProductDatas(pageResultData.getData());
+		result.setTotalNum(pageResultData.getRecordsTotal());
+		return ResponseFactory.success(result);
+	}
+
+
+	/**
+	 * 获取平台有效商品信息
+	 * @return
+	 */
+
+	@PostMapping("/user/effect")
+	public ResponseData<PageProductVO> userEffect(SearchProductVO searchProductVO) {
+		if(searchProductVO==null){
+			return ResponseFactory.paramsError("参数为空或者用户ID为空");
+		}
+		User user = getUserInfo(searchProductVO.getUserId());
+		if(user==null){
+			return ResponseFactory.signError("用户不存在");
+		}
+
 		PageProductVO result = new PageProductVO();
 		PageResultBase<ProductVO>  pageResultData =  productService.pageSimpeProduct(searchProductVO);
 		result.setPageNum(searchProductVO.getPageNum());
