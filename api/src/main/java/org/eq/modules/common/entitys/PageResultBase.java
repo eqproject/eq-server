@@ -14,15 +14,18 @@ import java.util.List;
 public class PageResultBase<T> {
 
     public PageResultBase() {
-        this.recordsTotal = 0;
-        this.recordsFiltered = 0;
+        this.total = 0;
         this.data = new ArrayList<>();
     }
 
-    long recordsTotal;
+    /**
+     * 总共个数
+     */
+    long total;
 
-    long recordsFiltered;
-
+    /**
+     * 数据
+     */
     List<T> data;
 
 

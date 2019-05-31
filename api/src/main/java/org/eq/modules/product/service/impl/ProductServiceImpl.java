@@ -102,8 +102,7 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 			dataList.add(ProductUtil.transObj(p));
 		}
 		result.setData(dataList);
-		result.setRecordsFiltered(baseTableData.getRecordsFiltered());
-		result.setRecordsTotal(baseTableData.getRecordsTotal());
+		result.setTotal(baseTableData.getRecordsTotal());
 		return result;
 	}
 
