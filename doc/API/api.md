@@ -726,7 +726,7 @@
 
 > | 参数        | 必选  | 类型   | 说明                               |
 > | ----------- | ----- | ------ | ---------------------------------- |
-> | productCode | true | 字符串 | 商品编号|
+> | productId | true | 整型 | 商品id |
 > | adTitle | true | 字符串 |广告标题|
 > | price | true | 整型 |单个商品价格|
 > | number | true | 整型 |商品售卖价格|
@@ -838,6 +838,7 @@
 > | userId | true | 字符串 |当前用户ID|
 > | type | true | 字符串 |当前用户ID|
 > | pageSize    | true  | 整形   | 每页大小                           |
+> | pageNum | true | 整形 | 当前页 |
 > | orderType    | true  | 整形   | 广告类型(1:我要卖 2:我要买)                 |
 > | sign        | true  | 字符串 | 平台签名                           |
 >
@@ -851,28 +852,29 @@
 >data 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
->| orderDatas  |Objet[]  |广告订单集合  |
-> orderData 对象
+>|total|int|总共多少个 |
+>| list  |Object[]  |广告订单集合  |
+>Object对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
-> | orderCode    | 字符串 | 订单号    |
-> | productName     | 字符串 | 商品名称     |
-> | img             | 字符串 | 商品图片     |
-> | price | 整形   | 销售单价         |
-> | orderNumber | 整形   | 订单总量     |
-> |saleedNumber | 整形   |已售卖量    |
-> |saleNumber | 整形   |可交易量   |
-> | title | 字符串  | 订单标题       |
-> | brand           | 字符串 | 商家         |
-> | brandImg         | 字符串 | 商家图片     |
-> | brandTel         | 字符串 | 商家电话号码 |
-> | desc            | 字符串 | 商品介绍     |
-> | userId            | 字符串 | 用户Id     |
-> | userImg         | 字符串 | 用户头像|
-> | userBoundState  |整型 | 1:仅支付宝 2:微信 3:支付宝微信均绑定|
-> | expirationStart | 字符串 | 生效时间     |
-> | expirationEnd    | 字符串 | 过期时间     |
-> 
+>| orderCode    | 字符串 | 订单号    |
+>| productName     | 字符串 | 商品名称     |
+>| img             | 字符串 | 商品图片     |
+>| price | 整形   | 销售单价         |
+>| orderNumber | 整形   | 订单总量     |
+>|saleedNumber | 整形   |已售卖量    |
+>|saleNumber | 整形   |可交易量   |
+>| title | 字符串  | 订单标题       |
+>| brand           | 字符串 | 商家         |
+>| brandImg         | 字符串 | 商家图片     |
+>| brandTel         | 字符串 | 商家电话号码 |
+>| desc            | 字符串 | 商品介绍     |
+>| userId            | 字符串 | 用户Id     |
+>| userImg         | 字符串 | 用户头像|
+>| userBoundState  |整型 | 1:仅支付宝 2:微信 3:支付宝微信均绑定|
+>| expirationStart | 字符串 | 生效时间     |
+>| expirationEnd    | 字符串 | 过期时间     |
+>
 
 ###### 返回实例
 
@@ -881,7 +883,8 @@
  "status":1,
  "errMsg":"",
  "data":{ 
-   "orderDatas":[
+   "total":20,
+   "list":[
      {
       "orderCode":"NG12323456",
        "productName":"京东E卡",
@@ -932,6 +935,7 @@
 > | ----------- | ----- | ------ | ---------------------------------- |
 > | userId | true | 字符串 |当前用户ID|
 > | pageSize    | true  | 整形   | 每页大小                           |
+> | pageNum | true | 整形 | 当前页 |
 > | orderType    | true  | 整形   | 广告类型(1:我要卖 2:我要买)                 |
 > | sign        | true  | 字符串 | 平台签名                           |
 >
@@ -945,24 +949,25 @@
 >data 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
->| orderDatas  |Objet[]  |广告订单集合  |
-> orderData 对象
+>|total|int|总共多少 |
+>| list  |Object[]  |广告订单集合  |
+>Object对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
-> | orderCode    | 字符串 | 订单号    |
-> | productName     | 字符串 | 商品名称     |
-> | orderType     |整型 | 订单类型     |
-> | img             | 字符串 | 商品图片     |
-> | unit_price | 整形   | 商品单价      |
-> | price | 整形   | 销售单价         |
-> | orderNumber | 整形   | 订单总量     |
-> |saleedNumber | 整形   |已完成量    |
-> |saleNumber | 整形   |可交易量   |
-> | title | 字符串  | 订单标题       |
-> | desc            | 字符串 | 商品介绍     |
-> | userId            | 字符串 | 用户Id     |
-> | expirationStart | 字符串 | 生效时间     |
-> | expirationEnd    | 字符串 | 过期时间     |
+>| orderCode    | 字符串 | 订单号    |
+>| productName     | 字符串 | 商品名称     |
+>| orderType     |整型 | 订单类型     |
+>| img             | 字符串 | 商品图片     |
+>| unit_price | 整形   | 商品单价      |
+>| price | 整形   | 销售单价         |
+>| orderNumber | 整形   | 订单总量     |
+>|saleedNumber | 整形   |已完成量    |
+>|saleNumber | 整形   |可交易量   |
+>| title | 字符串  | 订单标题       |
+>| desc            | 字符串 | 商品介绍     |
+>| userId            | 字符串 | 用户Id     |
+>| expirationStart | 字符串 | 生效时间     |
+>| expirationEnd    | 字符串 | 过期时间     |
 
 ###### 返回实例
 
@@ -971,7 +976,8 @@
  "status":1,
  "errMsg":"",
  "data":{ 
-   "orderDatas":[
+   "total":20
+   "list":[
      {
       "orderCode":"NG12323456",
        "productName":"京东E卡",
@@ -1515,18 +1521,18 @@
 >data 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
->| pageNum   |int    |  当前页 |
->| productDatas   |Object[]    |商品详情   |
->productDatas 对象
+>| total |int    | 总共多少 |
+>| list   |Object[]    |商品详情   |
+>Object对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
-> | productCode     | true | 字符串 | 商品编号     |
-> | productName     | true | 字符串 | 商品名称     |
-> | unitPrice       | true | 整形   | 面值         |
-> | img             | true | 字符串 | 商品图片     |
-> | number            | true | 整型 | 持有数量    |
-> | effectNumber            | true | 整型 | 可交易量   |
-> | lockNumber            | true | 整型 | 锁定量   |
+> | productId     | true | 商品ID |
+> | productName     | true | 商品名称 |
+> | unitPrice       | true | 单价 |
+> | img             | true | t图片 |
+> | number            | true | 持有数量 |
+> | effectNumber            | true | 有效量 |
+> | lockNumber            | true | 锁定量 |
 > 
 
 ###### 返回实例
@@ -1536,10 +1542,10 @@
  "status":1,
  "errMsg":"",
  "data":{ 
-   "pageNum":1,
-   "productDatas":[
+   "total":100,
+   "list":[
      {
-      "productCode":"1234211",
+      "productId": 1,
        "productName":"京东E卡",
        "unitPrice":12,
        "img":"http://e.png",
@@ -1578,7 +1584,7 @@
 > | 参数        | 必选  | 类型   | 说明                               |
 > | ----------- | ----- | ------ | ---------------------------------- |
 > | userId             | true | 整型|当前用户ID|
-> | productCode | true | 字符串 |券码|
+> | productId | true | 字符串 |商品ID|
 > | number          | true | 整型 |转让数量|
 > | targetId          | true | 整型 |目标用户|
 > | sign        | true  | 字符串 | 平台签名                           |
@@ -1633,7 +1639,7 @@
 > | 参数        | 必选  | 类型   | 说明                               |
 > | ----------- | ----- | ------ | ---------------------------------- |
 > | userId             | true | 整型|当前用户ID|
-> | productCode | true | 字符串 |券码|
+> | productId | true | 整型 |商品ID|
 > | number          | true | 整型 |转让数量|
 > | consignee          | true | 字符串 |联系人|
 > | consigneePhone          | true | 字符串 |联系人电话号码|
@@ -1700,6 +1706,8 @@
 
 > | 参数        | 必选  | 类型   | 说明                               |
 > | ----------- | ----- | ------ | ---------------------------------- |
+> | pageSize | true | 整型 | 每页大小 |
+> | pageNum | true | 整型 | 页号 |
 > | userId             | true | 整型|当前用户ID|
 > | sign        | true  | 字符串 | 平台签名                           |
 >
@@ -1713,16 +1721,17 @@
 >data 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
->| acceptDatas  |Objet[]  |承兑订单集合  |
-> acceptData 对象
+>|total|int|总共条数 |
+>| list  |Object[]  |承兑订单集合  |
+>Object对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
-> |acceptCode    | 字符串 | 订单号    |
-> | productName     | 字符串 | 商品名称     |
-> | img             | 字符串 | 商品图片     |
-> | unit_price | 整形   | 商品面值      |
-> | acceptNumber | 整形   | 承兑数量     |
-> 
+>|acceptCode    | 字符串 | 订单号    |
+>| productName     | 字符串 | 商品名称     |
+>| img             | 字符串 | 商品图片     |
+>| unit_price | 整形   | 商品面值      |
+>| acceptNumber | 整形   | 承兑数量     |
+>
 
 ###### 返回实例
 
@@ -1731,7 +1740,8 @@
  "status":1,
  "errMsg":"",
  "data":{ 
-   "acceptDatas";[
+    "total":200
+   "list"：[
      {
    	 	"acceptCode":"M212313411",
    		"productName":"E卡",
@@ -1768,6 +1778,8 @@
 
 > | 参数        | 必选  | 类型   | 说明                               |
 > | ----------- | ----- | ------ | ---------------------------------- |
+> | pageSize | true | 整型 | 每页大小 |
+> | pageNum | true | 整型 | 当前页 |
 > | userId             | true | 整型|当前用户ID|
 > | sign        | true  | 字符串 | 平台签名                           |
 >
@@ -1781,15 +1793,16 @@
 >data 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
->| turnoutDatas  |Objet[]  |承兑订单集合  |
-> turnoutData 对象
+>|total|int|总共多少条 |
+>| list  |Object[]  |承兑订单集合  |
+>Object对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
-> |turnoutCode    | 字符串 | 订单号    |
-> | productName     | 字符串 | 商品名称     |
-> | img             | 字符串 | 商品图片     |
-> | unit_price | 整形   | 商品面值      |
-> | turnoutNumber | 整形   | 承兑数量     |
+>|turnoutCode    | 字符串 | 订单号    |
+>| productName     | 字符串 | 商品名称     |
+>| img             | 字符串 | 商品图片     |
+>| unit_price | 整形   | 商品面值      |
+>| turnoutNumber | 整形   | 承兑数量     |
 >
 ###### 返回实例
 
@@ -1798,7 +1811,8 @@
  "status":1,
  "errMsg":"",
  "data":{ 
-   "turnoutDatas";[
+   "total":200,
+   "list";[
      {
    	 	"turnoutCode":"M212313411",
    		"productName":"E卡",
@@ -1836,6 +1850,8 @@
 
 > | 参数        | 必选  | 类型   | 说明                               |
 > | ----------- | ----- | ------ | ---------------------------------- |
+> | pageNum | true | 整型 | 当前页 |
+> | pageSize | true | 整型 | 每页大小 |
 > | userId             | true | 整型|当前用户ID|
 > | sign        | true  | 字符串 | 平台签名                           |
 >
@@ -1849,15 +1865,16 @@
 >data 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
->| productDatas  |Objet[]  |承兑订单集合  |
-> productData 对象
+>|total|int|总数 |
+>| list  |Object[]  |承兑订单集合  |
+>Object对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
-> | productName     | 字符串 | 商品名称     |
-> | img             | 字符串 | 商品图片     |
-> | unit_price | 整形   | 商品面值      |
-> | number | 整形   | 商品数量     |
-> 
+>| productName     | 字符串 | 商品名称     |
+>| img             | 字符串 | 商品图片     |
+>| unit_price | 整形   | 商品面值      |
+>| number | 整形   | 商品数量     |
+>
 
 ###### 返回实例
 
@@ -1866,7 +1883,8 @@
  "status":1,
  "errMsg":"",
  "data":{ 
-   "productDatas";[
+   "total":300
+   "list"：[
      {
    		"productName":"E卡",
    	   "img":"http://e.png",
@@ -1969,6 +1987,7 @@
 > GET
 
 ###### 请求参数
+
 > |参数|必选|类型|说明|
 |:-----  |:-------|:-----|-----|
 |userId      |true    |long  | 用户Id|
