@@ -9,7 +9,7 @@ import org.eq.modules.common.entitys.SearchBase;
  * @date 2019-05-29
  */
 @Data
-public class SearchProductVO extends SearchBase {
+public class SearchPageProductVO extends SearchBase {
 
     /**
      * 用户ID
@@ -17,19 +17,13 @@ public class SearchProductVO extends SearchBase {
     private long userId;
 
     /**
-     * 商品ID
+     * 每页最大条数
      */
-    private long productId;
+    private int  pageSize;
 
     /**
-     * 商品状态
-     * @see  org.eq.modules.enums.ProductStateEnum
+     * 页号
      */
-    private Integer state;
+    private int pageNum;
 
-    /**
-     * 是否过期
-     *  默认有效
-     */
-    private boolean isOver;
 }

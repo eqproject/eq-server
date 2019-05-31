@@ -20,6 +20,45 @@
 	    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
     </resultMap>
 
+
+    <!--用于封装商品大对象-->
+    <resultMap id="allResultMap" type="org.eq.modules.product.entity.ProductAll">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="product_img" jdbcType="VARCHAR" property="productImg" />
+        <result column="product_accept_id" jdbcType="BIGINT" property="productAcceptId" />
+        <result column="product_issuer_id" jdbcType="BIGINT" property="productIssuerId" />
+        <result column="unit_price" jdbcType="INTEGER" property="unitPrice" />
+        <result column="sort" jdbcType="INTEGER" property="sort" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+        <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+        <result column="expiration_start" jdbcType="VARCHAR" property="expirationStart" />
+        <result column="expiration_end" jdbcType="VARCHAR" property="expirationEnd" />
+        <result column="tag_ids" jdbcType="VARCHAR" property="tagIds" />
+        <result column="tag_names" jdbcType="VARCHAR" property="tagNames" />
+        <result column="extend_info" jdbcType="VARCHAR" property="extendInfo" />
+        <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+        <!--accept-->
+        <result column="acceptName" jdbcType="VARCHAR" property="acceptName" />
+        <result column="acceptIcon" jdbcType="VARCHAR" property="acceptIcon" />
+        <result column="acceptAddress" jdbcType="VARCHAR" property="acceptAddress" />
+        <result column="acceptIntro" jdbcType="VARCHAR" property="acceptIntro" />
+        <!--Issuer-->
+        <result column="issuerName" jdbcType="VARCHAR" property="issuerName" />
+        <result column="issuerIcon" jdbcType="VARCHAR" property="issuerIcon" />
+        <result column="issuerAddress" jdbcType="VARCHAR" property="issuerAddress" />
+        <result column="issuerIntro" jdbcType="VARCHAR" property="issuerIntro" />
+
+        <!--blockChain-->
+        <result column="blockAssetCode" jdbcType="VARCHAR" property="assetCode" />
+        <result column="blockAssetIssuer" jdbcType="VARCHAR" property="assetIssuer" />
+        <result column="blockContractAddress" jdbcType="VARCHAR" property="contractAddress" />
+        <result column="blockTicketId" jdbcType="VARCHAR" property="ticketid" />
+        <result column="blockTrancheId" jdbcType="VARCHAR" property="trancheid" />
+
+    </resultMap>
+
     <sql id="Example_Where_Clause">
         <where>
             <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -91,6 +130,30 @@
         </if>
         <include refid="Base_Column_List" />
         from platform_product
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+
+    <sql id="all_Column_List">
+        p.id,p.name,p.product_img,p.product_accept_id,p.product_issuer_id,p.unit_price,p.sort,p.status,p.create_date,p.update_date,p.expiration_start,p.expiration_end,p.tag_ids,p.tag_names,p.extend_info,p.remarks,
+        accept.name as acceptName,accept.icon as acceptIcon,accept.address as acceptAddress,accept.intro as acceptIntro,
+        issuer.name as issuerName,issuer.icon as issuerIcon,issuer.address as issuerAddress,issuer.intro as issuerIntro,
+        block.asset_code as blockAssetCode,block.asset_issuer as blockAssetIssuer,block.contract_address as blockContractAddress,block.ticketId as  blockTicketId,block.trancheId as blockTrancheId
+    </sql>
+
+    <select id="selectProductAllByExample" parameterType="org.eq.modules.product.entity.ProductExample" resultMap="allResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="all_Column_List" />
+        from platform_product p left join platform_product_accept accept on p.product_accept_id = accept.id
+                                left join platform_product_issuer issuer on p.product_issuer_id = issuer.id
+                                left join platform_product_blockchain block on p.id = block.product_id
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>

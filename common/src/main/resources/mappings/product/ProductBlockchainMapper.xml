@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.eq.modules.product.dao.ProductBlockchainMapper">
+    <resultMap id="BaseResultMap" type="org.eq.modules.product.entity.ProductBlockchain">
+	    <result column="product_id" jdbcType="BIGINT" property="productId" />
+	    <result column="asset_code" jdbcType="VARCHAR" property="assetCode" />
+	    <result column="asset_issuer" jdbcType="VARCHAR" property="assetIssuer" />
+	    <result column="contract_address" jdbcType="VARCHAR" property="contractAddress" />
+	    <result column="ticketId" jdbcType="VARCHAR" property="ticketid" />
+	    <result column="trancheId" jdbcType="VARCHAR" property="trancheid" />
+	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+	    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+    </resultMap>
+
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_List">
+        product_id,asset_code,asset_issuer,contract_address,ticketId,trancheId,create_date,update_date
+    </sql>
+
+    <select id="selectByExample" parameterType="org.eq.modules.product.entity.ProductBlockchainExample" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List" />
+        from platform_product_blockchain
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from platform_product_blockchain
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from platform_product_blockchain
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByExample" parameterType="org.eq.modules.product.entity.ProductBlockchainExample">
+        delete from platform_product_blockchain
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
+
+    <insert id="insert" parameterType="org.eq.modules.product.entity.ProductBlockchain">
+        insert into platform_product_blockchain (product_id,asset_code,asset_issuer,contract_address,ticketId,trancheId,create_date,update_date)
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{productId,jdbcType=BIGINT},
+            #{assetCode,jdbcType=VARCHAR},
+            #{assetIssuer,jdbcType=VARCHAR},
+            #{contractAddress,jdbcType=VARCHAR},
+            #{ticketid,jdbcType=VARCHAR},
+            #{trancheid,jdbcType=VARCHAR},
+            #{createDate,jdbcType=TIMESTAMP},
+            #{updateDate,jdbcType=TIMESTAMP},
+        </trim>
+    </insert>
+
+    <insert id="insertSelective" parameterType="org.eq.modules.product.entity.ProductBlockchain">
+        insert into platform_product_blockchain
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            product_id,
+            asset_code,
+            asset_issuer,
+            contract_address,
+            ticketId,
+            trancheId,
+            create_date,
+            update_date,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{productId,jdbcType=BIGINT},
+            #{assetCode,jdbcType=VARCHAR},
+            #{assetIssuer,jdbcType=VARCHAR},
+            #{contractAddress,jdbcType=VARCHAR},
+            #{ticketid,jdbcType=VARCHAR},
+            #{trancheid,jdbcType=VARCHAR},
+            #{createDate,jdbcType=TIMESTAMP},
+            #{updateDate,jdbcType=TIMESTAMP},
+        </trim>
+    </insert>
+
+    <select id="countByExample" parameterType="org.eq.modules.product.entity.ProductBlockchainExample" resultType="java.lang.Long">
+        select count(*) from platform_product_blockchain
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </select>
+
+    <update id="updateByExampleSelective" parameterType="map">
+        update platform_product_blockchain
+        <set>
+            <if test="record.productId != null">
+                product_id = #{record.productId,jdbcType=BIGINT},
+            </if>
+            <if test="record.assetCode != null">
+                asset_code = #{record.assetCode,jdbcType=VARCHAR},
+            </if>
+            <if test="record.assetIssuer != null">
+                asset_issuer = #{record.assetIssuer,jdbcType=VARCHAR},
+            </if>
+            <if test="record.contractAddress != null">
+                contract_address = #{record.contractAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="record.ticketid != null">
+                ticketId = #{record.ticketid,jdbcType=VARCHAR},
+            </if>
+            <if test="record.trancheid != null">
+                trancheId = #{record.trancheid,jdbcType=VARCHAR},
+            </if>
+            <if test="record.createDate != null">
+                create_date = #{record.createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.updateDate != null">
+                update_date = #{record.updateDate,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByExample" parameterType="map">
+        update platform_product_blockchain
+        set
+        <trim  suffixOverrides=",">
+            product_id = #{record.productId,jdbcType=BIGINT},
+            asset_code = #{record.assetCode,jdbcType=VARCHAR},
+            asset_issuer = #{record.assetIssuer,jdbcType=VARCHAR},
+            contract_address = #{record.contractAddress,jdbcType=VARCHAR},
+            ticketId = #{record.ticketid,jdbcType=VARCHAR},
+            trancheId = #{record.trancheid,jdbcType=VARCHAR},
+            create_date = #{record.createDate,jdbcType=TIMESTAMP},
+            update_date = #{record.updateDate,jdbcType=TIMESTAMP},
+        </trim>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.modules.product.entity.ProductBlockchain">
+        update platform_product_blockchain
+        <set>
+            <if test="productId != null">
+            product_id = #{productId,jdbcType=BIGINT},
+            </if>
+            <if test="assetCode != null">
+            asset_code = #{assetCode,jdbcType=VARCHAR},
+            </if>
+            <if test="assetIssuer != null">
+            asset_issuer = #{assetIssuer,jdbcType=VARCHAR},
+            </if>
+            <if test="contractAddress != null">
+            contract_address = #{contractAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="ticketid != null">
+            ticketId = #{ticketid,jdbcType=VARCHAR},
+            </if>
+            <if test="trancheid != null">
+            trancheId = #{trancheid,jdbcType=VARCHAR},
+            </if>
+            <if test="createDate != null">
+            create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateDate != null">
+            update_date = #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="org.eq.modules.product.entity.ProductBlockchain">
+        update platform_product_blockchain
+        set
+        <trim  suffixOverrides=",">
+              product_id = #{productId,jdbcType=BIGINT},
+              asset_code = #{assetCode,jdbcType=VARCHAR},
+              asset_issuer = #{assetIssuer,jdbcType=VARCHAR},
+              contract_address = #{contractAddress,jdbcType=VARCHAR},
+              ticketId = #{ticketid,jdbcType=VARCHAR},
+              trancheId = #{trancheid,jdbcType=VARCHAR},
+              create_date = #{createDate,jdbcType=TIMESTAMP},
+              update_date = #{updateDate,jdbcType=TIMESTAMP},
+        </trim>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+</mapper>

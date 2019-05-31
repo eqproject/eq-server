@@ -11,7 +11,7 @@ import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.vo.ProductVO;
-import org.eq.modules.product.vo.SearchProductVO;
+import org.eq.modules.product.vo.SearchPageProductVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,15 +41,15 @@ public class ProductController extends BaseController {
 	 * @return
 	 */
 	@PostMapping("/platform/effect")
-	public ResponseData<PageResultData> platformEffect(SearchProductVO searchProductVO) {
-		if(searchProductVO==null){
+	public ResponseData<PageResultData> platformEffect(SearchPageProductVO searchPageProductVO) {
+		if(searchPageProductVO ==null){
 			return ResponseFactory.paramsError("参数为空或者用户ID为空");
 		}
-		User user = getUserInfo(searchProductVO.getUserId());
+		User user = getUserInfo(searchPageProductVO.getUserId());
 		if(user==null){
 			return ResponseFactory.signError("用户不存在");
 		}
-		PageResultData<ProductVO> pageResultData =  productService.pageSimpeProduct(searchProductVO);
+		PageResultData<ProductVO> pageResultData =  productService.pageSimpeProduct(searchPageProductVO);
 		return ResponseFactory.success(pageResultData);
 	}
 
@@ -60,15 +60,15 @@ public class ProductController extends BaseController {
 	 */
 
 	@PostMapping("/user/effect")
-	public ResponseData<PageResultData> userEffect(SearchProductVO searchProductVO) {
-		if(searchProductVO==null){
+	public ResponseData<PageResultData> userEffect(SearchPageProductVO searchPageProductVO) {
+		if(searchPageProductVO ==null){
 			return ResponseFactory.paramsError("参数为空或者用户ID为空");
 		}
-		User user = getUserInfo(searchProductVO.getUserId());
+		User user = getUserInfo(searchPageProductVO.getUserId());
 		if(user==null){
 			return ResponseFactory.signError("用户不存在");
 		}
-		PageResultData<ProductVO> pageResultData =  productService.pageSimpeProduct(searchProductVO);
+		PageResultData<ProductVO> pageResultData =  productService.pageSimpeProduct(searchPageProductVO);
 
 		return ResponseFactory.success(pageResultData);
 	}

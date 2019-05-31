@@ -16,9 +16,11 @@ import org.eq.modules.common.utils.ProductUtil;
 import org.eq.modules.enums.ProductStateEnum;
 import org.eq.modules.product.dao.ProductMapper;
 import org.eq.modules.product.entity.Product;
+import org.eq.modules.product.entity.ProductAll;
 import org.eq.modules.product.entity.ProductExample;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.vo.ProductVO;
+import org.eq.modules.product.vo.SearchPageProductVO;
 import org.eq.modules.product.vo.SearchProductVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +47,9 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 	public ProductServiceImpl(ProductMapper mapper){
 		super.setMapper(mapper);
 	}
+
+	@Autowired
+	private ProductMapper productMapper;
 
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Override
@@ -81,18 +86,18 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 	}
 
 	@Override
-	public PageResultData<ProductVO> pageSimpeProduct(SearchProductVO searchProductVO) {
+	public PageResultData<ProductVO> pageSimpeProduct(SearchPageProductVO searchPageProductVO) {
 		PageResultData<ProductVO> result = new PageResultData<>();
-		if(searchProductVO ==null){
-			searchProductVO = new SearchProductVO();
+		if(searchPageProductVO ==null){
+			searchPageProductVO = new SearchPageProductVO();
 		}
-		if(searchProductVO.getPageSize()<=0 || searchProductVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
-			searchProductVO.setPageSize(StaticEntity.MAX_PAGE_SIZE);
+		if(searchPageProductVO.getPageSize()<=0 || searchPageProductVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
+			searchPageProductVO.setPageSize(StaticEntity.MAX_PAGE_SIZE);
 		}
-		if(searchProductVO.getPageNum()<=0){
-			searchProductVO.setPageNum(1);
+		if(searchPageProductVO.getPageNum()<=0){
+			searchPageProductVO.setPageNum(1);
 		}
-		BaseTableData baseTableData = findDataTableByExampleForPage(getBaseEffectExample(),searchProductVO.getPageNum(),searchProductVO.getPageSize());
+		BaseTableData baseTableData = findDataTableByExampleForPage(ProductUtil.getBaseEffectExample(), searchPageProductVO.getPageNum(), searchPageProductVO.getPageSize());
 		if(baseTableData==null || CollectionUtils.isEmpty(baseTableData.getData())){
 			return result;
 		}
@@ -106,19 +111,21 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 		return result;
 	}
 
-
-	/**
-	 * 获取基本有效查询条件
-	 * @return
-	 */
-	private ProductExample getBaseEffectExample() {
-		ProductExample example = new ProductExample();
-		ProductExample.Criteria ca = example.or();
-		example.setOrderByClause(" sort desc ");
-		ca.andStatusEqualTo(ProductStateEnum.ONLINE.getState());
-		ca.andExpirationEndGreaterThan(DateUtil.getNowTimeStr());
-		return example;
+	@Override
+	public List<ProductAll> listProductAll(SearchProductVO searchProductVO) {
+		if(searchProductVO ==null){
+			searchProductVO = new SearchProductVO();
+		}
+		ProductExample productExample = ProductUtil.createPlatformSearchExample(searchProductVO);
+		List<ProductAll> result = productMapper.selectProductAllByExample(productExample);
+		if(CollectionUtils.isEmpty(result)){
+			return new ArrayList<ProductAll>();
+		}
+		return  result;
 	}
+
+
+
 
 
 
