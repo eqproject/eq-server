@@ -15,7 +15,7 @@ public class PageResultBase<T> {
 
     public PageResultBase() {
         this.total = 0;
-        this.data = new ArrayList<>();
+        this.list = new ArrayList<>();
     }
 
     /**
@@ -26,7 +26,7 @@ public class PageResultBase<T> {
     /**
      * 数据
      */
-    List<T> data;
+    List<T> list;
 
 
 
