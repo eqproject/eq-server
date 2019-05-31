@@ -33,16 +33,19 @@
 |:-----   |:------|:-----------------------------   |
 |status   |int    |返回结果状态。0：正常；1：错误。   |
 |errMsg   |string    |错误描述   |
-|userId   |long    |用户id   |
+|data   |object    |  数据 |
+|-userId |long|用户ID|
 
 ###### 接口示例
 
 > 地址： [/api/user/register](/api/user/register)
 ```
 {
-	"errMsg": "",
 	"status": 0,
-	"userId": 0
+	"errMsg": "",
+	"data":{
+		"userId": 0
+	}
 }
 ```
 ##### 1-02\.用户重置密码接口
@@ -77,8 +80,8 @@
 > 地址： [/api/user/reset](/api/user/reset)
 ```
 {
-	"errMsg": "",
-	"status": 0
+	"status": 0,
+	"errMsg": ""
 }
 ```
 
@@ -118,8 +121,8 @@
 > 地址： [/api/user/reset](/api/user/reset)
 ```
 {
-	"errMsg": "",
-	"status": 0
+	"status": 0,
+	"errMsg": ""
 }
 ```
 
@@ -155,8 +158,8 @@
 > 地址： [/api/user/reset](/api/user/reset)
 ```
 {
-	"errMsg": "",
-	"status": 0
+	"status": 0,
+	"errMsg": ""
 }
 ```
 ##### 1-05\.用户实名认证接口
@@ -192,8 +195,8 @@
 > 地址： [/api/user/identity/verify](/api/user/identity/verify)
 ```
 {
-	"errMsg": "",
-	"status": 0
+	"status": 0,
+	"errMsg": ""
 }
 ```
 ##### 1-06\.用户绑定支付账号接口
@@ -230,8 +233,8 @@
 > 地址：[/api/user/pay/bind](/api/user/pay/bind)
 ```
 {
-	"errMsg": "",
-	"status": 0
+	"status": 0,
+	"errMsg": ""
 }
 ```
 
@@ -2109,9 +2112,10 @@
 >地址： /api/support/terms
 ```json
 {
-	"errMsg": "",
-	"status": 0,
-	"info": {
+	
+    "status": 0,
+    "errMsg": "",
+	"data": {
 		"termsNo":"",
 		"title":"",
 		"content":""
@@ -2158,9 +2162,9 @@
 >地址： /api/support/legal
 ```json
 {
-	"errMsg": "",
 	"status": 0,
-	"info": {
+    "errMsg": "",
+	"data": {
 		"legalNo":"",
 		"title":"",
 		"content":""
@@ -2207,9 +2211,9 @@
 >地址： /api/support/buydoc
 ```json
 {
-	"errMsg": "",
 	"status": 0,
-	"info": {
+    "errMsg": "",
+	"data": {
 		"docNo":"",
 		"title":"",
 		"content":""
