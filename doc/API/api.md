@@ -426,7 +426,7 @@
 >|:-----   |:------|:-----------------------------   |
 >| total |int    | 总共个数 |
 >| list   |Object[]    |商品详情   |
->productDatas 对象
+>list 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
 > |id|true|商品id |
@@ -540,7 +540,7 @@
 
 
 
-##### 2-05  查询用户非持有券（L）
+##### 2-04  查询用户非持有券详情（L）
 
 ###### 接口功能
 
@@ -575,11 +575,7 @@
 >data 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
->| productData   |Object  |商品详情   |
->productData 对象
->|返回字段|字段类型|说明                              |
->|:-----   |:------|:-----------------------------   |
-> | productCode      | 字符串 | 商品编号     |
+> | id      | 整型| 商品id    |
 > | productName     | 字符串 | 商品名称     |
 > | unitPrice       | 整形   | 面值         |
 > | img             | 字符串 | 商品图片     |
@@ -599,9 +595,10 @@
  "status":1,
  "errMsg":"",
  "data":{ 
-   "productData":
-      	{
-    		"productCode":"1111",
+   
+  
+      	
+    		"id":1,
     		"productName":"京东E卡",
      		"unitPrice":12,
      		"img":"htttp://pic.ka.png",
@@ -613,14 +610,14 @@
      		"receive":"提货说明",
      		"expirationStart":"有效期开始时间",
      		"expiration_end":"有效期结束时间"
-   		}
+   		
  }
 }
 ```
 
 
 
-##### 2-06\. 查询自己持有券详情接口
+##### 2-06\. 查询自己持有券详情接口（L）
 
 ###### 接口功能
 
@@ -638,35 +635,41 @@
 ###### 请求参数
 > | 参数        | 必选 | 类型   | 说明     |
 > | :---------- | :--- | :----- | -------- |
-> | productCode | true | string | 商品编码 |
+> | id | true | long | 商品id |
 > | userId      | true | string | 用户ID   |
 > | sign        | true | string | 签名     |
 
 ###### 返回字段
-> | 返回字段                        | 字段类型 | 说明                             |
-> | :------------------------------ | :------- | :------------------------------- |
-> | status                          | int      | 返回结果状态。0：正常；1：错误。 |
-> | errMsg                          | string   | 错误描述                         |
-> | info                            | object   | 用户持有券详情                   |
-> | -    product                    | object   | 商品信息                         |
-> | --        productImg            | string   | 商品图片url                      |
-> | --        name                  | string   | 商品名称                         |
-> | --        unitPrice             | int      | 商品面值(单位:分)                |
-> | --        description           | string   | 商品描述                         |
-> | -    brandInfo                  | object   | 品牌商信息                       |
-> | --        brand                 | string   | 品牌商名称                       |
-> | --        brandImg              | string   | 品牌商图片url                    |
-> | --        brandDescription      | string   | 品牌商备注信息                   |
-> | --        receive               | string   | 承兑说明                         |
-> | --        expirationStart       | string   | 券有效期开始时间                 |
-> | --        expirationEnd         | string   | 券有效期结束时间                 |
-> | -    stockInfo                  | object   | 持有商品库存信息                 |
-> | --        num                   | int      | 可用量                           |
-> | --        lockedNum             | int      | 锁定量                           |
-> | -    couponChainInfo            | object   | 券链信息                         |
-> | --        serviceProviderName   | string   | 数字券技术服务商名称             |
-> | --        publisherImg          | string   | 发行商图片url                    |
-> | --        publisherIntroduction | string   | 发行商简介                       |
+>|返回字段|字段类型|说明                              |
+>|:-----   |:------|:-----------------------------   |
+>|status   |int    |返回结果状态。0：正常；1：错误。   |
+>|errMsg   |string    |错误描述   |
+>|data  |Object | 参考对象           |
+>data 对象
+>|返回字段|字段类型|说明                              |
+>|:-----   |:------|:-----------------------------   |
+> |img            | string   | 商品图片url                      |
+> |  name                  | string   | 商品名称                         |
+> | unitPrice             | int      | 商品面值(单位:分)                |
+> |desc           | string   | 商品描述                         |
+> |  brand                | object   | 品牌商信息                       |
+> | blockChain                | object   | 券链信息                 |
+> | receive               | string   | 承兑说明                         |
+> |  expirationStart       | string   | 券有效期开始时间                 |
+> |  expirationEnd         | string   | 券有效期结束时间                 |
+> | num                   | int      | 可用量                           |
+> |  lockedNum             | int      | 锁定量                           |
+>brand 对象
+>|返回字段|字段类型|说明  |
+>|:-----   |:------|:-----------------------------   |
+> |name                 | string   | 品牌商名称                       |
+> | img              | string   | 品牌商图片url                    |
+> |desc      | string   | 品牌商备注信息                   |
+>blockChain 对象
+>|返回字段|字段类型|说明  |
+>|:-----   |:------|:-----------------------------   |
+> |  issuer            | String   | 资产发行人                         |
+> |address   | string   | 合约地址         |
 
 ###### 接口示例
 
@@ -676,32 +679,25 @@
 {
 	"errMsg": "",
 	"status": 0,
-	"info": {
-		"product": {
-			"productImg": "http://product.png",
+	"data": {
+			"img": "http://product.png",
 			"unitPrice": 600,
 			"name": "Nick Sportswear"
-		},
-		"brandInfo": {
-			"brand": "耐克官方旗舰店",
-			"brandImg":"http://brand.png",
-			"brandDescription": "提供承兑",
-			"receive": "
-			  提货有效期为：2019.03.23-2049.12.31
-			  此卡不兑换现金，只可提取Nick自产产品
-			",
+			"num":5,
+			"lockedNum":5,
+			"desc":"描述",
+		    "brand": {
+					"name": "耐克官方旗舰店",
+					"img":"http://brand.png",
+					"desc": "提供承兑"
+			 },
+			 "blockChain":{
+			      "issuer":"北京公司",
+			      "address":"合约地址"
+			 }，
+			"receive": "  提货有效期为：2019.03.23-2049.12.31 此卡不兑换现   金，只可提取Nick自产产品",
 			"expirationStart": "2019.03.23",
 			"expirationEnd": "2049.12.31"
-		},
-		"stockInfo": {
-			"num":5,
-			"lockedNum":5
-		},
-		"couponChainInfo": {
-			"serviceProviderName":"BUMO",
-			"publisherImg":"http://publisher.png",
-			publisherIntroduction:"NICK公司总部位于美国俄勒冈州波特兰市。公司生产的体育用品包罗万象公司生产的体育用品。"
-		}
 
     }
 }
