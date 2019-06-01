@@ -9,10 +9,8 @@ import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.product.entity.UserProductStock;
 import org.eq.modules.product.entity.UserProductStockExample;
-import org.eq.modules.product.vo.ProductVO;
+import org.eq.modules.product.vo.ProductBaseVO;
 import org.eq.modules.product.vo.SearchPageProductVO;
-
-import java.util.List;
 
 /**
  * 用户商品管理Service
@@ -29,7 +27,7 @@ public interface UserProductStockService extends ServiceExtend<UserProductStock,
      * @param user
      * @return
      */
-    PageResultData<ProductVO> pageSimpeProduct(SearchPageProductVO searchPageProductVO,User user);
+    PageResultData<ProductBaseVO> pageSimpeProduct(SearchPageProductVO searchPageProductVO, User user);
 
 
 }

@@ -240,7 +240,7 @@
 
 #### 2\.商品接口
 
-##### 2-01 导入商品信息（L）
+##### 2-00 导入商品信息（L）
 
 ###### 接口功能
 
@@ -390,7 +390,7 @@
 
 
 
-##### 2-03 获取用户可售卖商品
+##### 2-02 获取用户可售卖商品
 
 ###### 接口功能
 
@@ -467,15 +467,15 @@
 
 
 
-##### 2-04 获取用户商品详情（L）
+##### 2-03 获取商品详情（L）
 
 ###### 接口功能
 
->  获取用户商品信息，不包含敏感信息
+>  获取商品信息，不包含敏感信息
 
 ###### URL
 
-> /api/product/user/details
+> /api/product/platform/details
 
 ###### 支持格式
 
@@ -508,14 +508,19 @@
 > | productName     | 字符串 | 商品名称     |
 > | unitPrice       | 整形   | 面值         |
 > | img             | 字符串 | 商品图片     |
-> | brand           | 字符串 | 商家         |
-> | brandImg         | 字符串 | 商家图片     |
-> | brandDesc        | 字符串 | 商家描述信息 |
-> | brandTel         | 字符串 | 商家电话号码 |
+> | acceptName           | 字符串 |承兑商名称       |
+> | acceptImg         | 字符串 | 承兑商图片     |
+> | acceptAddress        | 字符串 | 承兑商地址 |
+> | acceptIntro         | 字符串 | 承兑商简介|
+> | issuerName           | 字符串 |发行商名称     |
+> | issuerImg         | 字符串 | 发行商图片     |
+> | issuerAddress        | 字符串 | 发行商地址 |
+> | issuerIntro         | 字符串 | 发行商简介|
 > | desc            | 字符串 | 商品介绍     |
 > | receive          | 字符串 | 商品提货说明 |
 > | expirationStart | 字符串 | 生效时间     |
 > | expirationEnd    | 字符串 | 过期时间     |
+> | number    | 字符串 | 持有量     |
 
 ###### 返回实例
 
@@ -528,14 +533,19 @@
     		"productName":"京东E卡",
      		"unitPrice":12,
      		"img":"htttp://pic.ka.png",
-            "brand":"京东",
-            "brandImg":"http://jindong.png",
-            "brandDesc":"互联网企业",
-            "brandTel":"0931123422",
+            "acceptName":"京东",
+            "acceptImg":"http://jindong.png",
+            "acceptAddress":"北京",
+            "acceptIntro":"京东简介",
+            "issuerName":"发行商京东",
+            "issuerImg":"http://jindong.png",
+            "issuerAddress":"北京",
+            "issuerIntro":"京东简介",
      		"desc":"仅限京东平台使用",
      		"receive":"提货说明",
      		"expirationStart":"有效期开始时间",
-     		"expiration_end":"有效期结束时间"
+     		"expiration_end":"有效期结束时间",
+     		"number":100
    		
      }
 }

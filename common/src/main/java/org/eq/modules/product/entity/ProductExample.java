@@ -130,6 +130,11 @@ public class ProductExample {
             return (Criteria) this;
         }
 
+        public Criteria andIdAllEqualTo(Long value) {
+            addCriterion("p.id =", value, "id");
+            return (Criteria) this;
+        }
+
         public Criteria andIdNotEqualTo(Long value) {
             addCriterion("id <>", value, "id");
             return (Criteria) this;

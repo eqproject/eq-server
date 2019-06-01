@@ -116,27 +116,27 @@ public class UserProductStockExample {
 
 
         public Criteria andIdEqualTo(Long value) {
-            addCriterion("userStock.id =", value, "id");
+            addCriterion("stock.id =", value, "id");
             return (Criteria) this;
         }
 
 
         public Criteria andUserIdEqualTo(Long value) {
-            addCriterion("userStock.user_id =", value, "userId");
+            addCriterion("stock.user_id =", value, "userId");
             return (Criteria) this;
         }
         public Criteria andUserIdIn(List<Long> values) {
-            addCriterion("userStock.user_id in", values, "userId");
+            addCriterion("stock.user_id in", values, "userId");
             return (Criteria) this;
         }
 
         public Criteria andProductIdEqualTo(Long value) {
-            addCriterion("userStock.product_id =", value, "productId");
+            addCriterion("stock.product_id =", value, "productId");
             return (Criteria) this;
         }
 
         public Criteria andProductIdIn(List<Long> values) {
-            addCriterion("userStock.product_id in", values, "productId");
+            addCriterion("stock.product_id in", values, "productId");
             return (Criteria) this;
         }
 

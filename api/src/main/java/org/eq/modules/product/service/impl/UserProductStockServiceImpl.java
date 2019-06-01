@@ -4,10 +4,8 @@
  */
 package org.eq.modules.product.service.impl;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.annotation.AutowiredService;
-import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.cache.ProductCache;
@@ -16,13 +14,12 @@ import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.common.utils.ProductUtil;
 import org.eq.modules.product.dao.UserProductStockMapper;
 import org.eq.modules.product.entity.Product;
-import org.eq.modules.product.entity.ProductBlockchain;
 import org.eq.modules.product.entity.UserProductStock;
 import org.eq.modules.product.entity.UserProductStockExample;
 import org.eq.modules.product.service.ProductBlockchainService;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.service.UserProductStockService;
-import org.eq.modules.product.vo.ProductVO;
+import org.eq.modules.product.vo.ProductBaseVO;
 import org.eq.modules.product.vo.SearchPageProductVO;
 import org.eq.modules.product.vo.TicketProductVO;
 import org.slf4j.Logger;
@@ -31,9 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 用户商品管理ServiceImpl
@@ -93,8 +88,8 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 	}
 
 	@Override
-	public PageResultData<ProductVO> pageSimpeProduct(SearchPageProductVO searchPageProductVO,User user) {
-		PageResultData<ProductVO> result = new PageResultData<>();
+	public PageResultData<ProductBaseVO> pageSimpeProduct(SearchPageProductVO searchPageProductVO, User user) {
+		PageResultData<ProductBaseVO> result = new PageResultData<>();
 		if(user ==null || StringUtils.isEmpty(user.getTxPassword())){
 			return result;
 		}
@@ -111,36 +106,90 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 		if(searchPageProductVO.getPageNum()<=0){
 			searchPageProductVO.setPageNum(1);
 		}
-		BaseTableData baseTableData = findDataTableByExampleForPage(ProductUtil.getUserBaseEffectExample(), searchPageProductVO.getPageNum(), searchPageProductVO.getPageSize());
-		if(baseTableData==null || CollectionUtils.isEmpty(baseTableData.getData())){
-			return result;
-		}
-		List<ProductVO> dataList = new ArrayList<>(baseTableData.getData().size());
-		List<UserProductStock> pList = baseTableData.getData();
-
-		for(UserProductStock p : pList){
-			//ProductAll productAll = productCache.getProduct(String.valueOf(p.getProductId()));
-			Product product = productService.selectByPrimaryKey(p.getProductId());
+		//组装可返回实体列表
+		List<ProductBaseVO> allReult = new ArrayList<>();
+		Iterator<String> ite = tickMap.keySet().iterator();
+		while(ite.hasNext()){
+			String key = ite.next();
+			TicketProductVO ticketProductVO = tickMap.get(key);
+			String productId = productCache.getProductIdByTicketKey(key);
+			if(StringUtils.isEmpty(productId)){
+				continue;
+			}
+			Product product = productService.selectByPrimaryKey(Long.valueOf(productId));
 			if(!ProductUtil.isEffect(product)){
 				continue;
 			}
-			ProductBlockchain productBlockchain = productBlockchainService.getBuyProductId(p.getId());
-			if(productBlockchain==null){
+			int number = Integer.valueOf(ticketProductVO.getBalance()) - getLockedStockNum(product.getId(),user.getId()); ;
+			if(number<=0){
 				continue;
 			}
-			StringBuilder ticketKey = new StringBuilder().append(productBlockchain.getTicketid()).append("_").append(productBlockchain.getTrancheid());
-			TicketProductVO ticketProductVO = tickMap.get(ticketKey.toString());
-			if(ticketProductVO==null){
-				continue;
-			}
-			int number = Integer.valueOf(ticketProductVO.getBalance());
-			if((number-p.getLockedNum())<=0){
-				continue;
-			}
-			dataList.add(ProductUtil.transObj(product));
+
+			ProductBaseVO productBaseVO = ProductUtil.transObj(product);
+			productBaseVO.setNumber(number);
+			allReult.add(productBaseVO);
 		}
+		Collections.sort(allReult,new ProductBaseVO());
+		List<ProductBaseVO> dataList = pageBySubList(allReult,searchPageProductVO.getPageSize(),searchPageProductVO.getPageNum());
 		result.setList(dataList);
-		result.setTotal(baseTableData.getRecordsTotal());
+		result.setTotal(allReult.size());
 		return result;
+	}
+
+	/**
+	 * 根据商品信息和用户信息获取用户库存数据
+	 * @param productId
+	 * @param userId
+	 * @return
+	 */
+	private int getLockedStockNum(long productId, long userId){
+		if(productId<=0 || userId<=0 ){
+			return 0;
+		}
+		UserProductStock userProductStock = new UserProductStock();
+		userProductStock.setUserId(userId);
+		userProductStock.setProductId(productId);
+		userProductStock = selectByRecord(userProductStock);
+		if(userProductStock!=null){
+			return userProductStock.getLockedNum();
+		}
+		userProductStock = new UserProductStock();
+		userProductStock.setProductId(productId);
+		userProductStock.setUserId(userId);
+		userProductStock.setCreateDate(new Date());
+		userProductStock.setLockedNum(0);
+		userProductStock.setUpdateDate(userProductStock.getCreateDate());
+		int result = insertSelective(userProductStock);
+		System.out.println(result+"====");
+		int retryNum = 3;
+		while(result<=0 && retryNum>0){
+			result = insertSelective(userProductStock);
+			retryNum--;
+		}
+		return 0;
+	}
+
+	private static List<ProductBaseVO> pageBySubList(List<ProductBaseVO> list, int pagesize, int currentPage) {
+		int totalcount = list.size();
+		int pagecount = 0;
+		List<ProductBaseVO> subList = new ArrayList<>();
+		int m = totalcount % pagesize;
+		if (m > 0) {
+			pagecount = totalcount / pagesize + 1;
+		} else {
+			pagecount = totalcount / pagesize;
+		}
+		int start = (currentPage - 1) * pagesize;
+		if(start>totalcount){
+			return subList;
+		}
+		int end = pagesize * (currentPage);
+		if(m!=0 && currentPage == pagecount){
+			end = totalcount;
+		}
+		if(end>totalcount){
+			end = totalcount;
+		}
+		return  list.subList(start,end );
 	}
 }

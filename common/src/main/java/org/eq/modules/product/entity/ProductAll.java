@@ -75,6 +75,11 @@ public class ProductAll  extends Product implements Serializable {
 	 */
 	private String trancheid;
 
+	/**
+	 * 商品数量
+	 */
+	private int number;
+
 
 
 

@@ -2,16 +2,14 @@ package org.eq.modules.common.utils;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.eq.modules.business.ProductUtils;
+import org.eq.modules.business.ProductBusines;
 import org.eq.modules.enums.ProductStateEnum;
 import org.eq.basic.common.util.DateUtil;
 import org.eq.modules.product.entity.Product;
+import org.eq.modules.product.entity.ProductAll;
 import org.eq.modules.product.entity.ProductExample;
 import org.eq.modules.product.entity.UserProductStockExample;
-import org.eq.modules.product.vo.ProductExtend;
-import org.eq.modules.product.vo.ProductVO;
-import org.eq.modules.product.vo.SearchProductVO;
-import org.eq.modules.product.vo.TicketProductVO;
+import org.eq.modules.product.vo.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +22,7 @@ import java.util.Map;
  * @date  2019-05-27
  */
 @SuppressWarnings("all")
-public class ProductUtil  extends ProductUtils {
+public class ProductUtil  extends ProductBusines {
 
 
     /**
@@ -32,20 +30,54 @@ public class ProductUtil  extends ProductUtils {
      * @param product
      * @return
      */
-    public static ProductVO transObj(Product product){
+    public static ProductBaseVO transObj(Product product){
         if(product==null){
             return null;
         }
-        ProductVO result = new ProductVO();
+        ProductBaseVO result = new ProductBaseVO();
         result.setId(product.getId());
         result.setProductName(product.getName());
         result.setUnitPrice(product.getUnitPrice());
         result.setImg(product.getProductImg());
-        result.setDesc(product.getRemarks());
-        ProductExtend productExtend = formatExtend(product.getExtendInfo());
-        result.setReceive(productExtend.getReceive());
         result.setExpirationStart(product.getExpirationStart());
         result.setExpirationEnd(product.getExpirationEnd());
+        result.setSort(product.getSort());
+        ProductExtend productExtend = formatExtend(product.getExtendInfo());
+        result.setReceive(productExtend.getReceive());
+        result.setDesc(productExtend.getTicketDesc());
+        return result;
+    }
+
+
+    /**
+     * 转化对象实体
+     * @param product
+     * @return
+     */
+    public static ProductDetailVO transObjTOProductDetail(ProductAll productAll){
+        if(productAll==null){
+            return null;
+        }
+        ProductDetailVO result = new ProductDetailVO();
+        result.setId(productAll.getId());
+        result.setProductName(productAll.getName());
+        result.setUnitPrice(productAll.getUnitPrice());
+        result.setImg(productAll.getProductImg());
+        result.setExpirationStart(productAll.getExpirationStart());
+        result.setExpirationEnd(productAll.getExpirationEnd());
+        result.setSort(productAll.getSort());
+        result.setNumber(productAll.getNumber());
+        ProductExtend productExtend = formatExtend(productAll.getExtendInfo());
+        result.setReceive(productExtend.getReceive());
+        result.setDesc(productExtend.getTicketDesc());
+        result.setAcceptName(productAll.getAcceptName());
+        result.setAcceptImg(productAll.getAcceptIcon());
+        result.setAcceptAddress(productAll.getAcceptAddress());
+        result.setAcceptIntro(productAll.getAcceptIntro());
+        result.setIssuerName(productAll.getIssuerName());
+        result.setIssuerImg(productAll.getIssuerIcon());
+        result.setIssuerAddress(productAll.getIssuerAddress());
+        result.setIssuerIntro(productAll.getIssuerIntro());
         return result;
     }
 
@@ -63,33 +95,41 @@ public class ProductUtil  extends ProductUtils {
         }
         JSONObject obj = JSONObject.parseObject(extendInfo);
         productExtend.setReceive(obj.getString("receive"));
+        productExtend.setTicketDesc(obj.getString("ticketDesc"));
         return productExtend;
     }
 
     /**
      * 根据查询条件 封装Example
-     * @param searchProductVO 查询条件
+     * @param searchBSearchProductVO 查询条件
      * @return
      */
-    public static ProductExample createPlatformSearchExample(SearchProductVO searchProductVO) {
+    public static ProductExample createPlatformSearchExample(BSearchProduct bsearchProduct,boolean isall) {
         ProductExample example = new ProductExample();
         ProductExample.Criteria ca = example.or();
         example.setOrderByClause(" sort desc ");
-        if(searchProductVO.getProductId()>0){
-            ca.andIdEqualTo(searchProductVO.getProductId());
+        if(bsearchProduct.getProductId()>0){
+            if(isall){
+                ca.andIdAllEqualTo(bsearchProduct.getProductId());
+            }else{
+                ca.andIdEqualTo(bsearchProduct.getProductId());
+            }
+
         }
-        if(searchProductVO.getState()!=null){
-            ca.andStatusEqualTo(searchProductVO.getState().intValue());
+        if(bsearchProduct.getState()!=null){
+            ca.andStatusEqualTo(bsearchProduct.getState().intValue());
         }else{
             ca.andStatusEqualTo(ProductStateEnum.ONLINE.getState());
         }
-        if(searchProductVO.isOver()){
+        if(bsearchProduct.isOver()){
             ca.andExpirationEndLessThanOrEqualTo(DateUtil.getNowTimeStr());
         }else{
             ca.andExpirationEndGreaterThan(DateUtil.getNowTimeStr());
         }
         return example;
     }
+
+
 
 
 
@@ -155,6 +195,26 @@ public class ProductUtil  extends ProductUtils {
             ticketProductVO.setBalance("1000");
             ticketProductVO.setTicketDesc("区块链商品简介");
             String key = ticketProductVO.getTicketId()+"_"+ticketProductVO.getTrancheId();
+            result.put(key,ticketProductVO);
+
+            ticketProductVO = new TicketProductVO();
+            ticketProductVO.setTicketId("TICKET02");
+            ticketProductVO.setTrancheId("TRANCEID02");
+            ticketProductVO.setTicketName("区块链商品名称");
+            ticketProductVO.setTicketFaceValue("1000");
+            ticketProductVO.setBalance("1000");
+            ticketProductVO.setTicketDesc("区块链商品简介");
+            key = ticketProductVO.getTicketId()+"_"+ticketProductVO.getTrancheId();
+            result.put(key,ticketProductVO);
+
+            ticketProductVO = new TicketProductVO();
+            ticketProductVO.setTicketId("TICKET03");
+            ticketProductVO.setTrancheId("TRANCEID03");
+            ticketProductVO.setTicketName("区块链商品名称");
+            ticketProductVO.setTicketFaceValue("1000");
+            ticketProductVO.setBalance("1000");
+            ticketProductVO.setTicketDesc("区块链商品简介");
+            key = ticketProductVO.getTicketId()+"_"+ticketProductVO.getTrancheId();
             result.put(key,ticketProductVO);
         }
         return result;

@@ -9,18 +9,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
+import org.eq.modules.common.cache.ProductCache;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.common.utils.ProductUtil;
-import org.eq.modules.enums.ProductStateEnum;
 import org.eq.modules.product.dao.ProductMapper;
 import org.eq.modules.product.entity.Product;
 import org.eq.modules.product.entity.ProductAll;
 import org.eq.modules.product.entity.ProductExample;
 import org.eq.modules.product.service.ProductService;
-import org.eq.modules.product.vo.ProductVO;
+import org.eq.modules.product.vo.ProductBaseVO;
+import org.eq.modules.product.vo.ProductDetailVO;
 import org.eq.modules.product.vo.SearchPageProductVO;
-import org.eq.modules.product.vo.SearchProductVO;
+import org.eq.modules.product.vo.BSearchProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,9 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 
 	@Autowired
 	private ProductMapper productMapper;
+
+	@Autowired
+	private ProductCache productCache;
 
 
 	@Override
@@ -88,8 +92,8 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 	}
 
 	@Override
-	public PageResultData<ProductVO> pageSimpeProduct(SearchPageProductVO searchPageProductVO) {
-		PageResultData<ProductVO> result = new PageResultData<>();
+	public PageResultData<ProductBaseVO> pageSimpeProduct(SearchPageProductVO searchPageProductVO) {
+		PageResultData<ProductBaseVO> result = new PageResultData<>();
 		if(searchPageProductVO ==null){
 			searchPageProductVO = new SearchPageProductVO();
 		}
@@ -103,7 +107,7 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 		if(baseTableData==null || CollectionUtils.isEmpty(baseTableData.getData())){
 			return result;
 		}
-		List<ProductVO> dataList = new ArrayList<>(baseTableData.getData().size());
+		List<ProductBaseVO> dataList = new ArrayList<>(baseTableData.getData().size());
 		List<Product> pList = baseTableData.getData();
 		for(Product p : pList){
 			dataList.add(ProductUtil.transObj(p));
@@ -114,11 +118,11 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 	}
 
 	@Override
-	public List<ProductAll> listProductAll(SearchProductVO searchProductVO) {
-		if(searchProductVO ==null){
-			searchProductVO = new SearchProductVO();
+	public List<ProductAll> listProductAll(BSearchProduct searchBSearchProduct) {
+		if(searchBSearchProduct ==null){
+			searchBSearchProduct = new BSearchProduct();
 		}
-		ProductExample productExample = ProductUtil.createPlatformSearchExample(searchProductVO);
+		ProductExample productExample = ProductUtil.createPlatformSearchExample(searchBSearchProduct,true);
 		List<ProductAll> result = productMapper.selectProductAllByExample(productExample);
 		if(CollectionUtils.isEmpty(result)){
 			return new ArrayList<ProductAll>();
@@ -126,9 +130,19 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 		return  result;
 	}
 
-
-
-
+    @Override
+    public ProductDetailVO getProductAll(BSearchProduct bsearchProduct) {
+		ProductDetailVO result = null;
+		if(bsearchProduct ==null){
+			bsearchProduct = new BSearchProduct();
+		}
+		ProductExample productExample = ProductUtil.createPlatformSearchExample(bsearchProduct,true);
+		List<ProductAll> productList = productMapper.selectProductAllByExample(productExample);
+		if(CollectionUtils.isEmpty(productList)){
+			return result;
+		}
+		return  ProductUtil.transObjTOProductDetail(productList.get(0));
+    }
 
 
 }

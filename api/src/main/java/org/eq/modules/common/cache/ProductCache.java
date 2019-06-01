@@ -5,13 +5,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.util.DateUtil;
 import org.eq.modules.enums.ProductStateEnum;
 import org.eq.modules.product.entity.ProductAll;
+import org.eq.modules.product.entity.ProductBlockchain;
+import org.eq.modules.product.service.ProductBlockchainService;
 import org.eq.modules.product.service.ProductService;
-import org.eq.modules.product.vo.SearchProductVO;
+import org.eq.modules.product.vo.BSearchProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,12 +31,47 @@ public class ProductCache implements BaseCache {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private ProductBlockchainService productBlockchainService;
+
 
     /**
      * 商品缓存Map
      */
     private static Map<String,ProductAll> productMap = new ConcurrentHashMap<>();
 
+
+    /**
+     * 区块链key到商品ID
+     */
+    private static Map<String,String> ticketKeyTOProductId = new HashMap<>();
+
+
+    /**
+     * 通过区块量KEY 获取商品ID
+     * @param ticketKey
+     * @return
+     */
+    public  String getProductIdByTicketKey(String ticketKey){
+        if(StringUtils.isEmpty(ticketKey)){
+            return null;
+        }
+        String result = ticketKeyTOProductId.get(ticketKey);
+        if(!StringUtils.isEmpty(result)){
+            return  result;
+        }
+        String[] keys = ticketKey.split("_");
+        if(keys.length!=2){
+            return null;
+        }
+        ProductBlockchain productBlockchain = productBlockchainService.getBuyTicketInfo(keys[0],keys[1]);
+        if(productBlockchain==null){
+            return  null;
+        }
+
+        ticketKeyTOProductId.put(ticketKey,String.valueOf(productBlockchain.getProductId()));
+        return String.valueOf(productBlockchain.getProductId());
+    }
 
     /**
      * 通过商品ID 获取商品有效信息
@@ -56,13 +94,13 @@ public class ProductCache implements BaseCache {
      * @param productId
      */
     private  void reloadProduct(String productId){
-        SearchProductVO searchProductVO = new  SearchProductVO();
+        BSearchProduct bsearchProduct = new BSearchProduct();
         if(!StringUtils.isEmpty(productId)){
-            searchProductVO.setProductId(Long.valueOf(productId));
+            bsearchProduct.setProductId(Long.valueOf(productId));
         }
-        searchProductVO.setOver(false);
-        searchProductVO.setState(ProductStateEnum.ONLINE.getState());
-        List<ProductAll> result =  productService.listProductAll(searchProductVO);
+        bsearchProduct.setOver(false);
+        bsearchProduct.setState(ProductStateEnum.ONLINE.getState());
+        List<ProductAll> result =  productService.listProductAll(bsearchProduct);
         if(CollectionUtils.isEmpty(result)){
             return ;
         }

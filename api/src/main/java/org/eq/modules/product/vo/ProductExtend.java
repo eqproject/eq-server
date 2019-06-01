@@ -18,6 +18,11 @@ public class ProductExtend implements Serializable {
      */
     private  String receive;
 
+    /**
+     * 商品描述
+     */
+    private String ticketDesc;
+
 
 
 }

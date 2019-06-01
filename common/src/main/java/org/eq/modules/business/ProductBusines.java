@@ -8,7 +8,7 @@ import org.eq.modules.product.entity.Product;
 /**
  * 商品工具类
  */
-public class ProductUtils {
+public class ProductBusines {
 
 
     /**

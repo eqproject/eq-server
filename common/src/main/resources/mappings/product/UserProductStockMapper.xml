@@ -112,6 +112,9 @@
     </delete>
 
     <insert id="insert" parameterType="org.eq.modules.product.entity.UserProductStock">
+        <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
         insert into user_stock (user_id,product_id,locked_num,create_date,update_date,remarks)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -125,6 +128,9 @@
     </insert>
 
     <insert id="insertSelective" parameterType="org.eq.modules.product.entity.UserProductStock">
+        <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
         insert into user_stock
         <trim prefix="(" suffix=")" suffixOverrides=",">
             user_id,

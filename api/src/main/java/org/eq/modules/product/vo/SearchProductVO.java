@@ -19,17 +19,7 @@ public class SearchProductVO extends SearchBase {
     /**
      * 商品ID
      */
-    private long productId;
+    private long id;
 
-    /**
-     * 商品状态
-     * @see  org.eq.modules.enums.ProductStateEnum
-     */
-    private Integer state;
 
-    /**
-     * 是否过期
-     *  默认有效
-     */
-    private boolean isOver;
 }

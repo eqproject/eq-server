@@ -9,10 +9,10 @@ import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
+import org.eq.modules.product.entity.ProductAll;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.service.UserProductStockService;
-import org.eq.modules.product.vo.ProductVO;
-import org.eq.modules.product.vo.SearchPageProductVO;
+import org.eq.modules.product.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,7 +53,7 @@ public class ProductController extends BaseController {
 		if(user==null){
 			return ResponseFactory.signError("用户不存在");
 		}
-		PageResultData<ProductVO> pageResultData =  productService.pageSimpeProduct(searchPageProductVO);
+		PageResultData<ProductBaseVO> pageResultData =  productService.pageSimpeProduct(searchPageProductVO);
 		return ResponseFactory.success(pageResultData);
 	}
 
@@ -73,8 +73,29 @@ public class ProductController extends BaseController {
 			return ResponseFactory.signError("用户不存在");
 		}
 
-		PageResultData<ProductVO> pageResultData =  userProductStockService.pageSimpeProduct(searchPageProductVO,user);
+		PageResultData<ProductBaseVO> pageResultData =  userProductStockService.pageSimpeProduct(searchPageProductVO,user);
 		return ResponseFactory.success(pageResultData);
+	}
+
+
+	@PostMapping("/platform/details")
+	public ResponseData platformDetails(SearchProductVO searchProductVO) {
+		if(searchProductVO ==null || searchProductVO.getUserId()<=0 || searchProductVO.getId()<=0){
+			return ResponseFactory.paramsError("参数为空或者用户ID为空");
+		}
+		User user = getUserInfo(searchProductVO.getUserId());
+		if(user==null){
+			return ResponseFactory.signError("用户不存在");
+		}
+
+		BSearchProduct bsearchProduct = new BSearchProduct();
+		bsearchProduct.setProductId(searchProductVO.getId());
+		ProductDetailVO productDetailVO =  productService.getProductAll(bsearchProduct);
+		if(productDetailVO==null){
+			productDetailVO = new ProductDetailVO();
+		}
+
+		return ResponseFactory.success(productDetailVO);
 	}
 
 
