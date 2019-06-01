@@ -11,7 +11,6 @@ import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
-import org.eq.modules.common.utils.DateUtil;
 import org.eq.modules.common.utils.ProductUtil;
 import org.eq.modules.enums.ProductStateEnum;
 import org.eq.modules.product.dao.ProductMapper;
@@ -43,6 +42,9 @@ import java.util.Map;
 @AutowiredService
 public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product, ProductExample> implements ProductService {
 
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
+
+
 	@Autowired
 	public ProductServiceImpl(ProductMapper mapper){
 		super.setMapper(mapper);
@@ -51,7 +53,7 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 	@Autowired
 	private ProductMapper productMapper;
 
-	protected Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	@Override
 	public ProductExample getExampleFromEntity(Product product, Map<String, Object> params) {
 		ProductExample example = new ProductExample();

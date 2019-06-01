@@ -11,4 +11,22 @@ public class StaticEntity {
      * 每页最大条数
      */
     public static final int MAX_PAGE_SIZE=100;
+
+
+    /**
+     * 区块链获取请求令牌TOKEN
+     */
+    public static final String  TICKET_ACCESS_TOKEN_URL = "https://PCP/auth/accessToken";
+
+
+    /**
+     * 区块链请求平台商品地址
+     */
+    public static final String  TICKET_PRODUCT_URL = "https://{url}/ticket/v1/list";
+
+
+    /**
+     * 区块链请求用户商品地址
+     */
+    public static final String  TICKET_USER_PRODUCT_URL = "https://{url}/ticket/v1/account/balance";
 }

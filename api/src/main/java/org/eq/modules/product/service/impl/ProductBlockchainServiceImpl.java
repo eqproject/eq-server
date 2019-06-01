@@ -8,9 +8,13 @@ import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.StringLowUtils;
 import org.eq.modules.product.dao.ProductBlockchainMapper;
+import org.eq.modules.product.dao.ProductIssuerMapper;
 import org.eq.modules.product.entity.ProductBlockchain;
 import org.eq.modules.product.entity.ProductBlockchainExample;
 import org.eq.modules.product.service.ProductBlockchainService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +29,14 @@ import java.util.Map;
 @Transactional
 @AutowiredService
 public class ProductBlockchainServiceImpl extends ServiceImplExtend<ProductBlockchainMapper, ProductBlockchain, ProductBlockchainExample> implements ProductBlockchainService {
+
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
+
+
+	@Autowired
+	public ProductBlockchainServiceImpl(ProductBlockchainMapper productBlockchainMapper){
+		super.setMapper(productBlockchainMapper);
+	}
 
 	@Override
 	public ProductBlockchainExample getExampleFromEntity(ProductBlockchain productBlockchain, Map<String, Object> params) {
@@ -42,7 +54,7 @@ public class ProductBlockchainServiceImpl extends ServiceImplExtend<ProductBlock
 		if(orderName!=null&&!"".equals(orderName)){
 			example.setOrderByClause(orderName+" "+orderDir);
 		}else{
-			example.setOrderByClause("id asc");
+			example.setOrderByClause("product_id asc");
 		}
 		if(productBlockchain.getProductId()!=null){
 			ca.andProductIdEqualTo(productBlockchain.getProductId());
@@ -71,4 +83,20 @@ public class ProductBlockchainServiceImpl extends ServiceImplExtend<ProductBlock
 		return example;
 	}
 
+	@Override
+	public ProductBlockchain getBuyProductId(long productId) {
+		ProductBlockchain productBlockchain = new ProductBlockchain();
+		productBlockchain.setProductId(productId);
+		ProductBlockchain result =  selectByRecord(productBlockchain);
+		return result;
+	}
+
+	@Override
+	public ProductBlockchain getBuyTicketInfo(String ticketId, String trancheId) {
+		ProductBlockchain productBlockchain = new ProductBlockchain();
+		productBlockchain.setTicketid(ticketId);
+		productBlockchain.setTrancheid(trancheId);
+		ProductBlockchain result =  selectByRecord(productBlockchain);
+		return result;
+	}
 }

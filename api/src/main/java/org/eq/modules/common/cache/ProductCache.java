@@ -2,7 +2,7 @@ package org.eq.modules.common.cache;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.eq.modules.common.utils.DateUtil;
+import org.eq.basic.common.util.DateUtil;
 import org.eq.modules.enums.ProductStateEnum;
 import org.eq.modules.product.entity.ProductAll;
 import org.eq.modules.product.service.ProductService;
@@ -35,7 +35,11 @@ public class ProductCache implements BaseCache {
     private static Map<String,ProductAll> productMap = new ConcurrentHashMap<>();
 
 
-
+    /**
+     * 通过商品ID 获取商品有效信息
+     * @param productId
+     * @return
+     */
     public ProductAll getProduct(String productId){
         if(StringUtils.isEmpty(productId)){
             return null;

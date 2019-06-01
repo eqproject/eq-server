@@ -15,4 +15,20 @@ import org.eq.modules.product.entity.ProductBlockchainExample;
  */
 public interface ProductBlockchainService extends ServiceExtend<ProductBlockchain, ProductBlockchainExample> {
 
+
+    /**
+     * 通过商品ID 获取对象
+     * @param productId
+     * @return
+     */
+    public ProductBlockchain getBuyProductId(long productId);
+
+
+    /**
+     * 通过 区块链券ID 和 分组ID 获取商品信息
+     * @param ticketId  区块链券ID
+     * @param trancheId 分组ID
+     * @return
+     */
+    public ProductBlockchain getBuyTicketInfo(String ticketId,String trancheId);
 }

@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.eq.modules.product.dao.ProductBlockchainMapper">
-    <resultMap id="BaseResultMap" type="org.eq.modules.product.entity.ProductBlockchain">
+<mapper namespace="org.eq.modules.product.dao.UserProductStockMapper">
+    <resultMap id="BaseResultMap" type="org.eq.modules.product.entity.UserProductStock">
+        <id column="id" jdbcType="BIGINT" property="id" />
+	    <result column="user_id" jdbcType="BIGINT" property="userId" />
 	    <result column="product_id" jdbcType="BIGINT" property="productId" />
-	    <result column="asset_code" jdbcType="VARCHAR" property="assetCode" />
-	    <result column="asset_issuer" jdbcType="VARCHAR" property="assetIssuer" />
-	    <result column="contract_address" jdbcType="VARCHAR" property="contractAddress" />
-	    <result column="ticketId" jdbcType="VARCHAR" property="ticketid" />
-	    <result column="trancheId" jdbcType="VARCHAR" property="trancheid" />
+	    <result column="locked_num" jdbcType="INTEGER" property="lockedNum" />
 	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
 	    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+	    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+        <result column="pstate" jdbcType="INTEGER" property="productStatus" />
+        <result column="pexpiration_end" jdbcType="VARCHAR" property="productExpirationEnd" />
     </resultMap>
 
     <sql id="Example_Where_Clause">
@@ -73,16 +74,16 @@
     </sql>
 
     <sql id="Base_Column_List">
-        product_id,asset_code,asset_issuer,contract_address,ticketId,trancheId,create_date,update_date
+        stock.id,stock.user_id,stock.product_id,stock.locked_num,stock.create_date,stock.update_date,stock.remarks,p.status as pstatus,p.expiration_end as pexpiration_end
     </sql>
 
-    <select id="selectByExample" parameterType="org.eq.modules.product.entity.ProductBlockchainExample" resultMap="BaseResultMap">
+    <select id="selectByExample" parameterType="org.eq.modules.product.entity.UserProductStockExample" resultMap="BaseResultMap">
         select
         <if test="distinct">
             distinct
         </if>
         <include refid="Base_Column_List" />
-        from platform_product_blockchain
+        from user_stock as  stock left join platform_product p on stock.product_id = p.id
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>
@@ -94,94 +95,85 @@
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
-        from platform_product_blockchain
-        where product_id = #{productId,jdbcType=BIGINT}
+        from user_stock as  stock left join platform_product p on stock.product_id = p.id
+        where id = #{id,jdbcType=BIGINT}
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete from platform_product_blockchain
-        where product_id = #{productId,jdbcType=BIGINT}
+        delete from user_stock
+        where id = #{id,jdbcType=BIGINT}
     </delete>
 
-    <delete id="deleteByExample" parameterType="org.eq.modules.product.entity.ProductBlockchainExample">
-        delete from platform_product_blockchain
+    <delete id="deleteByExample" parameterType="org.eq.modules.product.entity.UserProductStockExample">
+        delete from user_stock
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>
     </delete>
 
-    <insert id="insert" parameterType="org.eq.modules.product.entity.ProductBlockchain">
-        insert into platform_product_blockchain (product_id,asset_code,asset_issuer,contract_address,ticketId,trancheId,create_date,update_date)
+    <insert id="insert" parameterType="org.eq.modules.product.entity.UserProductStock">
+        insert into user_stock (user_id,product_id,locked_num,create_date,update_date,remarks)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{userId,jdbcType=BIGINT},
             #{productId,jdbcType=BIGINT},
-            #{assetCode,jdbcType=VARCHAR},
-            #{assetIssuer,jdbcType=VARCHAR},
-            #{contractAddress,jdbcType=VARCHAR},
-            #{ticketid,jdbcType=VARCHAR},
-            #{trancheid,jdbcType=VARCHAR},
+            #{lockedNum,jdbcType=INTEGER},
             #{createDate,jdbcType=TIMESTAMP},
             #{updateDate,jdbcType=TIMESTAMP},
+            #{remarks,jdbcType=VARCHAR},
         </trim>
     </insert>
 
-    <insert id="insertSelective" parameterType="org.eq.modules.product.entity.ProductBlockchain">
-        insert into platform_product_blockchain
+    <insert id="insertSelective" parameterType="org.eq.modules.product.entity.UserProductStock">
+        insert into user_stock
         <trim prefix="(" suffix=")" suffixOverrides=",">
+            user_id,
             product_id,
-            asset_code,
-            asset_issuer,
-            contract_address,
-            ticketId,
-            trancheId,
+            locked_num,
             create_date,
             update_date,
+            remarks,
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{userId,jdbcType=BIGINT},
             #{productId,jdbcType=BIGINT},
-            #{assetCode,jdbcType=VARCHAR},
-            #{assetIssuer,jdbcType=VARCHAR},
-            #{contractAddress,jdbcType=VARCHAR},
-            #{ticketid,jdbcType=VARCHAR},
-            #{trancheid,jdbcType=VARCHAR},
+            #{lockedNum,jdbcType=INTEGER},
             #{createDate,jdbcType=TIMESTAMP},
             #{updateDate,jdbcType=TIMESTAMP},
+            #{remarks,jdbcType=VARCHAR},
         </trim>
     </insert>
 
-    <select id="countByExample" parameterType="org.eq.modules.product.entity.ProductBlockchainExample" resultType="java.lang.Long">
-        select count(*) from platform_product_blockchain
+    <select id="countByExample" parameterType="org.eq.modules.product.entity.UserProductStockExample" resultType="java.lang.Long">
+        select count(*) from user_stock as  stock left join platform_product p on stock.product_id = p.id
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>
     </select>
 
     <update id="updateByExampleSelective" parameterType="map">
-        update platform_product_blockchain
+        update user_stock
         <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.userId != null">
+                user_id = #{record.userId,jdbcType=BIGINT},
+            </if>
             <if test="record.productId != null">
                 product_id = #{record.productId,jdbcType=BIGINT},
             </if>
-            <if test="record.assetCode != null">
-                asset_code = #{record.assetCode,jdbcType=VARCHAR},
-            </if>
-            <if test="record.assetIssuer != null">
-                asset_issuer = #{record.assetIssuer,jdbcType=VARCHAR},
-            </if>
-            <if test="record.contractAddress != null">
-                contract_address = #{record.contractAddress,jdbcType=VARCHAR},
-            </if>
-            <if test="record.ticketid != null">
-                ticketId = #{record.ticketid,jdbcType=VARCHAR},
-            </if>
-            <if test="record.trancheid != null">
-                trancheId = #{record.trancheid,jdbcType=VARCHAR},
+            <if test="record.lockedNum != null">
+                locked_num = #{record.lockedNum,jdbcType=INTEGER},
             </if>
             <if test="record.createDate != null">
                 create_date = #{record.createDate,jdbcType=TIMESTAMP},
             </if>
             <if test="record.updateDate != null">
                 update_date = #{record.updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.remarks != null">
+                remarks = #{record.remarks,jdbcType=VARCHAR},
             </if>
         </set>
         <if test="_parameter != null">
@@ -190,43 +182,33 @@
     </update>
 
     <update id="updateByExample" parameterType="map">
-        update platform_product_blockchain
+        update user_stock
         set
         <trim  suffixOverrides=",">
+            id = #{record.id,jdbcType=BIGINT},
+            user_id = #{record.userId,jdbcType=BIGINT},
             product_id = #{record.productId,jdbcType=BIGINT},
-            asset_code = #{record.assetCode,jdbcType=VARCHAR},
-            asset_issuer = #{record.assetIssuer,jdbcType=VARCHAR},
-            contract_address = #{record.contractAddress,jdbcType=VARCHAR},
-            ticketId = #{record.ticketid,jdbcType=VARCHAR},
-            trancheId = #{record.trancheid,jdbcType=VARCHAR},
+            locked_num = #{record.lockedNum,jdbcType=INTEGER},
             create_date = #{record.createDate,jdbcType=TIMESTAMP},
             update_date = #{record.updateDate,jdbcType=TIMESTAMP},
+            remarks = #{record.remarks,jdbcType=VARCHAR},
         </trim>
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause" />
         </if>
     </update>
 
-    <update id="updateByPrimaryKeySelective" parameterType="org.eq.modules.product.entity.ProductBlockchain">
-        update platform_product_blockchain
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.modules.product.entity.UserProductStock">
+        update user_stock
         <set>
+            <if test="userId != null">
+            user_id = #{userId,jdbcType=BIGINT},
+            </if>
             <if test="productId != null">
             product_id = #{productId,jdbcType=BIGINT},
             </if>
-            <if test="assetCode != null">
-            asset_code = #{assetCode,jdbcType=VARCHAR},
-            </if>
-            <if test="assetIssuer != null">
-            asset_issuer = #{assetIssuer,jdbcType=VARCHAR},
-            </if>
-            <if test="contractAddress != null">
-            contract_address = #{contractAddress,jdbcType=VARCHAR},
-            </if>
-            <if test="ticketid != null">
-            ticketId = #{ticketid,jdbcType=VARCHAR},
-            </if>
-            <if test="trancheid != null">
-            trancheId = #{trancheid,jdbcType=VARCHAR},
+            <if test="lockedNum != null">
+            locked_num = #{lockedNum,jdbcType=INTEGER},
             </if>
             <if test="createDate != null">
             create_date = #{createDate,jdbcType=TIMESTAMP},
@@ -234,24 +216,25 @@
             <if test="updateDate != null">
             update_date = #{updateDate,jdbcType=TIMESTAMP},
             </if>
+            <if test="remarks != null">
+            remarks = #{remarks,jdbcType=VARCHAR},
+            </if>
         </set>
-        where product_id = #{productId,jdbcType=BIGINT}
+        where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="org.eq.modules.product.entity.ProductBlockchain">
-        update platform_product_blockchain
+    <update id="updateByPrimaryKey" parameterType="org.eq.modules.product.entity.UserProductStock">
+        update user_stock
         set
         <trim  suffixOverrides=",">
+              user_id = #{userId,jdbcType=BIGINT},
               product_id = #{productId,jdbcType=BIGINT},
-              asset_code = #{assetCode,jdbcType=VARCHAR},
-              asset_issuer = #{assetIssuer,jdbcType=VARCHAR},
-              contract_address = #{contractAddress,jdbcType=VARCHAR},
-              ticketId = #{ticketid,jdbcType=VARCHAR},
-              trancheId = #{trancheid,jdbcType=VARCHAR},
+              locked_num = #{lockedNum,jdbcType=INTEGER},
               create_date = #{createDate,jdbcType=TIMESTAMP},
               update_date = #{updateDate,jdbcType=TIMESTAMP},
+              remarks = #{remarks,jdbcType=VARCHAR},
         </trim>
-        where product_id = #{productId,jdbcType=BIGINT}
+        where id = #{id,jdbcType=BIGINT}
     </update>
 
 </mapper>

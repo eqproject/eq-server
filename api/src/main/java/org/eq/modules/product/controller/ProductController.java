@@ -10,6 +10,7 @@ import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
 import org.eq.modules.product.service.ProductService;
+import org.eq.modules.product.service.UserProductStockService;
 import org.eq.modules.product.vo.ProductVO;
 import org.eq.modules.product.vo.SearchPageProductVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class ProductController extends BaseController {
 
 	@Autowired
 	private ProductService productService;
+
+	@Autowired
+	private UserProductStockService userProductStockService;
 
 	@GetMapping("list")
 	public ResponseData<String> index() {
@@ -68,8 +72,8 @@ public class ProductController extends BaseController {
 		if(user==null){
 			return ResponseFactory.signError("用户不存在");
 		}
-		PageResultData<ProductVO> pageResultData =  productService.pageSimpeProduct(searchPageProductVO);
 
+		PageResultData<ProductVO> pageResultData =  userProductStockService.pageSimpeProduct(searchPageProductVO,user);
 		return ResponseFactory.success(pageResultData);
 	}
 

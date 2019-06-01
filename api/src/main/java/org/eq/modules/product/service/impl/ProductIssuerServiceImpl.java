@@ -5,16 +5,16 @@
 package org.eq.modules.product.service.impl;
 
 
-import org.apache.commons.lang3.StringUtils;
+import org.eq.basic.common.annotation.AutowiredService;
+import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.StringLowUtils;
 import org.eq.modules.product.dao.ProductIssuerMapper;
 import org.eq.modules.product.entity.ProductIssuer;
 import org.eq.modules.product.entity.ProductIssuerExample;
 import org.eq.modules.product.service.ProductIssuerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.eq.basic.common.annotation.AutowiredService;
-import org.eq.basic.common.base.ServiceImplExtend;
 
 import java.util.Map;
 
@@ -27,6 +27,13 @@ import java.util.Map;
 @Transactional
 @AutowiredService
 public class ProductIssuerServiceImpl extends ServiceImplExtend<ProductIssuerMapper, ProductIssuer, ProductIssuerExample> implements ProductIssuerService {
+
+	@Autowired
+	public ProductIssuerServiceImpl(ProductIssuerMapper productIssuerMapper){
+		super.setMapper(productIssuerMapper);
+	}
+
+
 
 	@Override
 	public ProductIssuerExample getExampleFromEntity(ProductIssuer productIssuer, Map<String, Object> params) {

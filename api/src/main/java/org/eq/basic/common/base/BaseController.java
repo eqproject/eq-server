@@ -30,7 +30,10 @@ public abstract class BaseController {
      */
     public User getUserInfo(long userId){
         //TODO 增加用户有效性 变更用户实体
-        return new User();
+        User user = new User();
+        user.setId(1L);
+        user.setTxPassword("KAKA");
+        return user;
     }
 
 

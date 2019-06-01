@@ -6,15 +6,15 @@ package org.eq.modules.product.dao;
 
 import org.eq.basic.common.base.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.eq.modules.product.entity.ProductBlockchain;
-import org.eq.modules.product.entity.ProductBlockchainExample;
+import org.eq.modules.product.entity.UserProductStock;
+import org.eq.modules.product.entity.UserProductStockExample;
 
 /**
- * productBlockMapper接口
+ * 用户商品管理Mapper接口
  * @author kaka
  * @version 1.0.1
  */
 @Mapper
-public interface ProductBlockchainMapper extends BaseMapper<ProductBlockchain, ProductBlockchainExample> {
-
+public interface UserProductStockMapper extends BaseMapper<UserProductStock,UserProductStockExample> {
+	
 }
