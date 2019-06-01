@@ -14,6 +14,7 @@ import org.eq.basic.common.base.BaseController;
 import org.eq.basic.common.base.BaseEntity;
 import org.eq.basic.common.base.BaseOpMsg;
 import org.eq.basic.common.base.BaseTableData;
+import org.eq.basic.common.config.sysUtil.UserUtil;
 import org.eq.basic.common.status.StatusCode;
 import org.eq.basic.modules.sys.entity.SysUser;
 import org.springframework.beans.factory.annotation.Autowired;
