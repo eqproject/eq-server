@@ -78,6 +78,10 @@
 				<value>longtext</value>
 				<label>VARCHAR</label>
 			</field>
+			<field>
+				<value>tinyint</value>
+				<label>TINYINT</label>
+			</field>
 			<value>mysql</value>
 		</dbType>
 		<dbType>
@@ -136,6 +140,10 @@
 			<field>
 				<value>CHARACTER</value>
 				<label>CHAR</label>
+			</field>
+			<field>
+				<value>tinyint</value>
+				<label>TINYINT</label>
 			</field>
 			<value>db2</value>
 		</dbType>
@@ -208,7 +216,10 @@
 			<value>CHARACTER</value>
 			<label>String</label>
 		</field>
-
+		<field>
+			<value>TINYINT</value>
+			<label>Byte</label>
+		</field>
 
 	</javaFieldType>
 
