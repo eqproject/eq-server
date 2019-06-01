@@ -14,7 +14,7 @@ import ${entityPackage}.${className};
 import ${daoPackage}.${className}Mapper;
 import ${entityPackage}.${className}Example;
 import ${servicePackage}.${className}Service;
-import org.apache.commons.lang3.StringUtils;
+import org.eq.basic.common.util.StringLowUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.eq.basic.common.annotation.AutowiredService;
