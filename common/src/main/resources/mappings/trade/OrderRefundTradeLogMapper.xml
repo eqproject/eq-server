@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.eq.modules.trade.dao.OrderRefundTradeLogMapper">
+    <resultMap id="BaseResultMap" type="org.eq.modules.trade.entity.OrderRefundTradeLog">
+        <id column="id" jdbcType="BIGINT" property="id" />
+	    <result column="order_refund_trade_id" jdbcType="BIGINT" property="orderRefundTradeId" />
+	    <result column="old_status" jdbcType="TINYINT" property="oldStatus" />
+	    <result column="new_status" jdbcType="TINYINT" property="newStatus" />
+	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+	    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+    </resultMap>
+
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_List">
+        id,order_refund_trade_id,old_status,new_status,create_date,remarks
+    </sql>
+
+    <select id="selectByExample" parameterType="org.eq.modules.trade.entity.OrderRefundTradeLogExample" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List" />
+        from order_refund_trade_log
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from order_refund_trade_log
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from order_refund_trade_log
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByExample" parameterType="org.eq.modules.trade.entity.OrderRefundTradeLogExample">
+        delete from order_refund_trade_log
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
+
+    <insert id="insert" parameterType="org.eq.modules.trade.entity.OrderRefundTradeLog">
+        insert into order_refund_trade_log (order_refund_trade_id,old_status,new_status,create_date,remarks)
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{orderRefundTradeId,jdbcType=BIGINT},
+            #{oldStatus,jdbcType=TINYINT},
+            #{newStatus,jdbcType=TINYINT},
+            #{createDate,jdbcType=TIMESTAMP},
+            #{remarks,jdbcType=VARCHAR},
+        </trim>
+    </insert>
+
+    <insert id="insertSelective" parameterType="org.eq.modules.trade.entity.OrderRefundTradeLog">
+        insert into order_refund_trade_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            order_refund_trade_id,
+            old_status,
+            new_status,
+            create_date,
+            remarks,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{orderRefundTradeId,jdbcType=BIGINT},
+            #{oldStatus,jdbcType=TINYINT},
+            #{newStatus,jdbcType=TINYINT},
+            #{createDate,jdbcType=TIMESTAMP},
+            #{remarks,jdbcType=VARCHAR},
+        </trim>
+    </insert>
+
+    <select id="countByExample" parameterType="org.eq.modules.trade.entity.OrderRefundTradeLogExample" resultType="java.lang.Long">
+        select count(*) from order_refund_trade_log
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </select>
+
+    <update id="updateByExampleSelective" parameterType="map">
+        update order_refund_trade_log
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.orderRefundTradeId != null">
+                order_refund_trade_id = #{record.orderRefundTradeId,jdbcType=BIGINT},
+            </if>
+            <if test="record.oldStatus != null">
+                old_status = #{record.oldStatus,jdbcType=TINYINT},
+            </if>
+            <if test="record.newStatus != null">
+                new_status = #{record.newStatus,jdbcType=TINYINT},
+            </if>
+            <if test="record.createDate != null">
+                create_date = #{record.createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.remarks != null">
+                remarks = #{record.remarks,jdbcType=VARCHAR},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByExample" parameterType="map">
+        update order_refund_trade_log
+        set
+        <trim  suffixOverrides=",">
+            id = #{record.id,jdbcType=BIGINT},
+            order_refund_trade_id = #{record.orderRefundTradeId,jdbcType=BIGINT},
+            old_status = #{record.oldStatus,jdbcType=TINYINT},
+            new_status = #{record.newStatus,jdbcType=TINYINT},
+            create_date = #{record.createDate,jdbcType=TIMESTAMP},
+            remarks = #{record.remarks,jdbcType=VARCHAR},
+        </trim>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.modules.trade.entity.OrderRefundTradeLog">
+        update order_refund_trade_log
+        <set>
+            <if test="orderRefundTradeId != null">
+            order_refund_trade_id = #{orderRefundTradeId,jdbcType=BIGINT},
+            </if>
+            <if test="oldStatus != null">
+            old_status = #{oldStatus,jdbcType=TINYINT},
+            </if>
+            <if test="newStatus != null">
+            new_status = #{newStatus,jdbcType=TINYINT},
+            </if>
+            <if test="createDate != null">
+            create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remarks != null">
+            remarks = #{remarks,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="org.eq.modules.trade.entity.OrderRefundTradeLog">
+        update order_refund_trade_log
+        set
+        <trim  suffixOverrides=",">
+              order_refund_trade_id = #{orderRefundTradeId,jdbcType=BIGINT},
+              old_status = #{oldStatus,jdbcType=TINYINT},
+              new_status = #{newStatus,jdbcType=TINYINT},
+              create_date = #{createDate,jdbcType=TIMESTAMP},
+              remarks = #{remarks,jdbcType=VARCHAR},
+        </trim>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+</mapper>

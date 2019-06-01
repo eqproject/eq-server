@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.eq.modules.trade.dao.OrderTradeMapper">
+    <resultMap id="BaseResultMap" type="org.eq.modules.trade.entity.OrderTrade">
+        <id column="id" jdbcType="BIGINT" property="id" />
+	    <result column="sell_user_id" jdbcType="BIGINT" property="sellUserId" />
+	    <result column="buy_user_id" jdbcType="BIGINT" property="buyUserId" />
+	    <result column="ad_no" jdbcType="VARCHAR" property="adNo" />
+	    <result column="trade_no" jdbcType="VARCHAR" property="tradeNo" />
+	    <result column="product_id" jdbcType="BIGINT" property="productId" />
+	    <result column="order_num" jdbcType="INTEGER" property="orderNum" />
+	    <result column="type" jdbcType="TINYINT" property="type" />
+	    <result column="status" jdbcType="TINYINT" property="status" />
+	    <result column="blockchain_status" jdbcType="TINYINT" property="blockchainStatus" />
+	    <result column="sale_price" jdbcType="INTEGER" property="salePrice" />
+	    <result column="unit_price" jdbcType="INTEGER" property="unitPrice" />
+	    <result column="amount" jdbcType="INTEGER" property="amount" />
+	    <result column="remind_pay" jdbcType="TINYINT" property="remindPay" />
+	    <result column="finish_time" jdbcType="TIMESTAMP" property="finishTime" />
+	    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+	    <result column="cancel_desc" jdbcType="VARCHAR" property="cancelDesc" />
+	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+	    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+	    <result column="tx_id" jdbcType="BIGINT" property="txId" />
+    </resultMap>
+
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_List">
+        id,sell_user_id,buy_user_id,ad_no,trade_no,product_id,order_num,type,status,blockchain_status,sale_price,unit_price,amount,remind_pay,finish_time,remarks,cancel_desc,create_date,update_date,tx_id
+    </sql>
+
+    <select id="selectByExample" parameterType="org.eq.modules.trade.entity.OrderTradeExample" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List" />
+        from order_trade
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from order_trade
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from order_trade
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByExample" parameterType="org.eq.modules.trade.entity.OrderTradeExample">
+        delete from order_trade
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
+
+    <insert id="insert" parameterType="org.eq.modules.trade.entity.OrderTrade">
+        insert into order_trade (sell_user_id,buy_user_id,ad_no,trade_no,product_id,order_num,type,status,blockchain_status,sale_price,unit_price,amount,remind_pay,finish_time,remarks,cancel_desc,create_date,update_date,tx_id)
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{sellUserId,jdbcType=BIGINT},
+            #{buyUserId,jdbcType=BIGINT},
+            #{adNo,jdbcType=VARCHAR},
+            #{tradeNo,jdbcType=VARCHAR},
+            #{productId,jdbcType=BIGINT},
+            #{orderNum,jdbcType=INTEGER},
+            #{type,jdbcType=TINYINT},
+            #{status,jdbcType=TINYINT},
+            #{blockchainStatus,jdbcType=TINYINT},
+            #{salePrice,jdbcType=INTEGER},
+            #{unitPrice,jdbcType=INTEGER},
+            #{amount,jdbcType=INTEGER},
+            #{remindPay,jdbcType=TINYINT},
+            #{finishTime,jdbcType=TIMESTAMP},
+            #{remarks,jdbcType=VARCHAR},
+            #{cancelDesc,jdbcType=VARCHAR},
+            #{createDate,jdbcType=TIMESTAMP},
+            #{updateDate,jdbcType=TIMESTAMP},
+            #{txId,jdbcType=BIGINT},
+        </trim>
+    </insert>
+
+    <insert id="insertSelective" parameterType="org.eq.modules.trade.entity.OrderTrade">
+        insert into order_trade
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            sell_user_id,
+            buy_user_id,
+            ad_no,
+            trade_no,
+            product_id,
+            order_num,
+            type,
+            status,
+            blockchain_status,
+            sale_price,
+            unit_price,
+            amount,
+            remind_pay,
+            finish_time,
+            remarks,
+            cancel_desc,
+            create_date,
+            update_date,
+            tx_id,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{sellUserId,jdbcType=BIGINT},
+            #{buyUserId,jdbcType=BIGINT},
+            #{adNo,jdbcType=VARCHAR},
+            #{tradeNo,jdbcType=VARCHAR},
+            #{productId,jdbcType=BIGINT},
+            #{orderNum,jdbcType=INTEGER},
+            #{type,jdbcType=TINYINT},
+            #{status,jdbcType=TINYINT},
+            #{blockchainStatus,jdbcType=TINYINT},
+            #{salePrice,jdbcType=INTEGER},
+            #{unitPrice,jdbcType=INTEGER},
+            #{amount,jdbcType=INTEGER},
+            #{remindPay,jdbcType=TINYINT},
+            #{finishTime,jdbcType=TIMESTAMP},
+            #{remarks,jdbcType=VARCHAR},
+            #{cancelDesc,jdbcType=VARCHAR},
+            #{createDate,jdbcType=TIMESTAMP},
+            #{updateDate,jdbcType=TIMESTAMP},
+            #{txId,jdbcType=BIGINT},
+        </trim>
+    </insert>
+
+    <select id="countByExample" parameterType="org.eq.modules.trade.entity.OrderTradeExample" resultType="java.lang.Long">
+        select count(*) from order_trade
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </select>
+
+    <update id="updateByExampleSelective" parameterType="map">
+        update order_trade
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.sellUserId != null">
+                sell_user_id = #{record.sellUserId,jdbcType=BIGINT},
+            </if>
+            <if test="record.buyUserId != null">
+                buy_user_id = #{record.buyUserId,jdbcType=BIGINT},
+            </if>
+            <if test="record.adNo != null">
+                ad_no = #{record.adNo,jdbcType=VARCHAR},
+            </if>
+            <if test="record.tradeNo != null">
+                trade_no = #{record.tradeNo,jdbcType=VARCHAR},
+            </if>
+            <if test="record.productId != null">
+                product_id = #{record.productId,jdbcType=BIGINT},
+            </if>
+            <if test="record.orderNum != null">
+                order_num = #{record.orderNum,jdbcType=INTEGER},
+            </if>
+            <if test="record.type != null">
+                type = #{record.type,jdbcType=TINYINT},
+            </if>
+            <if test="record.status != null">
+                status = #{record.status,jdbcType=TINYINT},
+            </if>
+            <if test="record.blockchainStatus != null">
+                blockchain_status = #{record.blockchainStatus,jdbcType=TINYINT},
+            </if>
+            <if test="record.salePrice != null">
+                sale_price = #{record.salePrice,jdbcType=INTEGER},
+            </if>
+            <if test="record.unitPrice != null">
+                unit_price = #{record.unitPrice,jdbcType=INTEGER},
+            </if>
+            <if test="record.amount != null">
+                amount = #{record.amount,jdbcType=INTEGER},
+            </if>
+            <if test="record.remindPay != null">
+                remind_pay = #{record.remindPay,jdbcType=TINYINT},
+            </if>
+            <if test="record.finishTime != null">
+                finish_time = #{record.finishTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.remarks != null">
+                remarks = #{record.remarks,jdbcType=VARCHAR},
+            </if>
+            <if test="record.cancelDesc != null">
+                cancel_desc = #{record.cancelDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="record.createDate != null">
+                create_date = #{record.createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.updateDate != null">
+                update_date = #{record.updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.txId != null">
+                tx_id = #{record.txId,jdbcType=BIGINT},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByExample" parameterType="map">
+        update order_trade
+        set
+        <trim  suffixOverrides=",">
+            id = #{record.id,jdbcType=BIGINT},
+            sell_user_id = #{record.sellUserId,jdbcType=BIGINT},
+            buy_user_id = #{record.buyUserId,jdbcType=BIGINT},
+            ad_no = #{record.adNo,jdbcType=VARCHAR},
+            trade_no = #{record.tradeNo,jdbcType=VARCHAR},
+            product_id = #{record.productId,jdbcType=BIGINT},
+            order_num = #{record.orderNum,jdbcType=INTEGER},
+            type = #{record.type,jdbcType=TINYINT},
+            status = #{record.status,jdbcType=TINYINT},
+            blockchain_status = #{record.blockchainStatus,jdbcType=TINYINT},
+            sale_price = #{record.salePrice,jdbcType=INTEGER},
+            unit_price = #{record.unitPrice,jdbcType=INTEGER},
+            amount = #{record.amount,jdbcType=INTEGER},
+            remind_pay = #{record.remindPay,jdbcType=TINYINT},
+            finish_time = #{record.finishTime,jdbcType=TIMESTAMP},
+            remarks = #{record.remarks,jdbcType=VARCHAR},
+            cancel_desc = #{record.cancelDesc,jdbcType=VARCHAR},
+            create_date = #{record.createDate,jdbcType=TIMESTAMP},
+            update_date = #{record.updateDate,jdbcType=TIMESTAMP},
+            tx_id = #{record.txId,jdbcType=BIGINT},
+        </trim>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.modules.trade.entity.OrderTrade">
+        update order_trade
+        <set>
+            <if test="sellUserId != null">
+            sell_user_id = #{sellUserId,jdbcType=BIGINT},
+            </if>
+            <if test="buyUserId != null">
+            buy_user_id = #{buyUserId,jdbcType=BIGINT},
+            </if>
+            <if test="adNo != null">
+            ad_no = #{adNo,jdbcType=VARCHAR},
+            </if>
+            <if test="tradeNo != null">
+            trade_no = #{tradeNo,jdbcType=VARCHAR},
+            </if>
+            <if test="productId != null">
+            product_id = #{productId,jdbcType=BIGINT},
+            </if>
+            <if test="orderNum != null">
+            order_num = #{orderNum,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+            type = #{type,jdbcType=TINYINT},
+            </if>
+            <if test="status != null">
+            status = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="blockchainStatus != null">
+            blockchain_status = #{blockchainStatus,jdbcType=TINYINT},
+            </if>
+            <if test="salePrice != null">
+            sale_price = #{salePrice,jdbcType=INTEGER},
+            </if>
+            <if test="unitPrice != null">
+            unit_price = #{unitPrice,jdbcType=INTEGER},
+            </if>
+            <if test="amount != null">
+            amount = #{amount,jdbcType=INTEGER},
+            </if>
+            <if test="remindPay != null">
+            remind_pay = #{remindPay,jdbcType=TINYINT},
+            </if>
+            <if test="finishTime != null">
+            finish_time = #{finishTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remarks != null">
+            remarks = #{remarks,jdbcType=VARCHAR},
+            </if>
+            <if test="cancelDesc != null">
+            cancel_desc = #{cancelDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="createDate != null">
+            create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateDate != null">
+            update_date = #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="txId != null">
+            tx_id = #{txId,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="org.eq.modules.trade.entity.OrderTrade">
+        update order_trade
+        set
+        <trim  suffixOverrides=",">
+              sell_user_id = #{sellUserId,jdbcType=BIGINT},
+              buy_user_id = #{buyUserId,jdbcType=BIGINT},
+              ad_no = #{adNo,jdbcType=VARCHAR},
+              trade_no = #{tradeNo,jdbcType=VARCHAR},
+              product_id = #{productId,jdbcType=BIGINT},
+              order_num = #{orderNum,jdbcType=INTEGER},
+              type = #{type,jdbcType=TINYINT},
+              status = #{status,jdbcType=TINYINT},
+              blockchain_status = #{blockchainStatus,jdbcType=TINYINT},
+              sale_price = #{salePrice,jdbcType=INTEGER},
+              unit_price = #{unitPrice,jdbcType=INTEGER},
+              amount = #{amount,jdbcType=INTEGER},
+              remind_pay = #{remindPay,jdbcType=TINYINT},
+              finish_time = #{finishTime,jdbcType=TIMESTAMP},
+              remarks = #{remarks,jdbcType=VARCHAR},
+              cancel_desc = #{cancelDesc,jdbcType=VARCHAR},
+              create_date = #{createDate,jdbcType=TIMESTAMP},
+              update_date = #{updateDate,jdbcType=TIMESTAMP},
+              tx_id = #{txId,jdbcType=BIGINT},
+        </trim>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+</mapper>

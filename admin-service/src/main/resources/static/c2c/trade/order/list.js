@@ -4,13 +4,12 @@
 var User;
 (function (User) {
     function UserTrade() {
-        this.$code = $("#code");
         this.$status = $("#status");
         this.$type = $("#type");
         this.$payType = $("#payType");
         this.$productName = $("#productName");
-        this.$productCode = $("#productCode");
         this.$mobile = $("#mobile");
+        this.$blockchainStatus = $("#blockchainStatus");
         this.$select = $("#select");
 
         this.$orderTable = $("#orderTable");
@@ -21,7 +20,11 @@ var User;
     // 支付类型
     var tradePayTypeObj = {1:'微信',2:'支付宝'};
     // 订单状态
-    var tradeStatusObj = {1:'创建',2:'待支付',3:'取消',4:'下线取消',5:'支付成功',6:'支付失败'};
+    var tradeStatusObj = {1:'待支付',2:'取消交易',3:'支付中',4:'支付成功',5:'支付失败',6:'关闭交易(支付超时)',7:'放券中',8:'放款中',9:'放款失败',10:'交易成功',11:'退款中',12:'退款成功'};
+
+    // 区块链状态
+    var blockchainStatusObj = {1:'区块链处理中',2:'区块链处理成功',3:'区块链处理失败'};
+
 
     function getObjValByKey(obj,key) {
         for(var v in obj){
@@ -46,9 +49,6 @@ var User;
                     orderable: false,
                     targets: 0,//第1列
                     render: function (data, type, row, meta) {
-                        console.log("data"+data);
-                        console.log("row"+row);
-                        console.log("meta"+meta);
                         return meta.row+1;
                     }
                 },
@@ -75,26 +75,28 @@ var User;
                     url: urlPath + '/trade/order/dataList',
                     data: function (d) {
                         //添加额外的数据请求参数
-                        d.code = curr.$code.val();
                         d.status = curr.$status.val();
                         d.productName = curr.$productName.val();
-                        d.productCode = curr.$productCode.val();
                         d.mobile = curr.$mobile.val();
+                        d.blockchainStatus = curr.$blockchainStatus.val();
                         d.payType = curr.$payType.val();
                         d.type = curr.$type.val();
+                        console.log("查询参数:"+JSON.stringify(d));
                     }
                 },
                 columns: [
                     {},
-                    {data: 'code', name: 'code'},
+                    {data: 'adNo', name: 'adNo'},
+                    {data: 'tradeNo', name: 'tradeNo'},
                     {data: 'productId', name: 'productId'},
-                    {data: 'productNum', name: 'productNum'},
+                    {data: 'orderNum', name: 'orderNum'},
                     {data: 'amount', name: 'amount'},
                     {data: 'type', name: 'type',render:function(data, type, row){return getObjValByKey(tradeTypeObj,row.type)}},
                     {data: 'status', name: 'status',render:function(data, type, row){return getObjValByKey(tradeStatusObj,row.status)}},
+                    {data: 'blockchainStatus', name: 'blockchainStatus',render:function(data, type, row){return getObjValByKey(blockchainStatusObj,row.blockchainStatus)}},
                     {data: 'payType', name: 'payType',render:function(data, type, row){return getObjValByKey(tradePayTypeObj,row.payType)}},
+                    {data: 'finishTime', name: 'finishTime'},
                     {data: 'description', name: 'description'},
-                    {data: 'createBy', name: 'createBy'},
                     {data: 'createDate', name: 'createDate'}
                 ],
                 fnDrawCallback: function () {

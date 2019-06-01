@@ -5,16 +5,16 @@
 package org.eq.modules.trade.dao;
 
 import org.eq.basic.common.base.BaseMapper;
-import org.eq.modules.trade.entity.Order;
-import org.eq.modules.trade.entity.OrderExample;
 import org.apache.ibatis.annotations.Mapper;
+import org.eq.modules.trade.entity.OrderTradeLog;
+import org.eq.modules.trade.entity.OrderTradeLogExample;
 
 /**
- * 交易订单管理Mapper接口
+ * 订单交易日志Mapper接口
  * @author yufei.sun
- * @version 1.0.0
+ * @version 0.0.1
  */
 @Mapper
-public interface OrderMapper extends BaseMapper<Order,OrderExample> {
+public interface OrderTradeLogMapper extends BaseMapper<OrderTradeLog,OrderTradeLogExample> {
 	
 }

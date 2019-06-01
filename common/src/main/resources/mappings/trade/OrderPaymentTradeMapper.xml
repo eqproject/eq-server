@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.eq.modules.trade.dao.OrderPaymentTradeMapper">
+    <resultMap id="BaseResultMap" type="org.eq.modules.trade.entity.OrderPaymentTrade">
+        <id column="id" jdbcType="BIGINT" property="id" />
+	    <result column="trade_no" jdbcType="VARCHAR" property="tradeNo" />
+	    <result column="pay_no" jdbcType="VARCHAR" property="payNo" />
+	    <result column="pay_type" jdbcType="TINYINT" property="payType" />
+	    <result column="payer_user" jdbcType="VARCHAR" property="payerUser" />
+	    <result column="payee_user" jdbcType="VARCHAR" property="payeeUser" />
+	    <result column="product_id" jdbcType="BIGINT" property="productId" />
+	    <result column="order_num" jdbcType="INTEGER" property="orderNum" />
+	    <result column="status" jdbcType="TINYINT" property="status" />
+	    <result column="pay_time" jdbcType="TIMESTAMP" property="payTime" />
+	    <result column="service_fee" jdbcType="INTEGER" property="serviceFee" />
+	    <result column="amount" jdbcType="INTEGER" property="amount" />
+	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+	    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+	    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+    </resultMap>
+
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_List">
+        id,trade_no,pay_no,pay_type,payer_user,payee_user,product_id,order_num,status,pay_time,service_fee,amount,create_date,update_date,remarks
+    </sql>
+
+    <select id="selectByExample" parameterType="org.eq.modules.trade.entity.OrderPaymentTradeExample" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List" />
+        from order_payment_trade
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from order_payment_trade
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from order_payment_trade
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByExample" parameterType="org.eq.modules.trade.entity.OrderPaymentTradeExample">
+        delete from order_payment_trade
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
+
+    <insert id="insert" parameterType="org.eq.modules.trade.entity.OrderPaymentTrade">
+        insert into order_payment_trade (trade_no,pay_no,pay_type,payer_user,payee_user,product_id,order_num,status,pay_time,service_fee,amount,create_date,update_date,remarks)
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{tradeNo,jdbcType=VARCHAR},
+            #{payNo,jdbcType=VARCHAR},
+            #{payType,jdbcType=TINYINT},
+            #{payerUser,jdbcType=VARCHAR},
+            #{payeeUser,jdbcType=VARCHAR},
+            #{productId,jdbcType=BIGINT},
+            #{orderNum,jdbcType=INTEGER},
+            #{status,jdbcType=TINYINT},
+            #{payTime,jdbcType=TIMESTAMP},
+            #{serviceFee,jdbcType=INTEGER},
+            #{amount,jdbcType=INTEGER},
+            #{createDate,jdbcType=TIMESTAMP},
+            #{updateDate,jdbcType=TIMESTAMP},
+            #{remarks,jdbcType=VARCHAR},
+        </trim>
+    </insert>
+
+    <insert id="insertSelective" parameterType="org.eq.modules.trade.entity.OrderPaymentTrade">
+        insert into order_payment_trade
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            trade_no,
+            pay_no,
+            pay_type,
+            payer_user,
+            payee_user,
+            product_id,
+            order_num,
+            status,
+            pay_time,
+            service_fee,
+            amount,
+            create_date,
+            update_date,
+            remarks,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{tradeNo,jdbcType=VARCHAR},
+            #{payNo,jdbcType=VARCHAR},
+            #{payType,jdbcType=TINYINT},
+            #{payerUser,jdbcType=VARCHAR},
+            #{payeeUser,jdbcType=VARCHAR},
+            #{productId,jdbcType=BIGINT},
+            #{orderNum,jdbcType=INTEGER},
+            #{status,jdbcType=TINYINT},
+            #{payTime,jdbcType=TIMESTAMP},
+            #{serviceFee,jdbcType=INTEGER},
+            #{amount,jdbcType=INTEGER},
+            #{createDate,jdbcType=TIMESTAMP},
+            #{updateDate,jdbcType=TIMESTAMP},
+            #{remarks,jdbcType=VARCHAR},
+        </trim>
+    </insert>
+
+    <select id="countByExample" parameterType="org.eq.modules.trade.entity.OrderPaymentTradeExample" resultType="java.lang.Long">
+        select count(*) from order_payment_trade
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </select>
+
+    <update id="updateByExampleSelective" parameterType="map">
+        update order_payment_trade
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.tradeNo != null">
+                trade_no = #{record.tradeNo,jdbcType=VARCHAR},
+            </if>
+            <if test="record.payNo != null">
+                pay_no = #{record.payNo,jdbcType=VARCHAR},
+            </if>
+            <if test="record.payType != null">
+                pay_type = #{record.payType,jdbcType=TINYINT},
+            </if>
+            <if test="record.payerUser != null">
+                payer_user = #{record.payerUser,jdbcType=VARCHAR},
+            </if>
+            <if test="record.payeeUser != null">
+                payee_user = #{record.payeeUser,jdbcType=VARCHAR},
+            </if>
+            <if test="record.productId != null">
+                product_id = #{record.productId,jdbcType=BIGINT},
+            </if>
+            <if test="record.orderNum != null">
+                order_num = #{record.orderNum,jdbcType=INTEGER},
+            </if>
+            <if test="record.status != null">
+                status = #{record.status,jdbcType=TINYINT},
+            </if>
+            <if test="record.payTime != null">
+                pay_time = #{record.payTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.serviceFee != null">
+                service_fee = #{record.serviceFee,jdbcType=INTEGER},
+            </if>
+            <if test="record.amount != null">
+                amount = #{record.amount,jdbcType=INTEGER},
+            </if>
+            <if test="record.createDate != null">
+                create_date = #{record.createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.updateDate != null">
+                update_date = #{record.updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.remarks != null">
+                remarks = #{record.remarks,jdbcType=VARCHAR},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByExample" parameterType="map">
+        update order_payment_trade
+        set
+        <trim  suffixOverrides=",">
+            id = #{record.id,jdbcType=BIGINT},
+            trade_no = #{record.tradeNo,jdbcType=VARCHAR},
+            pay_no = #{record.payNo,jdbcType=VARCHAR},
+            pay_type = #{record.payType,jdbcType=TINYINT},
+            payer_user = #{record.payerUser,jdbcType=VARCHAR},
+            payee_user = #{record.payeeUser,jdbcType=VARCHAR},
+            product_id = #{record.productId,jdbcType=BIGINT},
+            order_num = #{record.orderNum,jdbcType=INTEGER},
+            status = #{record.status,jdbcType=TINYINT},
+            pay_time = #{record.payTime,jdbcType=TIMESTAMP},
+            service_fee = #{record.serviceFee,jdbcType=INTEGER},
+            amount = #{record.amount,jdbcType=INTEGER},
+            create_date = #{record.createDate,jdbcType=TIMESTAMP},
+            update_date = #{record.updateDate,jdbcType=TIMESTAMP},
+            remarks = #{record.remarks,jdbcType=VARCHAR},
+        </trim>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.modules.trade.entity.OrderPaymentTrade">
+        update order_payment_trade
+        <set>
+            <if test="tradeNo != null">
+            trade_no = #{tradeNo,jdbcType=VARCHAR},
+            </if>
+            <if test="payNo != null">
+            pay_no = #{payNo,jdbcType=VARCHAR},
+            </if>
+            <if test="payType != null">
+            pay_type = #{payType,jdbcType=TINYINT},
+            </if>
+            <if test="payerUser != null">
+            payer_user = #{payerUser,jdbcType=VARCHAR},
+            </if>
+            <if test="payeeUser != null">
+            payee_user = #{payeeUser,jdbcType=VARCHAR},
+            </if>
+            <if test="productId != null">
+            product_id = #{productId,jdbcType=BIGINT},
+            </if>
+            <if test="orderNum != null">
+            order_num = #{orderNum,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+            status = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="payTime != null">
+            pay_time = #{payTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="serviceFee != null">
+            service_fee = #{serviceFee,jdbcType=INTEGER},
+            </if>
+            <if test="amount != null">
+            amount = #{amount,jdbcType=INTEGER},
+            </if>
+            <if test="createDate != null">
+            create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateDate != null">
+            update_date = #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remarks != null">
+            remarks = #{remarks,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="org.eq.modules.trade.entity.OrderPaymentTrade">
+        update order_payment_trade
+        set
+        <trim  suffixOverrides=",">
+              trade_no = #{tradeNo,jdbcType=VARCHAR},
+              pay_no = #{payNo,jdbcType=VARCHAR},
+              pay_type = #{payType,jdbcType=TINYINT},
+              payer_user = #{payerUser,jdbcType=VARCHAR},
+              payee_user = #{payeeUser,jdbcType=VARCHAR},
+              product_id = #{productId,jdbcType=BIGINT},
+              order_num = #{orderNum,jdbcType=INTEGER},
+              status = #{status,jdbcType=TINYINT},
+              pay_time = #{payTime,jdbcType=TIMESTAMP},
+              service_fee = #{serviceFee,jdbcType=INTEGER},
+              amount = #{amount,jdbcType=INTEGER},
+              create_date = #{createDate,jdbcType=TIMESTAMP},
+              update_date = #{updateDate,jdbcType=TIMESTAMP},
+              remarks = #{remarks,jdbcType=VARCHAR},
+        </trim>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+</mapper>
