@@ -20,5 +20,4 @@ public class OrderTradeDetailResVO implements Serializable {
     private OrderTradeDetailProduct product;
     private OrderTradeDetailUser user;
     private OrderTradeDetailTrade trade;
-
 }

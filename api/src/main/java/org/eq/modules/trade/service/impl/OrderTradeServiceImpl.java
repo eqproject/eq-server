@@ -9,6 +9,9 @@ import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.DateUtil;
 import org.eq.basic.common.util.OrderNoGenerateUtil;
 import org.eq.basic.common.util.StringLowUtils;
+import org.eq.modules.auth.entity.User;
+import org.eq.modules.auth.exception.UserNotExistsException;
+import org.eq.modules.auth.service.UserService;
 import org.eq.modules.enums.OrderNoPreFixEnum;
 import org.eq.modules.enums.OrderTradeStateEnum;
 import org.eq.modules.order.entity.OrderAd;
@@ -18,20 +21,19 @@ import org.eq.modules.product.entity.Product;
 import org.eq.modules.product.exception.ProductNotExistsException;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.trade.dao.OrderTradeMapper;
-import org.eq.modules.trade.entity.OrderTrade;
-import org.eq.modules.trade.entity.OrderTradeExample;
-import org.eq.modules.trade.entity.OrderTradeLog;
+import org.eq.modules.trade.entity.*;
+import org.eq.modules.trade.exception.PaymentTradeOrderNotExistsException;
 import org.eq.modules.trade.exception.TradeOrderNotExistsException;
+import org.eq.modules.trade.service.OrderPaymentTradeLogService;
+import org.eq.modules.trade.service.OrderPaymentTradeService;
 import org.eq.modules.trade.service.OrderTradeLogService;
 import org.eq.modules.trade.service.OrderTradeService;
-import org.eq.modules.trade.vo.OrderTradeDetailProduct;
-import org.eq.modules.trade.vo.OrderTradeDetailResVO;
-import org.eq.modules.trade.vo.OrderTradeDetailTrade;
-import org.eq.modules.trade.vo.OrderTradeDetailUser;
+import org.eq.modules.trade.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -51,6 +53,14 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 
 	@Autowired
 	OrderAdService orderAdService;
+	@Autowired
+	UserService userService;
+
+	@Autowired
+	OrderPaymentTradeService orderPaymentTradeService;
+
+	@Autowired
+	OrderPaymentTradeLogService orderPaymentTradeLogService;
 
 	@Override
 	public OrderTradeExample getExampleFromEntity(OrderTrade orderTrade, Map<String, Object> params) {
@@ -149,9 +159,24 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 			throw new OrderAdNotExistsException("广告订单"+orderTrade.getProductId()+"记录不存在");
 		}
 
+		User buserUser = userService.selectByPrimaryKey(orderTrade.getBuyUserId());
+		if (buserUser == null) {
+			logger.error("createTradeOrder 买家[{}]用户记录不存在",orderTrade.getBuyUserId());
+			throw new UserNotExistsException("买家"+orderTrade.getBuyUserId()+"用户记录不存在");
+		}
 
+		User sellUser = userService.selectByPrimaryKey(orderAd.getUserId());
+		if (sellUser == null) {
+			logger.error("createTradeOrder 卖家[{}]用户记录不存在",orderAd.getUserId());
+			throw new UserNotExistsException("卖家"+orderAd.getUserId()+"用户记录不存在");
+		}
+		Date nowDate = DateUtil.getNowTime();
+
+		orderTrade.setCreateDate(nowDate);
+		orderTrade.setUpdateDate(nowDate);
 		orderTrade.setUnitPrice(product.getUnitPrice());
 		orderTrade.setAmount(orderTrade.getOrderNum()*orderTrade.getSalePrice());
+		orderTrade.setSellUserId(orderAd.getUserId());
 
 		String tradeNo = OrderNoGenerateUtil.generateNo(OrderNoPreFixEnum.TRADE_NO);
 		orderTrade.setTradeNo(tradeNo);
@@ -165,6 +190,24 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderTradeLog.setCreateDate(orderTrade.getCreateDate());
 		orderTradeLog.setRemarks(tradeNo);
 		orderTradeLogService.insertSelective(orderTradeLog);
+
+		// 插入支付记录
+		OrderPaymentTrade orderPaymentTrade = new OrderPaymentTrade();
+		orderPaymentTrade.setTradeNo(tradeNo);
+		orderPaymentTrade.setCreateDate(nowDate);
+		orderPaymentTrade.setUpdateDate(nowDate);
+		orderPaymentTrade.setProductId(orderTrade.getProductId());
+		orderPaymentTrade.setOrderNum(orderTrade.getOrderNum());
+		orderPaymentTrade.setServiceFee(orderTrade.getServiceFee());
+		Long orderPaymentTradeId = orderPaymentTradeService.insertOrderPaymentTradeReturnId(orderPaymentTrade);
+
+		// 插入支付日志记录
+		OrderPaymentTradeLog orderPaymentTradeLog = new OrderPaymentTradeLog();
+		orderPaymentTradeLog.setOrderPayTradeId(orderPaymentTradeId);
+		orderPaymentTradeLog.setCreateDate(nowDate);
+		orderPaymentTradeLog.setOldStatus(orderPaymentTrade.getStatus());
+		orderPaymentTradeLog.setNewStatus(orderPaymentTrade.getStatus());
+		orderPaymentTradeLogService.insertSelective(orderPaymentTradeLog);
 
 		return orderTrade;
 	}
@@ -189,16 +232,31 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderTrade.setTradeNo(tradeNo);
 		orderTrade = selectByRecord(orderTrade);
 		if (orderTrade == null) {
-			logger.error("cancelTradeOrder 失败，交易单号[{}]记录不存在",tradeNo);
+			logger.error("tradeOrderDetail 交易单号[{}]记录不存在",tradeNo);
 			throw new TradeOrderNotExistsException("交易单号"+tradeNo+"记录不存在");
 		}
 
 		Product product = productService.selectByPrimaryKey(orderTrade.getProductId());
 		if (product == null) {
-			logger.error("createTradeOrder 商品ID[{}]记录不存在",orderTrade.getProductId());
+			logger.error("tradeOrderDetail 商品ID[{}]记录不存在",orderTrade.getProductId());
 			throw new ProductNotExistsException("商品ID"+orderTrade.getProductId()+"记录不存在");
 		}
 
+		User buserUser = userService.selectByPrimaryKey(orderTrade.getBuyUserId());
+		if (buserUser == null) {
+			logger.error("tradeOrderDetail 买家[{}]用户记录不存在",orderTrade.getBuyUserId());
+			throw new UserNotExistsException("买家"+orderTrade.getBuyUserId()+"用户记录不存在");
+		}
+
+		User sellUser = userService.selectByPrimaryKey(orderTrade.getSellUserId());
+		if (sellUser == null) {
+			logger.error("tradeOrderDetail 卖家[{}]用户记录不存在",orderTrade.getSellUserId());
+			throw new UserNotExistsException("卖家"+orderTrade.getSellUserId()+"用户记录不存在");
+		}
+
+		OrderPaymentTrade orderPaymentTrade = new OrderPaymentTrade();
+		orderPaymentTrade.setTradeNo(orderTrade.getTradeNo());
+		orderPaymentTrade = orderPaymentTradeService.selectByRecord(orderPaymentTrade);
 
 
 		OrderTradeDetailProduct orderTradeDetailProduct = new OrderTradeDetailProduct();
@@ -212,10 +270,19 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		trade.setOrderNum(orderTrade.getOrderNum());
 		trade.setRemindPay(orderTrade.getRemindPay());
 		trade.setSalePrice(orderTrade.getSalePrice());
+		if (orderPaymentTrade != null) { // 未支付之前，数值为空
+			trade.setPayNo(orderPaymentTrade.getPayNo());
+			trade.setServiceFee(orderPaymentTrade.getServiceFee());
+			trade.setPayTime(DateUtil.dateToStr(orderPaymentTrade.getPayTime(),DateUtil.DATE_FORMAT_FULL_01));
+		}
 
 		OrderTradeDetailUser orderTradeDetailUser = new OrderTradeDetailUser();
 		orderTradeDetailUser.setBuyUserId(orderTrade.getBuyUserId());
 		orderTradeDetailUser.setSellUserId(orderTrade.getSellUserId());
+		orderTradeDetailUser.setBuyUserNickName(buserUser.getNickname());
+		orderTradeDetailUser.setSellUserName(sellUser.getName());
+		orderTradeDetailUser.setSellUserNickName(sellUser.getNickname());
+		orderTradeDetailUser.setSellUserAccount("");// todo 从用户绑定账户表中获取卖家支付账户
 
 
 		OrderTradeDetailResVO orderTradeDetailResVO = new OrderTradeDetailResVO();
@@ -223,5 +290,37 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderTradeDetailResVO.setProduct(orderTradeDetailProduct);
 		orderTradeDetailResVO.setUser(orderTradeDetailUser);
 		return orderTradeDetailResVO;
+	}
+
+	@Override
+	public OrderTradePaymentResVO orderPaymentTradeNotify(OrderPaymentTrade orderPaymentTrade) {
+
+		OrderPaymentTrade orderPaymentTradeOld = orderPaymentTradeService.findOrderPaymentTradeByTradeNo(orderPaymentTrade.getTradeNo());
+		if (orderPaymentTradeOld == null) {
+			logger.error("orderPaymentTradeNotify 交易单号[{}]支付记录不存在",orderPaymentTrade.getTradeNo());
+			throw new PaymentTradeOrderNotExistsException("交易单号"+orderPaymentTrade.getTradeNo()+"支付记录不存在");
+		}
+
+		Integer oldStatus = orderPaymentTradeOld.getStatus();
+		Date nowDate = DateUtil.getNowTime();
+
+		orderPaymentTradeOld.setPayTime(nowDate);
+		orderPaymentTradeOld.setStatus(orderPaymentTrade.getStatus());
+		orderPaymentTradeOld.setUpdateDate(nowDate);
+		orderPaymentTradeOld.setPayNo(orderPaymentTrade.getPayNo());
+		orderPaymentTradeOld.setPayType(orderPaymentTrade.getPayType());
+		orderPaymentTradeOld.setAmount(orderPaymentTrade.getAmount());
+		orderPaymentTradeService.updateByPrimaryKeySelective(orderPaymentTradeOld);
+
+		OrderPaymentTradeLog orderPaymentTradeLog = new OrderPaymentTradeLog();
+		orderPaymentTradeLog.setOrderPayTradeId(orderPaymentTradeOld.getId());
+		orderPaymentTradeLog.setCreateDate(nowDate);
+		orderPaymentTradeLog.setOldStatus(oldStatus);
+		orderPaymentTradeLog.setNewStatus(orderPaymentTrade.getStatus());
+		orderPaymentTradeLogService.insertSelective(orderPaymentTradeLog);
+
+		OrderTradePaymentResVO orderTradePaymentResVO = new OrderTradePaymentResVO();
+		orderTradePaymentResVO.setTradeNo(orderPaymentTrade.getTradeNo());
+		return orderTradePaymentResVO;
 	}
 }

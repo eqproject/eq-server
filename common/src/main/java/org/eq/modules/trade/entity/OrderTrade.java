@@ -42,4 +42,7 @@ public class OrderTrade implements Serializable {
 
 	// 查询条件
 	private String productName;// 商品名称
+
+	// 创建支付订单时使用
+	private Integer serviceFee;// 服务费
 }

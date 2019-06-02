@@ -13,6 +13,9 @@ import org.springframework.stereotype.Controller;
 @Controller
 public abstract class BaseController extends BaseLog {
 
+
+    protected final static String SYSTEM_ERROR_MSG = "系统错误";
+
     @Autowired
     protected UserService userService;
 

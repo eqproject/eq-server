@@ -7,17 +7,19 @@ package org.eq.modules.trade.controller;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.beanutils.BeanUtils;
 import org.eq.basic.common.base.BaseController;
+import org.eq.basic.common.base.BaseServiceException;
 import org.eq.basic.common.util.DateUtil;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
-import org.eq.modules.product.exception.ProductNotExistsException;
+import org.eq.modules.trade.entity.OrderPaymentTrade;
 import org.eq.modules.trade.entity.OrderTrade;
 import org.eq.modules.trade.service.OrderTradeService;
 import org.eq.modules.trade.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
@@ -39,8 +41,7 @@ public class OrderTradeController extends BaseController {
      * @param orderTradeCreateReqVO
      * @return
      */
-    @ResponseBody
-    @RequestMapping(value = {"create"})
+    @PostMapping("/create")
     public ResponseData<OrderTradeCreateResVO> createTradeOrder(OrderTradeCreateReqVO orderTradeCreateReqVO) {
         if (orderTradeCreateReqVO == null) {
             logger.error("createTradeOrder 失败，原因是 orderTradeCreateReqVO is null");
@@ -57,17 +58,14 @@ public class OrderTradeController extends BaseController {
             logger.error("createTradeOrder 失败，原因是",e);
             return ResponseFactory.paramsError("请求参数错误");
         }
-        Date nowDate = DateUtil.getNowTime();
-        orderTrade.setCreateDate(nowDate);
-        orderTrade.setUpdateDate(nowDate);
         try {
             orderTradeService.createTradeOrder(orderTrade);
-        } catch (ProductNotExistsException e) {
-            logger.error("createTradeOrder 失败，原因是",e);
+        } catch (BaseServiceException e) {
+            logger.error("createTradeOrder 失败，原因是:{}",e.getMessage());
             return ResponseFactory.paramsError(e.getMessage());
         } catch (Exception e) {
             logger.error("createTradeOrder 失败，原因是",e);
-            return ResponseFactory.systemError("系统错误");
+            return ResponseFactory.systemError(SYSTEM_ERROR_MSG);
         }
         OrderTradeCreateResVO orderTradeCreateResVO = new OrderTradeCreateResVO("");
         logger.info("createTradeOrder 响应内容:{}",JSON.toJSONString(orderTradeCreateResVO));
@@ -79,8 +77,7 @@ public class OrderTradeController extends BaseController {
      * @param orderTradeCancelReqVO
      * @return
      */
-    @ResponseBody
-    @RequestMapping(value = {"cancel"})
+    @GetMapping("/cancel")
     public ResponseData<OrderTradeCancelResVO> cancelTradeOrder(OrderTradeCancelReqVO orderTradeCancelReqVO) {
         if (orderTradeCancelReqVO == null) {
             logger.error("cancelTradeOrder 失败，原因是 orderTradeCreateReqVO is null");
@@ -94,12 +91,12 @@ public class OrderTradeController extends BaseController {
         orderTrade.setUpdateDate(nowDate);
         try {
             orderTradeService.cancelTradeOrder(orderTrade.getTradeNo());
-        } catch (ProductNotExistsException e) {
-            logger.error("cancelTradeOrder 失败，原因是",e);
+        } catch (BaseServiceException e) {
+            logger.error("cancelTradeOrder 失败，原因是:{}",e.getMessage());
             return ResponseFactory.paramsError(e.getMessage());
         } catch (Exception e) {
             logger.error("cancelTradeOrder 失败，原因是",e);
-            return ResponseFactory.systemError("系统错误");
+            return ResponseFactory.systemError(SYSTEM_ERROR_MSG);
         }
         OrderTradeCancelResVO orderTradeCancelResVO = new OrderTradeCancelResVO(orderTradeCancelReqVO.getTradeNo());
         logger.info("cancelTradeOrder 响应内容:{}",JSON.toJSONString(orderTradeCancelResVO));
@@ -112,31 +109,58 @@ public class OrderTradeController extends BaseController {
      * @param orderTradeDetailReqVO
      * @return
      */
-    @ResponseBody
-    @RequestMapping(value = {"detail"})
+    @GetMapping("/detail")
     public ResponseData<OrderTradeDetailResVO> tradeOrderDetail(OrderTradeDetailReqVO orderTradeDetailReqVO) {
         if (orderTradeDetailReqVO == null) {
             logger.error("tradeOrderDetail 失败，原因是 orderTradeDetailReqVO is null");
             return ResponseFactory.paramsError("请求参数不能为空");
         }
         logger.info("tradeOrderDetail 请求参数:{}",JSON.toJSONString(orderTradeDetailReqVO));
-        OrderTrade orderTrade =new OrderTrade();
-
-        Date nowDate = DateUtil.getNowTime();
-        orderTrade.setCreateDate(nowDate);
-        orderTrade.setUpdateDate(nowDate);
+        OrderTradeDetailResVO orderTradeCancelResVO;
         try {
-            orderTradeService.cancelTradeOrder(orderTrade.getTradeNo());
-        } catch (ProductNotExistsException e) {
-            logger.error("tradeOrderDetail 失败，原因是",e);
+            orderTradeCancelResVO = orderTradeService.tradeOrderDetail(orderTradeDetailReqVO.getTradeNo());
+        } catch (BaseServiceException e) {
+            logger.error("tradeOrderDetail 失败，原因是:{}",e.getMessage());
             return ResponseFactory.paramsError(e.getMessage());
         } catch (Exception e) {
             logger.error("tradeOrderDetail 失败，原因是",e);
-            return ResponseFactory.systemError("系统错误");
+            return ResponseFactory.systemError(SYSTEM_ERROR_MSG);
         }
-        OrderTradeDetailResVO orderTradeCancelResVO = new OrderTradeDetailResVO();
         logger.info("tradeOrderDetail 响应内容:{}",JSON.toJSONString(orderTradeCancelResVO));
         return ResponseFactory.success(orderTradeCancelResVO);
+    }
+
+    @PostMapping("/pay/notify")
+    public ResponseData<OrderTradePaymentResVO> createOrderTradePayment(OrderTradePaymentReqVO orderTradePaymentReqVO) {
+        if (orderTradePaymentReqVO == null) {
+            logger.error("createOrderTradePayment 失败，原因是 orderTradePaymentReqVO is null");
+            return ResponseFactory.paramsError("请求参数不能为空");
+        }
+        logger.info("createOrderTradePayment 请求参数:{}",JSON.toJSONString(orderTradePaymentReqVO));
+        OrderPaymentTrade orderPaymentTrade = new OrderPaymentTrade();
+        try {
+            BeanUtils.copyProperties(orderPaymentTrade, orderTradePaymentReqVO);
+            orderPaymentTrade.setAmount(orderTradePaymentReqVO.getPayAmout());
+            orderPaymentTrade.setStatus(orderTradePaymentReqVO.getPayStatus());
+        } catch (IllegalAccessException e) {
+            logger.error("createOrderTradePayment 失败，原因是",e);
+            return ResponseFactory.paramsError("请求参数错误");
+        } catch (InvocationTargetException e) {
+            logger.error("createOrderTradePayment 失败，原因是",e);
+            return ResponseFactory.paramsError("请求参数错误");
+        }
+        OrderTradePaymentResVO orderTradePaymentResVO;
+        try {
+            orderTradePaymentResVO = orderTradeService.orderPaymentTradeNotify(orderPaymentTrade);
+        } catch (BaseServiceException e) {
+            logger.error("createOrderTradePayment 失败，原因是:{}",e.getMessage());
+            return ResponseFactory.paramsError(e.getMessage());
+        } catch (Exception e) {
+            logger.error("createOrderTradePayment 失败，原因是",e);
+            return ResponseFactory.systemError(SYSTEM_ERROR_MSG);
+        }
+        logger.info("createOrderTradePayment 响应内容:{}",JSON.toJSONString(orderTradePaymentResVO));
+        return ResponseFactory.success(orderTradePaymentResVO);
     }
 
 }

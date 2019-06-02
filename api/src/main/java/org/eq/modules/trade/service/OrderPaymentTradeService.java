@@ -15,4 +15,9 @@ import org.eq.basic.common.base.ServiceExtend;
  */
 public interface OrderPaymentTradeService extends ServiceExtend<OrderPaymentTrade,OrderPaymentTradeExample> {
 
+
+    Long insertOrderPaymentTradeReturnId(OrderPaymentTrade orderPaymentTrade);
+
+    OrderPaymentTrade findOrderPaymentTradeByTradeNo(String tradeNo);
+
 }

@@ -92,4 +92,15 @@ public class OrderPaymentTradeServiceImpl extends ServiceImplExtend<OrderPayment
 		return example;
 	}
 
+	@Override
+	public Long insertOrderPaymentTradeReturnId(OrderPaymentTrade orderPaymentTrade) {
+		return getMapper().insertSelectiveAndReturnId(orderPaymentTrade);
+	}
+
+	@Override
+	public OrderPaymentTrade findOrderPaymentTradeByTradeNo(String tradeNo) {
+		OrderPaymentTrade orderPaymentTrade = new OrderPaymentTrade();
+		orderPaymentTrade.setTradeNo(tradeNo);
+		return selectByRecord(orderPaymentTrade);
+	}
 }

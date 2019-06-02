@@ -174,6 +174,46 @@
         </trim>
     </insert>
 
+    <insert id="insertSelective" parameterType="org.eq.modules.trade.entity.OrderPaymentTrade">
+        <!-- 插入数据后 返回主键 -->
+        <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into order_payment_trade
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            trade_no,
+            pay_no,
+            pay_type,
+            payer_user,
+            payee_user,
+            product_id,
+            order_num,
+            status,
+            pay_time,
+            service_fee,
+            amount,
+            create_date,
+            update_date,
+            remarks,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{tradeNo,jdbcType=VARCHAR},
+            #{payNo,jdbcType=VARCHAR},
+            #{payType,jdbcType=TINYINT},
+            #{payerUser,jdbcType=VARCHAR},
+            #{payeeUser,jdbcType=VARCHAR},
+            #{productId,jdbcType=BIGINT},
+            #{orderNum,jdbcType=INTEGER},
+            #{status,jdbcType=TINYINT},
+            #{payTime,jdbcType=TIMESTAMP},
+            #{serviceFee,jdbcType=INTEGER},
+            #{amount,jdbcType=INTEGER},
+            #{createDate,jdbcType=TIMESTAMP},
+            #{updateDate,jdbcType=TIMESTAMP},
+            #{remarks,jdbcType=VARCHAR},
+        </trim>
+    </insert>
+
     <select id="countByExample" parameterType="org.eq.modules.trade.entity.OrderPaymentTradeExample" resultType="java.lang.Long">
         select count(*) from order_payment_trade
         <if test="_parameter != null">
