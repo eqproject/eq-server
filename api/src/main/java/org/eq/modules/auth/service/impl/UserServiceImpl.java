@@ -45,7 +45,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         super.setMapper(mapper);
     }
 
-    private static final String MD5_KEY = "com.eq.modules";
+    private static final String MD5_KEY = "org.eq.modules";
 
     @Value("${aes.key}")
     private String aesKey;

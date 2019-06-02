@@ -86,8 +86,7 @@ public class UserController extends BaseController {
 
     /**
      * 用户实名认证接口
-     *
-     * @param request
+     * @param userIdentityAuth
      * @return
      */
     @RequestMapping(value = "/identity/verify")
