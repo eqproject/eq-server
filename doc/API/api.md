@@ -102,7 +102,7 @@
 ###### 请求参数
 > |参数|必选|类型|说明|
 |:-----  |:-------|:-----|-----|
-|userId      |true    |long  | 用户id|
+|id      |true    |long  | 用户id|
 |name      |false    |string  | 用户名|
 |nickname   |false    |string   |昵称|
 |birthday   |false    |string   |生日|

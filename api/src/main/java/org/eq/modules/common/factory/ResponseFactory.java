@@ -16,14 +16,14 @@ public class ResponseFactory<T> {
 
     /**
      * 返回单个结果实体
-     * @param date
+     * @param data
      * @param <T>
      * @return
      */
-    public static <T> ResponseData<T> success(T date){
+    public static <T> ResponseData<T> success(T data){
         ResponseData<T> result = initSuccess();
-        if(date!=null){
-            result.setData(date);
+        if(data!=null){
+            result.setData(data);
         }
         return result;
     }
@@ -31,14 +31,14 @@ public class ResponseFactory<T> {
 
     /**
      * 返回集合
-     * @param dates
+     * @param datas
      * @param <T>
      * @return
      */
-    public static <T> ResponseData<T> success(List<T> dates){
+    public static <T> ResponseData<T> success(List<T> datas){
         ResponseData<T> result = initSuccess();
-        if(!CollectionUtils.isEmpty(dates)){
-            result.setDatas(dates);
+        if(!CollectionUtils.isEmpty(datas)){
+            result.setDatas(datas);
         }
         return result;
     }

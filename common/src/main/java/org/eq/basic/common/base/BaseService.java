@@ -178,6 +178,12 @@ public interface BaseService<Record, Example> {
     int insertRecord(Record record);
 
     /**
+     * 新增记录，并返回
+     * @param record
+     */
+    void insertRecordReturnId(Record record);
+
+    /**
      * 插入记录有效字段
      *
      * @param record

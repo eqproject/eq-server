@@ -203,6 +203,16 @@ public abstract class BaseServiceImpl<Mapper, Record, Example> implements BaseSe
     }
 
     @Override
+    public void insertRecordReturnId(Record record){
+        try {
+            Method countByExample = this.mapper.getClass().getDeclaredMethod("insertReturnId", Object.class);
+            countByExample.invoke(this.mapper, record);
+        } catch(Exception e) {
+            this.logger.debug(e.getMessage());
+        }
+    }
+
+    @Override
     public int insertSelective(Record record) {
 
         try {

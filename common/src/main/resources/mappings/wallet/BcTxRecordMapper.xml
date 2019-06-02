@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.eq.modules.wallet.dao.BcTxRecordMapper">
+    <resultMap id="BaseResultMap" type="org.eq.modules.wallet.entity.BcTxRecord">
+        <id column="id" jdbcType="BIGINT" property="id" />
+	    <result column="from_address" jdbcType="VARCHAR" property="fromAddress" />
+	    <result column="to_address" jdbcType="VARCHAR" property="toAddress" />
+	    <result column="transfer_amount" jdbcType="VARCHAR" property="transferAmount" />
+	    <result column="asset_code" jdbcType="VARCHAR" property="assetCode" />
+	    <result column="asset_issuer" jdbcType="VARCHAR" property="assetIssuer" />
+	    <result column="contract_address" jdbcType="VARCHAR" property="contractAddress" />
+	    <result column="asset_type" jdbcType="INTEGER" property="assetType" />
+	    <result column="tx_status" jdbcType="INTEGER" property="txStatus" />
+	    <result column="tx_hash" jdbcType="VARCHAR" property="txHash" />
+	    <result column="biz_type" jdbcType="INTEGER" property="bizType" />
+	    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+	    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+	    <result column="opt_metadata" jdbcType="VARCHAR" property="optMetadata" />
+    </resultMap>
+
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_List">
+        id,from_address,to_address,transfer_amount,asset_code,asset_issuer,contract_address,asset_type,tx_status,tx_hash,biz_type,create_time,update_time,opt_metadata
+    </sql>
+
+    <select id="selectByExample" parameterType="org.eq.modules.wallet.entity.BcTxRecordExample" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List" />
+        from bc_tx_record
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from bc_tx_record
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from bc_tx_record
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByExample" parameterType="org.eq.modules.wallet.entity.BcTxRecordExample">
+        delete from bc_tx_record
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
+
+    <insert id="insert" parameterType="org.eq.modules.wallet.entity.BcTxRecord">
+        insert into bc_tx_record (from_address,to_address,transfer_amount,asset_code,asset_issuer,contract_address,asset_type,tx_status,tx_hash,biz_type,create_time,update_time,opt_metadata)
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{fromAddress,jdbcType=VARCHAR},
+            #{toAddress,jdbcType=VARCHAR},
+            #{transferAmount,jdbcType=VARCHAR},
+            #{assetCode,jdbcType=VARCHAR},
+            #{assetIssuer,jdbcType=VARCHAR},
+            #{contractAddress,jdbcType=VARCHAR},
+            #{assetType,jdbcType=INTEGER},
+            #{txStatus,jdbcType=INTEGER},
+            #{txHash,jdbcType=VARCHAR},
+            #{bizType,jdbcType=INTEGER},
+            #{createTime,jdbcType=TIMESTAMP},
+            #{updateTime,jdbcType=TIMESTAMP},
+            #{optMetadata,jdbcType=VARCHAR},
+        </trim>
+    </insert>
+
+    <insert id="insertReturnId" parameterType="org.eq.modules.wallet.entity.BcTxRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into bc_tx_record (from_address,to_address,transfer_amount,asset_code,asset_issuer,contract_address,asset_type,tx_status,tx_hash,biz_type,create_time,update_time,opt_metadata)
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{fromAddress,jdbcType=VARCHAR},
+            #{toAddress,jdbcType=VARCHAR},
+            #{transferAmount,jdbcType=VARCHAR},
+            #{assetCode,jdbcType=VARCHAR},
+            #{assetIssuer,jdbcType=VARCHAR},
+            #{contractAddress,jdbcType=VARCHAR},
+            #{assetType,jdbcType=INTEGER},
+            #{txStatus,jdbcType=INTEGER},
+            #{txHash,jdbcType=VARCHAR},
+            #{bizType,jdbcType=INTEGER},
+            #{createTime,jdbcType=TIMESTAMP},
+            #{updateTime,jdbcType=TIMESTAMP},
+            #{optMetadata,jdbcType=VARCHAR},
+        </trim>
+    </insert>
+
+    <insert id="insertSelective" parameterType="org.eq.modules.wallet.entity.BcTxRecord">
+        insert into bc_tx_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            from_address,
+            to_address,
+            transfer_amount,
+            asset_code,
+            asset_issuer,
+            contract_address,
+            asset_type,
+            tx_status,
+            tx_hash,
+            biz_type,
+            create_time,
+            update_time,
+            opt_metadata,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{fromAddress,jdbcType=VARCHAR},
+            #{toAddress,jdbcType=VARCHAR},
+            #{transferAmount,jdbcType=VARCHAR},
+            #{assetCode,jdbcType=VARCHAR},
+            #{assetIssuer,jdbcType=VARCHAR},
+            #{contractAddress,jdbcType=VARCHAR},
+            #{assetType,jdbcType=INTEGER},
+            #{txStatus,jdbcType=INTEGER},
+            #{txHash,jdbcType=VARCHAR},
+            #{bizType,jdbcType=INTEGER},
+            #{createTime,jdbcType=TIMESTAMP},
+            #{updateTime,jdbcType=TIMESTAMP},
+            #{optMetadata,jdbcType=VARCHAR},
+        </trim>
+    </insert>
+
+    <select id="countByExample" parameterType="org.eq.modules.wallet.entity.BcTxRecordExample" resultType="java.lang.Long">
+        select count(*) from bc_tx_record
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </select>
+
+    <update id="updateByExampleSelective" parameterType="map">
+        update bc_tx_record
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.fromAddress != null">
+                from_address = #{record.fromAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="record.toAddress != null">
+                to_address = #{record.toAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="record.transferAmount != null">
+                transfer_amount = #{record.transferAmount,jdbcType=VARCHAR},
+            </if>
+            <if test="record.assetCode != null">
+                asset_code = #{record.assetCode,jdbcType=VARCHAR},
+            </if>
+            <if test="record.assetIssuer != null">
+                asset_issuer = #{record.assetIssuer,jdbcType=VARCHAR},
+            </if>
+            <if test="record.contractAddress != null">
+                contract_address = #{record.contractAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="record.assetType != null">
+                asset_type = #{record.assetType,jdbcType=INTEGER},
+            </if>
+            <if test="record.txStatus != null">
+                tx_status = #{record.txStatus,jdbcType=INTEGER},
+            </if>
+            <if test="record.txHash != null">
+                tx_hash = #{record.txHash,jdbcType=VARCHAR},
+            </if>
+            <if test="record.bizType != null">
+                biz_type = #{record.bizType,jdbcType=INTEGER},
+            </if>
+            <if test="record.createTime != null">
+                create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.updateTime != null">
+                update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.optMetadata != null">
+                opt_metadata = #{record.optMetadata,jdbcType=VARCHAR},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByExample" parameterType="map">
+        update bc_tx_record
+        set
+        <trim  suffixOverrides=",">
+            id = #{record.id,jdbcType=BIGINT},
+            from_address = #{record.fromAddress,jdbcType=VARCHAR},
+            to_address = #{record.toAddress,jdbcType=VARCHAR},
+            transfer_amount = #{record.transferAmount,jdbcType=VARCHAR},
+            asset_code = #{record.assetCode,jdbcType=VARCHAR},
+            asset_issuer = #{record.assetIssuer,jdbcType=VARCHAR},
+            contract_address = #{record.contractAddress,jdbcType=VARCHAR},
+            asset_type = #{record.assetType,jdbcType=INTEGER},
+            tx_status = #{record.txStatus,jdbcType=INTEGER},
+            tx_hash = #{record.txHash,jdbcType=VARCHAR},
+            biz_type = #{record.bizType,jdbcType=INTEGER},
+            create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+            opt_metadata = #{record.optMetadata,jdbcType=VARCHAR},
+        </trim>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.modules.wallet.entity.BcTxRecord">
+        update bc_tx_record
+        <set>
+            <if test="fromAddress != null">
+            from_address = #{fromAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="toAddress != null">
+            to_address = #{toAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="transferAmount != null">
+            transfer_amount = #{transferAmount,jdbcType=VARCHAR},
+            </if>
+            <if test="assetCode != null">
+            asset_code = #{assetCode,jdbcType=VARCHAR},
+            </if>
+            <if test="assetIssuer != null">
+            asset_issuer = #{assetIssuer,jdbcType=VARCHAR},
+            </if>
+            <if test="contractAddress != null">
+            contract_address = #{contractAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="assetType != null">
+            asset_type = #{assetType,jdbcType=INTEGER},
+            </if>
+            <if test="txStatus != null">
+            tx_status = #{txStatus,jdbcType=INTEGER},
+            </if>
+            <if test="txHash != null">
+            tx_hash = #{txHash,jdbcType=VARCHAR},
+            </if>
+            <if test="bizType != null">
+            biz_type = #{bizType,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+            update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="optMetadata != null">
+            opt_metadata = #{optMetadata,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="org.eq.modules.wallet.entity.BcTxRecord">
+        update bc_tx_record
+        set
+        <trim  suffixOverrides=",">
+              from_address = #{fromAddress,jdbcType=VARCHAR},
+              to_address = #{toAddress,jdbcType=VARCHAR},
+              transfer_amount = #{transferAmount,jdbcType=VARCHAR},
+              asset_code = #{assetCode,jdbcType=VARCHAR},
+              asset_issuer = #{assetIssuer,jdbcType=VARCHAR},
+              contract_address = #{contractAddress,jdbcType=VARCHAR},
+              asset_type = #{assetType,jdbcType=INTEGER},
+              tx_status = #{txStatus,jdbcType=INTEGER},
+              tx_hash = #{txHash,jdbcType=VARCHAR},
+              biz_type = #{bizType,jdbcType=INTEGER},
+              create_time = #{createTime,jdbcType=TIMESTAMP},
+              update_time = #{updateTime,jdbcType=TIMESTAMP},
+              opt_metadata = #{optMetadata,jdbcType=VARCHAR},
+        </trim>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+</mapper>

@@ -1,12 +1,12 @@
 package org.eq.basic.common.base;
 
 import org.apache.ibatis.annotations.Param;
+import org.springframework.dao.RecoverableDataAccessException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public interface BaseMapper<Record, Example> {
-
     long countByExample(Example example);
 
     int deleteByExample(Example example);
@@ -14,6 +14,8 @@ public interface BaseMapper<Record, Example> {
     int deleteByPrimaryKey(Long id);
 
     int insert(Record record);
+
+    void insertReturnId(Record record);
 
     int insertSelective(Record record);
 
