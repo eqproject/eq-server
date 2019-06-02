@@ -50,11 +50,6 @@ public class ProductDetailVO extends EntityBase{
 
 
     /**
-     * 用户可用库存
-     */
-    private int number;
-
-    /**
      * 排序
      */
     private int sort;

@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
+import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.cache.ProductCache;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
@@ -17,11 +18,10 @@ import org.eq.modules.product.dao.ProductMapper;
 import org.eq.modules.product.entity.Product;
 import org.eq.modules.product.entity.ProductAll;
 import org.eq.modules.product.entity.ProductExample;
+import org.eq.modules.product.entity.UserProductStock;
 import org.eq.modules.product.service.ProductService;
-import org.eq.modules.product.vo.ProductBaseVO;
-import org.eq.modules.product.vo.ProductDetailVO;
-import org.eq.modules.product.vo.SearchPageProductVO;
-import org.eq.modules.product.vo.BSearchProduct;
+import org.eq.modules.product.service.UserProductStockService;
+import org.eq.modules.product.vo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +56,9 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 
 	@Autowired
 	private ProductCache productCache;
+
+	@Autowired
+	private UserProductStockService userProductStockService;
 
 
 	@Override
@@ -132,17 +135,41 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 
     @Override
     public ProductDetailVO getProductAll(BSearchProduct bsearchProduct) {
-		ProductDetailVO result = null;
 		if(bsearchProduct ==null){
 			bsearchProduct = new BSearchProduct();
 		}
 		ProductExample productExample = ProductUtil.createPlatformSearchExample(bsearchProduct,true);
 		List<ProductAll> productList = productMapper.selectProductAllByExample(productExample);
 		if(CollectionUtils.isEmpty(productList)){
-			return result;
+			return null;
 		}
-		return  ProductUtil.transObjTOProductDetail(productList.get(0));
+		return ProductUtil.transObjTOProductDetail(productList.get(0));
     }
+
+	@Override
+	public UserProductDetailVO getUserProductAll(BSearchProduct bsearchProduct, User user) {
+		if(user==null){
+			return null;
+		}
+		if(bsearchProduct ==null ){
+			bsearchProduct = new BSearchProduct();
+		}
+		ProductExample productExample = ProductUtil.createPlatformSearchExample(bsearchProduct,true);
+		List<ProductAll> productList = productMapper.selectProductAllByExample(productExample);
+		if(CollectionUtils.isEmpty(productList)){
+			return null;
+		}
+		ProductAll  productAll = productList.get(0);
+		UserProductStock userProductStock = userProductStockService.getUserProductStock(productAll.getId(),user);
+		if(userProductStock==null){
+			return null;
+		}
+		productAll.setNumber(userProductStock.getStockNum());
+		productAll.setLockNumber(userProductStock.getLockedNum());
+		return ProductUtil.transObjTOUserProductDetail(productList.get(0));
+
+
+	}
 
 
 }

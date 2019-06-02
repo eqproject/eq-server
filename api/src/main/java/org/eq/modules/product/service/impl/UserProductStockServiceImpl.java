@@ -136,6 +136,36 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 		return result;
 	}
 
+	@Override
+	public UserProductStock getUserProductStock(long productId, User user) {
+		if(productId<=0 || user==null || StringUtils.isEmpty(user.getTxPassword())){
+			return null;
+		}
+		Product product = productService.selectByPrimaryKey(productId);
+		if(!ProductUtil.isEffect(product)){
+			return null;
+		}
+		String ticketKey = productCache.getTicketKeyByProductId(productId);
+		if(StringUtils.isEmpty(ticketKey)){
+			return null;
+		}
+		Map<String,TicketProductVO> ticketMap = ProductUtil.getTicketUserProduct(user.getTxPassword());
+		if(ticketMap ==null || ticketMap.size()<=0 ){
+			return null;
+		}
+		TicketProductVO ticketProductVO = ticketMap.get(ticketKey);
+		if(ticketProductVO==null){
+			return null;
+		}
+
+		UserProductStock userProductStock = getUserStockLocked(product.getId(),user.getId());
+		if(userProductStock==null){
+			return null;
+		}
+		userProductStock.setStockNum(Integer.valueOf(ticketProductVO.getBalance()));
+		return userProductStock;
+	}
+
 	/**
 	 * 根据商品信息和用户信息获取用户库存数据
 	 * @param productId
@@ -160,13 +190,45 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 		userProductStock.setLockedNum(0);
 		userProductStock.setUpdateDate(userProductStock.getCreateDate());
 		int result = insertSelective(userProductStock);
-		System.out.println(result+"====");
 		int retryNum = 3;
 		while(result<=0 && retryNum>0){
 			result = insertSelective(userProductStock);
 			retryNum--;
 		}
 		return 0;
+	}
+
+
+	/**
+	 * 根据商品信息和用户信息获取用户库存数据
+	 * @param productId
+	 * @param userId
+	 * @return
+	 */
+	private UserProductStock getUserStockLocked(long productId, long userId){
+		if(productId<=0 || userId<=0 ){
+			return null;
+		}
+		UserProductStock userProductStock = new UserProductStock();
+		userProductStock.setUserId(userId);
+		userProductStock.setProductId(productId);
+		userProductStock = selectByRecord(userProductStock);
+		if(userProductStock!=null){
+			return userProductStock;
+		}
+		userProductStock = new UserProductStock();
+		userProductStock.setProductId(productId);
+		userProductStock.setUserId(userId);
+		userProductStock.setCreateDate(new Date());
+		userProductStock.setLockedNum(0);
+		userProductStock.setUpdateDate(userProductStock.getCreateDate());
+		int result = insertSelective(userProductStock);
+		int retryNum = 3;
+		while(result<=0 && retryNum>0){
+			result = insertSelective(userProductStock);
+			retryNum--;
+		}
+		return result>0?userProductStock:null;
 	}
 
 	private static List<ProductBaseVO> pageBySubList(List<ProductBaseVO> list, int pagesize, int currentPage) {

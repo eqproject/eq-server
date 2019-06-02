@@ -5,14 +5,12 @@
 package org.eq.modules.product.service;
 
 import org.eq.basic.common.base.ServiceExtend;
+import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.product.entity.Product;
 import org.eq.modules.product.entity.ProductAll;
 import org.eq.modules.product.entity.ProductExample;
-import org.eq.modules.product.vo.ProductBaseVO;
-import org.eq.modules.product.vo.ProductDetailVO;
-import org.eq.modules.product.vo.SearchPageProductVO;
-import org.eq.modules.product.vo.BSearchProduct;
+import org.eq.modules.product.vo.*;
 
 import java.util.List;
 
@@ -42,9 +40,18 @@ public interface ProductService extends ServiceExtend<Product,ProductExample> {
 
 
     /**
-     * 全量获取
-     * @param bsearchProduct
+     * 获取平台单个商品
+     * @param bsearchProduct 查询实体
      * @return
      */
     ProductDetailVO getProductAll(BSearchProduct bsearchProduct);
+
+
+    /**
+     * 获取用户单个商品
+     * @param bsearchProduct 查询实体
+     * @param user
+     * @return
+     */
+    UserProductDetailVO getUserProductAll(BSearchProduct bsearchProduct, User user);
 }

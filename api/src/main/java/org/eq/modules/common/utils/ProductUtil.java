@@ -5,10 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eq.modules.business.ProductBusines;
 import org.eq.modules.enums.ProductStateEnum;
 import org.eq.basic.common.util.DateUtil;
-import org.eq.modules.product.entity.Product;
-import org.eq.modules.product.entity.ProductAll;
-import org.eq.modules.product.entity.ProductExample;
-import org.eq.modules.product.entity.UserProductStockExample;
+import org.eq.modules.product.entity.*;
 import org.eq.modules.product.vo.*;
 
 import java.util.ArrayList;
@@ -58,15 +55,27 @@ public class ProductUtil  extends ProductBusines {
         if(productAll==null){
             return null;
         }
-        ProductDetailVO result = new ProductDetailVO();
+        ProductDetailVO result = transObjTOUserProductDetail(productAll);
+        return result;
+    }
+
+    /**
+     * 转化对象实体
+     * @param product
+     * @return
+     */
+    public static UserProductDetailVO transObjTOUserProductDetail(ProductAll productAll){
+        if(productAll==null || productAll.getId()==null ){
+            return null;
+        }
+        UserProductDetailVO result = new UserProductDetailVO();
         result.setId(productAll.getId());
         result.setProductName(productAll.getName());
-        result.setUnitPrice(productAll.getUnitPrice());
+        result.setUnitPrice(productAll.getUnitPrice()==null?0:productAll.getUnitPrice());
         result.setImg(productAll.getProductImg());
         result.setExpirationStart(productAll.getExpirationStart());
         result.setExpirationEnd(productAll.getExpirationEnd());
-        result.setSort(productAll.getSort());
-        result.setNumber(productAll.getNumber());
+        result.setSort(productAll.getSort()==null?0:productAll.getSort());
         ProductExtend productExtend = formatExtend(productAll.getExtendInfo());
         result.setReceive(productExtend.getReceive());
         result.setDesc(productExtend.getTicketDesc());
@@ -78,6 +87,8 @@ public class ProductUtil  extends ProductBusines {
         result.setIssuerImg(productAll.getIssuerIcon());
         result.setIssuerAddress(productAll.getIssuerAddress());
         result.setIssuerIntro(productAll.getIssuerIntro());
+        result.setNumber(productAll.getNumber());
+        result.setLockedNum(productAll.getLockNumber());
         return result;
     }
 
@@ -218,6 +229,15 @@ public class ProductUtil  extends ProductBusines {
             result.put(key,ticketProductVO);
         }
         return result;
+    }
+
+    public static void main(String[] args) {
+        ProductAll productAll = new ProductAll();
+        productAll.setId(1L);
+        productAll.setAcceptAddress("111");
+        productAll.setLockNumber(10);
+        ProductDetailVO result = transObjTOProductDetail(productAll);
+        System.out.println(result.getId()+"===");
     }
 
 

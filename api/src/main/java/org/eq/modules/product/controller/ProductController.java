@@ -99,4 +99,25 @@ public class ProductController extends BaseController {
 	}
 
 
+	@PostMapping("/user/details")
+	public ResponseData userDetails(SearchProductVO searchProductVO) {
+		if(searchProductVO ==null || searchProductVO.getUserId()<=0 || searchProductVO.getId()<=0){
+			return ResponseFactory.paramsError("参数为空或者用户ID为空");
+		}
+		User user = getUserInfo(searchProductVO.getUserId());
+		if(user==null){
+			return ResponseFactory.signError("用户不存在");
+		}
+
+		BSearchProduct bsearchProduct = new BSearchProduct();
+		bsearchProduct.setProductId(searchProductVO.getId());
+		UserProductDetailVO userProductDetailVO =  productService.getUserProductAll(bsearchProduct,user);
+		if(userProductDetailVO==null){
+			userProductDetailVO = new UserProductDetailVO();
+		}
+
+		return ResponseFactory.success(userProductDetailVO);
+	}
+
+
 }

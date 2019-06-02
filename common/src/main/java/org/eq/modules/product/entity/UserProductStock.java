@@ -59,5 +59,10 @@ public class UserProductStock implements Serializable {
 	 */
 	protected String productExpirationEnd;
 
+	/**
+	 * 用户库存
+	 */
+	private int stockNum;
+
 
 }

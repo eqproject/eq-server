@@ -670,7 +670,7 @@
 > | receive               | string   | 承兑说明                         |
 > |  expirationStart       | string   | 券有效期开始时间                 |
 > |  expirationEnd         | string   | 券有效期结束时间                 |
-> | num                   | int      | 可用量                           |
+> | number             | int      | 可用量                           |
 > |  lockedNum             | int      | 锁定量                           |
 >brand 对象
 >|返回字段|字段类型|说明  |

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -72,6 +73,34 @@ public class ProductCache implements BaseCache {
         ticketKeyTOProductId.put(ticketKey,String.valueOf(productBlockchain.getProductId()));
         return String.valueOf(productBlockchain.getProductId());
     }
+
+
+    /**
+     * 通过商品ID 获取商品的区块链KEY
+     * @param productId
+     * @return
+     */
+    public  String getTicketKeyByProductId(long productId){
+        if(productId<=0){
+            return null;
+        }
+        Iterator<String> ite = ticketKeyTOProductId.keySet().iterator();
+        while(ite.hasNext()){
+            String key  = ite.next();
+            String value = ticketKeyTOProductId.get(key);
+            if(String.valueOf(productId).equals(value)){
+                return key;
+            }
+        }
+        ProductBlockchain productBlockchain = productBlockchainService.getBuyProductId(productId);
+        if(productBlockchain==null){
+            return  null;
+        }
+        StringBuffer key = new StringBuffer().append(productBlockchain.getTicketid()).append("_").append(productBlockchain.getTrancheid());
+        ticketKeyTOProductId.put(key.toString(),String.valueOf(productId));
+        return key.toString();
+    }
+
 
     /**
      * 通过商品ID 获取商品有效信息

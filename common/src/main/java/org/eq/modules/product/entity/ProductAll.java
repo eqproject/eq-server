@@ -82,6 +82,14 @@ public class ProductAll  extends Product implements Serializable {
 
 
 
+	/**
+	 * 商品锁定量
+	 */
+	private int lockNumber;
+
+
+
+
 
 
 }

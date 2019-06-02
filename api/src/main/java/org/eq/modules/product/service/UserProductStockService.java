@@ -30,4 +30,13 @@ public interface UserProductStockService extends ServiceExtend<UserProductStock,
     PageResultData<ProductBaseVO> pageSimpeProduct(SearchPageProductVO searchPageProductVO, User user);
 
 
+    /**
+     * 获取用户库存信息数据
+     * @param productId 商品ID
+     * @param user  用户信息
+     * @return
+     */
+    UserProductStock getUserProductStock(long productId,User user);
+
+
 }
