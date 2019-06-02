@@ -7,6 +7,7 @@ package org.eq.modules.orderFinish.dao;
 import org.apache.ibatis.annotations.Mapper;
 import org.eq.basic.common.base.BaseMapper;
 import org.eq.modules.orderFinish.entity.OrderFinishSnapshoot;
+import org.eq.modules.orderFinish.entity.OrderFinishSnapshootExample;
 
 /**
  * 用户完成订单Mapper接口

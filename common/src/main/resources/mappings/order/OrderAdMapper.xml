@@ -111,7 +111,7 @@
         select
         <include refid="Base_Column_List" />
         from order_ad as  OA  left join user UU on UU.id = OA.user_id left join  platform_product PP on PP.id = OA.product_id
-        where id = #{id,jdbcType=BIGINT}
+        where OA.id = #{id,jdbcType=BIGINT}
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">

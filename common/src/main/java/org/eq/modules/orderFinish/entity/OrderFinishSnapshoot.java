@@ -16,19 +16,83 @@ import java.util.Date;
  * @version 2019-06-02
  */
 @Data
-public class OrderFinishSnapshoot extends BaseEntity {
+public class OrderFinishSnapshoot {
 
     private static final long serialVersionUID = 1L;
-    private Long id;        // 唯一标识
-    private String orderNo;        // 商品订单号
-    private String tradeNo;        // 交易订单号
-    private Long productId;        // 商品Id
-    private String productName;        // 商品名称
-    private Integer unitPrice;        // 商品单价
-    private Integer orderNum;        // 订单数量
-    private Integer tradeNum;        // 交易数量
-    private Integer type;        // 订单类型:(1:广告出售订单;2:广告求购订单;3:交易出售订单;4:交易求购订单)
-    private Integer status;        // 状态:(1:已完成;2:已关闭;3:已取消;)
-    private Integer saleprice;        //
-    private Integer amount;        // 金额（分）
+    private Long id;
+
+    /**
+     * 用户ID
+     */
+    private Long userId;
+    /**
+     * 商品订单号
+     */
+    private String orderNo;
+    /**
+     * 交易订单号
+     */
+    private String tradeNo;
+    /**
+     *  商品Id
+     */
+    private Long productId;
+    /**
+     * 商品名称
+     */
+    private String productName;
+    /**
+     *  商品单价
+     */
+    private Integer unitPrice;
+    /**
+     * 订单数量
+     */
+    private Integer orderNum;
+    /**
+     * 交易数量
+     */
+    private Integer tradeNum;
+    /**
+     * 订单类型
+     * @see  org.eq.modules.enums.OrderFinishTypeEnum
+     */
+    private Integer type;
+    /**
+     * 状态
+     * @see  org.eq.modules.enums.OrderFinishStateEnum
+     */
+    private Integer status;
+    /**
+     * 售卖价格
+     */
+    private Integer saleprice;
+
+    /**
+     * 订单价格
+     */
+    private Integer amount;
+
+
+    /**
+     * 创建时间
+     */
+    private Date createDate;
+
+
+    /**
+     * 昵称
+     */
+    private String nickName;
+
+
+    /**
+     * 头像地址
+     */
+    private String photoHead;
+
+    /**
+     * 商品图片地址
+     */
+    private String productImg;
 }

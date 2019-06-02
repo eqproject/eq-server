@@ -1428,6 +1428,7 @@
 > GET
 
 ###### 请求参数
+
 > |参数|必选|类型|说明|
 |:-----  |:-------|:-----|-----|
 |userId      |true    |long  | 用户Id|
@@ -1444,21 +1445,23 @@
 |data   |object|结果对象 |
 |- total  |int | 订单总记录数|
 |- list |list |交易订单列表                        |
-|--    product |object |商品信息 |
-|---        productImg |string |图片url |
-|---        name |string |名称|
-|---        unitPrice |int |面值(单位:分)|
-|--    trade |object |交易订单信息 |
-|---        tradeNo |string |交易订单号|
-|---        payNo |string |支付流水号|
-|---        amount |int |订单金额(单位:分)|
-|---        orderNum |int |订单数量|
-|---        salePrice |int |商品售价(单位:分)|
-|---        serviceFee |int |服务费(单位:分)|
-|---        status |int |状态:(1:已完成;)|
-|---        createTime |string |交易时间 |
-|---        finishTime |string |完成时间 |
-|---        type |string |订单类型:(1:广告出售订单;2:广告求购订单;3:交易出售订单;4:交易求购订单)|
+
+订单对象
+> |返回字段|字段类型|说明                              |
+|:-----   |:------|:-----------------------------   |
+|productImg |string |图片url |
+|productName |string |商品名称|
+|unitPrice |int |面值(单位:分)|
+|tradeNo |string |交易订单号|
+|orderNo |string |订单号|
+|amount |int |订单金额(单位:分)|
+|orderNum |int |订单数量|
+|salePrice |int |商品售价(单位:分)|
+|serviceFee |int |服务费(单位:分)|
+|status |int |状态:(1:已完成;)|
+|createTime |string |交易时间 |
+|finishTime |string |完成时间 |
+|type |string |订单类型:(1:广告出售订单;2:广告求购订单;3:交易出售订单;4:交易求购订单)|
 
 ###### 接口示例
 

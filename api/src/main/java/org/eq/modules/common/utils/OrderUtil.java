@@ -2,7 +2,9 @@ package org.eq.modules.common.utils;
 
 import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.order.vo.OrderAdSimpleVO;
+import org.eq.modules.order.vo.OrderFinishSnapshootSimpleVO;
 import org.eq.modules.order.vo.ResOrderAdVO;
+import org.eq.modules.orderFinish.entity.OrderFinishSnapshoot;
 
 /**
  * 订单工具类
@@ -55,6 +57,34 @@ public class OrderUtil{
         orderAdSimpleVO.setNickName(orderAd.getNickName());
         orderAdSimpleVO.setUserBoundState(orderAd.getAuthStatus());
         return orderAdSimpleVO;
+    }
+
+
+
+    /**
+     * 转化对象实体
+     * @param product
+     * @return
+     */
+    public static OrderFinishSnapshootSimpleVO transObjForSimple(OrderFinishSnapshoot orderFinishSnapshoot){
+        if(orderFinishSnapshoot==null){
+            return null;
+        }
+        OrderFinishSnapshootSimpleVO orderFinishSnapshootSimpleVO = new OrderFinishSnapshootSimpleVO();
+        orderFinishSnapshootSimpleVO.setProductId(orderFinishSnapshoot.getProductId());
+        orderFinishSnapshootSimpleVO.setProductImg(orderFinishSnapshoot.getProductImg());
+        orderFinishSnapshootSimpleVO.setProductName(orderFinishSnapshoot.getProductName());
+        orderFinishSnapshootSimpleVO.setUnitPrice(orderFinishSnapshoot.getUnitPrice());
+        orderFinishSnapshootSimpleVO.setTradeNo(orderFinishSnapshoot.getTradeNo());
+        orderFinishSnapshootSimpleVO.setOrderNo(orderFinishSnapshoot.getOrderNo());
+        orderFinishSnapshootSimpleVO.setAmount(orderFinishSnapshoot.getAmount());
+        orderFinishSnapshootSimpleVO.setOrderNum(orderFinishSnapshoot.getOrderNum());
+        orderFinishSnapshootSimpleVO.setSalePrice(orderFinishSnapshoot.getSaleprice());
+        orderFinishSnapshootSimpleVO.setServiceFee(orderFinishSnapshoot.getAmount() - orderFinishSnapshoot.getSaleprice());
+        orderFinishSnapshootSimpleVO.setStatus(orderFinishSnapshoot.getStatus());
+        orderFinishSnapshootSimpleVO.setFinishTime(orderFinishSnapshoot.getCreateDate());
+        orderFinishSnapshootSimpleVO.setType(orderFinishSnapshoot.getType());
+        return orderFinishSnapshootSimpleVO;
     }
 
 
