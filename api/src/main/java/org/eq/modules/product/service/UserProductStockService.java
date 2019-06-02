@@ -12,6 +12,8 @@ import org.eq.modules.product.entity.UserProductStockExample;
 import org.eq.modules.product.vo.ProductBaseVO;
 import org.eq.modules.product.vo.SearchPageProductVO;
 
+import java.util.List;
+
 /**
  * 用户商品管理Service
  * @author kaka
@@ -51,6 +53,19 @@ public interface UserProductStockService extends ServiceExtend<UserProductStock,
      * @return
      */
     boolean updateStock(long productId,long userId,int number);
+
+
+    /**
+     * 获取用户有效的商品信息
+     *  1、获取区块链商品信息
+     *  2、验证平台商品是否存在
+     *  3、查询用户平台库存 如果没有则新建库存信息
+     *  4、对比库存情况
+     *  5、验证通过后 返回用户库存信息数据
+     * @param user
+     * @return
+     */
+    List<Long> listUserProdutId(User user);
 
 
 }

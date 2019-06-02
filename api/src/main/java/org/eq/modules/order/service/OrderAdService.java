@@ -6,11 +6,10 @@ package org.eq.modules.order.service;
 
 import org.eq.basic.common.base.ServiceExtend;
 import org.eq.modules.auth.entity.User;
+import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.order.entity.OrderAdExample;
-import org.eq.modules.order.vo.ResOrderAdVO;
-import org.eq.modules.order.vo.SearchAdOrderVO;
-import org.eq.modules.order.vo.ServieReturn;
+import org.eq.modules.order.vo.*;
 
 /**
  * 广告订单Service
@@ -38,5 +37,15 @@ public interface OrderAdService extends ServiceExtend<OrderAd, OrderAdExample> {
      * @return
      */
     ServieReturn<ResOrderAdVO> cacelResOrderAdVO(SearchAdOrderVO searchAdOrderVO, User user);
+
+
+
+    /**
+     * 获取广告订单
+     * @param searchPageAdOrderVO
+     * @param user 用户实体
+     * @return
+     */
+    PageResultData<OrderAdSimpleVO> pagePlatOrderAd(SearchPageAdOrderVO searchPageAdOrderVO, User user);
 
 }

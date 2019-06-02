@@ -18,6 +18,12 @@
 	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
 	    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
 	    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+        <result column="nickName" jdbcType="VARCHAR" property="nickName" />
+        <result column="photoHead" jdbcType="VARCHAR" property="photoHead" />
+        <result column="authStatus" jdbcType="INTEGER" property="authStatus" />
+        <result column="sort" jdbcType="INTEGER" property="sort" />
+        <result column="productName" jdbcType="VARCHAR" property="productName" />
+        <result column="productImg" jdbcType="VARCHAR" property="productImg" />
     </resultMap>
 
     <sql id="Example_Where_Clause">
@@ -81,7 +87,9 @@
     </sql>
 
     <sql id="Base_Column_List">
-        id,user_id,order_no,product_id,title,product_num,trading_num,traded_num,type,status,price,amount,cancel_desc,create_date,update_date,remarks
+        OA.id, OA.user_id, OA.order_no, OA.product_id, OA.title, OA.product_num, OA.trading_num, OA.traded_num, OA.type, OA.status, OA.price, OA.amount, OA.cancel_desc, OA.create_date, OA.update_date, OA.remarks,
+        UU.nickname as nickName, UU.photo_head as photoHead ,UU.auth_status AS authStatus , PP.sort as sort, PP.name as productName , PP.product_img as productImg
+
     </sql>
 
     <select id="selectByExample" parameterType="org.eq.modules.order.entity.OrderAdExample" resultMap="BaseResultMap">
@@ -90,7 +98,7 @@
             distinct
         </if>
         <include refid="Base_Column_List" />
-        from order_ad
+        from order_ad as  OA left join user UU on UU.id = OA.user_id left join  platform_product PP on PP.id = OA.product_id
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>
@@ -102,7 +110,7 @@
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
-        from order_ad
+        from order_ad as  OA  left join user UU on UU.id = OA.user_id left join  platform_product PP on PP.id = OA.product_id
         where id = #{id,jdbcType=BIGINT}
     </select>
 

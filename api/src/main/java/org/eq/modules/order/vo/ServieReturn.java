@@ -1,7 +1,6 @@
 package org.eq.modules.order.vo;
 
 import lombok.Data;
-import org.eq.modules.common.enums.ResponseStateEnum;
 
 import java.util.List;
 

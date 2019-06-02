@@ -14,10 +14,7 @@ import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.common.factory.ResponseFactory;
 import org.eq.modules.enums.OrderAdTypeEnum;
 import org.eq.modules.order.service.OrderAdService;
-import org.eq.modules.order.vo.ResOrderAdVO;
-import org.eq.modules.order.vo.SearchAdOrderVO;
-import org.eq.modules.order.vo.ServieReturn;
-import org.eq.modules.order.vo.VolidOrderInfo;
+import org.eq.modules.order.vo.*;
 import org.eq.modules.product.entity.Product;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.vo.ProductBaseVO;
@@ -89,6 +86,32 @@ public class OrderController extends BaseController {
 			return ResponseFactory.signError(resOrderAdVO.getErrMsg());
 		}
 		return ResponseFactory.success(resOrderAdVO.getData());
+	}
+
+
+	/**
+	 * 集市订单查询
+	 * @return
+	 */
+	@PostMapping("/plat/list")
+	public ResponseData<PageResultData> orderAdinfoList(SearchPageAdOrderVO searchPageAdOrderVO) {
+		if(searchPageAdOrderVO==null){
+			return ResponseFactory.signError("查询条件为空");
+		}
+		User user = getUserInfo(searchPageAdOrderVO.getUserId());
+		if(user==null){
+			return ResponseFactory.signError("用户不存在");
+		}
+		if(searchPageAdOrderVO.getOrderType()!=1 && searchPageAdOrderVO.getOrderType()!=2){
+			return ResponseFactory.signError("订单类型出错");
+		}
+
+		PageResultData<OrderAdSimpleVO>  pageResult =  orderAdService.pagePlatOrderAd(searchPageAdOrderVO,user);
+		if(pageResult==null){
+			logger.error("集市获取订单接口异常");
+			return ResponseFactory.signError("查询异常");
+		}
+		return ResponseFactory.success(pageResult);
 	}
 
 

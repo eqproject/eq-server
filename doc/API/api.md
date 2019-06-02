@@ -717,7 +717,7 @@
 ```
 #### 3、广告订单
 
-##### 3-01 创建广告订单接口
+##### 3-01 创建广告订单接口（L）
 
 ###### 接口功能
 
@@ -774,7 +774,7 @@
 
 
 
-##### 3-02  关闭订单
+##### 3-02  关闭订单（L）
 
 ###### 接口功能
 
@@ -826,7 +826,7 @@
 
 
 
-##### 3-03  获取集市订单数据
+##### 3-03  获取集市订单数据（L）
 
 ###### 接口功能
 
@@ -849,12 +849,11 @@
 > | 参数        | 必选  | 类型   | 说明                               |
 > | ----------- | ----- | ------ | ---------------------------------- |
 > | userId | true | 字符串 |当前用户ID|
-> | type | true | 字符串 |当前用户ID|
 > | pageSize    | true  | 整形   | 每页大小                           |
 > | pageNum | true | 整形 | 当前页 |
 > | orderType    | true  | 整形   | 广告类型(1:我要卖 2:我要买)                 |
 > | sign        | true  | 字符串 | 平台签名                           |
->
+> 
 
 ###### 响应参数
 >|返回字段|字段类型|说明                              |
@@ -878,15 +877,9 @@
 >|saleedNumber | 整形   |已售卖量    |
 >|saleNumber | 整形   |可交易量   |
 >| title | 字符串  | 订单标题       |
->| brand           | 字符串 | 商家         |
->| brandImg         | 字符串 | 商家图片     |
->| brandTel         | 字符串 | 商家电话号码 |
->| desc            | 字符串 | 商品介绍     |
 >| userId            | 字符串 | 用户Id     |
 >| userImg         | 字符串 | 用户头像|
 >| userBoundState  |整型 | 1:仅支付宝 2:微信 3:支付宝微信均绑定|
->| expirationStart | 字符串 | 生效时间     |
->| expirationEnd    | 字符串 | 过期时间     |
 >
 
 ###### 返回实例
@@ -899,24 +892,20 @@
    "total":20,
    "list":[
      {
-      "orderCode":"NG12323456",
-       "productName":"京东E卡",
-       "img":"http://ek.png",
-       "price":12,
-       "orderNumber":100,
-       "saleedNumber":10,
-       "saleNumber":90,
-       "title":"便宜的E卡出售",
-       "brand":"京东",
-       "brandImg":"http://jd.png",
-       "brandTel":"0931-43173213",
-       "des":"E卡描述",
-       "userId":"123",
-       "userImg":"http://touxiang.png",
-       "userBoundState":"3",
-       "expirationStart":"生效时间",
-       "expirationEnd":"失效时间"
-     }
+         "orderCode": "AD20190602171926308704",
+         "productId": "1",
+         "productName": "京东E卡",
+        "img": "https://gss0.baidu.com/9vo3dSag_xI4khGko9WTAnF6hhy/zhidao/wh%3D600%2C800/sign=6d06d91632a85edffad9f6257964251b/37d3d539b6003af3ebb06c26332ac65c1038b66a.jpg",
+        "price": 10,
+        "orderNumber": 10,
+        "saleedNumber": 3,
+       "saleNumber": 7,
+        "title": "便宜售卖1",
+        "userId": 1,
+        "userImg": null,
+         "nickName": "你好呀",
+         "userBoundState": 0
+      }
    ]
  }
 }

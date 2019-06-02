@@ -86,4 +86,38 @@ public class OrderAd implements Serializable {
 	 */
 	private String remarks;
 
+
+	/**
+	 * 昵称
+	 */
+	private String nickName;
+
+
+	/**
+	 * 头像地址
+	 */
+	private String photoHead;
+
+
+	/**
+	 * 认证状态
+	 */
+	private int authStatus;
+
+	/**
+	 * 排序
+	 */
+	private int sort;
+
+	/**
+	 * 商品名称
+	 */
+	private String productName;
+
+
+	/**
+	 * 商品图片
+	 */
+	private String productImg;
+
 }

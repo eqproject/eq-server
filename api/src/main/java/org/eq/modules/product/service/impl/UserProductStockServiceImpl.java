@@ -187,6 +187,35 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 		return false;
 	}
 
+	@Override
+	public List<Long> listUserProdutId(User user) {
+		List<Long> result = new ArrayList<>();
+		Map<String,TicketProductVO> tickMap = ProductUtil.getTicketUserProduct(user.getTxPassword());
+		if(tickMap ==null || tickMap.size()<=0){
+			return result;
+		}
+		Iterator<String> ite = tickMap.keySet().iterator();
+		while(ite.hasNext()){
+			String key = ite.next();
+			TicketProductVO ticketProductVO = tickMap.get(key);
+			String productId = productCache.getProductIdByTicketKey(key);
+			if(StringUtils.isEmpty(productId)){
+				continue;
+			}
+			Product product = productService.selectByPrimaryKey(Long.valueOf(productId));
+			if(!ProductUtil.isEffect(product)){
+				continue;
+			}
+			int number = Integer.valueOf(ticketProductVO.getBalance()) - getLockedStockNum(product.getId(),user.getId()); ;
+			if(number<=0){
+				continue;
+			}
+			result.add(product.getId());
+		}
+		return result;
+
+	}
+
 	/**
 	 * 根据商品信息和用户信息获取用户库存数据
 	 * @param productId

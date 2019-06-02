@@ -4,12 +4,16 @@
  */
 package org.eq.modules.order.service.impl;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.annotation.AutowiredService;
+import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.DateUtil;
 import org.eq.basic.common.util.StringLowUtils;
 import org.eq.modules.auth.entity.User;
+import org.eq.modules.common.entitys.PageResultData;
+import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.common.utils.OrderUtil;
 import org.eq.modules.common.utils.ProductUtil;
 import org.eq.modules.enums.OrderAdStateEnum;
@@ -20,20 +24,21 @@ import org.eq.modules.order.entity.OrderAdExample;
 import org.eq.modules.order.entity.OrderAdLog;
 import org.eq.modules.order.service.OrderAdLogService;
 import org.eq.modules.order.service.OrderAdService;
-import org.eq.modules.order.vo.ResOrderAdVO;
-import org.eq.modules.order.vo.SearchAdOrderVO;
-import org.eq.modules.order.vo.ServieReturn;
-import org.eq.modules.order.vo.VolidOrderInfo;
+import org.eq.modules.order.vo.*;
 import org.eq.modules.product.dao.ProductMapper;
 import org.eq.modules.product.entity.Product;
 import org.eq.modules.product.entity.UserProductStock;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.service.UserProductStockService;
+import org.eq.modules.product.vo.ProductBaseVO;
+import org.eq.modules.product.vo.SearchPageProductVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -79,54 +84,6 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		}else{
 			example.setOrderByClause("id asc");
 		}
-		if(orderAd.getId()!=null){
-			ca.andIdEqualTo(orderAd.getId());
-		}
-		if(orderAd.getUserId()!=null){
-			ca.andUserIdEqualTo(orderAd.getUserId());
-		}
-		if(StringLowUtils.isNotBlank(orderAd.getOrderNo())){
-			ca.andOrderNoEqualTo(orderAd.getOrderNo());
-		}
-		if(orderAd.getProductId()!=null){
-			ca.andProductIdEqualTo(orderAd.getProductId());
-		}
-		if(StringLowUtils.isNotBlank(orderAd.getTitle())){
-			ca.andTitleEqualTo(orderAd.getTitle());
-		}
-		if(orderAd.getProductNum()!=null){
-			ca.andProductNumEqualTo(orderAd.getProductNum());
-		}
-		if(orderAd.getTradingNum()!=null){
-			ca.andTradingNumEqualTo(orderAd.getTradingNum());
-		}
-		if(orderAd.getTradedNum()!=null){
-			ca.andTradedNumEqualTo(orderAd.getTradedNum());
-		}
-		if(orderAd.getType()!=null){
-			ca.andTypeEqualTo(orderAd.getType());
-		}
-		if(orderAd.getStatus()!=null){
-			ca.andStatusEqualTo(orderAd.getStatus());
-		}
-		if(orderAd.getPrice()!=null){
-			ca.andPriceEqualTo(orderAd.getPrice());
-		}
-		if(orderAd.getAmount()!=null){
-			ca.andAmountEqualTo(orderAd.getAmount());
-		}
-		if(StringLowUtils.isNotBlank(orderAd.getCancelDesc())){
-			ca.andCancelDescEqualTo(orderAd.getCancelDesc());
-		}
-		if(orderAd.getCreateDate()!=null){
-			ca.andCreateDateEqualTo(orderAd.getCreateDate());
-		}
-		if(orderAd.getUpdateDate()!=null){
-			ca.andUpdateDateEqualTo(orderAd.getUpdateDate());
-		}
-		if(StringLowUtils.isNotBlank(orderAd.getRemarks())){
-			ca.andRemarksEqualTo(orderAd.getRemarks());
-		}
 		return example;
 	}
 
@@ -140,8 +97,29 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 	public OrderAdExample getExampleFromEntity(int statue,long id) {
 		OrderAdExample example = new OrderAdExample();
 		OrderAdExample.Criteria ca = example.or();
-	    ca.andIdEqualToForSimple(id);
-	    ca.andStatusEqualToForSimple(statue);
+	    ca.andIdEqualToForUpdate(id);
+	    ca.andStatusEqualToForUpdate(statue);
+
+		return example;
+	}
+
+
+	/**
+	 * 获取有效订单数据
+	 * @param orderType
+	 * @return
+	 */
+	public OrderAdExample getExampleFromEntityAll(int orderType,List<Long> productList) {
+		OrderAdExample example = new OrderAdExample();
+		OrderAdExample.Criteria ca = example.or();
+		ca.andTypeEqualToForAll(orderType);
+		if(!CollectionUtils.isEmpty(productList)){
+			ca.andProductIdInForAll(productList);
+		}
+		List<Integer> states = new ArrayList<>();
+		states.add(OrderAdStateEnum.ORDER_TRADEING.getState());
+		ca.andStatusInForAll(states);
+		example.setOrderByClause("sort desc");
 		return example;
 	}
 
@@ -255,6 +233,49 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		result.setData(OrderUtil.transObj(orderAd));
 		return  result ;
 	}
+
+	@Override
+	public PageResultData<OrderAdSimpleVO> pagePlatOrderAd(SearchPageAdOrderVO searchPageAdOrderVO,User user) {
+		PageResultData<OrderAdSimpleVO> result = new PageResultData<>();
+		if(searchPageAdOrderVO ==null){
+			searchPageAdOrderVO = new SearchPageAdOrderVO();
+		}
+		if(searchPageAdOrderVO.getPageSize()<=0 || searchPageAdOrderVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
+			searchPageAdOrderVO.setPageSize(StaticEntity.MAX_PAGE_SIZE);
+		}
+		if(searchPageAdOrderVO.getPageNum()<=0){
+			searchPageAdOrderVO.setPageNum(1);
+		}
+		if(searchPageAdOrderVO.getOrderType()!=1 && searchPageAdOrderVO.getOrderType()!=2){
+			return result;
+		}
+		if(user==null){
+			return result;
+		}
+		OrderAdExample orderAdExample = null;
+		//我要卖 难
+		if(searchPageAdOrderVO.getOrderType()==1){
+			List<Long> userProductId = new ArrayList<>();
+			userProductId.add(-1L);
+			userProductId.addAll(userProductStockService.listUserProdutId(user));
+			orderAdExample  = getExampleFromEntityAll(OrderAdTypeEnum.ORDER_BUY.getType(),userProductId);
+		}else{//我要买
+			orderAdExample  = getExampleFromEntityAll(OrderAdTypeEnum.ORDER_SALE.getType(),null);
+		}
+		BaseTableData baseTableData = findDataTableByExampleForPage(orderAdExample, searchPageAdOrderVO.getPageNum(), searchPageAdOrderVO.getPageSize());
+		if(baseTableData==null){
+			return result;
+		}
+		List<OrderAdSimpleVO> dataList = new ArrayList<>(baseTableData.getData().size());
+		List<OrderAd> pList = baseTableData.getData();
+		for(OrderAd p : pList){
+			dataList.add(OrderUtil.transObjForSimple(p));
+		}
+		result.setList(dataList);
+		result.setTotal(baseTableData.getRecordsTotal());
+		return result;
+	}
+
 
 	/**
 	 * 创建求购订单
