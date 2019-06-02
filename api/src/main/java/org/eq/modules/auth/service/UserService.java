@@ -7,6 +7,7 @@ package org.eq.modules.auth.service;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.auth.entity.UserExample;
 import org.eq.basic.common.base.ServiceExtend;
+import org.eq.modules.auth.entity.UserIdentityAuth;
 import org.eq.modules.common.entitys.ResponseData;
 
 /**
@@ -18,4 +19,5 @@ public interface UserService extends ServiceExtend<User, UserExample> {
     ResponseData register(String mobile, String captcha);
     ResponseData reset(String userId, String pwd);
     ResponseData login(String userId, String pwd);
+    ResponseData verify(UserIdentityAuth userIdentityAuth);
 }

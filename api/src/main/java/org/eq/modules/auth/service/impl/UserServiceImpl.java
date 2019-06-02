@@ -10,6 +10,8 @@ import org.eq.basic.common.util.StringLowUtils;
 import org.eq.modules.auth.dao.UserMapper;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.auth.entity.UserExample;
+import org.eq.modules.auth.entity.UserIdentityAuth;
+import org.eq.modules.auth.service.UserIdentityAuthService;
 import org.eq.modules.auth.service.UserService;
 import org.eq.modules.auth.util.WalletUtil;
 import org.eq.modules.common.entitys.ResponseData;
@@ -45,7 +47,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 
     private static final String MD5_KEY = "com.eq.modules";
 
-    @Value("ase.key")
+    @Value("${aes.key}")
     private String aesKey;
 
     @Autowired
@@ -53,6 +55,9 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 
     @Autowired
     private BcTxRecordService bcTxRecordService;
+
+    @Autowired
+    private UserIdentityAuthService userIdentityAuthService;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -215,7 +220,6 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             user.setId(Long.parseLong(userId));
             //AES解密
             String password = AESUtils.decrypt(pwd, aesKey);
-            System.out.println("明文密码：" +password);
             String content = userId + password + MD5_KEY;
             user.setPassword(MD5Utils.digestAsHex(content));
             User currUser = selectByRecord(user);
@@ -228,4 +232,20 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             return ResponseFactory.error("登陆失败", "1");
         }
     }
+
+    @Override
+    public ResponseData verify(UserIdentityAuth userIdentityAuth) {
+        //实名认证
+        userIdentityAuth.setResultStatus(1);
+        userIdentityAuth.setCreateDate(new Date());
+        userIdentityAuth.setUpdateDate(new Date());
+        int cnt = userIdentityAuthService.insertRecord(userIdentityAuth);
+        if (cnt > 0) {
+            return ResponseFactory.success(null);
+        } else {
+            return ResponseFactory.error("认证失败", "1");
+        }
+    }
+
+
 }

@@ -3,7 +3,7 @@ package org.eq.modules.auth.controller;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.eq.basic.common.base.BaseController;
 import org.eq.modules.auth.entity.User;
-import org.eq.modules.auth.service.UserService;
+import org.eq.modules.auth.entity.UserIdentityAuth;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,12 +57,9 @@ public class UserController extends BaseController {
 
     /**
      * 用户信息维护接口
-     *
-     * @param request
      * @param user
      * @return
      */
-
     @RequestMapping(value = "/modify",method = RequestMethod.POST)
     public ResponseData modify(User user) {
         user.setUpdateDate(new Date());
@@ -94,8 +91,8 @@ public class UserController extends BaseController {
      * @return
      */
     @RequestMapping(value = "/identity/verify")
-    public ResponseData verify(HttpServletRequest request) {
-        return ResponseFactory.error("认证失败","1");
+    public ResponseData verify(UserIdentityAuth userIdentityAuth) {
+        return userService.verify(userIdentityAuth);
     }
     @RequestMapping(value = "/getCode")
     public String getCode(String mobile){

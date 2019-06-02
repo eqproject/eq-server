@@ -10,6 +10,7 @@ import org.eq.modules.auth.dao.UserIdentityAuthMapper;
 import org.eq.modules.auth.entity.UserIdentityAuthExample;
 import org.eq.modules.auth.service.UserIdentityAuthService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.eq.basic.common.annotation.AutowiredService;
@@ -26,6 +27,10 @@ import java.util.Map;
 @Transactional
 @AutowiredService
 public class UserIdentityAuthServiceImpl extends ServiceImplExtend<UserIdentityAuthMapper, UserIdentityAuth, UserIdentityAuthExample> implements UserIdentityAuthService {
+
+	public UserIdentityAuthServiceImpl(UserIdentityAuthMapper mapper){
+		super.setMapper(mapper);
+	}
 
 	@Override
 	public UserIdentityAuthExample getExampleFromEntity(UserIdentityAuth userIdentityAuth, Map<String, Object> params) {

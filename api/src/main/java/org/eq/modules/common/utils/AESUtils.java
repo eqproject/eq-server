@@ -17,6 +17,7 @@ public class AESUtils {
 
     /**
      * AES 加密操作
+     *
      * @param content  待加密内容
      * @param password 加密密码
      * @return 返回Base64转码后的加密数据
@@ -49,7 +50,6 @@ public class AESUtils {
     public static String decrypt(String content, String password) {
 
         try {
-            //实例化
             Cipher cipher = Cipher.getInstance(DEFAULT_CIPHER_ALGORITHM);
 
             //使用密钥初始化，设置为解密模式
@@ -90,15 +90,5 @@ public class AESUtils {
         }
 
         return null;
-    }
-
-    public static void main(String[] args) {
-        String content = "123456";
-        String key = "96448f740822fd73517f96a3c3a2487f";
-        System.out.println("content:" + content);
-        String s1 = AESUtils.encrypt(content, key);
-        System.out.println("s1:" + s1);
-        System.out.println("s2:" + AESUtils.decrypt(s1, key));
-
     }
 }
