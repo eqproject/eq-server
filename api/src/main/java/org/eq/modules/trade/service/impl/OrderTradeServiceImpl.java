@@ -6,11 +6,16 @@ package org.eq.modules.trade.service.impl;
 
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.ServiceImplExtend;
+import org.eq.basic.common.exception.OrderAdNotExistsException;
 import org.eq.basic.common.exception.ProductNotExistsException;
+import org.eq.basic.common.exception.TradeOrderNotExistsException;
+import org.eq.basic.common.util.DateUtil;
 import org.eq.basic.common.util.OrderNoGenerateUtil;
 import org.eq.basic.common.util.StringLowUtils;
 import org.eq.modules.enums.OrderNoPreFixEnum;
 import org.eq.modules.enums.OrderTradeStateEnum;
+import org.eq.modules.order.entity.OrderAd;
+import org.eq.modules.order.service.OrderAdService;
 import org.eq.modules.product.entity.Product;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.trade.dao.OrderTradeMapper;
@@ -19,6 +24,10 @@ import org.eq.modules.trade.entity.OrderTradeExample;
 import org.eq.modules.trade.entity.OrderTradeLog;
 import org.eq.modules.trade.service.OrderTradeLogService;
 import org.eq.modules.trade.service.OrderTradeService;
+import org.eq.modules.trade.vo.OrderTradeDetailProduct;
+import org.eq.modules.trade.vo.OrderTradeDetailResVO;
+import org.eq.modules.trade.vo.OrderTradeDetailTrade;
+import org.eq.modules.trade.vo.OrderTradeDetailUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +48,9 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 	OrderTradeLogService  orderTradeLogService;
 	@Autowired
 	ProductService productService;
+
+	@Autowired
+	OrderAdService orderAdService;
 
 	@Override
 	public OrderTradeExample getExampleFromEntity(OrderTrade orderTrade, Map<String, Object> params) {
@@ -129,6 +141,15 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 			logger.error("createTradeOrder 商品ID[{}]记录不存在",orderTrade.getProductId());
 			throw new ProductNotExistsException("商品ID"+orderTrade.getProductId()+"记录不存在");
 		}
+		OrderAd orderAd = new OrderAd();
+		orderAd.setOrderNo(orderTrade.getAdNo());
+		orderAd = orderAdService.selectByRecord(orderAd);
+		if (orderAd == null) {
+			logger.error("createTradeOrder 广告订单[{}]记录不存在",orderTrade.getAdNo());
+			throw new OrderAdNotExistsException("广告订单"+orderTrade.getProductId()+"记录不存在");
+		}
+
+
 		orderTrade.setUnitPrice(product.getUnitPrice());
 		orderTrade.setAmount(orderTrade.getOrderNum()*orderTrade.getSalePrice());
 
@@ -146,5 +167,61 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderTradeLogService.insertSelective(orderTradeLog);
 
 		return orderTrade;
+	}
+
+	@Override
+	public void cancelTradeOrder(String tradeNo) {
+		OrderTrade orderTrade = new OrderTrade();
+		orderTrade.setTradeNo(tradeNo);
+		orderTrade = selectByRecord(orderTrade);
+		if (orderTrade == null) {
+			logger.error("cancelTradeOrder 失败，交易单号[{}]记录不存在",tradeNo);
+			throw new TradeOrderNotExistsException("交易单号"+tradeNo+"记录不存在");
+		}
+		orderTrade.setStatus(OrderTradeStateEnum.CANCEL.getState());
+		orderTrade.setUpdateDate(DateUtil.getNowTime());
+		updateByPrimaryKeySelective(orderTrade);
+	}
+
+	@Override
+	public OrderTradeDetailResVO tradeOrderDetail(String tradeNo) {
+		OrderTrade orderTrade = new OrderTrade();
+		orderTrade.setTradeNo(tradeNo);
+		orderTrade = selectByRecord(orderTrade);
+		if (orderTrade == null) {
+			logger.error("cancelTradeOrder 失败，交易单号[{}]记录不存在",tradeNo);
+			throw new TradeOrderNotExistsException("交易单号"+tradeNo+"记录不存在");
+		}
+
+		Product product = productService.selectByPrimaryKey(orderTrade.getProductId());
+		if (product == null) {
+			logger.error("createTradeOrder 商品ID[{}]记录不存在",orderTrade.getProductId());
+			throw new ProductNotExistsException("商品ID"+orderTrade.getProductId()+"记录不存在");
+		}
+
+
+
+		OrderTradeDetailProduct orderTradeDetailProduct = new OrderTradeDetailProduct();
+		orderTradeDetailProduct.setUnitPrice(product.getUnitPrice());
+		orderTradeDetailProduct.setName(product.getName());
+		orderTradeDetailProduct.setProductImg(product.getProductImg());
+
+		OrderTradeDetailTrade trade = new OrderTradeDetailTrade();
+		trade.setAmount(orderTrade.getAmount());
+		trade.setCreateTime(DateUtil.dateToStr(orderTrade.getCreateDate(),DateUtil.DATE_FORMAT_FULL_01));
+		trade.setOrderNum(orderTrade.getOrderNum());
+		trade.setRemindPay(orderTrade.getRemindPay());
+		trade.setSalePrice(orderTrade.getSalePrice());
+
+		OrderTradeDetailUser orderTradeDetailUser = new OrderTradeDetailUser();
+		orderTradeDetailUser.setBuyUserId(orderTrade.getBuyUserId());
+		orderTradeDetailUser.setSellUserId(orderTrade.getSellUserId());
+
+
+		OrderTradeDetailResVO orderTradeDetailResVO = new OrderTradeDetailResVO();
+		orderTradeDetailResVO.setTrade(trade);
+		orderTradeDetailResVO.setProduct(orderTradeDetailProduct);
+		orderTradeDetailResVO.setUser(orderTradeDetailUser);
+		return orderTradeDetailResVO;
 	}
 }

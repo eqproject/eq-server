@@ -7,6 +7,7 @@ package org.eq.modules.trade.service;
 import org.eq.modules.trade.entity.OrderTrade;
 import org.eq.modules.trade.entity.OrderTradeExample;
 import org.eq.basic.common.base.ServiceExtend;
+import org.eq.modules.trade.vo.OrderTradeDetailResVO;
 
 /**
  * 订单交易Service
@@ -16,5 +17,9 @@ import org.eq.basic.common.base.ServiceExtend;
 public interface OrderTradeService extends ServiceExtend<OrderTrade,OrderTradeExample> {
 
     OrderTrade createTradeOrder(OrderTrade orderTrade);
+
+    void cancelTradeOrder(String tradeNo);
+
+    OrderTradeDetailResVO tradeOrderDetail(String tradeNo);
 
 }

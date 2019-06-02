@@ -6,19 +6,19 @@ import java.io.Serializable;
 
 /**
  * @author admin
- * @Title: OrderTradeCreateResVO
+ * @Title: OrderTradeCancelResVO
  * @Copyright: Copyright (c) 2018
  * @Description: <br>
  * @Company: 123.com
  * @Created on 2019/6/1下午7:21
  */
 @Data
-public class OrderTradeCreateResVO implements Serializable {
+public class OrderTradeCancelResVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String tradeNo; // 交易订单号
 
-    public OrderTradeCreateResVO(String tradeNo) {
+    public OrderTradeCancelResVO(String tradeNo) {
         this.tradeNo = tradeNo;
     }
 }

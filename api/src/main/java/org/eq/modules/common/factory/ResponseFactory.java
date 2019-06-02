@@ -82,6 +82,17 @@ public class ResponseFactory<T> {
         return result;
     }
 
+    /**
+     * 系统错误 没有明确的错误情况，使用该返回码
+     * @param errMsg
+     * @return
+     */
+    public static  ResponseData systemError(String errMsg){
+        ResponseData result = initError(errMsg);
+        result.setStatus(ResponseStateEnum.ERROR_SYSTEM.getStatus());
+        return result;
+    }
+
 
     /**
      * 构造成功实体

@@ -13,6 +13,7 @@ import org.eq.modules.common.entitys.SearchBase;
  */
 @Data
 public class OrderTradeCreateReqVO extends SearchBase{
+    private static final long serialVersionUID = 1L;
 
     private Long buyUserId;
     private String adNo;
