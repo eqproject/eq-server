@@ -209,6 +209,11 @@ public class OrderTradeController extends BaseController {
         try {
             List<Integer> orderTradeStatus = new ArrayList<>();
             orderTradeStatus.add(OrderTradeStateEnum.WAIT_PAY.getState());
+            orderTradeStatus.add(OrderTradeStateEnum.PAY_SUCCESS.getState());
+            orderTradeStatus.add(OrderTradeStateEnum.VOUCHER_ING.getState());
+            orderTradeStatus.add(OrderTradeStateEnum.LOAN_ING.getState());
+            orderTradeStatus.add(OrderTradeStateEnum.PAY_ING.getState());
+            orderTradeStatus.add(OrderTradeStateEnum.REFUND_ING.getState());
             orderTradeListResVOPageResultData = orderTradeService.pageTradeOrderList(orderTradeListReqVO,orderTradeStatus);
         } catch (BaseServiceException e) {
             logger.error("porcessingOrderTradeList 失败，原因是:{}",e.getMessage());

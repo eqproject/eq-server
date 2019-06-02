@@ -223,6 +223,11 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderPaymentTradeLog.setNewStatus(orderPaymentTrade.getStatus());
 		orderPaymentTradeLogService.insertSelective(orderPaymentTradeLog);
 
+		// 增加广告订单交易中的数量
+		orderAd.setTradingNum(orderAd.getTradingNum()+orderTrade.getOrderNum());
+		orderAd.setUpdateDate(nowDate);
+		orderAdService.updateByPrimaryKeySelective(orderAd);
+
 		return orderTrade;
 	}
 
@@ -235,9 +240,39 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 			logger.error("cancelTradeOrder 失败，交易单号[{}]记录不存在",tradeNo);
 			throw new TradeOrderNotExistsException("交易单号记录不存在");
 		}
+		if (OrderTradeStateEnum.WAIT_PAY.getState() != orderTrade.getStatus()) {
+			logger.error("cancelTradeOrder 失败，非待支付状态的交易不能取消，交易单号[{}]当前状态是[{}]",orderTrade.getStatus());
+			throw new TradeOrderNotExistsException("非待支付状态的交易不能取消");
+		}
+
+		Integer oldStatus = orderTrade.getStatus();
+		Date nowDate = DateUtil.getNowTime();
+
 		orderTrade.setStatus(OrderTradeStateEnum.CANCEL.getState());
-		orderTrade.setUpdateDate(DateUtil.getNowTime());
+		orderTrade.setUpdateDate(nowDate);
 		updateByPrimaryKeySelective(orderTrade);
+
+		OrderTradeLog orderTradeLog = new OrderTradeLog();
+		orderTradeLog.setOldStatus(oldStatus);
+		orderTradeLog.setNewStatus(orderTrade.getStatus());
+		orderTradeLog.setOrderTradeId(orderTrade.getId());
+		orderTradeLog.setCreateDate(nowDate);
+		orderTradeLog.setRemarks(tradeNo);
+		orderTradeLogService.insertSelective(orderTradeLog);
+
+		OrderAd orderAd = new OrderAd();
+		orderAd.setOrderNo(orderTrade.getAdNo());
+		orderAd = orderAdService.selectByRecord(orderAd);
+		if (orderAd != null) {
+			// 减少广告订单交易中的数量
+			Integer num;
+			if ((num =orderAd.getTradingNum()-orderTrade.getOrderNum())<=0) {
+				num = 0;
+			}
+			orderAd.setTradingNum(num);
+			orderAd.setUpdateDate(nowDate);
+			orderAdService.updateByPrimaryKeySelective(orderAd);
+		}
 	}
 
 	@Override
@@ -314,6 +349,14 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 	@Override
 	public OrderTradePaymentResVO orderPaymentTradeNotify(OrderPaymentTrade orderPaymentTrade) {
 
+		OrderTrade orderTrade = new OrderTrade();
+		orderTrade.setTradeNo(orderPaymentTrade.getTradeNo());
+		orderTrade = selectByRecord(orderTrade);
+		if (orderTrade == null) {
+			logger.error("orderPaymentTradeNotify 交易单号[{}]记录不存在",orderPaymentTrade.getTradeNo());
+			throw new TradeOrderNotExistsException("交易单号记录不存在");
+		}
+
 		OrderPaymentTrade orderPaymentTradeOld = orderPaymentTradeService.findOrderPaymentTradeByTradeNo(orderPaymentTrade.getTradeNo());
 		if (orderPaymentTradeOld == null) {
 			logger.error("orderPaymentTradeNotify 交易单号[{}]支付记录不存在",orderPaymentTrade.getTradeNo());
@@ -337,6 +380,24 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderPaymentTradeLog.setOldStatus(oldStatus);
 		orderPaymentTradeLog.setNewStatus(orderPaymentTrade.getStatus());
 		orderPaymentTradeLogService.insertSelective(orderPaymentTradeLog);
+
+
+		oldStatus = orderTrade.getStatus();
+		if (OrderTradeStateEnum.PAY_SUCCESS.getState() == orderPaymentTrade.getStatus()) { // 支付成功
+			orderTrade.setStatus(OrderTradeStateEnum.VOUCHER_ING.getState());
+		} else if (OrderTradeStateEnum.PAY_FAIL.getState() == orderPaymentTrade.getStatus()) { // 支付失败
+			orderTrade.setStatus(orderPaymentTrade.getStatus());
+		}
+		orderTrade.setUpdateDate(nowDate);
+		getMapper().updateByPrimaryKeySelective(orderTrade);
+
+		OrderTradeLog orderTradeLog = new OrderTradeLog();
+		orderTradeLog.setOldStatus(oldStatus);
+		orderTradeLog.setNewStatus(orderTrade.getStatus());
+		orderTradeLog.setOrderTradeId(orderTrade.getId());
+		orderTradeLog.setCreateDate(nowDate);
+		orderTradeLog.setRemarks(orderTrade.getTradeNo());
+		orderTradeLogService.insertSelective(orderTradeLog);
 
 		OrderTradePaymentResVO orderTradePaymentResVO = new OrderTradePaymentResVO();
 		orderTradePaymentResVO.setTradeNo(orderPaymentTrade.getTradeNo());
