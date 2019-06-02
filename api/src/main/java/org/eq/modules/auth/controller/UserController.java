@@ -25,8 +25,6 @@ import java.util.Date;
 @RequestMapping(value = "/api/user")
 public class UserController extends BaseController {
 
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private RedisTemplate redisTemplate;

@@ -2,14 +2,19 @@ package org.eq.basic.common.base;
 
 import com.alibaba.fastjson.JSONObject;
 import org.eq.modules.auth.entity.User;
+import org.eq.modules.auth.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 /**
  * 控制器支持类
  * Created by JoinHan on 2018/01/11.
  */
+@Controller
 public abstract class BaseController extends BaseLog {
 
-
+    @Autowired
+    protected UserService userService;
 
     public JSONObject success() {
         JSONObject json = new JSONObject();
@@ -29,11 +34,7 @@ public abstract class BaseController extends BaseLog {
      * @return
      */
     public User getUserInfo(long userId){
-        //TODO 增加用户有效性 变更用户实体
-        User user = new User();
-        user.setId(1L);
-        user.setTxPassword("KAKA");
-        return user;
+        return userService.selectByPrimaryKey(userId);
     }
 
 
