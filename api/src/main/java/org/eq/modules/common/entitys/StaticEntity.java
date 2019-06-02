@@ -29,4 +29,9 @@ public class StaticEntity {
      * 区块链请求用户商品地址
      */
     public static final String  TICKET_USER_PRODUCT_URL = "https://{url}/ticket/v1/account/balance";
+
+    /**
+     * 广告订单标题长度限制大小
+     */
+    public static final int ORDER_AD_TITLE_LENGTH=200;
 }

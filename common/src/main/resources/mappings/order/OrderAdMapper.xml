@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.eq.modules.order.dao.OrderAdMapper">
+    <resultMap id="BaseResultMap" type="org.eq.modules.order.entity.OrderAd">
+        <id column="id" jdbcType="BIGINT" property="id" />
+	    <result column="user_id" jdbcType="BIGINT" property="userId" />
+	    <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
+	    <result column="product_id" jdbcType="BIGINT" property="productId" />
+	    <result column="title" jdbcType="VARCHAR" property="title" />
+	    <result column="product_num" jdbcType="INTEGER" property="productNum" />
+	    <result column="trading_num" jdbcType="INTEGER" property="tradingNum" />
+	    <result column="traded_num" jdbcType="INTEGER" property="tradedNum" />
+	    <result column="type" jdbcType="INTEGER" property="type" />
+	    <result column="status" jdbcType="INTEGER" property="status" />
+	    <result column="price" jdbcType="INTEGER" property="price" />
+	    <result column="amount" jdbcType="INTEGER" property="amount" />
+	    <result column="cancel_desc" jdbcType="VARCHAR" property="cancelDesc" />
+	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+	    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+	    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+    </resultMap>
+
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_List">
+        id,user_id,order_no,product_id,title,product_num,trading_num,traded_num,type,status,price,amount,cancel_desc,create_date,update_date,remarks
+    </sql>
+
+    <select id="selectByExample" parameterType="org.eq.modules.order.entity.OrderAdExample" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List" />
+        from order_ad
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from order_ad
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from order_ad
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByExample" parameterType="org.eq.modules.order.entity.OrderAdExample">
+        delete from order_ad
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
+
+    <insert id="insert" parameterType="org.eq.modules.order.entity.OrderAd">
+        insert into order_ad (user_id,order_no,product_id,title,product_num,trading_num,traded_num,type,status,price,amount,cancel_desc,create_date,update_date,remarks)
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{userId,jdbcType=BIGINT},
+            #{orderNo,jdbcType=VARCHAR},
+            #{productId,jdbcType=BIGINT},
+            #{title,jdbcType=VARCHAR},
+            #{productNum,jdbcType=INTEGER},
+            #{tradingNum,jdbcType=INTEGER},
+            #{tradedNum,jdbcType=INTEGER},
+            #{type,jdbcType=INTEGER},
+            #{status,jdbcType=INTEGER},
+            #{price,jdbcType=INTEGER},
+            #{amount,jdbcType=INTEGER},
+            #{cancelDesc,jdbcType=VARCHAR},
+            #{createDate,jdbcType=TIMESTAMP},
+            #{updateDate,jdbcType=TIMESTAMP},
+            #{remarks,jdbcType=VARCHAR},
+        </trim>
+    </insert>
+
+    <insert id="insertSelective" parameterType="org.eq.modules.order.entity.OrderAd">
+        insert into order_ad
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            user_id,
+            order_no,
+            product_id,
+            title,
+            product_num,
+            trading_num,
+            traded_num,
+            type,
+            status,
+            price,
+            amount,
+            cancel_desc,
+            create_date,
+            update_date,
+            remarks,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{userId,jdbcType=BIGINT},
+            #{orderNo,jdbcType=VARCHAR},
+            #{productId,jdbcType=BIGINT},
+            #{title,jdbcType=VARCHAR},
+            #{productNum,jdbcType=INTEGER},
+            #{tradingNum,jdbcType=INTEGER},
+            #{tradedNum,jdbcType=INTEGER},
+            #{type,jdbcType=INTEGER},
+            #{status,jdbcType=INTEGER},
+            #{price,jdbcType=INTEGER},
+            #{amount,jdbcType=INTEGER},
+            #{cancelDesc,jdbcType=VARCHAR},
+            #{createDate,jdbcType=TIMESTAMP},
+            #{updateDate,jdbcType=TIMESTAMP},
+            #{remarks,jdbcType=VARCHAR},
+        </trim>
+    </insert>
+
+    <select id="countByExample" parameterType="org.eq.modules.order.entity.OrderAdExample" resultType="java.lang.Long">
+        select count(*) from order_ad
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </select>
+
+    <update id="updateByExampleSelective" parameterType="map">
+        update order_ad
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.userId != null">
+                user_id = #{record.userId,jdbcType=BIGINT},
+            </if>
+            <if test="record.orderNo != null">
+                order_no = #{record.orderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="record.productId != null">
+                product_id = #{record.productId,jdbcType=BIGINT},
+            </if>
+            <if test="record.title != null">
+                title = #{record.title,jdbcType=VARCHAR},
+            </if>
+            <if test="record.productNum != null">
+                product_num = #{record.productNum,jdbcType=INTEGER},
+            </if>
+            <if test="record.tradingNum != null">
+                trading_num = #{record.tradingNum,jdbcType=INTEGER},
+            </if>
+            <if test="record.tradedNum != null">
+                traded_num = #{record.tradedNum,jdbcType=INTEGER},
+            </if>
+            <if test="record.type != null">
+                type = #{record.type,jdbcType=INTEGER},
+            </if>
+            <if test="record.status != null">
+                status = #{record.status,jdbcType=INTEGER},
+            </if>
+            <if test="record.price != null">
+                price = #{record.price,jdbcType=INTEGER},
+            </if>
+            <if test="record.amount != null">
+                amount = #{record.amount,jdbcType=INTEGER},
+            </if>
+            <if test="record.cancelDesc != null">
+                cancel_desc = #{record.cancelDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="record.createDate != null">
+                create_date = #{record.createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.updateDate != null">
+                update_date = #{record.updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.remarks != null">
+                remarks = #{record.remarks,jdbcType=VARCHAR},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByExample" parameterType="map">
+        update order_ad
+        set
+        <trim  suffixOverrides=",">
+            id = #{record.id,jdbcType=BIGINT},
+            user_id = #{record.userId,jdbcType=BIGINT},
+            order_no = #{record.orderNo,jdbcType=VARCHAR},
+            product_id = #{record.productId,jdbcType=BIGINT},
+            title = #{record.title,jdbcType=VARCHAR},
+            product_num = #{record.productNum,jdbcType=INTEGER},
+            trading_num = #{record.tradingNum,jdbcType=INTEGER},
+            traded_num = #{record.tradedNum,jdbcType=INTEGER},
+            type = #{record.type,jdbcType=INTEGER},
+            status = #{record.status,jdbcType=INTEGER},
+            price = #{record.price,jdbcType=INTEGER},
+            amount = #{record.amount,jdbcType=INTEGER},
+            cancel_desc = #{record.cancelDesc,jdbcType=VARCHAR},
+            create_date = #{record.createDate,jdbcType=TIMESTAMP},
+            update_date = #{record.updateDate,jdbcType=TIMESTAMP},
+            remarks = #{record.remarks,jdbcType=VARCHAR},
+        </trim>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.modules.order.entity.OrderAd">
+        update order_ad
+        <set>
+            <if test="userId != null">
+            user_id = #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="orderNo != null">
+            order_no = #{orderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="productId != null">
+            product_id = #{productId,jdbcType=BIGINT},
+            </if>
+            <if test="title != null">
+            title = #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="productNum != null">
+            product_num = #{productNum,jdbcType=INTEGER},
+            </if>
+            <if test="tradingNum != null">
+            trading_num = #{tradingNum,jdbcType=INTEGER},
+            </if>
+            <if test="tradedNum != null">
+            traded_num = #{tradedNum,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+            type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+            status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="price != null">
+            price = #{price,jdbcType=INTEGER},
+            </if>
+            <if test="amount != null">
+            amount = #{amount,jdbcType=INTEGER},
+            </if>
+            <if test="cancelDesc != null">
+            cancel_desc = #{cancelDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="createDate != null">
+            create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateDate != null">
+            update_date = #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remarks != null">
+            remarks = #{remarks,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="org.eq.modules.order.entity.OrderAd">
+        update order_ad
+        set
+        <trim  suffixOverrides=",">
+              user_id = #{userId,jdbcType=BIGINT},
+              order_no = #{orderNo,jdbcType=VARCHAR},
+              product_id = #{productId,jdbcType=BIGINT},
+              title = #{title,jdbcType=VARCHAR},
+              product_num = #{productNum,jdbcType=INTEGER},
+              trading_num = #{tradingNum,jdbcType=INTEGER},
+              traded_num = #{tradedNum,jdbcType=INTEGER},
+              type = #{type,jdbcType=INTEGER},
+              status = #{status,jdbcType=INTEGER},
+              price = #{price,jdbcType=INTEGER},
+              amount = #{amount,jdbcType=INTEGER},
+              cancel_desc = #{cancelDesc,jdbcType=VARCHAR},
+              create_date = #{createDate,jdbcType=TIMESTAMP},
+              update_date = #{updateDate,jdbcType=TIMESTAMP},
+              remarks = #{remarks,jdbcType=VARCHAR},
+        </trim>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+</mapper>
