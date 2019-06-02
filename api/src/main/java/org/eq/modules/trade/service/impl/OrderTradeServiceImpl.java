@@ -149,26 +149,26 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		Product product = productService.selectByPrimaryKey(orderTrade.getProductId());
 		if (product == null) {
 			logger.error("createTradeOrder 商品ID[{}]记录不存在",orderTrade.getProductId());
-			throw new ProductNotExistsException("商品ID"+orderTrade.getProductId()+"记录不存在");
+			throw new ProductNotExistsException("商品ID记录不存在");
 		}
 		OrderAd orderAd = new OrderAd();
 		orderAd.setOrderNo(orderTrade.getAdNo());
 		orderAd = orderAdService.selectByRecord(orderAd);
 		if (orderAd == null) {
 			logger.error("createTradeOrder 广告订单[{}]记录不存在",orderTrade.getAdNo());
-			throw new OrderAdNotExistsException("广告订单"+orderTrade.getProductId()+"记录不存在");
+			throw new OrderAdNotExistsException("广告订单记录不存在");
 		}
 
 		User buserUser = userService.selectByPrimaryKey(orderTrade.getBuyUserId());
 		if (buserUser == null) {
 			logger.error("createTradeOrder 买家[{}]用户记录不存在",orderTrade.getBuyUserId());
-			throw new UserNotExistsException("买家"+orderTrade.getBuyUserId()+"用户记录不存在");
+			throw new UserNotExistsException("买家用户记录不存在");
 		}
 
 		User sellUser = userService.selectByPrimaryKey(orderAd.getUserId());
 		if (sellUser == null) {
 			logger.error("createTradeOrder 卖家[{}]用户记录不存在",orderAd.getUserId());
-			throw new UserNotExistsException("卖家"+orderAd.getUserId()+"用户记录不存在");
+			throw new UserNotExistsException("卖家用户记录不存在");
 		}
 		Date nowDate = DateUtil.getNowTime();
 
@@ -219,7 +219,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderTrade = selectByRecord(orderTrade);
 		if (orderTrade == null) {
 			logger.error("cancelTradeOrder 失败，交易单号[{}]记录不存在",tradeNo);
-			throw new TradeOrderNotExistsException("交易单号"+tradeNo+"记录不存在");
+			throw new TradeOrderNotExistsException("交易单号记录不存在");
 		}
 		orderTrade.setStatus(OrderTradeStateEnum.CANCEL.getState());
 		orderTrade.setUpdateDate(DateUtil.getNowTime());
@@ -233,25 +233,25 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderTrade = selectByRecord(orderTrade);
 		if (orderTrade == null) {
 			logger.error("tradeOrderDetail 交易单号[{}]记录不存在",tradeNo);
-			throw new TradeOrderNotExistsException("交易单号"+tradeNo+"记录不存在");
+			throw new TradeOrderNotExistsException("交易单号记录不存在");
 		}
 
 		Product product = productService.selectByPrimaryKey(orderTrade.getProductId());
 		if (product == null) {
 			logger.error("tradeOrderDetail 商品ID[{}]记录不存在",orderTrade.getProductId());
-			throw new ProductNotExistsException("商品ID"+orderTrade.getProductId()+"记录不存在");
+			throw new ProductNotExistsException("商品ID记录不存在");
 		}
 
 		User buserUser = userService.selectByPrimaryKey(orderTrade.getBuyUserId());
 		if (buserUser == null) {
 			logger.error("tradeOrderDetail 买家[{}]用户记录不存在",orderTrade.getBuyUserId());
-			throw new UserNotExistsException("买家"+orderTrade.getBuyUserId()+"用户记录不存在");
+			throw new UserNotExistsException("买家用户记录不存在");
 		}
 
 		User sellUser = userService.selectByPrimaryKey(orderTrade.getSellUserId());
 		if (sellUser == null) {
 			logger.error("tradeOrderDetail 卖家[{}]用户记录不存在",orderTrade.getSellUserId());
-			throw new UserNotExistsException("卖家"+orderTrade.getSellUserId()+"用户记录不存在");
+			throw new UserNotExistsException("卖家用户记录不存在");
 		}
 
 		OrderPaymentTrade orderPaymentTrade = new OrderPaymentTrade();
@@ -298,7 +298,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		OrderPaymentTrade orderPaymentTradeOld = orderPaymentTradeService.findOrderPaymentTradeByTradeNo(orderPaymentTrade.getTradeNo());
 		if (orderPaymentTradeOld == null) {
 			logger.error("orderPaymentTradeNotify 交易单号[{}]支付记录不存在",orderPaymentTrade.getTradeNo());
-			throw new PaymentTradeOrderNotExistsException("交易单号"+orderPaymentTrade.getTradeNo()+"支付记录不存在");
+			throw new PaymentTradeOrderNotExistsException("交易单号支付记录不存在");
 		}
 
 		Integer oldStatus = orderPaymentTradeOld.getStatus();

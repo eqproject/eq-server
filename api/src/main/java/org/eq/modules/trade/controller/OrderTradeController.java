@@ -59,7 +59,7 @@ public class OrderTradeController extends BaseController {
             return ResponseFactory.paramsError("请求参数错误");
         }
         try {
-            orderTradeService.createTradeOrder(orderTrade);
+            orderTrade = orderTradeService.createTradeOrder(orderTrade);
         } catch (BaseServiceException e) {
             logger.error("createTradeOrder 失败，原因是:{}",e.getMessage());
             return ResponseFactory.paramsError(e.getMessage());
@@ -67,7 +67,7 @@ public class OrderTradeController extends BaseController {
             logger.error("createTradeOrder 失败，原因是",e);
             return ResponseFactory.systemError(SYSTEM_ERROR_MSG);
         }
-        OrderTradeCreateResVO orderTradeCreateResVO = new OrderTradeCreateResVO("");
+        OrderTradeCreateResVO orderTradeCreateResVO = new OrderTradeCreateResVO(orderTrade.getTradeNo());
         logger.info("createTradeOrder 响应内容:{}",JSON.toJSONString(orderTradeCreateResVO));
         return ResponseFactory.success(orderTradeCreateResVO);
     }
@@ -80,17 +80,12 @@ public class OrderTradeController extends BaseController {
     @GetMapping("/cancel")
     public ResponseData<OrderTradeCancelResVO> cancelTradeOrder(OrderTradeCancelReqVO orderTradeCancelReqVO) {
         if (orderTradeCancelReqVO == null) {
-            logger.error("cancelTradeOrder 失败，原因是 orderTradeCreateReqVO is null");
+            logger.error("cancelTradeOrder 失败，原因是 orderTradeCancelReqVO is null");
             return ResponseFactory.paramsError("请求参数不能为空");
         }
         logger.info("cancelTradeOrder 请求参数:{}",JSON.toJSONString(orderTradeCancelReqVO));
-        OrderTrade orderTrade =new OrderTrade();
-
-        Date nowDate = DateUtil.getNowTime();
-        orderTrade.setCreateDate(nowDate);
-        orderTrade.setUpdateDate(nowDate);
         try {
-            orderTradeService.cancelTradeOrder(orderTrade.getTradeNo());
+            orderTradeService.cancelTradeOrder(orderTradeCancelReqVO.getTradeNo());
         } catch (BaseServiceException e) {
             logger.error("cancelTradeOrder 失败，原因是:{}",e.getMessage());
             return ResponseFactory.paramsError(e.getMessage());
