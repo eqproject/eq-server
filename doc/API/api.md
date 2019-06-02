@@ -2164,7 +2164,7 @@
 >| status   | int      | 返回结果状态。0：正常；1：错误。 |
 >| errMsg   | string   | 错误描述|
 >|data|object|条款信息|
->|--content|stirng|内容|
+>|-content|stirng|内容|
 >
 ###### 接口示例
 >地址： /api/support/legal
