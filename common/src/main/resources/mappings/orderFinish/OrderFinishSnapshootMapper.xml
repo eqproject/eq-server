@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.robust.c2c.org.eq.modules.order.dao.OrderFinishSnapshootMapper">
+    <resultMap id="BaseResultMap" type="com.robust.c2c.org.eq.modules.order.entity.OrderFinishSnapshoot">
+        <id column="id" jdbcType="BIGINT" property="id" />
+	    <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
+	    <result column="trade_no" jdbcType="VARCHAR" property="tradeNo" />
+	    <result column="product_id" jdbcType="BIGINT" property="productId" />
+	    <result column="product_name" jdbcType="VARCHAR" property="productName" />
+	    <result column="unit_price" jdbcType="INTEGER" property="unitPrice" />
+	    <result column="order_num" jdbcType="INTEGER" property="orderNum" />
+	    <result column="trade_num" jdbcType="INTEGER" property="tradeNum" />
+	    <result column="type" jdbcType="TINYINT" property="type" />
+	    <result column="status" jdbcType="TINYINT" property="status" />
+	    <result column="salePrice" jdbcType="INTEGER" property="saleprice" />
+	    <result column="amount" jdbcType="INTEGER" property="amount" />
+	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    </resultMap>
+
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_List">
+        id,order_no,trade_no,product_id,product_name,unit_price,order_num,trade_num,type,status,salePrice,amount,create_date
+    </sql>
+
+    <select id="selectByExample" parameterType="com.robust.c2c.org.eq.modules.order.entity.OrderFinishSnapshootExample" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List" />
+        from order_finish_snapshoot
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from order_finish_snapshoot
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from order_finish_snapshoot
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByExample" parameterType="com.robust.c2c.org.eq.modules.order.entity.OrderFinishSnapshootExample">
+        delete from order_finish_snapshoot
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
+
+    <insert id="insert" parameterType="com.robust.c2c.org.eq.modules.order.entity.OrderFinishSnapshoot">
+        insert into order_finish_snapshoot (order_no,trade_no,product_id,product_name,unit_price,order_num,trade_num,type,status,salePrice,amount,create_date)
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{orderNo,jdbcType=VARCHAR},
+            #{tradeNo,jdbcType=VARCHAR},
+            #{productId,jdbcType=BIGINT},
+            #{productName,jdbcType=VARCHAR},
+            #{unitPrice,jdbcType=INTEGER},
+            #{orderNum,jdbcType=INTEGER},
+            #{tradeNum,jdbcType=INTEGER},
+            #{type,jdbcType=TINYINT},
+            #{status,jdbcType=TINYINT},
+            #{saleprice,jdbcType=INTEGER},
+            #{amount,jdbcType=INTEGER},
+            #{createDate,jdbcType=TIMESTAMP},
+        </trim>
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.robust.c2c.org.eq.modules.order.entity.OrderFinishSnapshoot">
+        insert into order_finish_snapshoot
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            order_no,
+            trade_no,
+            product_id,
+            product_name,
+            unit_price,
+            order_num,
+            trade_num,
+            type,
+            status,
+            salePrice,
+            amount,
+            create_date,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{orderNo,jdbcType=VARCHAR},
+            #{tradeNo,jdbcType=VARCHAR},
+            #{productId,jdbcType=BIGINT},
+            #{productName,jdbcType=VARCHAR},
+            #{unitPrice,jdbcType=INTEGER},
+            #{orderNum,jdbcType=INTEGER},
+            #{tradeNum,jdbcType=INTEGER},
+            #{type,jdbcType=TINYINT},
+            #{status,jdbcType=TINYINT},
+            #{saleprice,jdbcType=INTEGER},
+            #{amount,jdbcType=INTEGER},
+            #{createDate,jdbcType=TIMESTAMP},
+        </trim>
+    </insert>
+
+    <select id="countByExample" parameterType="com.robust.c2c.org.eq.modules.order.entity.OrderFinishSnapshootExample" resultType="java.lang.Long">
+        select count(*) from order_finish_snapshoot
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </select>
+
+    <update id="updateByExampleSelective" parameterType="map">
+        update order_finish_snapshoot
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.orderNo != null">
+                order_no = #{record.orderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="record.tradeNo != null">
+                trade_no = #{record.tradeNo,jdbcType=VARCHAR},
+            </if>
+            <if test="record.productId != null">
+                product_id = #{record.productId,jdbcType=BIGINT},
+            </if>
+            <if test="record.productName != null">
+                product_name = #{record.productName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.unitPrice != null">
+                unit_price = #{record.unitPrice,jdbcType=INTEGER},
+            </if>
+            <if test="record.orderNum != null">
+                order_num = #{record.orderNum,jdbcType=INTEGER},
+            </if>
+            <if test="record.tradeNum != null">
+                trade_num = #{record.tradeNum,jdbcType=INTEGER},
+            </if>
+            <if test="record.type != null">
+                type = #{record.type,jdbcType=TINYINT},
+            </if>
+            <if test="record.status != null">
+                status = #{record.status,jdbcType=TINYINT},
+            </if>
+            <if test="record.saleprice != null">
+                salePrice = #{record.saleprice,jdbcType=INTEGER},
+            </if>
+            <if test="record.amount != null">
+                amount = #{record.amount,jdbcType=INTEGER},
+            </if>
+            <if test="record.createDate != null">
+                create_date = #{record.createDate,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByExample" parameterType="map">
+        update order_finish_snapshoot
+        set
+        <trim  suffixOverrides=",">
+            id = #{record.id,jdbcType=BIGINT},
+            order_no = #{record.orderNo,jdbcType=VARCHAR},
+            trade_no = #{record.tradeNo,jdbcType=VARCHAR},
+            product_id = #{record.productId,jdbcType=BIGINT},
+            product_name = #{record.productName,jdbcType=VARCHAR},
+            unit_price = #{record.unitPrice,jdbcType=INTEGER},
+            order_num = #{record.orderNum,jdbcType=INTEGER},
+            trade_num = #{record.tradeNum,jdbcType=INTEGER},
+            type = #{record.type,jdbcType=TINYINT},
+            status = #{record.status,jdbcType=TINYINT},
+            salePrice = #{record.saleprice,jdbcType=INTEGER},
+            amount = #{record.amount,jdbcType=INTEGER},
+            create_date = #{record.createDate,jdbcType=TIMESTAMP},
+        </trim>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.robust.c2c.org.eq.modules.order.entity.OrderFinishSnapshoot">
+        update order_finish_snapshoot
+        <set>
+            <if test="orderNo != null">
+            order_no = #{orderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="tradeNo != null">
+            trade_no = #{tradeNo,jdbcType=VARCHAR},
+            </if>
+            <if test="productId != null">
+            product_id = #{productId,jdbcType=BIGINT},
+            </if>
+            <if test="productName != null">
+            product_name = #{productName,jdbcType=VARCHAR},
+            </if>
+            <if test="unitPrice != null">
+            unit_price = #{unitPrice,jdbcType=INTEGER},
+            </if>
+            <if test="orderNum != null">
+            order_num = #{orderNum,jdbcType=INTEGER},
+            </if>
+            <if test="tradeNum != null">
+            trade_num = #{tradeNum,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+            type = #{type,jdbcType=TINYINT},
+            </if>
+            <if test="status != null">
+            status = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="saleprice != null">
+            salePrice = #{saleprice,jdbcType=INTEGER},
+            </if>
+            <if test="amount != null">
+            amount = #{amount,jdbcType=INTEGER},
+            </if>
+            <if test="createDate != null">
+            create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.robust.c2c.org.eq.modules.order.entity.OrderFinishSnapshoot">
+        update order_finish_snapshoot
+        set
+        <trim  suffixOverrides=",">
+              order_no = #{orderNo,jdbcType=VARCHAR},
+              trade_no = #{tradeNo,jdbcType=VARCHAR},
+              product_id = #{productId,jdbcType=BIGINT},
+              product_name = #{productName,jdbcType=VARCHAR},
+              unit_price = #{unitPrice,jdbcType=INTEGER},
+              order_num = #{orderNum,jdbcType=INTEGER},
+              trade_num = #{tradeNum,jdbcType=INTEGER},
+              type = #{type,jdbcType=TINYINT},
+              status = #{status,jdbcType=TINYINT},
+              salePrice = #{saleprice,jdbcType=INTEGER},
+              amount = #{amount,jdbcType=INTEGER},
+              create_date = #{createDate,jdbcType=TIMESTAMP},
+        </trim>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+</mapper>
