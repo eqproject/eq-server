@@ -2116,9 +2116,7 @@
 >| :------- | :------- | :------------------------------- |
 >| status   | int      | 返回结果状态。0：正常；1：错误。 |
 >| errMsg   | string   | 错误描述|
->|info|object|条款信息|
->|-termsNo|string|条款编号|
->|-title|string|标题|
+>|data|object|条款信息|
 >|-content|stirng|内容|
 >
 
@@ -2130,8 +2128,6 @@
     "status": 0,
     "errMsg": "",
 	"data": {
-		"termsNo":"",
-		"title":"",
 		"content":""
 	}
 }
@@ -2167,9 +2163,7 @@
 >| :------- | :------- | :------------------------------- |
 >| status   | int      | 返回结果状态。0：正常；1：错误。 |
 >| errMsg   | string   | 错误描述|
->|info|object|条款信息|
->|--legalNo|string|条款编号|
->|--title|string|标题|
+>|data|object|条款信息|
 >|--content|stirng|内容|
 >
 ###### 接口示例
@@ -2179,8 +2173,6 @@
 	"status": 0,
     "errMsg": "",
 	"data": {
-		"legalNo":"",
-		"title":"",
 		"content":""
 	}
 }
@@ -2216,9 +2208,7 @@
 >| :------- | :------- | :------------------------------- |
 >| status   | int      | 返回结果状态。0：正常；1：错误。 |
 >| errMsg   | string   | 错误描述|
->| info|object|条款信息|
->|-docNo|string|文案编号|
->|-title|string|标题|
+>| data|object|条款信息|
 >|-content|stirng|内容|
 >
 ###### 接口示例
@@ -2228,8 +2218,6 @@
 	"status": 0,
     "errMsg": "",
 	"data": {
-		"docNo":"",
-		"title":"",
 		"content":""
 	}
 }
