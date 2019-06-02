@@ -276,6 +276,9 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		trade.setOrderNum(orderTrade.getOrderNum());
 		trade.setRemindPay(orderTrade.getRemindPay());
 		trade.setSalePrice(orderTrade.getSalePrice());
+		trade.setTradeNo(tradeNo);
+		trade.setStatus(orderTrade.getStatus());
+		trade.setRemindPay(orderTrade.getRemindPay());
 		if (orderPaymentTrade != null) { // 未支付之前，数值为空
 			trade.setPayNo(orderPaymentTrade.getPayNo());
 			trade.setServiceFee(orderPaymentTrade.getServiceFee());
