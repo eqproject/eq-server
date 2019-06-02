@@ -43,4 +43,11 @@ public interface BaseMapper<Record, Example> {
 
         return 0;
     }
+
+    /**
+     * 插入并返回主键ID的方法
+     * @param record
+     * @return
+     */
+    Long insertSelectiveAndReturnId(Record record);
 }

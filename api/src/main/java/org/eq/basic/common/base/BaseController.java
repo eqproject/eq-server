@@ -7,7 +7,7 @@ import org.eq.modules.auth.entity.User;
  * 控制器支持类
  * Created by JoinHan on 2018/01/11.
  */
-public abstract class BaseController {
+public abstract class BaseController extends BaseLog {
 
 
 

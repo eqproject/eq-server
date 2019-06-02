@@ -11,7 +11,11 @@ public enum ResponseStateEnum {
 
     ERROR_SIGN("300","认证失败"),
 
-    ERROR_PARAMS("301","参数错误");
+    ERROR_PARAMS("301","参数错误"),
+
+    ERROR_SYSTEM("500","系统错误"), //遇到不明确的异常，统一为这个错误码
+
+    ;
 
     /**
      * 状态

@@ -194,6 +194,57 @@
         </trim>
     </insert>
 
+
+    <insert id="insertSelectiveAndReturnId" parameterType="org.eq.modules.trade.entity.OrderTrade">
+        <!-- 插入数据后 返回主键 -->
+        <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into order_trade
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            sell_user_id,
+            buy_user_id,
+            ad_no,
+            trade_no,
+            product_id,
+            order_num,
+            type,
+            status,
+            blockchain_status,
+            sale_price,
+            unit_price,
+            amount,
+            remind_pay,
+            finish_time,
+            remarks,
+            cancel_desc,
+            create_date,
+            update_date,
+            tx_id,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{sellUserId,jdbcType=BIGINT},
+            #{buyUserId,jdbcType=BIGINT},
+            #{adNo,jdbcType=VARCHAR},
+            #{tradeNo,jdbcType=VARCHAR},
+            #{productId,jdbcType=BIGINT},
+            #{orderNum,jdbcType=INTEGER},
+            #{type,jdbcType=TINYINT},
+            #{status,jdbcType=TINYINT},
+            #{blockchainStatus,jdbcType=TINYINT},
+            #{salePrice,jdbcType=INTEGER},
+            #{unitPrice,jdbcType=INTEGER},
+            #{amount,jdbcType=INTEGER},
+            #{remindPay,jdbcType=TINYINT},
+            #{finishTime,jdbcType=TIMESTAMP},
+            #{remarks,jdbcType=VARCHAR},
+            #{cancelDesc,jdbcType=VARCHAR},
+            #{createDate,jdbcType=TIMESTAMP},
+            #{updateDate,jdbcType=TIMESTAMP},
+            #{txId,jdbcType=BIGINT},
+        </trim>
+    </insert>
+
     <select id="countByExample" parameterType="org.eq.modules.trade.entity.OrderTradeExample" resultType="java.lang.Long">
         select count(*) from order_trade
         <if test="_parameter != null">
