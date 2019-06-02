@@ -10,10 +10,11 @@ import java.util.Date;
 
 /**
  * 时间工具类
- * @author  kaka
- * @date  2019-05-27
+ *
+ * @author kaka
+ * @date 2019-05-27
  */
-public class DateUtil{
+public class DateUtil {
 
     private final static Logger logBase = LoggerFactory.getLogger(DateUtil.class);
 
@@ -26,63 +27,86 @@ public class DateUtil{
     private static final SimpleDateFormat simpleFormat = new SimpleDateFormat(DATE_FORMAT_SHORT_01);
 
 
-
-
     /**
      * 获取当前时间 字符串
-     *   格式为yyyy-MM-dd HH:mm:ss
+     * 格式为yyyy-MM-dd HH:mm:ss
+     *
      * @return
      */
-    public  static String getNowTimeStr(){
+    public static String getNowTimeStr() {
         return chinaFormat.format(new Date());
     }
 
 
     /**
      * 获取当前时间
+     *
      * @return
      */
-    public static Date getNowTime(){
+    public static Date getNowTime() {
         return new Date();
     }
 
     /**
      * 格式化时间
+     *
      * @param timeStr 时间字符串
      * @return
      */
-    public static Date passDateOrNow(String timeStr){
-        if(StringUtils.isEmpty(timeStr)){
+    public static Date passDateOrNow(String timeStr) {
+        if (StringUtils.isEmpty(timeStr)) {
             return getNowTime();
         }
-        try{
+        try {
             return simpleFormat.parse(timeStr);
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
+
+        return getNowTime();
+    }
+
+    /**
+     * 格式化时间
+     *
+     * @param timeStr 时间字符串
+     * @param format  格式
+     * @return
+     */
+    public static Date passDate(String timeStr, String format) {
+        if (StringUtils.isEmpty(timeStr)) {
+            return null;
+        }
+        try {
+            return simpleFormat.parse(timeStr);
+        } catch (Exception e) {
+        }
 
         return getNowTime();
     }
 
     /**
      * 日期按照指定格式转换为日期字符串
+     *
      * @param date
      * @param format
      * @return
      */
-    public static String dateToStr(Date date,String format) {
+    public static String dateToStr(Date date, String format) {
         try {
             DateFormat dateFormat = new SimpleDateFormat(format);
             return dateFormat.format(date);
         } catch (Exception e) {
-            logBase.error("日期转换为字符串异常",e);
+            logBase.error("日期转换为字符串异常", e);
         }
-        return  null;
+        return null;
     }
 
     /**
      * 返回时间戳
+     *
      * @return
      */
-    public static String getLockNowTime(){
+    public static String getLockNowTime() {
         return new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
     }
 
