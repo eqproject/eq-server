@@ -1,7 +1,10 @@
 package org.eq.basic.common.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -10,10 +13,19 @@ import java.util.Date;
  * @author  kaka
  * @date  2019-05-27
  */
-public class DateUtil {
+public class DateUtil{
 
-    private static final SimpleDateFormat chinaFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static final SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private final static Logger logBase = LoggerFactory.getLogger(DateUtil.class);
+
+    private static final String DATE_FORMAT_FULL = "yyyyMMddHHmmss";
+    private static final String DATE_FORMAT_FULL_01 = "yyyy-MM-dd HH:mm:ss";
+    private static final String DATE_FORMAT_SHORT = "yyyyMMdd";
+    private static final String DATE_FORMAT_SHORT_01 = "yyyy-MM-dd";
+
+    private static final SimpleDateFormat chinaFormat = new SimpleDateFormat(DATE_FORMAT_FULL_01);
+    private static final SimpleDateFormat simpleFormat = new SimpleDateFormat(DATE_FORMAT_SHORT_01);
+
+
 
 
     /**
@@ -48,6 +60,22 @@ public class DateUtil {
         }catch (Exception e){}
 
         return getNowTime();
+    }
+
+    /**
+     * 日期按照指定格式转换为日期字符串
+     * @param date
+     * @param format
+     * @return
+     */
+    public static String dateToStr(Date date,String format) {
+        try {
+            DateFormat dateFormat = new SimpleDateFormat(format);
+            return dateFormat.format(date);
+        } catch (Exception e) {
+            logBase.error("日期转换为字符串异常",e);
+        }
+        return  null;
     }
 
 
