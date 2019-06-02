@@ -28,4 +28,15 @@ public interface OrderAdService extends ServiceExtend<OrderAd, OrderAdExample> {
      */
     ServieReturn<ResOrderAdVO> createResOrderAdVO(SearchAdOrderVO searchAdOrderVO, User user);
 
+
+
+
+    /**
+     * 取消订单
+     * @param searchAdOrderVO
+     * @param user 用户实体
+     * @return
+     */
+    ServieReturn<ResOrderAdVO> cacelResOrderAdVO(SearchAdOrderVO searchAdOrderVO, User user);
+
 }

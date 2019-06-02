@@ -53,7 +53,7 @@ public class OrderController extends BaseController {
 	 * @return
 	 */
 	@PostMapping("/user/create")
-	public ResponseData<ResOrderAdVO> platformEffect(SearchAdOrderVO searchAdOrderVO) {
+	public ResponseData<ResOrderAdVO> createOrderAdinfo(SearchAdOrderVO searchAdOrderVO) {
 		String volidResult = VolidOrderInfo.volidSearchOrderAd(searchAdOrderVO);
 		if(!StringUtils.isEmpty(volidResult)){
 			return ResponseFactory.paramsError(volidResult);
@@ -68,6 +68,29 @@ public class OrderController extends BaseController {
 		}
 		return ResponseFactory.success(resOrderAdVO.getData());
 	}
+
+
+	/**
+	 * 获取平台有效商品信息
+	 * @return
+	 */
+	@PostMapping("/user/cancel")
+	public ResponseData<ResOrderAdVO> cacelOrderAdinfo(SearchAdOrderVO searchAdOrderVO) {
+		if(searchAdOrderVO==null || StringUtils.isEmpty(searchAdOrderVO.getOrderCode())){
+			return ResponseFactory.signError("订单号为空，无法取消");
+		}
+		User user = getUserInfo(searchAdOrderVO.getUserId());
+		if(user==null){
+			return ResponseFactory.signError("用户不存在");
+		}
+
+		ServieReturn<ResOrderAdVO>  resOrderAdVO =  orderAdService.cacelResOrderAdVO(searchAdOrderVO,user);
+		if(!StringUtils.isEmpty(resOrderAdVO.getErrMsg())){
+			return ResponseFactory.signError(resOrderAdVO.getErrMsg());
+		}
+		return ResponseFactory.success(resOrderAdVO.getData());
+	}
+
 
 
 

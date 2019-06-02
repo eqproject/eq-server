@@ -17,6 +17,8 @@ import org.eq.modules.enums.OrderAdTypeEnum;
 import org.eq.modules.order.dao.OrderAdMapper;
 import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.order.entity.OrderAdExample;
+import org.eq.modules.order.entity.OrderAdLog;
+import org.eq.modules.order.service.OrderAdLogService;
 import org.eq.modules.order.service.OrderAdService;
 import org.eq.modules.order.vo.ResOrderAdVO;
 import org.eq.modules.order.vo.SearchAdOrderVO;
@@ -54,6 +56,9 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 
 	@Autowired
 	private ProductService productService;
+
+	@Autowired
+	private OrderAdLogService orderAdLogService;
 
 
 	@Override
@@ -125,6 +130,21 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		return example;
 	}
 
+
+	/**
+	 * 获取简单查询实体
+	 * @param statue
+	 * @param id
+	 * @return
+	 */
+	public OrderAdExample getExampleFromEntity(int statue,long id) {
+		OrderAdExample example = new OrderAdExample();
+		OrderAdExample.Criteria ca = example.or();
+	    ca.andIdEqualToForSimple(id);
+	    ca.andStatusEqualToForSimple(statue);
+		return example;
+	}
+
 	@Override
 	public ServieReturn<ResOrderAdVO> createResOrderAdVO(SearchAdOrderVO searchAdOrderVO, User user) {
 		String volidResult = VolidOrderInfo.volidSearchOrderAd(searchAdOrderVO);
@@ -170,6 +190,70 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 			result.setData(resOrderAdVO);
 		}
 		return result;
+	}
+
+	@Override
+	public ServieReturn<ResOrderAdVO> cacelResOrderAdVO(SearchAdOrderVO searchAdOrderVO, User user) {
+		ServieReturn<ResOrderAdVO> result  = new ServieReturn<>();
+		if(searchAdOrderVO == null  || StringUtils.isEmpty(searchAdOrderVO.getOrderCode())){
+			result.setErrMsg("订单号为空，无法取消");
+			return result;
+		}
+		if(user==null){
+			result.setErrMsg("用户信息为空");
+			return result;
+		}
+		OrderAd orderAd = new OrderAd();
+		orderAd.setUserId(user.getId());
+		orderAd.setOrderNo(searchAdOrderVO.getOrderCode());
+		orderAd = selectByRecord(orderAd);
+		if(orderAd==null){
+			result.setErrMsg("订单为空，无法取消");
+			return result;
+		}
+		if(orderAd.getStatus() == OrderAdStateEnum.ORDER_CANCEL.getState()){
+			result.setErrMsg("订单已为取消状态，无法进行二次取消");
+			return result;
+		}
+		OrderAd updateOrder = new OrderAd();
+		updateOrder.setStatus(OrderAdStateEnum.ORDER_CANCEL.getState());
+		updateOrder.setUpdateDate(new Date());
+		updateOrder.setCancelDesc("外部接口调用取消");
+		int updateResult = updateByExampleSelective(updateOrder,getExampleFromEntity(orderAd.getStatus(),orderAd.getId()));
+		if(updateResult<=0){
+			result.setErrMsg("订单取消失败");
+			return result;
+		}
+		StringBuffer remarks = new StringBuffer();
+		if(orderAd.getType()==OrderAdTypeEnum.ORDER_SALE.getType()){
+			int number  = orderAd.getProductNum() -orderAd.getTradedNum()  - orderAd.getTradingNum();
+			if(number<=0){
+				result.setErrMsg("订单库存异常");
+				return result;
+			}
+			boolean stockResult  = userProductStockService.updateStock(orderAd.getProductId(),user.getId(),-number);
+			if(stockResult){
+				remarks.append("取消成功,").append("退回库存成功,应退:").append(number).append(",执行快照为:").append(orderAd.toString());
+			}else{
+				remarks.append("取消成功,").append("退回库存失败,应退回:").append(number).append(",执行快照为:").append(orderAd.toString());
+			}
+		}else{
+			remarks.append("取消成功,").append("执行快照为:").append(orderAd.toString());
+		}
+		OrderAdLog orderAdLog = new OrderAdLog();
+		orderAdLog.setCreateDate(new Date());
+		orderAdLog.setNewStatus(OrderAdStateEnum.ORDER_CANCEL.getState());
+		orderAdLog.setOldStatus(orderAd.getStatus());
+		orderAdLog.setOrderAdId(orderAd.getId());
+		orderAdLog.setRemarks(remarks.toString());
+		try{
+			orderAdLogService.insertRecord(orderAdLog);
+		}catch (Exception e){
+			e.printStackTrace();
+			logger.info("插入订单操作日志记录数据出错 {}",orderAdLog.toString());
+		}
+		result.setData(OrderUtil.transObj(orderAd));
+		return  result ;
 	}
 
 	/**
@@ -266,4 +350,5 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		return buffer.toString();
 
 	}
+
 }

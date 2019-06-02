@@ -128,6 +128,10 @@ public class OrderAdExample {
             addCriterion("id =", value, "id");
             return (Criteria) this;
         }
+        public Criteria andIdEqualToForSimple(Long value) {
+            addCriterion("id =", value, "id");
+            return (Criteria) this;
+        }
 
         public Criteria andIdNotEqualTo(Long value) {
             addCriterion("id <>", value, "id");
@@ -688,6 +692,11 @@ public class OrderAdExample {
             addCriterion("status =", value, "status");
             return (Criteria) this;
         }
+        public Criteria andStatusEqualToForSimple(Integer value) {
+            addCriterion("status =", value, "status");
+            return (Criteria) this;
+        }
+
 
         public Criteria andStatusNotEqualTo(Integer value) {
             addCriterion("status <>", value, "status");

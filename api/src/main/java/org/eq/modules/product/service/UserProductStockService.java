@@ -47,7 +47,7 @@ public interface UserProductStockService extends ServiceExtend<UserProductStock,
      * 更改锁定量
      * @param productId
      * @param userId
-     * @param number
+     * @param number 为正则增加锁定量  为负数减少锁定量
      * @return
      */
     boolean updateStock(long productId,long userId,int number);

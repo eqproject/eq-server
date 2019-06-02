@@ -45,6 +45,12 @@ public class SearchAdOrderVO extends SearchBase {
     private int orderType;
 
 
+    /**
+     * 订单号
+     */
+    private String orderCode;
+
+
 
 
 }
