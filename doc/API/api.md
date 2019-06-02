@@ -66,7 +66,7 @@
 > |参数|必选|类型|说明|
 |:-----  |:-------|:-----|-----|
 |userId      |true    |long  | 用户id|
-|pwd      |true    |string  | 密码(待定加密算法)|
+|pwd      |true    |string  | 密码(AES128) |
 |sign       |true    |string   |签名|
 
 ###### 返回字段
@@ -144,7 +144,7 @@
 > |参数|必选|类型|说明|
 |:-----  |:-------|:-----|-----|
 |userId      |true    |long  | 用户id|
-|pwd      |true    |string  | 密码(待定加密算法)|
+|pwd      |true    |string  | 密码(AES128) |
 |sign       |true    |string   |签名|
 
 ###### 返回字段
@@ -181,7 +181,7 @@
 |:-----  |:-------|:-----|-----|
 |userId      |true    |long  | 用户id|
 |identityName     |true    |string  | 身份证名称|
-|identityNo       |true    |string  | 身份证号（待定加密算法）|
+|identityCard       |true    |string  | 身份证号（AES128） |
 |sign       |true    |string   |签名|
 
 ###### 返回字段
