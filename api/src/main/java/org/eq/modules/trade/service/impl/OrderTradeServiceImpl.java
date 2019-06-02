@@ -183,6 +183,8 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderTrade.setUnitPrice(product.getUnitPrice());
 		orderTrade.setAmount(orderTrade.getOrderNum()*orderTrade.getSalePrice());
 		orderTrade.setSellUserId(orderAd.getUserId());
+		orderTrade.setStatus(OrderTradeStateEnum.WAIT_PAY.getState());
+		orderTrade.setRemindPay(0);// 未催款
 
 		String tradeNo = OrderNoGenerateUtil.generateNo(OrderNoPreFixEnum.TRADE_NO);
 		orderTrade.setTradeNo(tradeNo);
@@ -282,7 +284,9 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		if (orderPaymentTrade != null) { // 未支付之前，数值为空
 			trade.setPayNo(orderPaymentTrade.getPayNo());
 			trade.setServiceFee(orderPaymentTrade.getServiceFee());
-			trade.setPayTime(DateUtil.dateToStr(orderPaymentTrade.getPayTime(),DateUtil.DATE_FORMAT_FULL_01));
+			if (orderPaymentTrade.getPayTime() != null) {
+				trade.setPayTime(DateUtil.dateToStr(orderPaymentTrade.getPayTime(),DateUtil.DATE_FORMAT_FULL_01));
+			}
 		}
 
 		OrderTradeDetailUser orderTradeDetailUser = new OrderTradeDetailUser();
