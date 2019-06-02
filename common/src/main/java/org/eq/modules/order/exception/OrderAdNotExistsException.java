@@ -1,4 +1,4 @@
-package org.eq.basic.common.exception;
+package org.eq.modules.order.exception;
 
 import org.eq.basic.common.base.BaseServiceException;
 

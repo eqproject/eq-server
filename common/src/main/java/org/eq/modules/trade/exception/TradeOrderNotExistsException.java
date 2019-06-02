@@ -1,4 +1,4 @@
-package org.eq.basic.common.exception;
+package org.eq.modules.trade.exception;
 
 import org.eq.basic.common.base.BaseServiceException;
 
