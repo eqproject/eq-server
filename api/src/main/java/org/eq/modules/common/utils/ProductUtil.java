@@ -110,6 +110,8 @@ public class ProductUtil  extends ProductBusines {
         return productExtend;
     }
 
+
+
     /**
      * 根据查询条件 封装Example
      * @param searchBSearchProductVO 查询条件

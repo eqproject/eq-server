@@ -32,11 +32,25 @@ public interface UserProductStockService extends ServiceExtend<UserProductStock,
 
     /**
      * 获取用户库存信息数据
+     *   1、验证平台商品是否存在
+     *   2、验证区块链用户商品是否存在
+     *   3、查询用户平台库存 如果没有则新建库存信息
+     *   4、对比库存情况
+     *   5、验证通过后 返回用户库存信息数据
      * @param productId 商品ID
      * @param user  用户信息
      * @return
      */
     UserProductStock getUserProductStock(long productId,User user);
+
+    /**
+     * 更改锁定量
+     * @param productId
+     * @param userId
+     * @param number
+     * @return
+     */
+    boolean updateStock(long productId,long userId,int number);
 
 
 }

@@ -120,6 +120,12 @@ public class UserProductStockExample {
             return (Criteria) this;
         }
 
+        public Criteria andIdEqualToForSimple(Long value) {
+            addCriterion("id =", value, "id");
+            return (Criteria) this;
+        }
+
+
 
         public Criteria andUserIdEqualTo(Long value) {
             addCriterion("stock.user_id =", value, "userId");
@@ -148,6 +154,11 @@ public class UserProductStockExample {
 
         public Criteria andProductExpirationEndGreaterThan(String value) {
             addCriterion("p.expiration_end >", value, "productExpirationEnd");
+            return (Criteria) this;
+        }
+
+        public Criteria andLockNumForSimple(long value) {
+            addCriterion("locked_num = ", value, "lockNum");
             return (Criteria) this;
         }
     }

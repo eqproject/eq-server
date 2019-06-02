@@ -5,10 +5,12 @@
 package org.eq.modules.order.service;
 
 import org.eq.basic.common.base.ServiceExtend;
+import org.eq.modules.auth.entity.User;
 import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.order.entity.OrderAdExample;
 import org.eq.modules.order.vo.ResOrderAdVO;
 import org.eq.modules.order.vo.SearchAdOrderVO;
+import org.eq.modules.order.vo.ServieReturn;
 
 /**
  * 广告订单Service
@@ -21,8 +23,9 @@ public interface OrderAdService extends ServiceExtend<OrderAd, OrderAdExample> {
     /**
      * 创建广告订单
      * @param searchAdOrderVO
+     * @param user 用户实体
      * @return
      */
-    ResOrderAdVO createResOrderAdVO(SearchAdOrderVO searchAdOrderVO);
+    ServieReturn<ResOrderAdVO> createResOrderAdVO(SearchAdOrderVO searchAdOrderVO, User user);
 
 }

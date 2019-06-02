@@ -78,5 +78,13 @@ public class DateUtil{
         return  null;
     }
 
+    /**
+     * 返回时间戳
+     * @return
+     */
+    public static String getLockNowTime(){
+        return new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+    }
+
 
 }

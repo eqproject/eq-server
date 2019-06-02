@@ -35,17 +35,17 @@ import java.util.*;
  * @author kaka
  * @version 1.0.1
  */
-@Service
 @Transactional
 @AutowiredService
+@Service
 public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductStockMapper, UserProductStock, UserProductStockExample> implements UserProductStockService {
 
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
 	@Autowired
-	public UserProductStockServiceImpl(UserProductStockMapper mapper){
-		super.setMapper(mapper);
+	public UserProductStockServiceImpl(UserProductStockMapper userProductStockMapper){
+		super.setMapper(userProductStockMapper);
 	}
 
 	@Autowired
@@ -166,6 +166,27 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 		return userProductStock;
 	}
 
+	@Override
+	public boolean updateStock(long productId, long userId, int number) {
+		UserProductStock userProductStock = new UserProductStock();
+		userProductStock.setUserId(userId);
+		userProductStock.setProductId(productId);
+		userProductStock = selectByRecord(userProductStock);
+		if(userProductStock==null){
+			return false;
+		}
+		int oldNum = userProductStock.getLockedNum();
+
+		UserProductStock update = new UserProductStock();
+		update.setLockedNum(userProductStock.getLockedNum()+number);
+		update.setUpdateDate(new Date());
+		int updateResult = updateByExampleSelective(update,getStockNumExample(userProductStock.getId(),oldNum));
+		if(updateResult>0){
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * 根据商品信息和用户信息获取用户库存数据
 	 * @param productId
@@ -253,5 +274,17 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 			end = totalcount;
 		}
 		return  list.subList(start,end );
+	}
+
+
+	private  UserProductStockExample  getStockNumExample(long id,long stock){
+		UserProductStockExample example = new UserProductStockExample();
+		UserProductStockExample.Criteria ca = example.or();
+		if(id<=0){
+			return example;
+		}
+		ca.andIdEqualToForSimple(id);
+		ca.andLockNumForSimple(stock);
+		return example;
 	}
 }

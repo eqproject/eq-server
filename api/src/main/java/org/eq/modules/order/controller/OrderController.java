@@ -16,6 +16,8 @@ import org.eq.modules.enums.OrderAdTypeEnum;
 import org.eq.modules.order.service.OrderAdService;
 import org.eq.modules.order.vo.ResOrderAdVO;
 import org.eq.modules.order.vo.SearchAdOrderVO;
+import org.eq.modules.order.vo.ServieReturn;
+import org.eq.modules.order.vo.VolidOrderInfo;
 import org.eq.modules.product.entity.Product;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.vo.ProductBaseVO;
@@ -52,7 +54,7 @@ public class OrderController extends BaseController {
 	 */
 	@PostMapping("/user/create")
 	public ResponseData<ResOrderAdVO> platformEffect(SearchAdOrderVO searchAdOrderVO) {
-		String volidResult = volidSearchOrderAd(searchAdOrderVO);
+		String volidResult = VolidOrderInfo.volidSearchOrderAd(searchAdOrderVO);
 		if(!StringUtils.isEmpty(volidResult)){
 			return ResponseFactory.paramsError(volidResult);
 		}
@@ -60,8 +62,11 @@ public class OrderController extends BaseController {
 		if(user==null){
 			return ResponseFactory.signError("用户不存在");
 		}
-		ResOrderAdVO resOrderAdVO =  orderAdService.createResOrderAdVO(searchAdOrderVO);
-		return ResponseFactory.success(resOrderAdVO);
+		ServieReturn<ResOrderAdVO>  resOrderAdVO =  orderAdService.createResOrderAdVO(searchAdOrderVO,user);
+		if(!StringUtils.isEmpty(resOrderAdVO.getErrMsg())){
+			return ResponseFactory.signError(resOrderAdVO.getErrMsg());
+		}
+		return ResponseFactory.success(resOrderAdVO.getData());
 	}
 
 
@@ -75,30 +80,5 @@ public class OrderController extends BaseController {
 		return json.toJSONString();
 	}
 
-	/**
-	 * 验证广告订单
-	 * @param searchAdOrderVO
-	 * @return
-	 */
-	private static String volidSearchOrderAd(SearchAdOrderVO searchAdOrderVO){
-		if(searchAdOrderVO==null){
-			return  "请求参数为空";
-		}
-		if(searchAdOrderVO.getUserId()<=0 ){
-			return "用户为空";
-		}
-		if(searchAdOrderVO.getProductId()<=0 || searchAdOrderVO.getNumber()<=0){
-			return "商品为空或数量为空";
-		}
-		if(StringUtils.isEmpty(searchAdOrderVO.getAdTitle()) || searchAdOrderVO.getAdTitle().length()> StaticEntity.ORDER_AD_TITLE_LENGTH){
-			return "广告标题长度为空或长度超过最大限制";
-		}
-		String result = OrderAdTypeEnum.getRemarkByType(searchAdOrderVO.getOrderType());
-		if(StringUtils.isEmpty(result)){
-			return "广告类型非法";
-		}
-		return null;
-
-	}
 
 }
