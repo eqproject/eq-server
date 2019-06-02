@@ -8,8 +8,10 @@ import com.alibaba.fastjson.JSON;
 import org.apache.commons.beanutils.BeanUtils;
 import org.eq.basic.common.base.BaseController;
 import org.eq.basic.common.base.BaseServiceException;
+import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
+import org.eq.modules.enums.OrderTradeStateEnum;
 import org.eq.modules.trade.entity.OrderPaymentTrade;
 import org.eq.modules.trade.entity.OrderTrade;
 import org.eq.modules.trade.service.OrderTradeService;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 订单交易Controller
@@ -123,6 +127,11 @@ public class OrderTradeController extends BaseController {
         return ResponseFactory.success(orderTradeCancelResVO);
     }
 
+    /**
+     * 支付结果回调
+     * @param orderTradePaymentReqVO
+     * @return
+     */
     @PostMapping("/pay/notify")
     public ResponseData<OrderTradePaymentResVO> orderPaymentTradeNotify(OrderTradePaymentReqVO orderTradePaymentReqVO) {
         if (orderTradePaymentReqVO == null) {
@@ -154,6 +163,62 @@ public class OrderTradeController extends BaseController {
         }
         logger.info("createOrderTradePayment 响应内容:{}",JSON.toJSONString(orderTradePaymentResVO));
         return ResponseFactory.success(orderTradePaymentResVO);
+    }
+
+    /**
+     * 查询待付款交易订单列表接口
+     * @param orderTradeListReqVO
+     * @return
+     */
+    @GetMapping("/paying/list")
+    public ResponseData<PageResultData> payingOrderTradeList(OrderTradeListReqVO orderTradeListReqVO) {
+        if (orderTradeListReqVO == null) {
+            logger.error("payingOrderTradeList 失败，原因是 orderTradeListReqVO is null");
+            return ResponseFactory.paramsError("请求参数不能为空");
+        }
+        logger.info("payingOrderTradeList 请求参数:{}",JSON.toJSONString(orderTradeListReqVO));
+        PageResultData<OrderTradeListResVO> orderTradeListResVOPageResultData;
+        try {
+            List<Integer> orderTradeStatus = new ArrayList<>();
+            orderTradeStatus.add(OrderTradeStateEnum.WAIT_PAY.getState());
+            orderTradeListResVOPageResultData = orderTradeService.pageTradeOrderList(orderTradeListReqVO,orderTradeStatus);
+        } catch (BaseServiceException e) {
+            logger.error("payingOrderTradeList 失败，原因是:{}",e.getMessage());
+            return ResponseFactory.paramsError(e.getMessage());
+        } catch (Exception e) {
+            logger.error("payingOrderTradeList 失败，原因是",e);
+            return ResponseFactory.systemError(SYSTEM_ERROR_MSG);
+        }
+        logger.info("payingOrderTradeList 响应内容:{}",JSON.toJSONString(orderTradeListResVOPageResultData));
+        return ResponseFactory.success(orderTradeListResVOPageResultData);
+    }
+
+    /**
+     * 查询进行中交易订单列表接口
+     * @param orderTradeListReqVO
+     * @return
+     */
+    @GetMapping("/porcessing/list")
+    public ResponseData<PageResultData> porcessingOrderTradeList(OrderTradeListReqVO orderTradeListReqVO) {
+        if (orderTradeListReqVO == null) {
+            logger.error("porcessingOrderTradeList 失败，原因是 orderTradeListReqVO is null");
+            return ResponseFactory.paramsError("请求参数不能为空");
+        }
+        logger.info("porcessingOrderTradeList 请求参数:{}",JSON.toJSONString(orderTradeListReqVO));
+        PageResultData<OrderTradeListResVO> orderTradeListResVOPageResultData;
+        try {
+            List<Integer> orderTradeStatus = new ArrayList<>();
+            orderTradeStatus.add(OrderTradeStateEnum.WAIT_PAY.getState());
+            orderTradeListResVOPageResultData = orderTradeService.pageTradeOrderList(orderTradeListReqVO,orderTradeStatus);
+        } catch (BaseServiceException e) {
+            logger.error("porcessingOrderTradeList 失败，原因是:{}",e.getMessage());
+            return ResponseFactory.paramsError(e.getMessage());
+        } catch (Exception e) {
+            logger.error("porcessingOrderTradeList 失败，原因是",e);
+            return ResponseFactory.systemError(SYSTEM_ERROR_MSG);
+        }
+        logger.info("porcessingOrderTradeList 响应内容:{}",JSON.toJSONString(orderTradeListResVOPageResultData));
+        return ResponseFactory.success(orderTradeListResVOPageResultData);
     }
 
 }

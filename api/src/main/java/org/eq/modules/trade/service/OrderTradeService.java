@@ -4,12 +4,18 @@
  */
 package org.eq.modules.trade.service;
 
+import org.eq.modules.common.entitys.PageResultData;
+import org.eq.modules.enums.OrderTradeStateEnum;
 import org.eq.modules.trade.entity.OrderPaymentTrade;
 import org.eq.modules.trade.entity.OrderTrade;
 import org.eq.modules.trade.entity.OrderTradeExample;
 import org.eq.basic.common.base.ServiceExtend;
 import org.eq.modules.trade.vo.OrderTradeDetailResVO;
+import org.eq.modules.trade.vo.OrderTradeListReqVO;
+import org.eq.modules.trade.vo.OrderTradeListResVO;
 import org.eq.modules.trade.vo.OrderTradePaymentResVO;
+
+import java.util.List;
 
 /**
  * 订单交易Service
@@ -25,6 +31,9 @@ public interface OrderTradeService extends ServiceExtend<OrderTrade,OrderTradeEx
     OrderTradeDetailResVO tradeOrderDetail(String tradeNo);
 
     OrderTradePaymentResVO orderPaymentTradeNotify(OrderPaymentTrade orderPaymentTrade);
+
+
+    PageResultData<OrderTradeListResVO> pageTradeOrderList(OrderTradeListReqVO orderTradeListReqVO,List<Integer> orderTradeStatus);
 
 
 

@@ -4,7 +4,9 @@
  */
 package org.eq.modules.trade.service.impl;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.eq.basic.common.annotation.AutowiredService;
+import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.DateUtil;
 import org.eq.basic.common.util.OrderNoGenerateUtil;
@@ -12,6 +14,8 @@ import org.eq.basic.common.util.StringLowUtils;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.auth.exception.UserNotExistsException;
 import org.eq.modules.auth.service.UserService;
+import org.eq.modules.common.entitys.PageResultData;
+import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.enums.OrderNoPreFixEnum;
 import org.eq.modules.enums.OrderTradeStateEnum;
 import org.eq.modules.order.entity.OrderAd;
@@ -33,7 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -335,5 +341,95 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		OrderTradePaymentResVO orderTradePaymentResVO = new OrderTradePaymentResVO();
 		orderTradePaymentResVO.setTradeNo(orderPaymentTrade.getTradeNo());
 		return orderTradePaymentResVO;
+	}
+
+	@Override
+	public PageResultData<OrderTradeListResVO> pageTradeOrderList(OrderTradeListReqVO orderTradeListReqVO,List<Integer> orderTradeStatus) {
+		PageResultData<OrderTradeListResVO> result = new PageResultData<>();
+		if(orderTradeListReqVO ==null){
+			orderTradeListReqVO = new OrderTradeListReqVO();
+		}
+		if(orderTradeListReqVO.getPageSize()<=0 || orderTradeListReqVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
+			orderTradeListReqVO.setPageSize(StaticEntity.MAX_PAGE_SIZE);
+		}
+		if(orderTradeListReqVO.getPageNum()<=0){
+			orderTradeListReqVO.setPageNum(1);
+		}
+		OrderTradeExample orderTradeExample = new OrderTradeExample();
+		OrderTradeExample.Criteria ca = orderTradeExample.or();
+		orderTradeExample.setOrderByClause(" create_date desc");
+
+		ca.andStatusIn(orderTradeStatus);
+		ca.andBuyUserIdEqualTo(orderTradeListReqVO.getUserId());
+
+		BaseTableData baseTableData = findDataTableByExampleForPage(orderTradeExample,orderTradeListReqVO.getPageNum(), orderTradeListReqVO.getPageSize());
+		if(baseTableData==null || CollectionUtils.isEmpty(baseTableData.getData())){
+			return result;
+		}
+		List<OrderTradeListResVO> dataList = new ArrayList<>(baseTableData.getData().size());
+		List<OrderTrade> pList = baseTableData.getData();
+		for(OrderTrade orderTrade : pList){
+			Product product = productService.selectByPrimaryKey(orderTrade.getProductId());
+			if (product == null) {
+				logger.error("pageTradeOrderList 交易订单号[{}] 商品ID[{}]记录不存在",orderTrade.getTradeNo(),orderTrade.getProductId());
+				continue;
+			}
+
+			User buserUser = userService.selectByPrimaryKey(orderTrade.getBuyUserId());
+			if (buserUser == null) {
+				logger.error("pageTradeOrderList 交易订单号[{}] 买家[{}]用户记录不存在",orderTrade.getTradeNo(),orderTrade.getBuyUserId());
+				continue;
+			}
+
+			User sellUser = userService.selectByPrimaryKey(orderTrade.getSellUserId());
+			if (sellUser == null) {
+				logger.error("pageTradeOrderList 交易订单号[{}] 卖家[{}]用户记录不存在",orderTrade.getTradeNo(),orderTrade.getSellUserId());
+				continue;
+			}
+
+			OrderPaymentTrade orderPaymentTrade = new OrderPaymentTrade();
+			orderPaymentTrade.setTradeNo(orderTrade.getTradeNo());
+			orderPaymentTrade = orderPaymentTradeService.selectByRecord(orderPaymentTrade);
+
+
+			OrderTradeDetailProduct orderTradeDetailProduct = new OrderTradeDetailProduct();
+			orderTradeDetailProduct.setUnitPrice(product.getUnitPrice());
+			orderTradeDetailProduct.setName(product.getName());
+			orderTradeDetailProduct.setProductImg(product.getProductImg());
+
+			OrderTradeDetailTrade trade = new OrderTradeDetailTrade();
+			trade.setAmount(orderTrade.getAmount());
+			trade.setCreateTime(DateUtil.dateToStr(orderTrade.getCreateDate(),DateUtil.DATE_FORMAT_FULL_01));
+			trade.setOrderNum(orderTrade.getOrderNum());
+			trade.setRemindPay(orderTrade.getRemindPay());
+			trade.setSalePrice(orderTrade.getSalePrice());
+			trade.setTradeNo(orderTrade.getTradeNo());
+			trade.setStatus(orderTrade.getStatus());
+			trade.setRemindPay(orderTrade.getRemindPay());
+			if (orderPaymentTrade != null) { // 未支付之前，数值为空
+				trade.setPayNo(orderPaymentTrade.getPayNo());
+				trade.setServiceFee(orderPaymentTrade.getServiceFee());
+				if (orderPaymentTrade.getPayTime() != null) {
+					trade.setPayTime(DateUtil.dateToStr(orderPaymentTrade.getPayTime(),DateUtil.DATE_FORMAT_FULL_01));
+				}
+			}
+
+			OrderTradeDetailUser orderTradeDetailUser = new OrderTradeDetailUser();
+			orderTradeDetailUser.setBuyUserId(orderTrade.getBuyUserId());
+			orderTradeDetailUser.setSellUserId(orderTrade.getSellUserId());
+			orderTradeDetailUser.setBuyUserNickName(buserUser.getNickname());
+			orderTradeDetailUser.setSellUserName(sellUser.getName());
+			orderTradeDetailUser.setSellUserNickName(sellUser.getNickname());
+			orderTradeDetailUser.setSellUserAccount("");// todo 从用户绑定账户表中获取卖家支付账户
+
+			OrderTradeListResVO orderTradeListResVO = new OrderTradeListResVO();
+			orderTradeListResVO.setUser(orderTradeDetailUser);
+			orderTradeListResVO.setProduct(orderTradeDetailProduct);
+			orderTradeListResVO.setTrade(trade);
+			dataList.add(orderTradeListResVO);
+		}
+		result.setList(dataList);
+		result.setTotal(baseTableData.getRecordsTotal());
+		return result;
 	}
 }
