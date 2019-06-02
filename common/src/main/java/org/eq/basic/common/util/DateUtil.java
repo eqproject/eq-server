@@ -17,10 +17,10 @@ public class DateUtil{
 
     private final static Logger logBase = LoggerFactory.getLogger(DateUtil.class);
 
-    private static final String DATE_FORMAT_FULL = "yyyyMMddHHmmss";
-    private static final String DATE_FORMAT_FULL_01 = "yyyy-MM-dd HH:mm:ss";
-    private static final String DATE_FORMAT_SHORT = "yyyyMMdd";
-    private static final String DATE_FORMAT_SHORT_01 = "yyyy-MM-dd";
+    public static final String DATE_FORMAT_FULL = "yyyyMMddHHmmss";
+    public static final String DATE_FORMAT_FULL_01 = "yyyy-MM-dd HH:mm:ss";
+    public static final String DATE_FORMAT_SHORT = "yyyyMMdd";
+    public static final String DATE_FORMAT_SHORT_01 = "yyyy-MM-dd";
 
     private static final SimpleDateFormat chinaFormat = new SimpleDateFormat(DATE_FORMAT_FULL_01);
     private static final SimpleDateFormat simpleFormat = new SimpleDateFormat(DATE_FORMAT_SHORT_01);
