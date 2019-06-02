@@ -9,6 +9,7 @@ import org.eq.modules.trade.dao.OrderPaymentTradeMapper;
 import org.eq.modules.trade.entity.OrderPaymentTradeExample;
 import org.eq.modules.trade.service.OrderPaymentTradeService;
 import org.eq.basic.common.util.StringLowUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.eq.basic.common.annotation.AutowiredService;
@@ -25,6 +26,11 @@ import java.util.Map;
 @Transactional
 @AutowiredService
 public class OrderPaymentTradeServiceImpl extends ServiceImplExtend<OrderPaymentTradeMapper, OrderPaymentTrade, OrderPaymentTradeExample> implements OrderPaymentTradeService {
+
+	@Autowired
+	public OrderPaymentTradeServiceImpl(OrderPaymentTradeMapper orderPaymentTradeMapper) {
+		super.setMapper(orderPaymentTradeMapper);
+	}
 
 	@Override
 	public OrderPaymentTradeExample getExampleFromEntity(OrderPaymentTrade orderPaymentTrade, Map<String, Object> params) {

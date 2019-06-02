@@ -8,7 +8,6 @@ import com.alibaba.fastjson.JSON;
 import org.apache.commons.beanutils.BeanUtils;
 import org.eq.basic.common.base.BaseController;
 import org.eq.basic.common.base.BaseServiceException;
-import org.eq.basic.common.util.DateUtil;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
 import org.eq.modules.trade.entity.OrderPaymentTrade;
@@ -16,20 +15,19 @@ import org.eq.modules.trade.entity.OrderTrade;
 import org.eq.modules.trade.service.OrderTradeService;
 import org.eq.modules.trade.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
 
 /**
  * 订单交易Controller
  * @author yufei.sun
  * @version 1.0
  */
-@Controller
+@RestController
 @RequestMapping(value = "/api/order/trade")
 public class OrderTradeController extends BaseController {
 
@@ -126,7 +124,7 @@ public class OrderTradeController extends BaseController {
     }
 
     @PostMapping("/pay/notify")
-    public ResponseData<OrderTradePaymentResVO> createOrderTradePayment(OrderTradePaymentReqVO orderTradePaymentReqVO) {
+    public ResponseData<OrderTradePaymentResVO> orderPaymentTradeNotify(OrderTradePaymentReqVO orderTradePaymentReqVO) {
         if (orderTradePaymentReqVO == null) {
             logger.error("createOrderTradePayment 失败，原因是 orderTradePaymentReqVO is null");
             return ResponseFactory.paramsError("请求参数不能为空");

@@ -46,6 +46,12 @@ import java.util.Map;
 @AutowiredService
 public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, OrderTrade, OrderTradeExample> implements OrderTradeService {
 
+
+	@Autowired
+	public OrderTradeServiceImpl(OrderTradeMapper orderTradeMapper) {
+		super.setMapper(orderTradeMapper);
+	}
+
 	@Autowired
 	OrderTradeLogService  orderTradeLogService;
 	@Autowired

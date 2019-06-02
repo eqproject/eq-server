@@ -9,6 +9,7 @@ import org.eq.modules.trade.dao.OrderRefundTradeMapper;
 import org.eq.modules.trade.entity.OrderRefundTradeExample;
 import org.eq.modules.trade.service.OrderRefundTradeService;
 import org.eq.basic.common.util.StringLowUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.eq.basic.common.annotation.AutowiredService;
@@ -25,6 +26,11 @@ import java.util.Map;
 @Transactional
 @AutowiredService
 public class OrderRefundTradeServiceImpl extends ServiceImplExtend<OrderRefundTradeMapper, OrderRefundTrade, OrderRefundTradeExample> implements OrderRefundTradeService {
+
+	@Autowired
+	public OrderRefundTradeServiceImpl(OrderRefundTradeMapper orderRefundTradeMapper) {
+		super.setMapper(orderRefundTradeMapper);
+	}
 
 	@Override
 	public OrderRefundTradeExample getExampleFromEntity(OrderRefundTrade orderRefundTrade, Map<String, Object> params) {
