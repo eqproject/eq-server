@@ -174,7 +174,7 @@
         </trim>
     </insert>
 
-    <insert id="insertSelective" parameterType="org.eq.modules.trade.entity.OrderPaymentTrade">
+    <insert id="insertSelectiveAndReturnId" parameterType="org.eq.modules.trade.entity.OrderPaymentTrade">
         <!-- 插入数据后 返回主键 -->
         <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
             SELECT LAST_INSERT_ID()
