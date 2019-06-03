@@ -4,7 +4,7 @@ import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.order.vo.OrderAdSimpleVO;
 import org.eq.modules.order.vo.OrderFinishSnapshootSimpleVO;
 import org.eq.modules.order.vo.ResOrderAdVO;
-import org.eq.modules.orderFinish.entity.OrderFinishSnapshoot;
+import org.eq.modules.orderfinish.entity.OrderFinishSnapshoot;
 
 /**
  * 订单工具类

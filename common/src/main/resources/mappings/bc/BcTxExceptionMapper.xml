@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.eq.modules.bc.dao.BcTxExceptionMapper">
+    <resultMap id="BaseResultMap" type="org.eq.modules.bc.entity.BcTxException">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="action_status" jdbcType="TINYINT" property="actionStatus" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+	    <result column="tx_hash" jdbcType="VARCHAR" property="txHash" />
+	    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_List">
+        action_status,create_time,id,tx_hash,update_time
+    </sql>
+
+    <select id="selectByExample" parameterType="org.eq.modules.bc.entity.BcTxExceptionExample" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List" />
+        from bc_tx_exception
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from bc_tx_exception
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from bc_tx_exception
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByExample" parameterType="org.eq.modules.bc.entity.BcTxExceptionExample">
+        delete from bc_tx_exception
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
+
+    <insert id="insert" parameterType="org.eq.modules.bc.entity.BcTxException">
+        insert into bc_tx_exception (action_status,create_time,tx_hash,update_time)
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{actionStatus,jdbcType=TINYINT},
+            #{createTime,jdbcType=TIMESTAMP},
+            #{txHash,jdbcType=VARCHAR},
+            #{updateTime,jdbcType=TIMESTAMP},
+        </trim>
+    </insert>
+
+    <insert id="insertSelective" parameterType="org.eq.modules.bc.entity.BcTxException">
+        insert into bc_tx_exception
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            action_status,
+            create_time,
+            tx_hash,
+            update_time,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{actionStatus,jdbcType=TINYINT},
+            #{createTime,jdbcType=TIMESTAMP},
+            #{txHash,jdbcType=VARCHAR},
+            #{updateTime,jdbcType=TIMESTAMP},
+        </trim>
+    </insert>
+
+    <select id="countByExample" parameterType="org.eq.modules.bc.entity.BcTxExceptionExample" resultType="java.lang.Long">
+        select count(*) from bc_tx_exception
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </select>
+
+    <update id="updateByExampleSelective" parameterType="map">
+        update bc_tx_exception
+        <set>
+            <if test="record.actionStatus != null">
+                action_status = #{record.actionStatus,jdbcType=TINYINT},
+            </if>
+            <if test="record.createTime != null">
+                create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.txHash != null">
+                tx_hash = #{record.txHash,jdbcType=VARCHAR},
+            </if>
+            <if test="record.updateTime != null">
+                update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByExample" parameterType="map">
+        update bc_tx_exception
+        set
+        <trim  suffixOverrides=",">
+            action_status = #{record.actionStatus,jdbcType=TINYINT},
+            create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            id = #{record.id,jdbcType=BIGINT},
+            tx_hash = #{record.txHash,jdbcType=VARCHAR},
+            update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+        </trim>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.modules.bc.entity.BcTxException">
+        update bc_tx_exception
+        <set>
+            <if test="actionStatus != null">
+            action_status = #{actionStatus,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="txHash != null">
+            tx_hash = #{txHash,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null">
+            update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="org.eq.modules.bc.entity.BcTxException">
+        update bc_tx_exception
+        set
+        <trim  suffixOverrides=",">
+              action_status = #{actionStatus,jdbcType=TINYINT},
+              create_time = #{createTime,jdbcType=TIMESTAMP},
+              tx_hash = #{txHash,jdbcType=VARCHAR},
+              update_time = #{updateTime,jdbcType=TIMESTAMP},
+        </trim>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+</mapper>

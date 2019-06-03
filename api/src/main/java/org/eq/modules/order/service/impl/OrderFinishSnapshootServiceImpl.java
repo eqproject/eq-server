@@ -4,32 +4,19 @@
  */
 package org.eq.modules.order.service.impl;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
-import org.eq.basic.common.util.DateUtil;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.common.utils.OrderUtil;
-import org.eq.modules.common.utils.ProductUtil;
-import org.eq.modules.enums.OrderAdStateEnum;
-import org.eq.modules.enums.OrderAdTypeEnum;
-import org.eq.modules.order.dao.OrderAdMapper;
-import org.eq.modules.order.entity.OrderAd;
-import org.eq.modules.order.entity.OrderAdExample;
-import org.eq.modules.order.entity.OrderAdLog;
 import org.eq.modules.order.service.OrderAdLogService;
-import org.eq.modules.order.service.OrderAdService;
 import org.eq.modules.order.service.OrderFinishSnapshootService;
 import org.eq.modules.order.vo.*;
-import org.eq.modules.orderFinish.dao.OrderFinishSnapshootMapper;
-import org.eq.modules.orderFinish.entity.OrderFinishSnapshoot;
-import org.eq.modules.orderFinish.entity.OrderFinishSnapshootExample;
-import org.eq.modules.product.entity.Product;
-import org.eq.modules.product.entity.UserProductStock;
+import org.eq.modules.orderfinish.dao.OrderFinishSnapshootMapper;
+import org.eq.modules.orderfinish.entity.OrderFinishSnapshoot;
+import org.eq.modules.orderfinish.entity.OrderFinishSnapshootExample;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.service.UserProductStockService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 

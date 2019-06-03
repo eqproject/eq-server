@@ -7,11 +7,9 @@ package org.eq.modules.order.service;
 import org.eq.basic.common.base.ServiceExtend;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.entitys.PageResultData;
-import org.eq.modules.order.entity.OrderAd;
-import org.eq.modules.order.entity.OrderAdExample;
 import org.eq.modules.order.vo.*;
-import org.eq.modules.orderFinish.entity.OrderFinishSnapshoot;
-import org.eq.modules.orderFinish.entity.OrderFinishSnapshootExample;
+import org.eq.modules.orderfinish.entity.OrderFinishSnapshoot;
+import org.eq.modules.orderfinish.entity.OrderFinishSnapshootExample;
 
 /**
  * 订单Service

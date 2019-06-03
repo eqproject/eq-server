@@ -4,9 +4,9 @@
  */
 package org.eq.modules.wallet.service;
 
-import org.eq.modules.wallet.entity.BcTxRecord;
-import org.eq.modules.wallet.entity.BcTxRecordExample;
 import org.eq.basic.common.base.ServiceExtend;
+import org.eq.modules.bc.entity.BcTxRecord;
+import org.eq.modules.bc.entity.BcTxRecordExample;
 
 /**
  * 激活钱包任务Service

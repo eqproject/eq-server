@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.eq.modules.bc.dao.InitiatorAccMapper">
+    <resultMap id="BaseResultMap" type="org.eq.modules.bc.entity.InitiatorAcc">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="address" jdbcType="VARCHAR" property="address" />
+        <result column="public_key" jdbcType="VARCHAR" property="publicKey" />
+        <result column="key_store" jdbcType="VARCHAR" property="keyStore" />
+        <result column="status" jdbcType="TINYINT" property="status" />
+        <result column="type" jdbcType="TINYINT" property="type" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_List">
+        address,create_time,id,key_store,public_key,status,type,update_time
+    </sql>
+
+    <select id="selectByExample" parameterType="org.eq.modules.bc.entity.InitiatorAccExample" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List" />
+        from initiator_acc
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from initiator_acc
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from initiator_acc
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByExample" parameterType="org.eq.modules.bc.entity.InitiatorAccExample">
+        delete from initiator_acc
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
+
+    <insert id="insert" parameterType="org.eq.modules.bc.entity.InitiatorAcc">
+        insert into initiator_acc (address,create_time,key_store,public_key,status,type,update_time)
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{address,jdbcType=VARCHAR},
+            #{createTime,jdbcType=TIMESTAMP},
+            #{keyStore,jdbcType=TEXT},
+            #{publicKey,jdbcType=VARCHAR},
+            #{status,jdbcType=TINYINT},
+            #{type,jdbcType=TINYINT},
+            #{updateTime,jdbcType=TIMESTAMP},
+        </trim>
+    </insert>
+
+    <insert id="insertSelective" parameterType="org.eq.modules.bc.entity.InitiatorAcc">
+        insert into initiator_acc
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            address,
+            create_time,
+            key_store,
+            public_key,
+            status,
+            type,
+            update_time,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{address,jdbcType=VARCHAR},
+            #{createTime,jdbcType=TIMESTAMP},
+            #{keyStore,jdbcType=TEXT},
+            #{publicKey,jdbcType=VARCHAR},
+            #{status,jdbcType=TINYINT},
+            #{type,jdbcType=TINYINT},
+            #{updateTime,jdbcType=TIMESTAMP},
+        </trim>
+    </insert>
+
+    <select id="countByExample" parameterType="org.eq.modules.bc.entity.InitiatorAccExample" resultType="java.lang.Long">
+        select count(*) from initiator_acc
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </select>
+
+    <update id="updateByExampleSelective" parameterType="map">
+        update initiator_acc
+        <set>
+            <if test="record.address != null">
+                address = #{record.address,jdbcType=VARCHAR},
+            </if>
+            <if test="record.createTime != null">
+                create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=INTEGER},
+            </if>
+            <if test="record.keyStore != null">
+                key_store = #{record.keyStore,jdbcType=TEXT},
+            </if>
+            <if test="record.publicKey != null">
+                public_key = #{record.publicKey,jdbcType=VARCHAR},
+            </if>
+            <if test="record.status != null">
+                status = #{record.status,jdbcType=TINYINT},
+            </if>
+            <if test="record.type != null">
+                type = #{record.type,jdbcType=TINYINT},
+            </if>
+            <if test="record.updateTime != null">
+                update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByExample" parameterType="map">
+        update initiator_acc
+        set
+        <trim  suffixOverrides=",">
+            address = #{record.address,jdbcType=VARCHAR},
+            create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            id = #{record.id,jdbcType=INTEGER},
+            key_store = #{record.keyStore,jdbcType=TEXT},
+            public_key = #{record.publicKey,jdbcType=VARCHAR},
+            status = #{record.status,jdbcType=TINYINT},
+            type = #{record.type,jdbcType=TINYINT},
+            update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+        </trim>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.modules.bc.entity.InitiatorAcc">
+        update initiator_acc
+        <set>
+            <if test="address != null">
+            address = #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="keyStore != null">
+            key_store = #{keyStore,jdbcType=TEXT},
+            </if>
+            <if test="publicKey != null">
+            public_key = #{publicKey,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+            status = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="type != null">
+            type = #{type,jdbcType=TINYINT},
+            </if>
+            <if test="updateTime != null">
+            update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="org.eq.modules.bc.entity.InitiatorAcc">
+        update initiator_acc
+        set
+        <trim  suffixOverrides=",">
+              address = #{address,jdbcType=VARCHAR},
+              create_time = #{createTime,jdbcType=TIMESTAMP},
+              key_store = #{keyStore,jdbcType=TEXT},
+              public_key = #{publicKey,jdbcType=VARCHAR},
+              status = #{status,jdbcType=TINYINT},
+              type = #{type,jdbcType=TINYINT},
+              update_time = #{updateTime,jdbcType=TIMESTAMP},
+        </trim>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+</mapper>

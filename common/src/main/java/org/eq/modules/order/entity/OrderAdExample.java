@@ -235,6 +235,10 @@ public class OrderAdExample {
             addCriterion("OA.status not in", values, "status");
             return (Criteria) this;
         }
+        public Criteria andUpdateDateBetween(Date value1, Date value2) {
+            addCriterion("update_date between", value1, value2, "updateDate");
+            return (Criteria) this;
+        }
 
     }
 

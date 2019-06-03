@@ -3,7 +3,7 @@ package org.eq.modules.order.task;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.eq.modules.order.biz.OrderFinishSnapshotBiz;
-import org.eq.modules.orderFinish.entity.OrderFinishSnapshoot;
+import org.eq.modules.orderfinish.entity.OrderFinishSnapshoot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

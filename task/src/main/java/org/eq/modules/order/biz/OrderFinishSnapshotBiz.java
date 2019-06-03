@@ -9,8 +9,8 @@ import org.eq.modules.enums.OrderTradeStateEnum;
 import org.eq.modules.order.dao.OrderAdMapper;
 import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.order.entity.OrderAdExample;
-import org.eq.modules.orderFinish.dao.OrderFinishSnapshootMapper;
-import org.eq.modules.orderFinish.entity.OrderFinishSnapshoot;
+import org.eq.modules.orderfinish.dao.OrderFinishSnapshootMapper;
+import org.eq.modules.orderfinish.entity.OrderFinishSnapshoot;
 import org.eq.modules.product.dao.ProductMapper;
 import org.eq.modules.product.entity.Product;
 import org.eq.modules.trade.dao.OrderTradeMapper;
@@ -50,7 +50,7 @@ public class OrderFinishSnapshotBiz {
 
         TaskTime time = new TaskTime().build();
 
-        ca.andStatusIn(status);
+        ca.andStatusInForAll(status);
         ca.andUpdateDateBetween(time.getStart(), time.getEnd());
         return orderAdMapper.selectByExample(example);
     }
