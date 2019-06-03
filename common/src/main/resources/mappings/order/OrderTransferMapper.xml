@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.eq.modules.order.dao.OrderTransferMapper">
+    <resultMap id="BaseResultMap" type="org.eq.modules.order.entity.OrderTransfer">
+        <id column="id" jdbcType="BIGINT" property="id" />
+	    <result column="user_id" jdbcType="BIGINT" property="userId" />
+	    <result column="transfer_no" jdbcType="VARCHAR" property="transferNo" />
+	    <result column="product_id" jdbcType="BIGINT" property="productId" />
+	    <result column="product_num" jdbcType="INTEGER" property="productNum" />
+	    <result column="status" jdbcType="TINYINT" property="status" />
+	    <result column="to_address" jdbcType="VARCHAR" property="toAddress" />
+	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+	    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+	    <result column="tx_id" jdbcType="BIGINT" property="txId" />
+    </resultMap>
+
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_List">
+        id,user_id,transfer_no,product_id,product_num,status,to_address,create_date,remarks,tx_id
+    </sql>
+
+    <select id="selectByExample" parameterType="org.eq.modules.order.entity.OrderTransferExample" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List" />
+        from order_transfer
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from order_transfer
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from order_transfer
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByExample" parameterType="org.eq.modules.order.entity.OrderTransferExample">
+        delete from order_transfer
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
+
+    <insert id="insert" parameterType="org.eq.modules.order.entity.OrderTransfer">
+        insert into order_transfer (user_id,transfer_no,product_id,product_num,status,to_address,create_date,remarks,tx_id)
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{userId,jdbcType=BIGINT},
+            #{transferNo,jdbcType=VARCHAR},
+            #{productId,jdbcType=BIGINT},
+            #{productNum,jdbcType=INTEGER},
+            #{status,jdbcType=TINYINT},
+            #{toAddress,jdbcType=VARCHAR},
+            #{createDate,jdbcType=TIMESTAMP},
+            #{remarks,jdbcType=VARCHAR},
+            #{txId,jdbcType=BIGINT},
+        </trim>
+    </insert>
+
+    <insert id="insertSelective" parameterType="org.eq.modules.order.entity.OrderTransfer">
+        insert into order_transfer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            user_id,
+            transfer_no,
+            product_id,
+            product_num,
+            status,
+            to_address,
+            create_date,
+            remarks,
+            tx_id,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{userId,jdbcType=BIGINT},
+            #{transferNo,jdbcType=VARCHAR},
+            #{productId,jdbcType=BIGINT},
+            #{productNum,jdbcType=INTEGER},
+            #{status,jdbcType=TINYINT},
+            #{toAddress,jdbcType=VARCHAR},
+            #{createDate,jdbcType=TIMESTAMP},
+            #{remarks,jdbcType=VARCHAR},
+            #{txId,jdbcType=BIGINT},
+        </trim>
+    </insert>
+
+    <select id="countByExample" parameterType="org.eq.modules.order.entity.OrderTransferExample" resultType="java.lang.Long">
+        select count(*) from order_transfer
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </select>
+
+    <update id="updateByExampleSelective" parameterType="map">
+        update order_transfer
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.userId != null">
+                user_id = #{record.userId,jdbcType=BIGINT},
+            </if>
+            <if test="record.transferNo != null">
+                transfer_no = #{record.transferNo,jdbcType=VARCHAR},
+            </if>
+            <if test="record.productId != null">
+                product_id = #{record.productId,jdbcType=BIGINT},
+            </if>
+            <if test="record.productNum != null">
+                product_num = #{record.productNum,jdbcType=INTEGER},
+            </if>
+            <if test="record.status != null">
+                status = #{record.status,jdbcType=TINYINT},
+            </if>
+            <if test="record.toAddress != null">
+                to_address = #{record.toAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="record.createDate != null">
+                create_date = #{record.createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.remarks != null">
+                remarks = #{record.remarks,jdbcType=VARCHAR},
+            </if>
+            <if test="record.txId != null">
+                tx_id = #{record.txId,jdbcType=BIGINT},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByExample" parameterType="map">
+        update order_transfer
+        set
+        <trim  suffixOverrides=",">
+            id = #{record.id,jdbcType=BIGINT},
+            user_id = #{record.userId,jdbcType=BIGINT},
+            transfer_no = #{record.transferNo,jdbcType=VARCHAR},
+            product_id = #{record.productId,jdbcType=BIGINT},
+            product_num = #{record.productNum,jdbcType=INTEGER},
+            status = #{record.status,jdbcType=TINYINT},
+            to_address = #{record.toAddress,jdbcType=VARCHAR},
+            create_date = #{record.createDate,jdbcType=TIMESTAMP},
+            remarks = #{record.remarks,jdbcType=VARCHAR},
+            tx_id = #{record.txId,jdbcType=BIGINT},
+        </trim>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.modules.order.entity.OrderTransfer">
+        update order_transfer
+        <set>
+            <if test="userId != null">
+            user_id = #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="transferNo != null">
+            transfer_no = #{transferNo,jdbcType=VARCHAR},
+            </if>
+            <if test="productId != null">
+            product_id = #{productId,jdbcType=BIGINT},
+            </if>
+            <if test="productNum != null">
+            product_num = #{productNum,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+            status = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="toAddress != null">
+            to_address = #{toAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="createDate != null">
+            create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remarks != null">
+            remarks = #{remarks,jdbcType=VARCHAR},
+            </if>
+            <if test="txId != null">
+            tx_id = #{txId,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="org.eq.modules.order.entity.OrderTransfer">
+        update order_transfer
+        set
+        <trim  suffixOverrides=",">
+              user_id = #{userId,jdbcType=BIGINT},
+              transfer_no = #{transferNo,jdbcType=VARCHAR},
+              product_id = #{productId,jdbcType=BIGINT},
+              product_num = #{productNum,jdbcType=INTEGER},
+              status = #{status,jdbcType=TINYINT},
+              to_address = #{toAddress,jdbcType=VARCHAR},
+              create_date = #{createDate,jdbcType=TIMESTAMP},
+              remarks = #{remarks,jdbcType=VARCHAR},
+              tx_id = #{txId,jdbcType=BIGINT},
+        </trim>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+</mapper>

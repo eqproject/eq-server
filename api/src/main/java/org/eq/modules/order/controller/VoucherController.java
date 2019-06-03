@@ -2,7 +2,7 @@
  *  该类有generator 自动生成
  * Copyright &copy; 2017-2018 All rights reserved.
  */
-package org.eq.modules.product.controller;
+package org.eq.modules.order.controller;
 
 import org.eq.basic.common.base.BaseController;
 import org.eq.modules.auth.entity.User;
