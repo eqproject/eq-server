@@ -11,6 +11,7 @@ import org.eq.modules.product.entity.UserProductStock;
 import org.eq.modules.product.entity.UserProductStockExample;
 import org.eq.modules.product.vo.ProductBaseVO;
 import org.eq.modules.product.vo.SearchPageProductVO;
+import org.eq.modules.product.vo.VoucherProductBaseVO;
 
 import java.util.List;
 
@@ -66,6 +67,16 @@ public interface UserProductStockService extends ServiceExtend<UserProductStock,
      * @return
      */
     List<Long> listUserProdutId(User user);
+
+
+    /**
+     *  分页获取用户钱包数据
+     * @param searchPageProductVO
+     * @param user
+     * @return
+     */
+    PageResultData<VoucherProductBaseVO> pageVoucherProduct(SearchPageProductVO searchPageProductVO, User user);
+
 
 
 }

@@ -89,6 +89,32 @@ public class ProductUtil  extends ProductBusines {
         result.setIssuerIntro(productAll.getIssuerIntro());
         result.setNumber(productAll.getNumber());
         result.setLockedNum(productAll.getLockNumber());
+
+        return result;
+    }
+
+
+    /**
+     * 转化对象实体
+     * @param product
+     * @return
+     */
+    public static VoucherProductBaseVO transObjForVoucher(Product product){
+        if(product==null){
+            return null;
+        }
+        VoucherProductBaseVO result = new VoucherProductBaseVO();
+        result.setId(product.getId());
+        result.setProductId(product.getId());
+        result.setProductName(product.getName());
+        result.setUnitPrice(product.getUnitPrice());
+        result.setImg(product.getProductImg());
+        result.setExpirationStart(product.getExpirationStart());
+        result.setExpirationEnd(product.getExpirationEnd());
+        result.setSort(product.getSort());
+        ProductExtend productExtend = formatExtend(product.getExtendInfo());
+        result.setReceive(productExtend.getReceive());
+        result.setDesc(productExtend.getTicketDesc());
         return result;
     }
 
@@ -196,7 +222,6 @@ public class ProductUtil  extends ProductBusines {
      * @return
      * TODO 实现区块链同步商品接口
      */
-
     public static Map<String,TicketProductVO> getTicketUserProduct(String address){
         Map<String,TicketProductVO> result = new HashMap<>();
         if("KAKA".equals(address)){
@@ -232,6 +257,17 @@ public class ProductUtil  extends ProductBusines {
         }
         return result;
     }
+
+
+    /**
+     * 区块链商品转让
+     * @return
+     * TODO 实现转让接口
+     */
+    public static boolean transferProduct(TicketProductVO ticketProductVO,int number){
+        return true;
+    }
+
 
     public static void main(String[] args) {
         ProductAll productAll = new ProductAll();

@@ -22,6 +22,7 @@ import org.eq.modules.product.service.UserProductStockService;
 import org.eq.modules.product.vo.ProductBaseVO;
 import org.eq.modules.product.vo.SearchPageProductVO;
 import org.eq.modules.product.vo.TicketProductVO;
+import org.eq.modules.product.vo.VoucherProductBaseVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +42,6 @@ import java.util.*;
 public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductStockMapper, UserProductStock, UserProductStockExample> implements UserProductStockService {
 
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
-
-
-	@Autowired
-	public UserProductStockServiceImpl(UserProductStockMapper userProductStockMapper){
-		super.setMapper(userProductStockMapper);
-	}
 
 	@Autowired
 	ProductBlockchainService productBlockchainService;
@@ -213,7 +208,58 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 			result.add(product.getId());
 		}
 		return result;
+	}
 
+	@Override
+	public PageResultData<VoucherProductBaseVO> pageVoucherProduct(SearchPageProductVO searchPageProductVO, User user) {
+		PageResultData<VoucherProductBaseVO> result = new PageResultData<>();
+		if(user ==null || StringUtils.isEmpty(user.getTxPassword())){
+			return result;
+		}
+		Map<String,TicketProductVO> tickMap = ProductUtil.getTicketUserProduct(user.getTxPassword());
+		if(tickMap ==null || tickMap.size()<=0){
+			return result;
+		}
+		if(searchPageProductVO ==null){
+			searchPageProductVO = new SearchPageProductVO();
+		}
+		if(searchPageProductVO.getPageSize()<=0 || searchPageProductVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
+			searchPageProductVO.setPageSize(StaticEntity.MAX_PAGE_SIZE);
+		}
+		if(searchPageProductVO.getPageNum()<=0){
+			searchPageProductVO.setPageNum(1);
+		}
+		//组装可返回实体列表
+		List<VoucherProductBaseVO> allReult = new ArrayList<>();
+		Iterator<String> ite = tickMap.keySet().iterator();
+		while(ite.hasNext()){
+			String key = ite.next();
+			TicketProductVO ticketProductVO = tickMap.get(key);
+			String productId = productCache.getProductIdByTicketKey(key);
+			if(StringUtils.isEmpty(productId)){
+				continue;
+			}
+			Product product = productService.selectByPrimaryKey(Long.valueOf(productId));
+			if(!ProductUtil.isEffect(product)){
+				continue;
+			}
+			int tickNum = Integer.valueOf(ticketProductVO.getBalance());
+			int lockNum =  getLockedStockNum(product.getId(),user.getId());
+			if((tickNum - lockNum)<=0){
+				continue;
+			}
+
+			VoucherProductBaseVO voucherProductBaseVO = ProductUtil.transObjForVoucher(product);
+			voucherProductBaseVO.setNumber(tickNum);
+			voucherProductBaseVO.setLockNumber(lockNum);
+			voucherProductBaseVO.setEffectNumber(tickNum-lockNum);
+			allReult.add(voucherProductBaseVO);
+		}
+		Collections.sort(allReult,new ProductBaseVO());
+		List<VoucherProductBaseVO> dataList = pageVoucherBySubList(allReult,searchPageProductVO.getPageSize(),searchPageProductVO.getPageNum());
+		result.setList(dataList);
+		result.setTotal(allReult.size());
+		return result;
 	}
 
 	/**
@@ -285,6 +331,38 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 		int totalcount = list.size();
 		int pagecount = 0;
 		List<ProductBaseVO> subList = new ArrayList<>();
+		int m = totalcount % pagesize;
+		if (m > 0) {
+			pagecount = totalcount / pagesize + 1;
+		} else {
+			pagecount = totalcount / pagesize;
+		}
+		int start = (currentPage - 1) * pagesize;
+		if(start>totalcount){
+			return subList;
+		}
+		int end = pagesize * (currentPage);
+		if(m!=0 && currentPage == pagecount){
+			end = totalcount;
+		}
+		if(end>totalcount){
+			end = totalcount;
+		}
+		return  list.subList(start,end );
+	}
+
+
+	/**
+	 * 分页 券包
+	 * @param list
+	 * @param pagesize
+	 * @param currentPage
+	 * @return
+	 */
+	private static List<VoucherProductBaseVO> pageVoucherBySubList(List<VoucherProductBaseVO> list, int pagesize, int currentPage) {
+		int totalcount = list.size();
+		int pagecount = 0;
+		List<VoucherProductBaseVO> subList = new ArrayList<>();
 		int m = totalcount % pagesize;
 		if (m > 0) {
 			pagecount = totalcount / pagesize + 1;
