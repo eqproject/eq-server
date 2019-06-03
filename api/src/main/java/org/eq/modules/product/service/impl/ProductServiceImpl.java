@@ -45,12 +45,6 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
-	@Autowired
-	public ProductServiceImpl(ProductMapper mapper){
-		super.setMapper(mapper);
-	}
-
 	@Autowired
 	private ProductMapper productMapper;
 
