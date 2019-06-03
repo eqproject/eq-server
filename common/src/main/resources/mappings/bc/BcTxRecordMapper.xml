@@ -140,6 +140,28 @@
         </trim>
     </insert>
 
+    <insert id="insertReturnId" parameterType="org.eq.modules.bc.entity.BcTxRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into bc_tx_record (asset_code,asset_issuer,asset_type,biz_type,contract_address,create_time,from_address,opt_metadata,ticketId,to_address,trancheId,transfer_amount,tx_hash,tx_status,update_time)
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{assetCode,jdbcType=VARCHAR},
+            #{assetIssuer,jdbcType=VARCHAR},
+            #{assetType,jdbcType=TINYINT},
+            #{bizType,jdbcType=TINYINT},
+            #{contractAddress,jdbcType=VARCHAR},
+            #{createTime,jdbcType=TIMESTAMP},
+            #{fromAddress,jdbcType=VARCHAR},
+            #{optMetadata,jdbcType=VARCHAR},
+            #{ticketid,jdbcType=VARCHAR},
+            #{toAddress,jdbcType=VARCHAR},
+            #{trancheid,jdbcType=VARCHAR},
+            #{transferAmount,jdbcType=VARCHAR},
+            #{txHash,jdbcType=VARCHAR},
+            #{txStatus,jdbcType=TINYINT},
+            #{updateTime,jdbcType=TIMESTAMP},
+        </trim>
+    </insert>
+
     <insert id="insertSelective" parameterType="org.eq.modules.bc.entity.BcTxRecord">
         insert into bc_tx_record
         <trim prefix="(" suffix=")" suffixOverrides=",">

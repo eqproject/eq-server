@@ -16,9 +16,11 @@ import org.eq.modules.auth.service.UserService;
 import org.eq.modules.auth.util.WalletUtil;
 import org.eq.modules.bc.entity.BcTxRecord;
 import org.eq.modules.common.entitys.ResponseData;
+import org.eq.modules.common.enums.ResponseStateEnum;
 import org.eq.modules.common.factory.ResponseFactory;
 import org.eq.modules.common.utils.AESUtils;
 import org.eq.modules.common.utils.MD5Utils;
+import org.eq.modules.enums.WalletStateEnum;
 import org.eq.modules.wallet.entity.UserWallet;
 import org.eq.modules.wallet.service.BcTxRecordService;
 import org.eq.modules.wallet.service.UserWalletService;
@@ -148,24 +150,46 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             return ResponseFactory.paramsError("验证码为空");
         }
         //检查验证码
-        String captchaRedis = (String) redisTemplate.opsForValue().get(mobile);
-        if (!captcha.equals(captchaRedis)) {
+        if (!checkCaptcha(mobile, captcha)) {
             return ResponseFactory.paramsError("验证码错误");
         }
 
         // 1.添加用户
         User user = new User();
         user.setMobile(mobile);
-        user.setCreateDate(new Date());
-        user.setUpdateDate(new Date());
-        insertRecordReturnId(user);
+        //检查是否已注册
+        if (checkDuplicateMobile(user)) {
+            return ResponseFactory.paramsError("该手机号已注册");
+        }
+        Long userId = saveUser(user);
         // 2.生成钱包地址
         String address = WalletUtil.getWalletAddr();
 
         // 3.bc_tx_record插入一条记录
         BcTxRecord bcTxRecord = new BcTxRecord();
-        bcTxRecord.setFromAddress("平台账户");
         bcTxRecord.setToAddress(address);
+        Long txId = addBcTxRecord(bcTxRecord);
+
+        //4.插入user_wallet钱包地址
+        UserWallet wallet = new UserWallet();
+        wallet.setUserId(userId);
+        wallet.setAddress(address);
+        wallet.setTxId(txId);
+        wallet.setStatus(WalletStateEnum.NO_ACTIVE.getState());
+        wallet.setCreateDate(new Date());
+        wallet.setUpdateDate(new Date());
+        userWalletService.insertRecordReturnId(wallet);
+
+        return ResponseFactory.success(user);
+    }
+
+    /**
+     * bc_tx_record添加一条激活账户的记录
+     * @param bcTxRecord
+     * @return
+     */
+    private Long addBcTxRecord(BcTxRecord bcTxRecord) {
+        bcTxRecord.setFromAddress("平台账户");
         bcTxRecord.setTransferAmount("0.01");
         bcTxRecord.setAssetType(2);
         bcTxRecord.setTxStatus(0);
@@ -173,22 +197,23 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         bcTxRecord.setCreateTime(new Date());
         bcTxRecord.setUpdateTime(new Date());
         bcTxRecord.setOptMetadata("激活账户");
-
         bcTxRecordService.insertRecordReturnId(bcTxRecord);
-
-        UserWallet wallet = new UserWallet();
-        wallet.setUserId(user.getId());
-        wallet.setAddress(address);
-        wallet.setStatus(0);
-        wallet.setTxId(bcTxRecord.getId());
-        wallet.setCreateDate(new Date());
-        wallet.setUpdateDate(new Date());
-
-        // 4.插入user_wallet钱包地址
-        userWalletService.insertRecordReturnId(wallet);
-
-        return ResponseFactory.success(user);
+        return bcTxRecord.getId();
     }
+
+    /**
+     * 保存用户，返回ID
+     *
+     * @param user
+     * @return
+     */
+    private Long saveUser(User user) {
+        user.setCreateDate(new Date());
+        user.setUpdateDate(new Date());
+        insertRecordReturnId(user);
+        return user.getId();
+    }
+
 
     @Override
     public ResponseData reset(String userId, String pwd) {
@@ -247,5 +272,35 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         }
     }
 
+    @Override
+    public ResponseData mobileLogin(String mobile, String captcha) {
+        if (!checkCaptcha(mobile, captcha)) {
+            return ResponseFactory.paramsError("验证码错误");
+        }
+        return ResponseFactory.success(null);
+    }
+
+    /**
+     * 检查手机验证码是否正确
+     *
+     * @param mobile
+     * @param captcha
+     * @return
+     */
+    private Boolean checkCaptcha(String mobile, String captcha) {
+        String captchaRedis = (String) redisTemplate.opsForValue().get(mobile);
+        return captcha.equals(captchaRedis);
+    }
+
+    /**
+     * 检查手机号是否已注册
+     *
+     * @param user
+     * @return
+     */
+    private boolean checkDuplicateMobile(User user) {
+        User checkUser = selectByRecord(user);
+        return checkUser != null;
+    }
 
 }

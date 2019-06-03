@@ -5,7 +5,6 @@
 package org.eq.modules.support.entity;
 
 import lombok.Data;
-import org.eq.basic.common.base.BaseEntity;
 
 /**
  * 文案相关Entity
@@ -13,7 +12,7 @@ import org.eq.basic.common.base.BaseEntity;
  * @version 2019-06-02
  */
 @Data
-public class Support extends BaseEntity {
+public class Support{
 
 	private static final long serialVersionUID = 1L;
 	private Long id;		// 主键

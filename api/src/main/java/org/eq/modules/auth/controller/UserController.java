@@ -72,7 +72,7 @@ public class UserController extends BaseController {
     }
 
     /**
-     * 用户登录接口
+     * 用户登录接口(密码登录方式)
      *
      * @param request
      * @return
@@ -82,6 +82,18 @@ public class UserController extends BaseController {
         String userId = request.getParameter("userId");
         String pwd = request.getParameter("pwd");
         return userService.login(userId,pwd);
+    }
+
+    /**
+     * 用户登录接口(手机验证码登录)
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/mobileLogin")
+    public ResponseData mobileLogin(HttpServletRequest request){
+        String mobile = request.getParameter("mobile");
+        String captcha = request.getParameter("captcha");
+        return userService.mobileLogin(mobile, captcha);
     }
 
     /**

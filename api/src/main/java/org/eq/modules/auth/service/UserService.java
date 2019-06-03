@@ -20,4 +20,5 @@ public interface UserService extends ServiceExtend<User, UserExample> {
     ResponseData reset(String userId, String pwd);
     ResponseData login(String userId, String pwd);
     ResponseData verify(UserIdentityAuth userIdentityAuth);
+    ResponseData mobileLogin(String mobile, String captcha);
 }

@@ -7,6 +7,7 @@ package org.eq.modules.wallet.service.impl;
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.StringLowUtils;
+import org.eq.modules.enums.WalletStateEnum;
 import org.eq.modules.wallet.dao.UserWalletMapper;
 import org.eq.modules.wallet.entity.UserWallet;
 import org.eq.modules.wallet.entity.UserWalletExample;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -77,4 +79,16 @@ public class UserWalletServiceImpl extends ServiceImplExtend<UserWalletMapper, U
 		return example;
 	}
 
+	/**
+	 * 激活钱包
+	 * @param userId
+	 * @return
+	 */
+	@Override
+	public Integer activateWallet(Long userId) {
+		UserWallet wallet = new UserWallet();
+		wallet.setUpdateDate(new Date());
+		wallet.setStatus(WalletStateEnum.ACTIVE.getState());
+		return updateByPrimaryKeySelective(wallet);
+	}
 }

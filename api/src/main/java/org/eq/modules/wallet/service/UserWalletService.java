@@ -14,5 +14,5 @@ import org.eq.basic.common.base.ServiceExtend;
  * @version 2019-05-30
  */
 public interface UserWalletService extends ServiceExtend<UserWallet,UserWalletExample> {
-
+    Integer activateWallet(Long userId);
 }
