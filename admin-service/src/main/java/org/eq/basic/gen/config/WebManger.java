@@ -436,8 +436,7 @@ public class WebManger {
                 tableDataModals.add(tableDataModal);
             }
         } catch(Exception e) {
-            logger.debug(e.getMessage());
-            ;
+            logger.error("error",e);
         }
         return tableDataModals;
     }

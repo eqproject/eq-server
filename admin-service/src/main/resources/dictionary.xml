@@ -82,6 +82,10 @@
 				<value>tinyint</value>
 				<label>TINYINT</label>
 			</field>
+			<field>
+				<value>text</value>
+				<label>VARCHAR</label>
+			</field>
 			<value>mysql</value>
 		</dbType>
 		<dbType>
@@ -165,6 +169,10 @@
 		</field>
 		<field>
 			<value>char</value>
+			<label>String</label>
+		</field>
+		<field>
+			<value>text</value>
 			<label>String</label>
 		</field>
 		<field>
