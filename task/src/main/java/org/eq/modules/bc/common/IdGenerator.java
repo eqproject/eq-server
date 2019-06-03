@@ -4,8 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
-import io.bumo.mall.talent.common.util.StringRandom;
 import io.bumo.mall.talent.enums.IdTypeEnum;
+import org.eq.modules.bc.common.util.StringRandom;
 
 /**
  * create id generator 

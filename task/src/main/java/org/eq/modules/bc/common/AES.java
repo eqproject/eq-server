@@ -15,7 +15,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.codec.binary.Base64;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class AES {
@@ -71,7 +71,7 @@ public static boolean initialized = false;
          
          String iv1Str = "6u02UWMciYDFwR5SmElPYQ==";
          //进行解密  
-         byte[] data1 = decrypt(Base64.decodeBase64(encryptedDataStr), Base64.decodeBase64(key1),Base64.decodeBase64(iv1Str));  
+         byte[] data1 = decrypt(Base64.decodeBase64(encryptedDataStr), Base64.decodeBase64(key1),Base64.decodeBase64(iv1Str));
          System.out.println("解密得到的数据 : " + new String(data1));  
 	}
 }

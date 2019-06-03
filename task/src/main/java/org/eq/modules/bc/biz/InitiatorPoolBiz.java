@@ -5,11 +5,14 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.eq.modules.bc.common.ConstantsUtil;
+import org.eq.modules.bc.common.util.RedisUtil;
+import org.eq.modules.bc.entity.InitiatorAcc;
+import org.eq.modules.bc.service.InitiatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import io.bumo.mall.talent.common.ConstantsUtil;
-import io.bumo.mall.talent.common.util.RedisUtil;
 import io.bumo.mall.talent.domain.InitiatorAcc;
 import io.bumo.mall.talent.enums.BcAccountTypeEnum;
 import io.bumo.mall.talent.service.InitiatorService;

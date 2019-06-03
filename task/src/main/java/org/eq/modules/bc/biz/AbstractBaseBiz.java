@@ -2,6 +2,7 @@ package org.eq.modules.bc.biz;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.eq.modules.bc.common.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 

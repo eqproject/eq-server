@@ -1,7 +1,5 @@
 package org.eq.modules.bc.common.log;
 
-import io.bumo.mall.talent.common.log.Logger;
-
 public final class LoggerFactory {
     private static final String EMPTY_PREFIX = null;
 

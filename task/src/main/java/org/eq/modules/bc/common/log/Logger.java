@@ -1,8 +1,7 @@
 package org.eq.modules.bc.common.log;
 
+import org.eq.modules.blockchain.common.util.StringUtil;
 import org.slf4j.Marker;
-
-import io.bumo.mall.talent.common.util.StringUtil;
 
 public class Logger implements org.slf4j.Logger {
     private static final String LEFT_SQUARE_BRACKET = "[";

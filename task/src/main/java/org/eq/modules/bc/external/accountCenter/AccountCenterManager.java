@@ -5,7 +5,11 @@ import java.util.HashSet;
 import java.util.Map;
 
 import org.eq.modules.bc.common.util.HttpKit;
+import org.eq.modules.bc.enums.ExceptionEnum;
+import org.eq.modules.bc.external.accountCenter.resp.AccCenterSignBlobResp;
+import org.eq.modules.bc.external.accountCenter.resp.AccountCenterGetAccessTokenResp;
 import org.eq.modules.bc.external.accountCenter.resp.AccountCenterRegisterResp;
+import org.eq.modules.bc.external.accountCenter.resp.AccountCenterSignBlobListResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -91,7 +95,7 @@ public class AccountCenterManager {
 		return null;
 	}
 	
-	public AccCenterSignBlobResp signBlob(String address,String blob, String accessToken){
+	public AccCenterSignBlobResp signBlob(String address, String blob, String accessToken){
 		String url = ipUrl+"/sign/blob";
 		AccCenterSignBlobResp accCenterSignBlobResp = null;
 		try{
@@ -116,7 +120,7 @@ public class AccountCenterManager {
 	}
 	
 	
-	public AccountCenterSignBlobListResp signBlobList(HashSet<String> addressList,String blob, String accessToken){
+	public AccountCenterSignBlobListResp signBlobList(HashSet<String> addressList, String blob, String accessToken){
 		String url = ipUrl+"/sign/blob/list";
 		AccountCenterSignBlobListResp resp = null;
 		try{

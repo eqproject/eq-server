@@ -1,47 +1,63 @@
 package org.eq.modules.bc.service;
 
-import java.util.List;
-
+import com.github.pagehelper.PageHelper;
+import lombok.RequiredArgsConstructor;
+import org.eq.modules.bc.dao.BcTxRecordMapper;
+import org.eq.modules.bc.entity.BcTxRecord;
+import org.eq.modules.bc.entity.BcTxRecordExample;
+import org.eq.modules.bc.enums.BcStatusEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import io.bumo.mall.talent.dao.BcTxRecordDAO;
-import io.bumo.mall.talent.domain.BcTxRecord;
-import io.bumo.mall.talent.enums.BcStatusEnum;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BcTxService {
-	
-	@Autowired
-	private BcTxRecordDAO bcTxRecordDAO;
+	private final BcTxRecordMapper bcTxRecordMapper;
 	
 	public long insertBcTxRecord(BcTxRecord bcTxRecord){
-		return bcTxRecordDAO.addBcTxRecord(bcTxRecord);
+		Date now = new Date();
+		bcTxRecord.setCreateTime(now);
+		bcTxRecord.setUpdateTime(now);
+		bcTxRecordMapper.insertReturnId(bcTxRecord);
+		return bcTxRecord.getId();
 	}
 	
 	public List<BcTxRecord> queryBcTxRecord4Init(){
-		return bcTxRecordDAO.queryBcTxRecord4Init(BcStatusEnum.INIT.getCode());
+		BcTxRecordExample example = new BcTxRecordExample();
+		BcTxRecordExample.Criteria c = example.or();
+		c.andTxStatusEqualTo(BcStatusEnum.INIT.getCode());
+		example.setOrderByClause("create_time");
+		PageHelper.startPage(0, 80);
+		return bcTxRecordMapper.selectByExample(example);
 	}
 	
 	public int updateBcTxRecord4BcProcess(List<BcTxRecord> recordList, String hash) {
-		StringBuffer sb = new StringBuffer();
-		sb.append(" and id in (");
-		int length = recordList.size();
-		for(int i=0;i<length;i++){
-			BcTxRecord bcTxRecord = recordList.get(i);
-			sb.append(bcTxRecord.getId());
-			if(i!=length-1){
-				sb.append(",");
-			}
+		if(recordList==null || recordList.isEmpty()){
+			return 0;
 		}
-		sb.append(")");
-		return bcTxRecordDAO.updateBcHashAndTxStatus(hash, BcStatusEnum.PROCESS.getCode(), sb.toString());
+		List<Long> ids = recordList.stream().map(o->o.getId()).collect(Collectors.toList());
+
+		BcTxRecord record = new BcTxRecord();
+		record.setTxHash(hash);
+		record.setTxStatus(BcStatusEnum.PROCESS.getCode());
+
+		BcTxRecordExample example = new BcTxRecordExample();
+		BcTxRecordExample.Criteria c = example.or();
+		c.andIdIn(ids);
+		return bcTxRecordMapper.updateByExampleSelective(record,example);
 	}
 	
 	public List<BcTxRecord> queryBcTxRecord4Hash(String txHash){
-		return bcTxRecordDAO.queryBcTxRecordByHash(txHash);
+		BcTxRecordExample example = new BcTxRecordExample();
+		BcTxRecordExample.Criteria c = example.or();
+		c.andTxHashEqualTo(txHash);
+		return bcTxRecordMapper.selectByExample(example);
 	}
 	
 	public BcTxRecord queryBcTxRecordById(String id){
-		return bcTxRecordDAO.queryBcTxRecordById(id);
+		return bcTxRecordMapper.selectByPrimaryKey(Long.parseLong(id));
 	}
 	
 }
