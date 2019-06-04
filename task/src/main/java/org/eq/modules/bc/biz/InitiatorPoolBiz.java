@@ -1,10 +1,5 @@
 package org.eq.modules.bc.biz;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
 import org.eq.modules.bc.common.ConstantsUtil;
 import org.eq.modules.bc.common.util.RedisUtil;
 import org.eq.modules.bc.entity.InitiatorAcc;
@@ -12,10 +7,9 @@ import org.eq.modules.bc.service.InitiatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import io.bumo.mall.talent.common.ConstantsUtil;
-import io.bumo.mall.talent.domain.InitiatorAcc;
-import io.bumo.mall.talent.enums.BcAccountTypeEnum;
-import io.bumo.mall.talent.service.InitiatorService;
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InitiatorPoolBiz {
 	
@@ -42,6 +36,7 @@ public class InitiatorPoolBiz {
 	
 	@PostConstruct
 	public void init(){
+		/*
 		buyMiddleAcc = initiatorService.queryMiddleAccountByType(BcAccountTypeEnum.BUY.getCode());
 		refundMiddleAcc = initiatorService.queryMiddleAccountByType(BcAccountTypeEnum.REFUND.getCode());
 		pickUpMiddleAcc = initiatorService.queryMiddleAccountByType(BcAccountTypeEnum.PICK_UP.getCode());
@@ -49,7 +44,9 @@ public class InitiatorPoolBiz {
 		rewardMiddleAcc = initiatorService.queryMiddleAccountByType(BcAccountTypeEnum.REWARD.getCode());
 		activityMiddleAcc = initiatorService.queryMiddleAccountByType(BcAccountTypeEnum.ACTIVITY.getCode());
 		activityRecycleAcc = initiatorService.queryMiddleAccountByType(BcAccountTypeEnum.COUPON_RECYCLE.getCode());
+		*/
 	}
+
 	
 	public String getInitiator(){
 		//当redis中的缓存账户数小于某个值时 需要重新插入

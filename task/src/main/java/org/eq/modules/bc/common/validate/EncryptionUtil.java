@@ -1,14 +1,12 @@
 package org.eq.modules.bc.common.validate;
 
-import java.security.MessageDigest;
-
 import org.apache.commons.codec.binary.Base64;
+import org.eq.modules.bc.common.log.Logger;
+import org.eq.modules.bc.common.log.LoggerFactory;
+import org.eq.modules.bc.common.util.Constants;
+import org.eq.modules.bc.common.util.StringUtil;
 
-import io.bumo.mall.talent.common.log.Logger;
-import io.bumo.mall.talent.common.log.LoggerFactory;
-import io.bumo.mall.talent.common.util.Constants;
-import io.bumo.mall.talent.common.util.StringUtil;
-
+import java.security.MessageDigest;
 
 
 public class EncryptionUtil {

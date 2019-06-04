@@ -1,5 +1,11 @@
 package org.eq.modules.bc.common.validate;
 
+import org.eq.modules.bc.common.log.Logger;
+import org.eq.modules.bc.common.log.LoggerFactory;
+import org.eq.modules.bc.common.util.ClassUtil;
+import org.eq.modules.bc.common.util.DateUtil;
+import org.eq.modules.bc.common.util.StringUtil;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -7,12 +13,6 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
-
-import io.bumo.mall.talent.common.log.Logger;
-import io.bumo.mall.talent.common.log.LoggerFactory;
-import io.bumo.mall.talent.common.util.ClassUtil;
-import io.bumo.mall.talent.common.util.DateUtil;
-import io.bumo.mall.talent.common.util.StringUtil;
 
 
 @SuppressWarnings({"rawtypes"})

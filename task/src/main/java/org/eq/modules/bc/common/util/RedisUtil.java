@@ -2,8 +2,9 @@ package org.eq.modules.bc.common.util;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
 import org.eq.modules.bc.common.log.Logger;
+import org.eq.modules.bc.common.log.LoggerFactory;
+import redis.clients.jedis.BinaryClient;
 import redis.clients.jedis.BinaryClient.LIST_POSITION;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -14,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class RedisUtil {
-    private static final Logger LOGGER = Logger.getLogger(RedisUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RedisUtil.class);
     private static JedisPool pool = null;
 
     private static RedisUtil ru = new RedisUtil();

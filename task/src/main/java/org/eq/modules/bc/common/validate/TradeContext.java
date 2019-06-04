@@ -1,11 +1,11 @@
 package org.eq.modules.bc.common.validate;
 
+import org.eq.modules.bc.common.log.Logger;
+import org.eq.modules.bc.common.log.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
-
-import io.bumo.mall.talent.common.log.Logger;
-import io.bumo.mall.talent.common.log.LoggerFactory;
 
 @SuppressWarnings("unchecked")
 public final class TradeContext {

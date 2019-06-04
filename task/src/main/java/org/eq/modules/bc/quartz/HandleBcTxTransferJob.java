@@ -14,7 +14,6 @@ import org.eq.modules.bc.entity.BcTxRecord;
 import org.eq.modules.bc.entity.BlockchainTx;
 import org.eq.modules.bc.entity.InitiatorAcc;
 import org.eq.modules.bc.enums.BcStatusEnum;
-import org.eq.modules.bc.external.accountCenter.AccountCenterManager;
 import org.eq.modules.bc.external.bc.BlockChainManager;
 import org.eq.modules.bc.external.bc.req.BatchSubmitTxReq;
 import org.eq.modules.bc.external.bc.req.BcTransferReq;
@@ -50,8 +49,6 @@ public class HandleBcTxTransferJob {
 	private BlockChainManager blockChainManager;
 	@Autowired
 	private UserWalletMapper userWalletMapper;
-	@Autowired
-	private AccountCenterManager accountCenterManager;
 
 	@Scheduled(cron = "* 0/1 * * * ?")
 	public void execute(){
