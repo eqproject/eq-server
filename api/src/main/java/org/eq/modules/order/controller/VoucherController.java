@@ -4,11 +4,15 @@
  */
 package org.eq.modules.order.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.base.BaseController;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
+import org.eq.modules.order.service.OrderAcceptService;
+import org.eq.modules.order.service.OrderTransferService;
+import org.eq.modules.order.vo.*;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.service.UserProductStockService;
 import org.eq.modules.product.vo.*;
@@ -29,7 +33,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class VoucherController extends BaseController {
 
 	@Autowired
-	private ProductService productService;
+	private OrderTransferService orderTransferService;
+
+	@Autowired
+	private OrderAcceptService orderAcceptService;
 
 	@Autowired
 	private UserProductStockService userProductStockService;
@@ -50,6 +57,52 @@ public class VoucherController extends BaseController {
 		}
 		PageResultData<VoucherProductBaseVO> pageResultData =  userProductStockService.pageVoucherProduct(searchPageProductVO,user);
 		return ResponseFactory.success(pageResultData);
+	}
+
+
+	/**
+	 * 转出
+	 * @return
+	 */
+	@PostMapping("/user/turnout")
+	public ResponseData<OrderTransVO> turnout(SearchTransOrderVO searchTransOrderVO) {
+		if(searchTransOrderVO ==null){
+			return ResponseFactory.paramsError("参数为空或者用户ID为空");
+		}
+		User user = getUserInfo(searchTransOrderVO.getUserId());
+		if(user==null){
+			return ResponseFactory.signError("用户不存在");
+		}
+		if(StringUtils.isEmpty(searchTransOrderVO.getAddress())){
+			return ResponseFactory.signError("转出地址为空");
+		}
+
+		ServieReturn<OrderTransVO>  resOrderAdVO =  orderTransferService.createTransOrderVO(searchTransOrderVO,user);
+		if(!StringUtils.isEmpty(resOrderAdVO.getErrMsg())){
+			return ResponseFactory.signError(resOrderAdVO.getErrMsg());
+		}
+		return ResponseFactory.success(resOrderAdVO.getData());
+	}
+
+
+	/**
+	 * 承兑
+	 * @return
+	 */
+	@PostMapping("/user/accept")
+	public ResponseData<OrderAcceptVO> accept(SearchAcceptOrderVO searchAcceptOrderVO) {
+		if(searchAcceptOrderVO ==null){
+			return ResponseFactory.paramsError("参数为空或者用户ID为空");
+		}
+		User user = getUserInfo(searchAcceptOrderVO.getUserId());
+		if(user==null){
+			return ResponseFactory.signError("用户不存在");
+		}
+		ServieReturn<OrderAcceptVO>  resOrderAdVO =  orderAcceptService.createAcceptOrderVO(searchAcceptOrderVO,user);
+		if(!StringUtils.isEmpty(resOrderAdVO.getErrMsg())){
+			return ResponseFactory.signError(resOrderAdVO.getErrMsg());
+		}
+		return ResponseFactory.success(resOrderAdVO.getData());
 	}
 
 

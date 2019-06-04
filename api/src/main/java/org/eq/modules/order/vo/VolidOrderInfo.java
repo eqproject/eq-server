@@ -40,4 +40,61 @@ public class VolidOrderInfo {
         }
         return null;
     }
+
+
+    /**
+     * 验证转让订单
+     * @param searchTransOrderVO
+     * @return
+     */
+    public static String volidSearchTransOrderAd(SearchTransOrderVO searchTransOrderVO){
+        if(searchTransOrderVO==null){
+            return  "请求参数为空";
+        }
+        if(searchTransOrderVO.getUserId()<=0 ){
+            return "用户为空";
+        }
+        if(searchTransOrderVO.getProductId()<=0){
+            return "商品不能为空";
+        }
+        if(searchTransOrderVO.getNumber()<=0){
+            return "转让数量必须大于0";
+        }
+        if(StringUtils.isEmpty(searchTransOrderVO.getAddress())){
+            return "转让地址必须填写";
+        }
+        return null;
+    }
+
+
+    /**
+     * 验证承兑
+     * @param searchAcceptOrderVO
+     * @return
+     */
+    public static String volidSearchAcceptOrderAd(SearchAcceptOrderVO searchAcceptOrderVO){
+        if(searchAcceptOrderVO==null){
+            return  "请求参数为空";
+        }
+        if(searchAcceptOrderVO.getUserId()<=0 ){
+            return "用户为空";
+        }
+        if(searchAcceptOrderVO.getProductId()<=0){
+            return "商品不能为空";
+        }
+        if(searchAcceptOrderVO.getNumber()<=0){
+            return "承兑数量必须大于0";
+        }
+        if(StringUtils.isEmpty(searchAcceptOrderVO.getConsignee())){
+            return "承兑人必须填写";
+        }
+        if(StringUtils.isEmpty(searchAcceptOrderVO.getConsigneePhone())){
+            return "承兑人电话号码必须填写";
+        }
+        if(StringUtils.isEmpty(searchAcceptOrderVO.getConsigneeAddress())){
+            return "承兑人地址必须填写";
+        }
+        return null;
+    }
+
 }

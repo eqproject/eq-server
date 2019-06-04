@@ -1,9 +1,9 @@
 package org.eq.modules.common.utils;
 
+import org.eq.modules.order.entity.OrderAccept;
 import org.eq.modules.order.entity.OrderAd;
-import org.eq.modules.order.vo.OrderAdSimpleVO;
-import org.eq.modules.order.vo.OrderFinishSnapshootSimpleVO;
-import org.eq.modules.order.vo.ResOrderAdVO;
+import org.eq.modules.order.entity.OrderTransfer;
+import org.eq.modules.order.vo.*;
 import org.eq.modules.orderfinish.entity.OrderFinishSnapshoot;
 
 /**
@@ -86,6 +86,46 @@ public class OrderUtil{
         orderFinishSnapshootSimpleVO.setType(orderFinishSnapshoot.getType());
         return orderFinishSnapshootSimpleVO;
     }
+
+
+    /**
+     * 转化对象实体
+     * @param orderTransfer
+     * @return
+     */
+    public static OrderTransVO transObjForOrderTrans(OrderTransfer orderTransfer){
+        if(orderTransfer==null){
+            return null;
+        }
+        OrderTransVO orderTransVO = new OrderTransVO();
+        orderTransVO.setUserId(orderTransfer.getUserId());
+        orderTransVO.setProductId(orderTransfer.getProductId());
+        orderTransVO.setTransNumber(orderTransfer.getProductNum());
+        orderTransVO.setTransCode(orderTransfer.getTransferNo());
+        return orderTransVO;
+    }
+
+
+    /**
+     * 转化对象实体
+     * @param orderAccept
+     * @return
+     */
+    public static OrderAcceptVO transObjForOrderTrans(OrderAccept orderAccept){
+        if(orderAccept==null){
+            return null;
+        }
+        OrderAcceptVO orderAcceptVO = new OrderAcceptVO();
+        orderAcceptVO.setUserId(orderAccept.getUserId());
+        orderAcceptVO.setProductId(orderAccept.getProductId());
+        orderAcceptVO.setNumber(orderAccept.getProductNum());
+        orderAcceptVO.setAcceptCode(orderAccept.getAcceptNo());
+        orderAcceptVO.setConsignee(orderAccept.getConsignee());
+        orderAcceptVO.setConsigneeAddress(orderAccept.getConsigneeAddress());
+        orderAcceptVO.setConsigneePhone(orderAccept.getConsigneeMobile());
+        return orderAcceptVO;
+    }
+
 
 
 

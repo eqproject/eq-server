@@ -26,6 +26,9 @@ import java.util.Map;
 @AutowiredService
 public class OrderAcceptLogServiceImpl extends ServiceImplExtend<OrderAcceptLogMapper, OrderAcceptLog, OrderAcceptLogExample> implements OrderAcceptLogService {
 
+
+
+
 	@Override
 	public OrderAcceptLogExample getExampleFromEntity(OrderAcceptLog orderAcceptLog, Map<String, Object> params) {
 		OrderAcceptLogExample example = new OrderAcceptLogExample();
@@ -64,5 +67,6 @@ public class OrderAcceptLogServiceImpl extends ServiceImplExtend<OrderAcceptLogM
 		}
 		return example;
 	}
+
 
 }

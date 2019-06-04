@@ -214,7 +214,6 @@ public abstract class BaseServiceImpl<Mapper, Record, Example> implements BaseSe
 
     @Override
     public int insertSelective(Record record) {
-
         try {
             Method countByExample = this.mapper.getClass().getDeclaredMethod("insertSelective", Object.class);
             Object result = countByExample.invoke(this.mapper, record);

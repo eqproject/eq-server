@@ -119,6 +119,7 @@
     </delete>
 
     <insert id="insert" parameterType="org.eq.modules.bc.entity.BcTxRecord">
+
         insert into bc_tx_record (asset_code,asset_issuer,asset_type,biz_type,contract_address,create_time,from_address,opt_metadata,ticketId,to_address,trancheId,transfer_amount,tx_hash,tx_status,update_time)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -163,6 +164,7 @@
     </insert>
 
     <insert id="insertSelective" parameterType="org.eq.modules.bc.entity.BcTxRecord">
+
         insert into bc_tx_record
         <trim prefix="(" suffix=")" suffixOverrides=",">
             asset_code,
@@ -198,6 +200,9 @@
             #{txStatus,jdbcType=TINYINT},
             #{updateTime,jdbcType=TIMESTAMP},
         </trim>
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
     </insert>
 
     <select id="countByExample" parameterType="org.eq.modules.bc.entity.BcTxRecordExample" resultType="java.lang.Long">

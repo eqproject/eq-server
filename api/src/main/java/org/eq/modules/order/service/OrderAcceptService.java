@@ -5,8 +5,10 @@
 package org.eq.modules.order.service;
 
 import org.eq.basic.common.base.ServiceExtend;
+import org.eq.modules.auth.entity.User;
 import org.eq.modules.order.entity.OrderAccept;
 import org.eq.modules.order.entity.OrderAcceptExample;
+import org.eq.modules.order.vo.*;
 
 /**
  * 承兑管理Service
@@ -14,5 +16,15 @@ import org.eq.modules.order.entity.OrderAcceptExample;
  * @version 1.0.1
  */
 public interface OrderAcceptService extends ServiceExtend<OrderAccept, OrderAcceptExample> {
+
+
+    /**
+     * 创建承兑
+     * @param searchAcceptOrderVO
+     * @param user 用户实体
+     * @return
+     */
+    ServieReturn<OrderAcceptVO> createAcceptOrderVO(SearchAcceptOrderVO searchAcceptOrderVO, User user);
+
 
 }

@@ -5,8 +5,10 @@
 package org.eq.modules.order.service;
 
 import org.eq.basic.common.base.ServiceExtend;
+import org.eq.modules.auth.entity.User;
 import org.eq.modules.order.entity.OrderTransfer;
 import org.eq.modules.order.entity.OrderTransferExample;
+import org.eq.modules.order.vo.*;
 
 /**
  * 商品转让Service
@@ -14,5 +16,15 @@ import org.eq.modules.order.entity.OrderTransferExample;
  * @version 1.0.1
  */
 public interface OrderTransferService extends ServiceExtend<OrderTransfer, OrderTransferExample> {
+
+    /**
+     * 创建广告订单
+     * @param searchTransOrderVO
+     * @param user 用户实体
+     * @return
+     */
+    ServieReturn<OrderTransVO> createTransOrderVO(SearchTransOrderVO searchTransOrderVO, User user);
+
+
 
 }

@@ -95,7 +95,7 @@
         select
         <include refid="Base_Column_List" />
         from user_wallet
-        where id = #{id,jdbcType=BIGINT}
+        where user_id = #{id,jdbcType=BIGINT}
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">

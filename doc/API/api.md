@@ -1576,7 +1576,7 @@
 
 
 
-##### 5-02  转出用户券
+##### 5-02  转出用户券(L)
 
 ###### 接口功能
 
@@ -1601,7 +1601,7 @@
 > | userId             | true | 整型|当前用户ID|
 > | productId | true | 字符串 |商品ID|
 > | number          | true | 整型 |转让数量|
-> | targetId          | true | 整型 |目标用户|
+> | address          | true | 字符串 |目标用户地址|
 > | sign        | true  | 字符串 | 平台签名                           |
 >
 
@@ -1614,7 +1614,10 @@
 >data 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
->| orderCode  |String |转出订单号  |
+>| transCode |String |转出订单号  |
+>| userId |long |用户ID |
+>| productId |long |商品ID |
+>| transNumber |int |交易数量 |
 >
 
 ###### 返回实例
@@ -1624,14 +1627,17 @@
  "status":1,
  "errMsg":"",
  "data":{ 
-   "orderCode":"TNG2313411"
+    "userId": 1,
+    "productId": 1,
+     "transCode": "TS20190605012635468811",
+     "transNumber": 1
  }
 }
 ```
 
 
 
-##### 5-03  兑换用户商品
+##### 5-03  兑换用户商品(L)
 
 ###### 接口功能
 
@@ -1671,13 +1677,13 @@
 >data 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
->| orderCode  |String |承兑订单号  |
+>| acceptCode |String |承兑订单号  |
 >| productName     | 字符串 | 商品名称     |
 >| img             | 字符串 | 商品图片     |
 >| number | 整形   |承兑数量     |
->| consignee        | true | 字符串 |联系人|
->| consigneePhone          | true | 字符串 |联系人电话号码|
->| consigneeAddress         | true | 字符串 |联系人地址|
+>| consignee        | true | 字符串 |
+>| consigneePhone          | true | 字符串 |
+>| consigneeAddress         | true | 字符串 |
 
 ###### 返回实例
 
@@ -1817,7 +1823,7 @@
 >| productName     | 字符串 | 商品名称     |
 >| img             | 字符串 | 商品图片     |
 >| unit_price | 整形   | 商品面值      |
->| turnoutNumber | 整形   | 承兑数量     |
+>| transNumber | 整形   | 承兑数量     |
 >
 ###### 返回实例
 
@@ -1829,11 +1835,11 @@
    "total":200,
    "list";[
      {
-   	 	"turnoutCode":"M212313411",
+   	 	"transCode":"M212313411",
    		"productName":"E卡",
    	   "img":"http://e.png",
    	   "unit_price":10,
-   		"turnoutNumber":1
+   		"transNumber":1
      }
    ]
   

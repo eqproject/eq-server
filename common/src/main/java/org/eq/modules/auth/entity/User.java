@@ -27,4 +27,11 @@ public class User extends BaseEntity {
     private String photoHead;        // 头像
     private String intro;        // 简介
 
+
+    /**
+     * 券链地址
+     */
+    private String address;
+
+
 }

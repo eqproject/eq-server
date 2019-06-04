@@ -51,10 +51,6 @@ import java.util.Map;
 @AutowiredService
 public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd, OrderAdExample> implements OrderAdService {
 
-	@Autowired
-	public OrderAdServiceImpl(OrderAdMapper orderAdMapper){
-		super.setMapper(orderAdMapper);
-	}
 
 	@Autowired
 	private UserProductStockService userProductStockService;
@@ -162,11 +158,11 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 			return result;
 		}
 		ResOrderAdVO resOrderAdVO = OrderUtil.transObj(createSaleOrderAd(searchAdOrderVO,user));
-		if(resOrderAdVO==null){
-			result.setErrMsg("创建订单失败");
-		}else{
+		if(resOrderAdVO!=null){
 			result.setData(resOrderAdVO);
+			return result;
 		}
+		result.setErrMsg("创建订单失败");
 		return result;
 	}
 
@@ -357,6 +353,18 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		while(result<=0 && retryNum>0){
 			result = insertSelective(orderAd);
 			retryNum--;
+		}
+		if(result<=0){
+			updateStockResult =true;
+			try {
+				updateStockResult = userProductStockService.updateStock(product.getId(),user.getId(),-searchAdOrderVO.getNumber());
+			}catch (Exception e){
+				e.printStackTrace();
+			}
+			if(!updateStockResult){
+				logger.error("创建订单失败，但是锁定库存成功，释放库存失败，用户id :{} 商品ID:{} 应释放量:{}",searchAdOrderVO.getProductId(),user.getId(),searchAdOrderVO.getNumber());
+			}
+
 		}
 		return result>0?orderAd:null;
 	}

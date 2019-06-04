@@ -3,6 +3,8 @@ package org.eq.basic.common.base;
 import com.alibaba.fastjson.JSONObject;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.auth.service.UserService;
+import org.eq.modules.wallet.entity.UserWallet;
+import org.eq.modules.wallet.service.UserWalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -18,6 +20,9 @@ public abstract class BaseController extends BaseLog {
 
     @Autowired
     protected UserService userService;
+
+    @Autowired
+    private UserWalletService userWalletService;
 
     public JSONObject success() {
         JSONObject json = new JSONObject();
@@ -37,7 +42,17 @@ public abstract class BaseController extends BaseLog {
      * @return
      */
     public User getUserInfo(long userId){
-        return userService.selectByPrimaryKey(userId);
+        User user =null;
+        try{
+            user = userService.selectByPrimaryKey(userId);
+            UserWallet userWallet = userWalletService.selectByPrimaryKey(userId);
+            if(userWallet!=null && userWallet.getStatus()==1){
+                user.setAddress(userWallet.getAddress());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return user;
     }
 
 
