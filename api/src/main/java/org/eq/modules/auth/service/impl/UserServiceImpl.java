@@ -13,17 +13,15 @@ import org.eq.modules.auth.entity.UserExample;
 import org.eq.modules.auth.entity.UserIdentityAuth;
 import org.eq.modules.auth.service.UserIdentityAuthService;
 import org.eq.modules.auth.service.UserService;
-import org.eq.modules.auth.util.WalletUtil;
 import org.eq.modules.bc.entity.BcTxRecord;
 import org.eq.modules.common.entitys.ResponseData;
-import org.eq.modules.common.enums.ResponseStateEnum;
 import org.eq.modules.common.factory.ResponseFactory;
 import org.eq.modules.common.utils.AESUtils;
 import org.eq.modules.common.utils.MD5Utils;
-import org.eq.modules.enums.WalletStateEnum;
 import org.eq.modules.wallet.entity.UserWallet;
 import org.eq.modules.wallet.service.BcTxRecordService;
 import org.eq.modules.wallet.service.UserWalletService;
+import org.eq.modules.wallet.util.WalletUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -163,21 +161,15 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         }
         Long userId = saveUser(user);
         // 2.生成钱包地址
-        String address = WalletUtil.getWalletAddr();
+        UserWallet wallet = WalletUtil.generate(userId);
 
         // 3.bc_tx_record插入一条记录
         BcTxRecord bcTxRecord = new BcTxRecord();
-        bcTxRecord.setToAddress(address);
+        bcTxRecord.setToAddress(wallet.getAddress());
         Long txId = addBcTxRecord(bcTxRecord);
 
         //4.插入user_wallet钱包地址
-        UserWallet wallet = new UserWallet();
-        wallet.setUserId(userId);
-        wallet.setAddress(address);
         wallet.setTxId(txId);
-        wallet.setStatus(WalletStateEnum.NO_ACTIVE.getState());
-        wallet.setCreateDate(new Date());
-        wallet.setUpdateDate(new Date());
         userWalletService.insertRecordReturnId(wallet);
 
         return ResponseFactory.success(user);

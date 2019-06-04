@@ -1,45 +1,29 @@
 package org.eq.modules.bc.external.bc;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.eq.modules.bc.external.bc.req.BcTransferReq;
-import org.eq.modules.bc.external.bc.resp.BlobDataResp;
-import org.omg.IOP.TransactionService;
-import org.springframework.beans.factory.annotation.Value;
-
 import io.bumo.SDK;
 import io.bumo.blockchain.TransactionService;
 import io.bumo.blockchain.impl.TransactionServiceImpl;
-import io.bumo.mall.talent.common.util.Tools;
-import io.bumo.mall.talent.external.bc.enums.StatusEnum;
-import io.bumo.mall.talent.external.bc.req.BatchSubmitTxReq;
-import io.bumo.mall.talent.external.bc.req.BcAssetReq;
-import io.bumo.mall.talent.external.bc.req.BcTransferReq;
-import io.bumo.mall.talent.external.bc.req.SignEntity;
-import io.bumo.mall.talent.external.bc.resp.BcAssetResp;
-import io.bumo.mall.talent.external.bc.resp.BlobDataResp;
-import io.bumo.model.request.AccountCheckActivatedRequst;
-import io.bumo.model.request.AccountGetAssetsRequest;
-import io.bumo.model.request.AccountGetBalanceRequest;
-import io.bumo.model.request.AccountGetNonceRequest;
-import io.bumo.model.request.TransactionBuildBlobRequest;
-import io.bumo.model.request.TransactionGetInfoRequest;
-import io.bumo.model.request.TransactionSubmitRequest;
+import io.bumo.model.request.*;
 import io.bumo.model.request.operation.AssetSendOperation;
 import io.bumo.model.request.operation.BUSendOperation;
-import io.bumo.model.response.AccountCheckActivatedResponse;
-import io.bumo.model.response.AccountGetAssetsResponse;
-import io.bumo.model.response.AccountGetBalanceResponse;
-import io.bumo.model.response.AccountGetNonceResponse;
-import io.bumo.model.response.TransactionBuildBlobResponse;
-import io.bumo.model.response.TransactionGetInfoResponse;
-import io.bumo.model.response.TransactionSubmitResponse;
+import io.bumo.model.response.*;
 import io.bumo.model.response.result.TransactionBuildBlobResult;
 import io.bumo.model.response.result.data.AssetInfo;
 import io.bumo.model.response.result.data.Signature;
 import io.bumo.model.response.result.data.TransactionHistory;
+import org.eq.modules.bc.common.util.Tools;
+import org.eq.modules.bc.external.bc.enums.StatusEnum;
+import org.eq.modules.bc.external.bc.req.BatchSubmitTxReq;
+import org.eq.modules.bc.external.bc.req.BcAssetReq;
+import org.eq.modules.bc.external.bc.req.BcTransferReq;
+import org.eq.modules.bc.external.bc.req.SignEntity;
+import org.eq.modules.bc.external.bc.resp.BcAssetResp;
+import org.eq.modules.bc.external.bc.resp.BlobDataResp;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class BlockChainManager {
 	
@@ -343,7 +327,7 @@ public class BlockChainManager {
 			accountGetAssetsRequest.setAddress(address);
 			
 			AccountGetAssetsResponse response = sdk.getAccountService().getAssets(accountGetAssetsRequest);
-			if(StatusEnum.SUCCESS.getCode() == response.getErrorCode()){
+			if(StatusEnum.SUCCESS.getCode() .equals(response.getErrorCode())){
 				return response;
 		    }
 		 }catch(Exception e){
@@ -352,7 +336,7 @@ public class BlockChainManager {
 		return null;
 	}
 	
-	public List<BcAssetResp> getAccountAsset4List(String address,List<BcAssetReq> bcAssetReqList){
+	public List<BcAssetResp> getAccountAsset4List(String address, List<BcAssetReq> bcAssetReqList){
 		List<BcAssetResp> result = new ArrayList<BcAssetResp>();
 		try{
 			SDK sdk = SDK.getInstance(bcUrl);

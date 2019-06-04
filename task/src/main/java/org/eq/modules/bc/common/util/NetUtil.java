@@ -1,9 +1,9 @@
 package org.eq.modules.bc.common.util;
 
-import javax.servlet.http.HttpServletRequest;
+import org.eq.modules.bc.common.log.Logger;
+import org.eq.modules.bc.common.log.LoggerFactory;
 
-import io.bumo.mall.talent.common.log.Logger;
-import io.bumo.mall.talent.common.log.LoggerFactory;
+import javax.servlet.http.HttpServletRequest;
 
 
 public class NetUtil {

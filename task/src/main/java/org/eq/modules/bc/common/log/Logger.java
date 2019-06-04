@@ -1,6 +1,6 @@
 package org.eq.modules.bc.common.log;
 
-import org.eq.modules.blockchain.common.util.StringUtil;
+import org.eq.modules.bc.common.util.StringUtil;
 import org.slf4j.Marker;
 
 public class Logger implements org.slf4j.Logger {
