@@ -134,10 +134,9 @@
         </trim>
     </insert>
 
-    <insert id="insertSelective" parameterType="org.eq.modules.order.entity.OrderAccept">
-        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
-            SELECT LAST_INSERT_ID()
-        </selectKey>
+
+
+    <insert id="insertSelective" parameterType="org.eq.modules.order.entity.OrderAccept" useGeneratedKeys="true" keyProperty="id">
         insert into order_accept
         <trim prefix="(" suffix=")" suffixOverrides=",">
             user_id,

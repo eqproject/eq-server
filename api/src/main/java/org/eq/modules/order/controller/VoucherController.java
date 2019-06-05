@@ -106,4 +106,50 @@ public class VoucherController extends BaseController {
 	}
 
 
+	/**
+	 * 承兑
+	 * @return
+	 */
+	@PostMapping("/user/acceptList")
+	public ResponseData<PageResultData> pageAcceptList(SearchPageAcceptVO searchPageAcceptVO) {
+		if(searchPageAcceptVO ==null){
+			return ResponseFactory.paramsError("参数为空或者用户ID为空");
+		}
+		User user = getUserInfo(searchPageAcceptVO.getUserId());
+		if(user==null){
+			return ResponseFactory.signError("用户不存在");
+		}
+		PageResultData<OrderAcceptVO> pageResultData =  orderAcceptService.pageAcceptOrder(searchPageAcceptVO,user);
+		if(pageResultData==null){
+			logger.error("获取承兑订单异常");
+			return ResponseFactory.signError("查询异常");
+		}
+		return ResponseFactory.success(pageResultData);
+	}
+
+
+
+	/**
+	 * 承兑
+	 * @return
+	 */
+	@PostMapping("/user/turnoutList")
+	public ResponseData<PageResultData> pageTurnoutList(SearchPageTransVO searchPageTransVO) {
+		if(searchPageTransVO ==null){
+			return ResponseFactory.paramsError("参数为空或者用户ID为空");
+		}
+		User user = getUserInfo(searchPageTransVO.getUserId());
+		if(user==null){
+			return ResponseFactory.signError("用户不存在");
+		}
+		PageResultData<OrderTransVO> pageResultData =  orderTransferService.pageTransOrder(searchPageTransVO,user);
+		if(pageResultData==null){
+			logger.error("获取转让订单异常");
+			return ResponseFactory.signError("查询异常");
+		}
+		return ResponseFactory.success(pageResultData);
+	}
+
+
+
 }

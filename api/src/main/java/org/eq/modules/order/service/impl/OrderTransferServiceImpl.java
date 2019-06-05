@@ -7,6 +7,7 @@ package org.eq.modules.order.service.impl;
 import net.bytebuddy.asm.Advice;
 import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.annotation.AutowiredService;
+import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.DateUtil;
 import org.eq.basic.common.util.StringLowUtils;
@@ -14,15 +15,16 @@ import org.eq.modules.auth.entity.User;
 import org.eq.modules.bc.dao.BcTxRecordMapper;
 import org.eq.modules.bc.entity.BcTxRecord;
 import org.eq.modules.common.cache.ProductCache;
+import org.eq.modules.common.entitys.PageResultData;
+import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.common.utils.OrderUtil;
 import org.eq.modules.common.utils.ProductUtil;
+import org.eq.modules.enums.OrderAcceptStateEnum;
 import org.eq.modules.enums.OrderAdStateEnum;
 import org.eq.modules.enums.OrderAdTypeEnum;
 import org.eq.modules.enums.OrderTransferStateEnum;
 import org.eq.modules.order.dao.OrderTransferMapper;
-import org.eq.modules.order.entity.OrderAd;
-import org.eq.modules.order.entity.OrderTransfer;
-import org.eq.modules.order.entity.OrderTransferExample;
+import org.eq.modules.order.entity.*;
 import org.eq.modules.order.service.OrderTransferService;
 import org.eq.modules.order.vo.*;
 import org.eq.modules.product.entity.Product;
@@ -35,7 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -159,7 +163,6 @@ public class OrderTransferServiceImpl extends ServiceImplExtend<OrderTransferMap
         bcTxRecord.setCreateTime(new Date());
         bcTxRecord.setUpdateTime(new Date());
         bcTxRecord.setOptMetadata("用户ID:"+user.getId()+"转让券");
-		System.out.println(bcTxRecord.getId());
 		long inserNum  = bcTxRecordMapper.insertSelective(bcTxRecord);
 		if(inserNum<=0){
 		    logger.error("插入区块链转出数据失败，数据为:{}",bcTxRecord.toString());
@@ -167,10 +170,53 @@ public class OrderTransferServiceImpl extends ServiceImplExtend<OrderTransferMap
 		long transId = orderTransfer.getId();
 		orderTransfer = new OrderTransfer();
 		orderTransfer.setId(transId);
-		orderTransfer.setTxId(inserNum);
+		orderTransfer.setTxId(bcTxRecord.getId());
 		updateByPrimaryKeySelective(orderTransfer);
-		System.out.println(inserNum);
         result.setData(orderTransVO);
+		return result;
+	}
+
+
+
+	@Override
+	public PageResultData<OrderTransVO> pageTransOrder(SearchPageTransVO searchPageTransVO, User user){
+		PageResultData<OrderTransVO> result = new PageResultData<>();
+		if(searchPageTransVO ==null){
+			searchPageTransVO = new SearchPageTransVO();
+		}
+		if(searchPageTransVO.getPageSize()<=0 || searchPageTransVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
+			searchPageTransVO.setPageSize(StaticEntity.MAX_PAGE_SIZE);
+		}
+		if(searchPageTransVO.getPageNum()<=0){
+			searchPageTransVO.setPageNum(1);
+		}
+		if(user==null){
+			return result;
+		}
+		OrderTransfer orderTransfer = new OrderTransfer();
+		orderTransfer.setUserId(user.getId());
+		OrderTransferExample orderTransferExample = getExampleFromEntity(orderTransfer,null);
+
+		BaseTableData baseTableData = findDataTableByExampleForPage(orderTransferExample, searchPageTransVO.getPageNum(), searchPageTransVO.getPageSize());
+		if(baseTableData==null){
+			return result;
+		}
+		List<OrderTransVO> dataList = new ArrayList<>(baseTableData.getData().size());
+		List<OrderTransfer> pList = baseTableData.getData();
+		for(OrderTransfer p : pList){
+			Product product = productService.selectByPrimaryKey(p.getProductId());
+			if(product==null){
+				logger.error("查询转让订单，获取商品详细信息异常");
+				continue;
+			}
+			OrderTransVO orderTransVO =  OrderUtil.transObjForOrderTrans(p);
+			orderTransVO.setImg(product.getProductImg());
+			orderTransVO.setProductName(product.getName());
+			orderTransVO.setUnitPrice(product.getUnitPrice());
+			dataList.add(orderTransVO);
+		}
+		result.setList(dataList);
+		result.setTotal(baseTableData.getRecordsTotal());
 		return result;
 	}
 
@@ -214,7 +260,6 @@ public class OrderTransferServiceImpl extends ServiceImplExtend<OrderTransferMap
 		int retryNum = 3;
 		while(result<=0 && retryNum>0){
 			result = insertSelective(orderTransfer);
-			orderTransfer.setId(result);
 			retryNum--;
 		}
 		if(result<=0){

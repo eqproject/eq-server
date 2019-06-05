@@ -1705,7 +1705,7 @@
 
 
 
-##### 5-04  兑换列表
+##### 5-04  兑换列表（L）
 
 ###### 接口功能
 
@@ -1750,8 +1750,8 @@
 >|acceptCode    | 字符串 | 订单号    |
 >| productName     | 字符串 | 商品名称     |
 >| img             | 字符串 | 商品图片     |
->| unit_price | 整形   | 商品面值      |
->| acceptNumber | 整形   | 承兑数量     |
+>| unitPrice | 整形   | 商品面值      |
+>| number | 整形   | 承兑数量     |
 >
 
 ###### 返回实例
@@ -1767,8 +1767,8 @@
    	 	"acceptCode":"M212313411",
    		"productName":"E卡",
    	   "img":"http://e.png",
-   	   "unit_price":10,
-   		"acceptNumber":1
+   	   "unitPrice":10,
+   		"number":1
      }
    ]
  }
@@ -1777,7 +1777,7 @@
 
 
 
-##### 5-05   转出商品列表
+##### 5-05   转出商品列表（L）
 
 ###### 接口功能
 
@@ -1822,8 +1822,9 @@
 >|turnoutCode    | 字符串 | 订单号    |
 >| productName     | 字符串 | 商品名称     |
 >| img             | 字符串 | 商品图片     |
->| unit_price | 整形   | 商品面值      |
->| transNumber | 整形   | 承兑数量     |
+>| unitPrice | 整形   | 商品面值      |
+>| transNumber | 整形   | 转出数量     |
+>| stateRemark | 字符串 | 状态描述 |
 >
 ###### 返回实例
 
@@ -1838,8 +1839,9 @@
    	 	"transCode":"M212313411",
    		"productName":"E卡",
    	   "img":"http://e.png",
-   	   "unit_price":10,
-   		"transNumber":1
+   	   "unitPrice":10,
+   		"transNumber":1,
+   		"stateRemark": "等待确认",
      }
    ]
   

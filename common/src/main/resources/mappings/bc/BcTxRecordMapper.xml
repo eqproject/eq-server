@@ -163,7 +163,7 @@
         </trim>
     </insert>
 
-    <insert id="insertSelective" parameterType="org.eq.modules.bc.entity.BcTxRecord">
+    <insert id="insertSelective" parameterType="org.eq.modules.bc.entity.BcTxRecord" useGeneratedKeys="true" keyProperty="id">
 
         insert into bc_tx_record
         <trim prefix="(" suffix=")" suffixOverrides=",">

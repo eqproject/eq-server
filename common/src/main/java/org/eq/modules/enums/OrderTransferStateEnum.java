@@ -49,6 +49,6 @@ public enum OrderTransferStateEnum {
                 return temp.remark;
             }
         }
-        return null;
+        return "";
     }
 }

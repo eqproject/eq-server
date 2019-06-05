@@ -57,4 +57,9 @@ public class OrderAcceptVO implements Serializable {
      */
     private String consigneeAddress;
 
+    /**
+     * 单价
+     */
+    private int unitPrice;
+
 }

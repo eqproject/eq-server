@@ -6,6 +6,7 @@ package org.eq.modules.order.service;
 
 import org.eq.basic.common.base.ServiceExtend;
 import org.eq.modules.auth.entity.User;
+import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.order.entity.OrderAccept;
 import org.eq.modules.order.entity.OrderAcceptExample;
 import org.eq.modules.order.vo.*;
@@ -25,6 +26,15 @@ public interface OrderAcceptService extends ServiceExtend<OrderAccept, OrderAcce
      * @return
      */
     ServieReturn<OrderAcceptVO> createAcceptOrderVO(SearchAcceptOrderVO searchAcceptOrderVO, User user);
+
+
+    /**
+     * 转让广告查询
+     * @param searchPageAcceptVO
+     * @param user 用户实体
+     * @return
+     */
+    PageResultData<OrderAcceptVO> pageAcceptOrder(SearchPageAcceptVO searchPageAcceptVO, User user);
 
 
 }

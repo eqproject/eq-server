@@ -1,5 +1,6 @@
 package org.eq.modules.common.utils;
 
+import org.eq.modules.enums.OrderTransferStateEnum;
 import org.eq.modules.order.entity.OrderAccept;
 import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.order.entity.OrderTransfer;
@@ -102,6 +103,7 @@ public class OrderUtil{
         orderTransVO.setProductId(orderTransfer.getProductId());
         orderTransVO.setTransNumber(orderTransfer.getProductNum());
         orderTransVO.setTransCode(orderTransfer.getTransferNo());
+        orderTransVO.setStateRemark(OrderTransferStateEnum.getRemarkByState(orderTransfer.getStatus()));
         return orderTransVO;
     }
 

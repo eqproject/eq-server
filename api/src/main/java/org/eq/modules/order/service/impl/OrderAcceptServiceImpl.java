@@ -4,8 +4,10 @@
  */
 package org.eq.modules.order.service.impl;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.annotation.AutowiredService;
+import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.DateUtil;
 import org.eq.basic.common.util.StringLowUtils;
@@ -13,13 +15,15 @@ import org.eq.modules.auth.entity.User;
 import org.eq.modules.bc.dao.BcTxRecordMapper;
 import org.eq.modules.bc.entity.BcTxRecord;
 import org.eq.modules.common.cache.ProductCache;
+import org.eq.modules.common.entitys.PageResultData;
+import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.common.utils.OrderUtil;
 import org.eq.modules.common.utils.ProductUtil;
 import org.eq.modules.enums.OrderAcceptStateEnum;
+import org.eq.modules.enums.OrderAdStateEnum;
+import org.eq.modules.enums.OrderAdTypeEnum;
 import org.eq.modules.order.dao.OrderAcceptMapper;
-import org.eq.modules.order.entity.OrderAccept;
-import org.eq.modules.order.entity.OrderAcceptExample;
-import org.eq.modules.order.entity.OrderTransfer;
+import org.eq.modules.order.entity.*;
 import org.eq.modules.order.service.OrderAcceptService;
 import org.eq.modules.order.vo.*;
 import org.eq.modules.product.entity.Product;
@@ -31,7 +35,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -88,29 +94,8 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 		if(orderAccept.getProductId()!=null){
 			ca.andProductIdEqualTo(orderAccept.getProductId());
 		}
-		if(orderAccept.getProductNum()!=null){
-			ca.andProductNumEqualTo(orderAccept.getProductNum());
-		}
 		if(orderAccept.getStatus()!=null){
 			ca.andStatusEqualTo(orderAccept.getStatus());
-		}
-		if(StringLowUtils.isNotBlank(orderAccept.getConsignee())){
-			ca.andConsigneeEqualTo(orderAccept.getConsignee());
-		}
-		if(StringLowUtils.isNotBlank(orderAccept.getConsigneeMobile())){
-			ca.andConsigneeMobileEqualTo(orderAccept.getConsigneeMobile());
-		}
-		if(StringLowUtils.isNotBlank(orderAccept.getConsigneeAddress())){
-			ca.andConsigneeAddressEqualTo(orderAccept.getConsigneeAddress());
-		}
-		if(orderAccept.getCreateDate()!=null){
-			ca.andCreateDateEqualTo(orderAccept.getCreateDate());
-		}
-		if(orderAccept.getUpdateDate()!=null){
-			ca.andUpdateDateEqualTo(orderAccept.getUpdateDate());
-		}
-		if(StringLowUtils.isNotBlank(orderAccept.getRemarks())){
-			ca.andRemarksEqualTo(orderAccept.getRemarks());
 		}
 		if(orderAccept.getTxId()!=null){
 			ca.andTxIdEqualTo(orderAccept.getTxId());
@@ -178,15 +163,56 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 		long transId = orderAccept.getId();
 		orderAccept = new OrderAccept();
 		orderAccept.setId(transId);
-		orderAccept.setTxId(inserNum);
+		orderAccept.setTxId(bcTxRecord.getId());
 		updateByPrimaryKeySelective(orderAccept);
-		System.out.println(inserNum);
 		result.setData(orderAcceptVO);
 		return result;
 	}
 
 
 
+	@Override
+	public PageResultData<OrderAcceptVO> pageAcceptOrder(SearchPageAcceptVO searchsPageAcceptVO, User user){
+		PageResultData<OrderAcceptVO> result = new PageResultData<>();
+		if(searchsPageAcceptVO ==null){
+			searchsPageAcceptVO = new SearchPageAcceptVO();
+		}
+		if(searchsPageAcceptVO.getPageSize()<=0 || searchsPageAcceptVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
+			searchsPageAcceptVO.setPageSize(StaticEntity.MAX_PAGE_SIZE);
+		}
+		if(searchsPageAcceptVO.getPageNum()<=0){
+			searchsPageAcceptVO.setPageNum(1);
+		}
+		if(user==null){
+			return result;
+		}
+		OrderAccept orderAccept = new OrderAccept();
+		orderAccept.setUserId(user.getId());
+		orderAccept.setStatus(OrderAcceptStateEnum.ACCEPT_PADDING.getState());
+		OrderAcceptExample orderAcceptExample = getExampleFromEntity(orderAccept,null);
+
+		BaseTableData baseTableData = findDataTableByExampleForPage(orderAcceptExample, searchsPageAcceptVO.getPageNum(), searchsPageAcceptVO.getPageSize());
+		if(baseTableData==null){
+			return result;
+		}
+		List<OrderAcceptVO> dataList = new ArrayList<>(baseTableData.getData().size());
+		List<OrderAccept> pList = baseTableData.getData();
+		for(OrderAccept p : pList){
+			Product product = productService.selectByPrimaryKey(p.getProductId());
+			if(product==null){
+				logger.error("查询承兑订单，获取商品详细信息异常");
+				continue;
+			}
+			OrderAcceptVO orderAcceptVO =  OrderUtil.transObjForOrderTrans(p);
+			orderAcceptVO.setImg(product.getProductImg());
+			orderAcceptVO.setProductName(product.getName());
+			orderAcceptVO.setUnitPrice(product.getUnitPrice());
+			dataList.add(orderAcceptVO);
+		}
+		result.setList(dataList);
+		result.setTotal(baseTableData.getRecordsTotal());
+		return result;
+	}
 
 
 
@@ -229,7 +255,6 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 		int retryNum = 3;
 		while(result<=0 && retryNum>0){
 			result = insertSelective(orderAccept);
-			orderAccept.setId(result);
 			retryNum--;
 		}
 		if(result<=0){

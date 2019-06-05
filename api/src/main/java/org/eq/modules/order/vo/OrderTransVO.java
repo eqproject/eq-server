@@ -32,4 +32,26 @@ public class OrderTransVO implements Serializable {
      */
     private int transNumber;
 
+    /**
+     * 商品名称
+     */
+    private String productName;
+
+    /**
+     * 图片
+     */
+    private String img;
+
+    /**
+     * 装让状态说明
+     */
+    private String stateRemark;
+
+    /**
+     * 单价
+     */
+    private int unitPrice;
+
+
+
 }
