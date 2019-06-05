@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -110,5 +111,21 @@ public class DateUtil {
         return new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
     }
 
-
+    /**
+     * 返回多少小时之前的时间
+     * @param date
+     * @param hour
+     * @return
+     */
+    public static Date beforeDateHour(Date date,int hour) {
+        try {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.HOUR,-hour);
+            return calendar.getTime();
+        } catch (Exception e) {
+            logBase.error("beforeDateHour异常", e);
+        }
+        return null;
+    }
 }
