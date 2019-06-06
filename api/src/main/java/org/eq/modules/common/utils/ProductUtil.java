@@ -253,6 +253,17 @@ public class ProductUtil  extends ProductBusines {
             ticketProductVO.setBalance("1000");
             ticketProductVO.setTicketDesc("区块链商品简介");
             key = ticketProductVO.getTicketId()+"_"+ticketProductVO.getTrancheId();
+
+
+            ticketProductVO = new TicketProductVO();
+            ticketProductVO.setTicketId("TICKET05");
+            ticketProductVO.setTrancheId("TRANCEID05");
+            ticketProductVO.setTicketName("区块链商品名称");
+            ticketProductVO.setTicketFaceValue("12");
+            ticketProductVO.setBalance("24");
+            ticketProductVO.setTicketDesc("区块链商品简介");
+            key = ticketProductVO.getTicketId()+"_"+ticketProductVO.getTrancheId();
+
             result.put(key,ticketProductVO);
         }
         return result;

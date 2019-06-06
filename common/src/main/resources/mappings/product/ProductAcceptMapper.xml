@@ -7,6 +7,7 @@
 	    <result column="icon" jdbcType="VARCHAR" property="icon" />
 	    <result column="address" jdbcType="VARCHAR" property="address" />
 	    <result column="intro" jdbcType="VARCHAR" property="intro" />
+        <result column="mobile" jdbcType="VARCHAR" property="mobile" />
 	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
 	    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
     </resultMap>
@@ -72,7 +73,7 @@
     </sql>
 
     <sql id="Base_Column_List">
-        id,name,icon,address,intro,create_date,update_date
+        id,name,icon,address,intro,mobile,create_date,update_date
     </sql>
 
     <select id="selectByExample" parameterType="org.eq.modules.product.entity.ProductAcceptExample" resultMap="BaseResultMap">
@@ -110,13 +111,14 @@
     </delete>
 
     <insert id="insert" parameterType="org.eq.modules.product.entity.ProductAccept">
-        insert into platform_product_accept (name,icon,address,intro,create_date,update_date)
+        insert into platform_product_accept (name,icon,address,intro,mobile,create_date,update_date)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
             #{name,jdbcType=VARCHAR},
             #{icon,jdbcType=VARCHAR},
             #{address,jdbcType=VARCHAR},
             #{intro,jdbcType=VARCHAR},
+            #{mobile,jdbcType=VARCHAR},
             #{createDate,jdbcType=TIMESTAMP},
             #{updateDate,jdbcType=TIMESTAMP},
         </trim>
@@ -129,6 +131,7 @@
             icon,
             address,
             intro,
+            mobile,
             create_date,
             update_date,
         </trim>
@@ -137,6 +140,7 @@
             #{icon,jdbcType=VARCHAR},
             #{address,jdbcType=VARCHAR},
             #{intro,jdbcType=VARCHAR},
+            #{mobile,jdbcType=VARCHAR},
             #{createDate,jdbcType=TIMESTAMP},
             #{updateDate,jdbcType=TIMESTAMP},
         </trim>
@@ -167,6 +171,9 @@
             <if test="record.intro != null">
                 intro = #{record.intro,jdbcType=VARCHAR},
             </if>
+            <if test="record.mobile != null">
+                intro = #{record.mobile,jdbcType=VARCHAR},
+            </if>
             <if test="record.createDate != null">
                 create_date = #{record.createDate,jdbcType=TIMESTAMP},
             </if>
@@ -188,6 +195,7 @@
             icon = #{record.icon,jdbcType=VARCHAR},
             address = #{record.address,jdbcType=VARCHAR},
             intro = #{record.intro,jdbcType=VARCHAR},
+            mobile = #{record.mobile,jdbcType=VARCHAR},
             create_date = #{record.createDate,jdbcType=TIMESTAMP},
             update_date = #{record.updateDate,jdbcType=TIMESTAMP},
         </trim>
@@ -211,6 +219,9 @@
             <if test="intro != null">
             intro = #{intro,jdbcType=VARCHAR},
             </if>
+            <if test="mobile != null">
+            mobile = #{mobile,jdbcType=VARCHAR},
+            </if>
             <if test="createDate != null">
             create_date = #{createDate,jdbcType=TIMESTAMP},
             </if>
@@ -229,6 +240,7 @@
               icon = #{icon,jdbcType=VARCHAR},
               address = #{address,jdbcType=VARCHAR},
               intro = #{intro,jdbcType=VARCHAR},
+              mobile = #{mobile,jdbcType=VARCHAR},
               create_date = #{createDate,jdbcType=TIMESTAMP},
               update_date = #{updateDate,jdbcType=TIMESTAMP},
         </trim>

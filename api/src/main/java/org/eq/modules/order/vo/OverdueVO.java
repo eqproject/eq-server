@@ -1,16 +1,18 @@
 package org.eq.modules.order.vo;
 
 import lombok.Data;
+import org.eq.modules.product.vo.ProductBaseVO;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 /**
- * 转出实体
+ * 失效商品
  * @author  kaka
  * @date  2019-06-04
  */
 @Data
-public class OrderAcceptVO implements Serializable {
+public class OverdueVO implements Serializable , Comparator<OverdueVO> {
 
     /**
      * 用户ID
@@ -22,10 +24,6 @@ public class OrderAcceptVO implements Serializable {
      */
     private long productId;
 
-    /**
-     * 转出订单号
-     */
-    private String  acceptCode;
 
     /**
      * 商品名称
@@ -38,41 +36,30 @@ public class OrderAcceptVO implements Serializable {
     private String img;
 
     /**
-     * 承兑数量
+     * 失效数量
      */
     private int number;
 
     /**
-     * 承兑人名称
-     */
-    private String consignee;
-
-    /**
-     * 承兑人电话
-     */
-    private String consigneePhone;
-
-    /**
-     * 承兑人地址
-     */
-    private String consigneeAddress;
-
-    /**
-     * 单价
+     * 面值
      */
     private int unitPrice;
 
 
     /**
-     * 商家电话
+     * 失效原因
      */
-    private String acceptModile;
-
+    private String overdueReason;
 
     /**
-     * 状态说明
+     * 排序
      */
-    private String stateRemak;
+    private int sort;
 
 
+
+    @Override
+    public int compare(OverdueVO o1, OverdueVO o2) {
+        return o1.getSort()-o2.getSort();
+    }
 }

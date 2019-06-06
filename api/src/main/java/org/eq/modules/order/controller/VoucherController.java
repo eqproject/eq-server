@@ -130,7 +130,7 @@ public class VoucherController extends BaseController {
 
 
 	/**
-	 * 承兑
+	 * 转让列表
 	 * @return
 	 */
 	@PostMapping("/user/turnoutList")
@@ -148,6 +148,49 @@ public class VoucherController extends BaseController {
 			return ResponseFactory.signError("查询异常");
 		}
 		return ResponseFactory.success(pageResultData);
+	}
+
+
+	/**
+	 * 失效列表
+	 * @return
+	 */
+	@PostMapping("/user/overdueList")
+	public ResponseData<PageResultData> pageOverdueList(SearchPageAcceptVO searchPageAcceptVO) {
+		if(searchPageAcceptVO ==null){
+			return ResponseFactory.paramsError("参数为空或者用户ID为空");
+		}
+		User user = getUserInfo(searchPageAcceptVO.getUserId());
+		if(user==null){
+			return ResponseFactory.signError("用户不存在");
+		}
+		PageResultData<OverdueVO> pageResultData = orderAcceptService.pageOverdueOrder(searchPageAcceptVO,user);
+		if(pageResultData==null){
+			logger.error("失效列表订单异常");
+			return ResponseFactory.signError("查询异常");
+		}
+		return ResponseFactory.success(pageResultData);
+	}
+
+
+	/**
+	 * 失效列表
+	 * @return
+	 */
+	@PostMapping("/user/acceptDetail")
+	public ResponseData<OrderAcceptVO> acceptDetail(SearchAcceptOrderVO searchAcceptOrderVO) {
+		if(searchAcceptOrderVO ==null){
+			return ResponseFactory.paramsError("参数为空或者用户ID为空");
+		}
+		User user = getUserInfo(searchAcceptOrderVO.getUserId());
+		if(user==null){
+			return ResponseFactory.signError("用户不存在");
+		}
+		ServieReturn<OrderAcceptVO>   servieReturn = orderAcceptService.searchOrderAccept(searchAcceptOrderVO,user);
+		if(!StringUtils.isEmpty(servieReturn.getErrMsg())){
+			return ResponseFactory.signError(servieReturn.getErrMsg());
+		}
+		return ResponseFactory.success(servieReturn.getData());
 	}
 
 

@@ -1851,7 +1851,7 @@
 
 
 
-##### 5-06 失效商品列表
+##### 5-06 失效商品列表(L)
 
 ###### 接口功能
 
@@ -1893,10 +1893,12 @@
 >Object对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
+>|productId|整型|商品ID |
 >| productName     | 字符串 | 商品名称     |
 >| img             | 字符串 | 商品图片     |
->| unit_price | 整形   | 商品面值      |
+>| unitPrice | 整形   | 商品面值      |
 >| number | 整形   | 商品数量     |
+>| overdueReason | 字符串 | 失效原因 |
 >
 
 ###### 返回实例
@@ -1909,10 +1911,14 @@
    "total":300
    "list"：[
      {
-   		"productName":"E卡",
-   	   "img":"http://e.png",
-   	   "unit_price":10,
-   		"number":1
+   		 "userId": 1,
+          "productId": 5,
+          "productName": "下线的卡",
+           "img": "038b66a.jpg",
+           "number": 24,
+           "unitPrice": 12,
+           "overdueReason": "已失效",
+           "sort": 5
      }
    ]
   
@@ -1922,7 +1928,7 @@
 
 
 
-##### 5-07   承兑订单详情
+##### 5-07   承兑订单详情（L）
 
 ###### 接口功能
 
@@ -1961,9 +1967,9 @@
 > |acceptCode    | 字符串 | 订单号    |
 > | productName     | 字符串 | 商品名称     |
 > | img             | 字符串 | 商品图片     |
-> | unit_price | 整形   | 商品面值      |
-> | acceptNumber | 整形   | 商品数量     |
-> | state | 整形   | 状态    |
+> | unitPrice | 整形   | 商品面值      |
+> | number | 整形   | 商品数量     |
+> | stateRemak | 字符串 | 状态描述  |
 > | consignee          | 字符串 | 联系人 |
 > | consigneePhone          | 字符串   | 电话号码 |
 > | consigneeAddress         | 字符串   | 地址 |
@@ -1976,15 +1982,18 @@
  "status":1,
  "errMsg":"",
  "data":{ 
-     "acceptCode":"TY123134",
-     "productName":"E卡",
-   	  "img":"http://e.png",
-     "unit_price":10,
-     "acceptNumber":1,
-     "state":"1(1:等待承兑;2:承兑完成;3:取消承兑;4:承兑失败)",
-     "consignee":"王五",
-     "consigneePhone":"1234531",
-     "consigneeAddress":"北京朝阳"  
+     "userId": 1,
+        "productId": 1,
+        "acceptCode": "AS20190605020737853317",
+        "productName": "京东E卡",
+        "img": "http://539b6003af3ebb06c26332ac65c1038b66a.jpg",
+        "number": 10,
+        "consignee": "齐木卡卡西",
+        "consigneePhone": "110",
+        "consigneeAddress": "承兑人地址",
+        "unitPrice": 10000,
+        "acceptModile": "承兑商热线电话",
+        "stateRemak": "承兑中"
      }
 }
 ```

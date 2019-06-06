@@ -44,4 +44,10 @@ public class SearchAcceptOrderVO extends SearchBase {
     private String consigneeAddress;
 
 
+    /**
+     * 承兑好
+     */
+    private String acceptCode;
+
+
 }

@@ -29,12 +29,34 @@ public interface OrderAcceptService extends ServiceExtend<OrderAccept, OrderAcce
 
 
     /**
-     * 转让广告查询
+     * 承兑广告查询
      * @param searchPageAcceptVO
      * @param user 用户实体
      * @return
      */
     PageResultData<OrderAcceptVO> pageAcceptOrder(SearchPageAcceptVO searchPageAcceptVO, User user);
+
+
+
+
+    /**
+     * 失效商品
+     * @param searchPageAcceptVO
+     * @param user 用户实体
+     * @return
+     */
+    PageResultData<OverdueVO> pageOverdueOrder(SearchPageAcceptVO searchPageAcceptVO, User user);
+
+
+
+
+    /**
+     * 失效商品
+     * @param searchAcceptOrderVO
+     * @param user 用户实体
+     * @return
+     */
+    ServieReturn<OrderAcceptVO> searchOrderAccept(SearchAcceptOrderVO searchAcceptOrderVO, User user);
 
 
 }

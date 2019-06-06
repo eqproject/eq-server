@@ -11,6 +11,7 @@ import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.cache.ProductCache;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
+import org.eq.modules.common.utils.PageUtils;
 import org.eq.modules.common.utils.ProductUtil;
 import org.eq.modules.product.dao.UserProductStockMapper;
 import org.eq.modules.product.entity.Product;
@@ -125,7 +126,7 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 			allReult.add(productBaseVO);
 		}
 		Collections.sort(allReult,new ProductBaseVO());
-		List<ProductBaseVO> dataList = pageBySubList(allReult,searchPageProductVO.getPageSize(),searchPageProductVO.getPageNum());
+		List<ProductBaseVO> dataList = PageUtils.pageBySubList(allReult,searchPageProductVO.getPageSize(),searchPageProductVO.getPageNum());
 		result.setList(dataList);
 		result.setTotal(allReult.size());
 		return result;
@@ -256,7 +257,7 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 			allReult.add(voucherProductBaseVO);
 		}
 		Collections.sort(allReult,new ProductBaseVO());
-		List<VoucherProductBaseVO> dataList = pageVoucherBySubList(allReult,searchPageProductVO.getPageSize(),searchPageProductVO.getPageNum());
+		List<VoucherProductBaseVO> dataList = PageUtils.pageBySubList(allReult,searchPageProductVO.getPageSize(),searchPageProductVO.getPageNum());
 		result.setList(dataList);
 		result.setTotal(allReult.size());
 		return result;
@@ -327,7 +328,7 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 		return result>0?userProductStock:null;
 	}
 
-	private static List<ProductBaseVO> pageBySubList(List<ProductBaseVO> list, int pagesize, int currentPage) {
+	/*private static List<ProductBaseVO> pageBySubList(List<ProductBaseVO> list, int pagesize, int currentPage) {
 		int totalcount = list.size();
 		int pagecount = 0;
 		List<ProductBaseVO> subList = new ArrayList<>();
@@ -351,7 +352,7 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 		return  list.subList(start,end );
 	}
 
-
+*/
 	/**
 	 * 分页 券包
 	 * @param list

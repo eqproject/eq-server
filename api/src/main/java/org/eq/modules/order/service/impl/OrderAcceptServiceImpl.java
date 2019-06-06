@@ -10,6 +10,7 @@ import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.DateUtil;
+import org.eq.basic.common.util.ParseUtil;
 import org.eq.basic.common.util.StringLowUtils;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.bc.dao.BcTxRecordMapper;
@@ -18,6 +19,7 @@ import org.eq.modules.common.cache.ProductCache;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.common.utils.OrderUtil;
+import org.eq.modules.common.utils.PageUtils;
 import org.eq.modules.common.utils.ProductUtil;
 import org.eq.modules.enums.OrderAcceptStateEnum;
 import org.eq.modules.enums.OrderAdStateEnum;
@@ -27,18 +29,20 @@ import org.eq.modules.order.entity.*;
 import org.eq.modules.order.service.OrderAcceptService;
 import org.eq.modules.order.vo.*;
 import org.eq.modules.product.entity.Product;
+import org.eq.modules.product.entity.ProductAccept;
 import org.eq.modules.product.entity.ProductAll;
 import org.eq.modules.product.entity.UserProductStock;
+import org.eq.modules.product.service.ProductAcceptService;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.service.UserProductStockService;
+import org.eq.modules.product.vo.ProductBaseVO;
+import org.eq.modules.product.vo.TicketProductVO;
+import org.eq.modules.product.vo.VoucherProductBaseVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 承兑管理ServiceImpl
@@ -62,7 +66,8 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 	@Autowired
 	private ProductCache productCache;
 
-
+	@Autowired
+	private ProductAcceptService productAcceptService;
 
 	@Override
 	public OrderAcceptExample getExampleFromEntity(OrderAccept orderAccept, Map<String, Object> params) {
@@ -108,7 +113,7 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 
 	@Override
 	public ServieReturn<OrderAcceptVO> createAcceptOrderVO(SearchAcceptOrderVO searchAcceptOrderVO, User user){
-		String volidResult = VolidOrderInfo.volidSearchAcceptOrderAd(searchAcceptOrderVO);
+		String volidResult = VolidOrderInfo.volidCreateAcceptOrder(searchAcceptOrderVO);
 		ServieReturn<OrderAcceptVO> result  = new ServieReturn<>();
 		if(!StringUtils.isEmpty(volidResult)){
 			result.setErrMsg(volidResult);
@@ -216,6 +221,140 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 
 
 
+	@Override
+	public PageResultData<OverdueVO> pageOverdueOrder(SearchPageAcceptVO searchsPageAcceptVO, User user){
+		PageResultData<OverdueVO> result = new PageResultData<>();
+		if(searchsPageAcceptVO ==null){
+			searchsPageAcceptVO = new SearchPageAcceptVO();
+		}
+		if(searchsPageAcceptVO.getPageSize()<=0 || searchsPageAcceptVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
+			searchsPageAcceptVO.setPageSize(StaticEntity.MAX_PAGE_SIZE);
+		}
+		if(searchsPageAcceptVO.getPageNum()<=0){
+			searchsPageAcceptVO.setPageNum(1);
+		}
+		if(user==null){
+			return result;
+		}
+
+		OrderAccept orderAccept = new OrderAccept();
+		orderAccept.setUserId(user.getId());
+		orderAccept.setStatus(OrderAcceptStateEnum.ACCEPT_FINISH.getState());
+		OrderAcceptExample orderAcceptExample = getExampleFromEntity(orderAccept,null);
+
+		List<OverdueVO> dataList = new ArrayList<>();
+
+		BaseTableData baseTableData = findDataTableByExampleForPage(orderAcceptExample, searchsPageAcceptVO.getPageNum(), searchsPageAcceptVO.getPageSize());
+		if(baseTableData!=null && !CollectionUtils.isEmpty(baseTableData.getData())){
+			List<OrderAccept> pList = baseTableData.getData();
+			for(OrderAccept p : pList){
+				Product product = productService.selectByPrimaryKey(p.getProductId());
+				if(product==null){
+					logger.error("查询承兑订单，获取商品详细信息异常");
+					continue;
+				}
+				OverdueVO overdueVO =  OrderUtil.transObjForOverdueVO(p);
+				overdueVO.setImg(product.getProductImg());
+				overdueVO.setProductName(product.getName());
+				overdueVO.setUnitPrice(product.getUnitPrice());
+				overdueVO.setSort(product.getSort());
+				dataList.add(overdueVO);
+			}
+		}
+		Map<String, TicketProductVO> ticketMap = ProductUtil.getTicketUserProduct(user.getTxPassword());
+		if(ticketMap!=null && ticketMap.size()>0){
+			Iterator<String> ite = ticketMap.keySet().iterator();
+			while(ite.hasNext()){
+				String key = ite.next();
+				TicketProductVO ticketProductVO = ticketMap.get(key);
+				String productId  = productCache.getProductIdByTicketKey(key);
+
+				if(StringUtils.isEmpty(productId)){
+					continue;
+				}
+				Product product = productService.selectByPrimaryKey(Long.valueOf(productId));
+				if(product==null || ProductUtil.isEffect(product)){
+					continue;
+				}
+				OverdueVO overdueVO = new OverdueVO();
+				overdueVO.setUserId(user.getId());
+				overdueVO.setProductId(product.getId());
+				int number = ParseUtil.getInt(ticketProductVO.getBalance());
+				if(number<=0){
+					continue;
+				}
+				overdueVO.setNumber(number);
+				overdueVO.setOverdueReason("已失效");
+				overdueVO.setImg(product.getProductImg());
+				overdueVO.setProductName(product.getName());
+				overdueVO.setUnitPrice(product.getUnitPrice());
+				overdueVO.setSort(product.getSort());
+				dataList.add(overdueVO);
+			}
+		}
+		Collections.sort(dataList,new OverdueVO());
+		List<OverdueVO> pageList = PageUtils.pageBySubList(dataList,searchsPageAcceptVO.getPageSize(),searchsPageAcceptVO.getPageNum());
+		result.setList(dataList);
+		result.setTotal(pageList.size());
+		return result;
+	}
+
+
+
+	@Override
+	public ServieReturn<OrderAcceptVO> searchOrderAccept(SearchAcceptOrderVO searchAcceptOrderVO, User user){
+		String volidResult = VolidOrderInfo.volidSearchAcceptOrder(searchAcceptOrderVO);
+		ServieReturn<OrderAcceptVO> result  = new ServieReturn<>();
+		if(!StringUtils.isEmpty(volidResult)){
+			result.setErrMsg(volidResult);
+			return result;
+		}
+		if(user==null){
+			result.setErrMsg("用户为空");
+			return result;
+		}
+		OrderAccept orderAccept = new OrderAccept();
+		orderAccept.setUserId(user.getId());
+		orderAccept.setAcceptNo(searchAcceptOrderVO.getAcceptCode());
+
+		try {
+			orderAccept =selectByRecord(orderAccept);
+		}catch (Exception e){
+			logger.error("查询承兑订单为空");
+		}
+		if(orderAccept==null){
+			result.setErrMsg("订单不存在");
+			return result;
+		}
+		OrderAcceptVO orderAcceptVO = OrderUtil.transObjForOrderTrans(orderAccept);
+		if(orderAcceptVO==null){
+			result.setErrMsg("订单转化异常");
+			return result;
+		}
+		Product product = productService.selectByPrimaryKey(orderAcceptVO.getProductId());
+		if(product==null){
+			result.setErrMsg("订单查询异常");
+			return result;
+		}
+		orderAcceptVO.setProductName(product.getName());
+		orderAcceptVO.setImg(product.getProductImg());
+		orderAcceptVO.setUnitPrice(product.getUnitPrice());
+		String modile = "";
+		try{
+			ProductAccept accept = productAcceptService.selectByPrimaryKey(product.getProductAcceptId());
+			if(accept!=null){
+				modile = accept.getMobile();
+			}
+		}catch (Exception e){
+			logger.error("查询承兑商信息异常",e);
+		}
+		orderAcceptVO.setAcceptModile(modile);
+		result.setData(orderAcceptVO);
+		return result;
+	}
+
+
+
 	/**
 	 * 创建承兑订单
 	 * @param searchAcceptOrderVO
@@ -282,8 +421,10 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 		}
 		buffer.append(DateUtil.getLockNowTime()).append(number);
 		return buffer.toString();
-
 	}
+
+
+
 
 
 }

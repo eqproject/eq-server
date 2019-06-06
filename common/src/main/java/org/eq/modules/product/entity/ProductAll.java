@@ -55,6 +55,11 @@ public class ProductAll  extends Product implements Serializable {
 	private String acceptIntro;
 
 	/**
+	 * 承兑商电话
+	 */
+	private String acceptMobile;
+
+	/**
 	 * 资产code
 	 */
 	private String assetCode;

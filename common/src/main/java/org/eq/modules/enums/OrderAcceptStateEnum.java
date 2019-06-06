@@ -49,6 +49,6 @@ public enum OrderAcceptStateEnum {
                 return temp.remark;
             }
         }
-        return null;
+        return "";
     }
 }

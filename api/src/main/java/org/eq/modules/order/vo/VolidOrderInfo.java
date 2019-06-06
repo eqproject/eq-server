@@ -72,7 +72,7 @@ public class VolidOrderInfo {
      * @param searchAcceptOrderVO
      * @return
      */
-    public static String volidSearchAcceptOrderAd(SearchAcceptOrderVO searchAcceptOrderVO){
+    public static String volidCreateAcceptOrder(SearchAcceptOrderVO searchAcceptOrderVO){
         if(searchAcceptOrderVO==null){
             return  "请求参数为空";
         }
@@ -94,6 +94,27 @@ public class VolidOrderInfo {
         if(StringUtils.isEmpty(searchAcceptOrderVO.getConsigneeAddress())){
             return "承兑人地址必须填写";
         }
+        return null;
+    }
+
+
+    /**
+     * 验证承兑查询
+     * @param searchAcceptOrderVO
+     * @return
+     */
+    public static String volidSearchAcceptOrder(SearchAcceptOrderVO searchAcceptOrderVO){
+        if(searchAcceptOrderVO==null){
+            return  "请求参数为空";
+        }
+        if(searchAcceptOrderVO.getUserId()<=0 ){
+            return "用户为空";
+        }
+        if(StringUtils.isEmpty(searchAcceptOrderVO.getAcceptCode())){
+            return "订单号为空";
+        }
+
+
         return null;
     }
 

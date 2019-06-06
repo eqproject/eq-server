@@ -37,6 +37,12 @@ public class ProductAccept implements Serializable {
 	 *  简介
 	 */
 	private String intro;
+
+	/**
+	 *  电话
+	 */
+	private String mobile;
+
 	/**
 	 * 创建日期
 	 */

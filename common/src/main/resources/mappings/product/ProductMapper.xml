@@ -44,6 +44,7 @@
         <result column="acceptIcon" jdbcType="VARCHAR" property="acceptIcon" />
         <result column="acceptAddress" jdbcType="VARCHAR" property="acceptAddress" />
         <result column="acceptIntro" jdbcType="VARCHAR" property="acceptIntro" />
+        <result column="acceptMobile" jdbcType="VARCHAR" property="acceptMobile" />
         <!--Issuer-->
         <result column="issuerName" jdbcType="VARCHAR" property="issuerName" />
         <result column="issuerIcon" jdbcType="VARCHAR" property="issuerIcon" />
@@ -140,7 +141,7 @@
 
     <sql id="all_Column_List">
         p.id,p.name,p.product_img,p.product_accept_id,p.product_issuer_id,p.unit_price,p.sort,p.status,p.create_date,p.update_date,p.expiration_start,p.expiration_end,p.tag_ids,p.tag_names,p.extend_info,p.remarks,
-        accept.name as acceptName,accept.icon as acceptIcon,accept.address as acceptAddress,accept.intro as acceptIntro,
+        accept.name as acceptName,accept.icon as acceptIcon,accept.address as acceptAddress,accept.intro as acceptIntro,accept.mobile as acceptMobile,
         issuer.name as issuerName,issuer.icon as issuerIcon,issuer.address as issuerAddress,issuer.intro as issuerIntro,
         block.asset_code as blockAssetCode,block.asset_issuer as blockAssetIssuer,block.contract_address as blockContractAddress,block.ticketId as  blockTicketId,block.trancheId as blockTrancheId
     </sql>

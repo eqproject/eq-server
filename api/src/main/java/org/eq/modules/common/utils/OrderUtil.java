@@ -1,5 +1,6 @@
 package org.eq.modules.common.utils;
 
+import org.eq.modules.enums.OrderAcceptStateEnum;
 import org.eq.modules.enums.OrderTransferStateEnum;
 import org.eq.modules.order.entity.OrderAccept;
 import org.eq.modules.order.entity.OrderAd;
@@ -113,6 +114,24 @@ public class OrderUtil{
      * @param orderAccept
      * @return
      */
+    public static OverdueVO transObjForOverdueVO(OrderAccept orderAccept){
+        if(orderAccept==null){
+            return null;
+        }
+        OverdueVO overdueVO = new OverdueVO();
+        overdueVO.setUserId(orderAccept.getUserId());
+        overdueVO.setProductId(orderAccept.getProductId());
+        overdueVO.setNumber(orderAccept.getProductNum());
+        overdueVO.setOverdueReason("已承兑");
+        return overdueVO;
+    }
+
+
+    /**
+     * 转化对象实体
+     * @param orderAccept
+     * @return
+     */
     public static OrderAcceptVO transObjForOrderTrans(OrderAccept orderAccept){
         if(orderAccept==null){
             return null;
@@ -125,6 +144,8 @@ public class OrderUtil{
         orderAcceptVO.setConsignee(orderAccept.getConsignee());
         orderAcceptVO.setConsigneeAddress(orderAccept.getConsigneeAddress());
         orderAcceptVO.setConsigneePhone(orderAccept.getConsigneeMobile());
+        orderAcceptVO.setStateRemak(OrderAcceptStateEnum.getRemarkByState(orderAccept.getStatus()));
+        orderAcceptVO.setAcceptCode(orderAccept.getAcceptNo());
         return orderAcceptVO;
     }
 

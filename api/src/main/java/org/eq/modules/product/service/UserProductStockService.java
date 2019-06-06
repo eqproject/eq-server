@@ -12,6 +12,7 @@ import org.eq.modules.product.entity.UserProductStockExample;
 import org.eq.modules.product.vo.ProductBaseVO;
 import org.eq.modules.product.vo.SearchPageProductVO;
 import org.eq.modules.product.vo.VoucherProductBaseVO;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
