@@ -557,11 +557,11 @@
 
 ###### 接口功能
 
->  获取用户商品信息，不包含敏感信息
+>  获取用户非持有券，一定是无效的券，如果有效则返回错误信息，此接口更偏向于无效列表点击详情
 
 ###### URL
 
-> /api/product/user/nonHoldList
+> /api/product/user/noHold
 
 ###### 支持格式
 
@@ -575,6 +575,7 @@
 
 > | 参数        | 必选  | 类型   | 说明                               |
 > | ----------- | ----- | ------ | ---------------------------------- |
+> | id | true | 整型 | 商品ID |
 > | userId    | true  | 整形   | 用户ID                          |
 > | sign        | true  | 字符串 | 平台签名                           |
 >
@@ -588,18 +589,23 @@
 >data 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
-> | id      | 整型| 商品id    |
-> | productName     | 字符串 | 商品名称     |
-> | unitPrice       | 整形   | 面值         |
-> | img             | 字符串 | 商品图片     |
-> | brand           | 字符串 | 商家         |
-> | brandImg         | 字符串 | 商家图片     |
-> | brandDesc        | 字符串 | 商家描述信息 |
-> | brandTel         | 字符串 | 商家电话号码 |
-> | desc            | 字符串 | 商品介绍     |
-> | receive          | 字符串 | 商品提货说明 |
-> | expirationStart | 字符串 | 生效时间     |
-> | expirationEnd    | 字符串 | 过期时间     |
+>| id      | 整型| 商品id    |
+>| productName     | 字符串 | 商品名称     |
+>| unitPrice       | 整形   | 面值         |
+>| img             | 字符串 | 商品图片     |
+>| acceptName | 字符串 | 承兑商  |
+>| acceptImg | 字符串 | 承兑商图片  |
+>| acceptAddress | 字符串 | 承兑商地址 |
+>| acceptIntro | 字符串 | 商家简介 |
+>| acceptMobile | 字符串 | 承兑商电话 |
+>| issuerName | 字符串 | 发行商 |
+>| issuerImg | 字符串 | 发行商图片 |
+>| issuerAddress | 字符串 | 发行商地址 |
+>| issuerIntro | 字符串 | 发行商简介 |
+>| desc            | 字符串 | 商品介绍     |
+>| receive          | 字符串 | 商品提货说明 |
+>| expirationStart | 字符串 | 生效时间     |
+>| expirationEnd    | 字符串 | 过期时间     |
 
 ###### 返回实例
 
@@ -609,21 +615,26 @@
  "errMsg":"",
  "data":{ 
    
-  
-      	
-    		"id":1,
-    		"productName":"京东E卡",
-     		"unitPrice":12,
-     		"img":"htttp://pic.ka.png",
-          "brand":"京东",
-          "brandImg":"http://jindong.png",
-          "brandDesc":"互联网企业",
-          "brandTel":"0931123422",
-     		"desc":"仅限京东平台使用",
-     		"receive":"提货说明",
-     		"expirationStart":"有效期开始时间",
-     		"expiration_end":"有效期结束时间"
-   		
+        "id": 5,
+        "productName": "下线的卡",
+        "unitPrice": 12,
+        "img": "b66a.jpg",
+        "desc": null,
+        "receive": null,
+        "expirationStart": "2019-05-31",
+        "expirationEnd": "2022-05-31",
+        "sort": 5,
+        "acceptName": "承兑商京东",
+        "acceptImg": "承兑商京东图片",
+        "acceptAddress": "承兑商京东地址",
+        "acceptIntro": "承兑商京东简介",
+        "acceptMobile": "承兑商热线电话",
+        "issuerName": "发行商京东",
+        "issuerImg": "发行商京东图片",
+        "issuerAddress": "发行商京东地址",
+        "issuerIntro": "发行商简介",
+        "number": 0,
+        "lockedNum": 0
  }
 }
 ```
@@ -634,15 +645,17 @@
 
 ###### 接口功能
 
-> 查询自己持有券详情接口
+> 查询自己持有券详情接口,一定是用户持有的，并且有效的
 
 ###### URL
-> [/api/user/product/detail](/api/user/product/detail)
+> [/api/product/user/detail](/api/user/product/detail)
 
 ###### 支持格式
+
 > JSON
 
 ###### HTTP请求方式
+
 > GET
 
 ###### 请求参数
@@ -661,29 +674,24 @@
 >data 对象
 >|返回字段|字段类型|说明                              |
 >|:-----   |:------|:-----------------------------   |
-> |img            | string   | 商品图片url                      |
-> |  name                  | string   | 商品名称                         |
-> | unitPrice             | int      | 商品面值(单位:分)                |
-> |desc           | string   | 商品描述                         |
-> |  brand                | object   | 品牌商信息                       |
-> | blockChain                | object   | 券链信息                 |
-> | receive               | string   | 承兑说明                         |
-> |  expirationStart       | string   | 券有效期开始时间                 |
-> |  expirationEnd         | string   | 券有效期结束时间                 |
-> | number             | int      | 可用量                           |
-> |  lockedNum             | int      | 锁定量                           |
->brand 对象
->|返回字段|字段类型|说明  |
->|:-----   |:------|:-----------------------------   |
-> |name                 | string   | 品牌商名称                       |
-> | img              | string   | 品牌商图片url                    |
-> |desc      | string   | 品牌商备注信息                   |
->blockChain 对象
->|返回字段|字段类型|说明  |
->|:-----   |:------|:-----------------------------   |
-> |  issuer            | String   | 资产发行人                         |
-> |address   | string   | 合约地址         |
-
+>| id      | 整型| 商品id    |
+>| productName     | 字符串 | 商品名称     |
+>| unitPrice       | 整形   | 面值         |
+>| img             | 字符串 | 商品图片     |
+>| acceptName | 字符串 | 承兑商  |
+>| acceptImg | 字符串 | 承兑商图片  |
+>| acceptAddress | 字符串 | 承兑商地址 |
+>| acceptIntro | 字符串 | 商家简介 |
+>| acceptMobile | 字符串 | 承兑商电话 |
+>| issuerName | 字符串 | 发行商 |
+>| issuerImg | 字符串 | 发行商图片 |
+>| issuerAddress | 字符串 | 发行商地址 |
+>| issuerIntro | 字符串 | 发行商简介 |
+>| desc            | 字符串 | 商品介绍     |
+>| receive          | 字符串 | 商品提货说明 |
+>| expirationStart | 字符串 | 生效时间     |
+>| expirationEnd    | 字符串 | 过期时间     |
+>
 ###### 接口示例
 
 > 地址： [/api/user/product/detail](/api/user/product/detail)
@@ -693,24 +701,26 @@
 	"errMsg": "",
 	"status": 0,
 	"data": {
-			"img": "http://product.png",
-			"unitPrice": 600,
-			"name": "Nick Sportswear"
-			"num":5,
-			"lockedNum":5,
-			"desc":"描述",
-		    "brand": {
-					"name": "耐克官方旗舰店",
-					"img":"http://brand.png",
-					"desc": "提供承兑"
-			 },
-			 "blockChain":{
-			      "issuer":"北京公司",
-			      "address":"合约地址"
-			 }，
-			"receive": "  提货有效期为：2019.03.23-2049.12.31 此卡不兑换现   金，只可提取Nick自产产品",
-			"expirationStart": "2019.03.23",
-			"expirationEnd": "2049.12.31"
+			 "id": 1,
+        "productName": "京东E卡",
+        "unitPrice": 10000,
+        "img": "d65c1038b66a.jpg",
+        "desc": "E卡说明",
+        "receive": "京东E卡提货说明",
+        "expirationStart": "2019-05-31",
+        "expirationEnd": "2022-05-31",
+        "sort": 2,
+        "acceptName": "承兑商京东",
+        "acceptImg": "承兑商京东图片",
+        "acceptAddress": "承兑商京东地址",
+        "acceptIntro": "承兑商京东简介",
+        "acceptMobile": "承兑商热线电话",
+        "issuerName": "发行商京东",
+        "issuerImg": "发行商京东图片",
+        "issuerAddress": "发行商京东地址",
+        "issuerIntro": "发行商简介",
+        "number": 1000,
+        "lockedNum": 132
 
     }
 }

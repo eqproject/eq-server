@@ -77,6 +77,11 @@ public class ProductDetailVO extends EntityBase{
     private String acceptIntro;
 
     /**
+     * 承兑商电话
+     */
+    private String acceptMobile;
+
+    /**
      * 发行商名称
      */
     private String issuerName;

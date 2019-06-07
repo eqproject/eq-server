@@ -83,6 +83,7 @@ public class ProductUtil  extends ProductBusines {
         result.setAcceptImg(productAll.getAcceptIcon());
         result.setAcceptAddress(productAll.getAcceptAddress());
         result.setAcceptIntro(productAll.getAcceptIntro());
+        result.setAcceptMobile(productAll.getAcceptMobile());
         result.setIssuerName(productAll.getIssuerName());
         result.setIssuerImg(productAll.getIssuerIcon());
         result.setIssuerAddress(productAll.getIssuerAddress());
@@ -164,6 +165,30 @@ public class ProductUtil  extends ProductBusines {
             ca.andExpirationEndLessThanOrEqualTo(DateUtil.getNowTimeStr());
         }else{
             ca.andExpirationEndGreaterThan(DateUtil.getNowTimeStr());
+        }
+        return example;
+    }
+
+
+
+
+
+    /**
+     * 根据查询条件 封装Example
+     * @param searchBSearchProductVO 查询条件
+     * @return
+     */
+    public static ProductExample createNoEffectformSearchExample(BSearchProduct bsearchProduct,boolean isall) {
+        ProductExample example = new ProductExample();
+        ProductExample.Criteria ca = example.or();
+        example.setOrderByClause(" sort desc ");
+        if(bsearchProduct.getProductId()>0){
+            if(isall){
+                ca.andIdAllEqualTo(bsearchProduct.getProductId());
+            }else{
+                ca.andIdEqualTo(bsearchProduct.getProductId());
+            }
+
         }
         return example;
     }

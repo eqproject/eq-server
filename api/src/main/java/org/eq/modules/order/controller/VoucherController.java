@@ -174,7 +174,7 @@ public class VoucherController extends BaseController {
 
 
 	/**
-	 * 失效列表
+	 * 承兑详情
 	 * @return
 	 */
 	@PostMapping("/user/acceptDetail")

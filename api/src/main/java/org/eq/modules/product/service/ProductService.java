@@ -7,6 +7,7 @@ package org.eq.modules.product.service;
 import org.eq.basic.common.base.ServiceExtend;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.entitys.PageResultData;
+import org.eq.modules.order.vo.ServieReturn;
 import org.eq.modules.product.entity.Product;
 import org.eq.modules.product.entity.ProductAll;
 import org.eq.modules.product.entity.ProductExample;
@@ -53,5 +54,14 @@ public interface ProductService extends ServiceExtend<Product,ProductExample> {
      * @param user
      * @return
      */
-    UserProductDetailVO getUserProductAll(BSearchProduct bsearchProduct, User user);
+    ServieReturn<UserProductDetailVO> getUserProductNoHold(BSearchProduct bsearchProduct, User user);
+
+
+    /**
+     * 获取用户单个商品
+     * @param bsearchProduct 查询实体
+     * @param user
+     * @return
+     */
+    ServieReturn<UserProductDetailVO> getUserProductAll(BSearchProduct bsearchProduct, User user);
 }

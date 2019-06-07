@@ -4,11 +4,13 @@
  */
 package org.eq.modules.product.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.base.BaseController;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
+import org.eq.modules.order.vo.ServieReturn;
 import org.eq.modules.product.entity.ProductAll;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.service.UserProductStockService;
@@ -99,6 +101,31 @@ public class ProductController extends BaseController {
 	}
 
 
+
+	@PostMapping("/user/noHold")
+	public ResponseData userNoHold(SearchProductVO searchProductVO) {
+		if(searchProductVO ==null || searchProductVO.getUserId()<=0 || searchProductVO.getId()<=0){
+			return ResponseFactory.paramsError("参数为空或者用户ID为空");
+		}
+		User user = getUserInfo(searchProductVO.getUserId());
+		if(user==null){
+			return ResponseFactory.signError("用户不存在");
+		}
+
+		BSearchProduct bsearchProduct = new BSearchProduct();
+		bsearchProduct.setProductId(searchProductVO.getId());
+		ServieReturn<UserProductDetailVO> servieReturn =  productService.getUserProductNoHold(bsearchProduct,user);
+		if(servieReturn==null){
+			return ResponseFactory.signError("系统异常");
+		}
+		if(!StringUtils.isEmpty(servieReturn.getErrMsg())){
+			return ResponseFactory.signError(servieReturn.getErrMsg());
+		}
+		return ResponseFactory.success(servieReturn.getData());
+	}
+
+
+
 	@PostMapping("/user/details")
 	public ResponseData userDetails(SearchProductVO searchProductVO) {
 		if(searchProductVO ==null || searchProductVO.getUserId()<=0 || searchProductVO.getId()<=0){
@@ -111,12 +138,15 @@ public class ProductController extends BaseController {
 
 		BSearchProduct bsearchProduct = new BSearchProduct();
 		bsearchProduct.setProductId(searchProductVO.getId());
-		UserProductDetailVO userProductDetailVO =  productService.getUserProductAll(bsearchProduct,user);
-		if(userProductDetailVO==null){
-			userProductDetailVO = new UserProductDetailVO();
+		ServieReturn<UserProductDetailVO> servieReturn = productService.getUserProductAll(bsearchProduct,user);
+		if(servieReturn==null){
+			return ResponseFactory.signError("系统异常");
+		}
+		if(!StringUtils.isEmpty(servieReturn.getErrMsg())){
+			return ResponseFactory.signError(servieReturn.getErrMsg());
 		}
 
-		return ResponseFactory.success(userProductDetailVO);
+		return ResponseFactory.success(servieReturn.getData());
 	}
 
 

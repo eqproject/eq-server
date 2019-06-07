@@ -83,7 +83,7 @@
     </sql>
 
     <sql id="Base_Column_List">
-        OFS.id ,OFS.user_id,OFS.order_no,OFS.trade_no,OFS.product_id,OFS.product_name,OFS.unit_price,OFS.order_num,OFS.trade_num,OFS.type,OFS.status,OFS.salePrice,OFS.amount,OFS.create_date,
+        OFS.id ,OFS.sell_user_id,OFS.buy_user_id,OFS.order_no,OFS.trade_no,OFS.product_id,OFS.product_name,OFS.unit_price,OFS.order_num,OFS.trade_num,OFS.type,OFS.status,OFS.salePrice,OFS.amount,OFS.create_date,
         UU.nickname as nickName,UU.photo_head AS photohead,PP.product_img as productImg
     </sql>
 
@@ -122,9 +122,11 @@
     </delete>
 
     <insert id="insert" parameterType="org.eq.modules.orderfinish.entity.OrderFinishSnapshoot">
-        insert into order_finish_snapshoot (order_no,trade_no,product_id,product_name,unit_price,order_num,trade_num,type,status,salePrice,amount,create_date)
+        insert into order_finish_snapshoot (sell_user_id,buy_user_id,order_no,trade_no,product_id,product_name,unit_price,order_num,trade_num,type,status,salePrice,amount,create_date)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{sellUserId,jdbcType=BIGINT},
+            #{buyUserId,jdbcType=BIGINT},
             #{orderNo,jdbcType=VARCHAR},
             #{tradeNo,jdbcType=VARCHAR},
             #{productId,jdbcType=BIGINT},
@@ -143,6 +145,8 @@
     <insert id="insertSelective" parameterType="org.eq.modules.orderfinish.entity.OrderFinishSnapshoot">
         insert into order_finish_snapshoot
         <trim prefix="(" suffix=")" suffixOverrides=",">
+            sell_user_id,
+            buy_user_id,
             order_no,
             trade_no,
             product_id,
@@ -157,6 +161,8 @@
             create_date,
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{sellUserId,jdbcType=BIGINT},
+            #{buyUserId,jdbcType=BIGINT},
             #{orderNo,jdbcType=VARCHAR},
             #{tradeNo,jdbcType=VARCHAR},
             #{productId,jdbcType=BIGINT},
@@ -184,6 +190,12 @@
         <set>
             <if test="record.id != null">
                 id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.sellUserId != null">
+                sell_user_id = #{record.sellUserId,jdbcType=BIGINT},
+            </if>
+            <if test="record.buyUserId != null">
+                buy_user_id = #{record.buyUserId,jdbcType=BIGINT},
             </if>
             <if test="record.orderNo != null">
                 order_no = #{record.orderNo,jdbcType=VARCHAR},
@@ -232,6 +244,8 @@
         set
         <trim  suffixOverrides=",">
             id = #{record.id,jdbcType=BIGINT},
+            sell_user_id = #{record.sellUserId,jdbcType=BIGINT},
+            buy_user_id = #{record.buyUserId,jdbcType=BIGINT},
             order_no = #{record.orderNo,jdbcType=VARCHAR},
             trade_no = #{record.tradeNo,jdbcType=VARCHAR},
             product_id = #{record.productId,jdbcType=BIGINT},
@@ -253,6 +267,12 @@
     <update id="updateByPrimaryKeySelective" parameterType="org.eq.modules.orderfinish.entity.OrderFinishSnapshoot">
         update order_finish_snapshoot
         <set>
+            <if test="sellUserId != null">
+                sell_user_id = #{sellUserId,jdbcType=BIGINT},
+            </if>
+            <if test="buyUserId != null">
+                buy_user_id = #{buyUserId,jdbcType=BIGINT},
+            </if>
             <if test="orderNo != null">
             order_no = #{orderNo,jdbcType=VARCHAR},
             </if>
@@ -297,6 +317,8 @@
         update order_finish_snapshoot
         set
         <trim  suffixOverrides=",">
+              sell_user_id = #{sellUserId,jdbcType=BIGINT},
+              buy_user_id = #{buyUserId,jdbcType=BIGINT},
               order_no = #{orderNo,jdbcType=VARCHAR},
               trade_no = #{tradeNo,jdbcType=VARCHAR},
               product_id = #{productId,jdbcType=BIGINT},
