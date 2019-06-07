@@ -3,7 +3,8 @@
 <mapper namespace="org.eq.modules.orderfinish.dao.OrderFinishSnapshootMapper">
     <resultMap id="BaseResultMap" type="org.eq.modules.orderfinish.entity.OrderFinishSnapshoot">
         <id column="id" jdbcType="BIGINT" property="id" />
-        <result column="user_id" jdbcType="VARCHAR" property="userId" />
+        <result column="sell_user_id" jdbcType="BIGINT" property="sellUserId" />
+        <result column="buy_user_id" jdbcType="BIGINT" property="buyUserId" />
 	    <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
 	    <result column="trade_no" jdbcType="VARCHAR" property="tradeNo" />
 	    <result column="product_id" jdbcType="BIGINT" property="productId" />

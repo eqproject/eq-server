@@ -7,11 +7,9 @@ package org.eq.modules.enums;
  */
 public enum OrderFinishStateEnum {
 
-    ORDER_DEFAULT(1,"待审核"),
-    ORDER_CANCEL(2,"取消"),
-    ORDER_TRADEING(3,"交易中"),
-    ORDER_FINISH(4,"完成"),
-    ORDER_REJECT(5,"审核不通过");
+    ORDER_FINISH(1,"完成"),
+    ORDER_CLOSE(2,"关闭"),
+    ORDER_CANCEL(3,"取消");
 
 
     OrderFinishStateEnum(int state, String remark) {

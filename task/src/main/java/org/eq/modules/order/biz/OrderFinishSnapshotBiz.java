@@ -5,17 +5,20 @@ import lombok.RequiredArgsConstructor;
 import org.eq.basic.common.util.DateUtil;
 import org.eq.modules.enums.OrderAdStateEnum;
 import org.eq.modules.enums.OrderAdTypeEnum;
+import org.eq.modules.enums.OrderFinishStateEnum;
 import org.eq.modules.enums.OrderTradeStateEnum;
 import org.eq.modules.order.dao.OrderAdMapper;
 import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.order.entity.OrderAdExample;
 import org.eq.modules.orderfinish.dao.OrderFinishSnapshootMapper;
 import org.eq.modules.orderfinish.entity.OrderFinishSnapshoot;
+import org.eq.modules.orderfinish.entity.OrderFinishSnapshootExample;
 import org.eq.modules.product.dao.ProductMapper;
 import org.eq.modules.product.entity.Product;
 import org.eq.modules.trade.dao.OrderTradeMapper;
 import org.eq.modules.trade.entity.OrderTrade;
 import org.eq.modules.trade.entity.OrderTradeExample;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -75,15 +78,37 @@ public class OrderFinishSnapshotBiz {
     }
 
     public void insert(OrderFinishSnapshoot o) {
-        //sudo 缺少检查是否存在
+        OrderFinishSnapshoot entity = getEntity(o);
+        if (entity == null) {
+            orderFinishSnapshootMapper.insert(o);
+        } else {
+            BeanUtils.copyProperties(o, entity, "id");
+            orderFinishSnapshootMapper.updateByPrimaryKeySelective(entity);
+        }
+    }
 
-        orderFinishSnapshootMapper.insert(o);
+    private OrderFinishSnapshoot getEntity(OrderFinishSnapshoot o) {
+        OrderFinishSnapshootExample example = new OrderFinishSnapshootExample();
+        example.or()
+                .andOrderNoEqualToForAll(o.getOrderNo())
+                .andTradeNoEqualToForAll(o.getTradeNo());
+        List<OrderFinishSnapshoot> list = orderFinishSnapshootMapper.selectByExample(example);
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
     }
 
     public OrderFinishSnapshoot toOrderFinishSnapshoot(OrderAd order) {
         Product product = productMapper.selectByPrimaryKey(order.getProductId());
 
         OrderFinishSnapshoot o = new OrderFinishSnapshoot();
+        if (order.getType() == OrderAdTypeEnum.ORDER_SALE.getType()) {
+            o.setSellUserId(order.getUserId());
+        } else {
+            o.setBuyUserId(order.getUserId());
+        }
+
         o.setOrderNo(order.getOrderNo());
         o.setProductId(order.getProductId());
         o.setProductName(product.getName());
@@ -92,12 +117,15 @@ public class OrderFinishSnapshotBiz {
         o.setOrderNum(order.getProductNum());
         o.setType(order.getType() == OrderAdTypeEnum.ORDER_SALE.getType() ? 1 : 2);
         o.setAmount(order.getAmount());
+
         if (order.getStatus() == OrderAdStateEnum.ORDER_CANCEL.getState()) {
-            o.setStatus(3);
+            o.setStatus(OrderFinishStateEnum.ORDER_CANCEL.getState());
+
         } else if (order.getStatus() == OrderAdStateEnum.ORDER_FINISH.getState()) {
-            o.setStatus(1);
+            o.setStatus(OrderFinishStateEnum.ORDER_FINISH.getState());
+
         } else if (order.getStatus() == OrderAdStateEnum.ORDER_REJECT.getState()) {
-            o.setStatus(2);
+            o.setStatus(OrderFinishStateEnum.ORDER_CLOSE.getState());
         }
         return o;
     }
@@ -106,6 +134,8 @@ public class OrderFinishSnapshotBiz {
         Product product = productMapper.selectByPrimaryKey(order.getProductId());
 
         OrderFinishSnapshoot o = new OrderFinishSnapshoot();
+        o.setSellUserId(order.getSellUserId());
+        o.setBuyUserId(order.getBuyUserId());
         o.setOrderNo(order.getTradeNo());
         o.setProductId(order.getProductId());
         o.setProductName(product.getName());
@@ -114,14 +144,18 @@ public class OrderFinishSnapshotBiz {
         o.setOrderNum(order.getOrderNum());
         o.setType(order.getType() == OrderAdTypeEnum.ORDER_SALE.getType() ? 1 : 2);
         o.setAmount(order.getAmount());
+
         if (order.getStatus() == OrderTradeStateEnum.CANCEL.getState()) {
-            o.setStatus(3);
+            o.setStatus(OrderFinishStateEnum.ORDER_CANCEL.getState());
+
         } else if (order.getStatus() == OrderTradeStateEnum.PAY_FAIL.getState()) {
-            o.setStatus(3);
+            o.setStatus(OrderFinishStateEnum.ORDER_CLOSE.getState());
+
         } else if (order.getStatus() == OrderTradeStateEnum.CANCEL_PAY_TIMEOUT.getState()) {
-            o.setStatus(2);
+            o.setStatus(OrderFinishStateEnum.ORDER_CLOSE.getState());
+
         } else if (order.getStatus() == OrderTradeStateEnum.TRADE_SUCCESS.getState()) {
-            o.setStatus(1);
+            o.setStatus(OrderFinishStateEnum.ORDER_FINISH.getState());
         }
         return o;
     }

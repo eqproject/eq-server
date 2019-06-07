@@ -159,6 +159,16 @@ public class OrderFinishSnapshootExample {
             addCriterion("status =", value, "status");
             return (Criteria) this;
         }
+
+        public Criteria andOrderNoEqualToForAll(String value) {
+            addCriterion("OFS.order_no =", value, "orderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andTradeNoEqualToForAll(String value) {
+            addCriterion("OFS.trade_no =", value, "tradeNo");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

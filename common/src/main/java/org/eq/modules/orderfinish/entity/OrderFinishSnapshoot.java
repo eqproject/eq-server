@@ -21,9 +21,13 @@ public class OrderFinishSnapshoot {
     private Long id;
 
     /**
-     * 用户ID
+     * 售卖用户id
      */
-    private Long userId;
+    private Long sellUserId;
+    /**
+     * 购买用户id
+     */
+    private Long buyUserId;
     /**
      * 商品订单号
      */
@@ -33,7 +37,7 @@ public class OrderFinishSnapshoot {
      */
     private String tradeNo;
     /**
-     *  商品Id
+     * 商品Id
      */
     private Long productId;
     /**
@@ -41,7 +45,7 @@ public class OrderFinishSnapshoot {
      */
     private String productName;
     /**
-     *  商品单价
+     * 商品单价
      */
     private Integer unitPrice;
     /**
@@ -54,12 +58,14 @@ public class OrderFinishSnapshoot {
     private Integer tradeNum;
     /**
      * 订单类型
-     * @see  org.eq.modules.enums.OrderFinishTypeEnum
+     *
+     * @see org.eq.modules.enums.OrderFinishTypeEnum
      */
     private Integer type;
     /**
      * 状态
-     * @see  org.eq.modules.enums.OrderFinishStateEnum
+     *
+     * @see org.eq.modules.enums.OrderFinishStateEnum
      */
     private Integer status;
     /**
