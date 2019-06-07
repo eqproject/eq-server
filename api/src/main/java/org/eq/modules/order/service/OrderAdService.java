@@ -48,4 +48,12 @@ public interface OrderAdService extends ServiceExtend<OrderAd, OrderAdExample> {
      */
     PageResultData<OrderAdSimpleVO> pagePlatOrderAd(SearchPageAdOrderVO searchPageAdOrderVO, User user);
 
+    /**
+     * 获取用户广告信息
+     * @param searchPageAdOrderVO
+     * @param user 用户实体
+     * @return
+     */
+    PageResultData<OrderAdSimpleVO> pageUserOrderAd(SearchPageAdOrderVO searchPageAdOrderVO, User user);
+
 }

@@ -93,6 +93,30 @@ public class OrderController extends BaseController {
 	 * 集市订单查询
 	 * @return
 	 */
+	@PostMapping("/user/list")
+	public ResponseData<PageResultData> orderAdUserList(SearchPageAdOrderVO searchPageAdOrderVO) {
+		if(searchPageAdOrderVO==null){
+			return ResponseFactory.signError("查询条件为空");
+		}
+		User user = getUserInfo(searchPageAdOrderVO.getUserId());
+		if(user==null){
+			return ResponseFactory.signError("用户不存在");
+		}
+		PageResultData<OrderAdSimpleVO>  pageResult =  orderAdService.pageUserOrderAd(searchPageAdOrderVO,user);
+		if(pageResult==null){
+			logger.error("集市获取订单接口异常");
+			return ResponseFactory.signError("查询异常");
+		}
+		return ResponseFactory.success(pageResult);
+	}
+
+
+
+
+	/**
+	 * 集市订单查询
+	 * @return
+	 */
 	@PostMapping("/plat/list")
 	public ResponseData<PageResultData> orderAdinfoList(SearchPageAdOrderVO searchPageAdOrderVO) {
 		if(searchPageAdOrderVO==null){

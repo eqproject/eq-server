@@ -119,6 +119,23 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		return example;
 	}
 
+
+	/**
+	 * 获取用户有效订单数据
+	 * @param user
+	 * @return
+	 */
+	private  OrderAdExample getExampleFromEntityAllForUser(User user) {
+		OrderAdExample example = new OrderAdExample();
+		OrderAdExample.Criteria ca = example.or();
+		List<Integer> states = new ArrayList<>();
+		states.add(OrderAdStateEnum.ORDER_TRADEING.getState());
+		ca.andStatusInForAll(states);
+		ca.andUserIdEqualToForAll(user.getId());
+		example.setOrderByClause("sort desc");
+		return example;
+	}
+
 	@Override
 	public ServieReturn<ResOrderAdVO> createResOrderAdVO(SearchAdOrderVO searchAdOrderVO, User user) {
 		String volidResult = VolidOrderInfo.volidSearchOrderAd(searchAdOrderVO);
@@ -273,6 +290,34 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 	}
 
 
+	@Override
+	public PageResultData<OrderAdSimpleVO> pageUserOrderAd(SearchPageAdOrderVO searchPageAdOrderVO,User user) {
+		PageResultData<OrderAdSimpleVO> result = new PageResultData<>();
+		if(searchPageAdOrderVO ==null){
+			searchPageAdOrderVO = new SearchPageAdOrderVO();
+		}
+		if(searchPageAdOrderVO.getPageSize()<=0 || searchPageAdOrderVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
+			searchPageAdOrderVO.setPageSize(StaticEntity.MAX_PAGE_SIZE);
+		}
+		if(searchPageAdOrderVO.getPageNum()<=0){
+			searchPageAdOrderVO.setPageNum(1);
+		}
+
+		BaseTableData baseTableData = findDataTableByExampleForPage(getExampleFromEntityAllForUser(user), searchPageAdOrderVO.getPageNum(), searchPageAdOrderVO.getPageSize());
+		if(baseTableData==null){
+			return result;
+		}
+		List<OrderAdSimpleVO> dataList = new ArrayList<>(baseTableData.getData().size());
+		List<OrderAd> pList = baseTableData.getData();
+		for(OrderAd p : pList){
+			dataList.add(OrderUtil.transObjForSimple(p));
+		}
+		result.setList(dataList);
+		result.setTotal(baseTableData.getRecordsTotal());
+		return result;
+	}
+
+
 	/**
 	 * 创建求购订单
 	 * @param searchAdOrderVO
@@ -377,7 +422,6 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		}
 		buffer.append(DateUtil.getLockNowTime()).append(number);
 		return buffer.toString();
-
 	}
 
 }

@@ -923,11 +923,11 @@
 
 
 
-##### 3-04   获取我的订单
+##### 3-04   获取我的订单(L)
 
 ###### 接口功能
 
->   获取用户个人我的订单
+>   获取用户个人发布中的广告订单
 
 ###### URL
 
@@ -948,9 +948,8 @@
 > | userId | true | 字符串 |当前用户ID|
 > | pageSize    | true  | 整形   | 每页大小                           |
 > | pageNum | true | 整形 | 当前页 |
-> | orderType    | true  | 整形   | 广告类型(1:我要卖 2:我要买)                 |
 > | sign        | true  | 字符串 | 平台签名                           |
->
+> 
 
 ###### 响应参数
 >|返回字段|字段类型|说明                              |
@@ -970,16 +969,15 @@
 >| productName     | 字符串 | 商品名称     |
 >| orderType     |整型 | 订单类型     |
 >| img             | 字符串 | 商品图片     |
->| unit_price | 整形   | 商品单价      |
->| price | 整形   | 销售单价         |
+>| price | 整形   | 订单单价 |
 >| orderNumber | 整形   | 订单总量     |
 >|saleedNumber | 整形   |已完成量    |
 >|saleNumber | 整形   |可交易量   |
 >| title | 字符串  | 订单标题       |
->| desc            | 字符串 | 商品介绍     |
 >| userId            | 字符串 | 用户Id     |
->| expirationStart | 字符串 | 生效时间     |
->| expirationEnd    | 字符串 | 过期时间     |
+>| userImg | 字符串 | 用户头像 |
+>| nickName | 字符串 | 用户昵称 |
+>| orderType | 整形 | d订单类型(1:出售广告2:求购广告) |
 
 ###### 返回实例
 
@@ -990,26 +988,22 @@
  "data":{ 
    "total":20
    "list":[
-     {
-      "orderCode":"NG12323456",
-       "productName":"京东E卡",
-       "orderType":":(1:出售;2:求购)"，
-       "img":"http://ek.png",
-       "price":12,
-       "orderNumber":100,
-       "saleedNumber":10,
-       "saleNumber":90,
-       "title":"便宜的E卡出售",
-       "brand":"京东",
-       "brandImg":"http://jd.png",
-       "brandTel":"0931-43173213",
-       "des":"E卡描述",
-       "userId":"123",
-       "userImg":"http://touxiang.png",
-       "userBoundState":"3",
-       "expirationStart":"生效时间",
-       "expirationEnd":"失效时间"
-     }
+      {
+         "orderCode": "AD20190602171926304504",
+        "productId": "1",
+         "productName": "京东E卡",
+         "img": "b66a.jpg",
+         "price": 100,
+         "orderNumber": 10,
+         "saleedNumber": 4,
+         "saleNumber": 6,
+        "title": "测试正在进行中订单",
+          "userId": 1,
+          "userImg": "用户头像地址",
+           "nickName": "齐木卡卡西",
+          "userBoundState": 0,
+           "orderType": 1
+            }
    ]
  }
 }

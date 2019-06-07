@@ -58,6 +58,7 @@ public class OrderUtil{
         orderAdSimpleVO.setUserImg(orderAd.getPhotoHead());
         orderAdSimpleVO.setNickName(orderAd.getNickName());
         orderAdSimpleVO.setUserBoundState(orderAd.getAuthStatus());
+        orderAdSimpleVO.setOrderType(orderAd.getType());
         return orderAdSimpleVO;
     }
 

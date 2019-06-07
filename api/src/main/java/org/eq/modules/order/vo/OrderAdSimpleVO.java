@@ -82,5 +82,10 @@ public class OrderAdSimpleVO implements Serializable {
      */
     private int userBoundState;
 
+    /**
+     * 订单类型
+     */
+    private int orderType;
+
 
 }
