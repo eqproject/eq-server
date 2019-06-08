@@ -13,7 +13,7 @@ import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.cache.ProductCache;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
-import org.eq.modules.common.utils.ProductUtil;
+import org.eq.modules.utils.ProductUtil;
 import org.eq.modules.order.vo.ServieReturn;
 import org.eq.modules.product.dao.ProductMapper;
 import org.eq.modules.product.entity.Product;

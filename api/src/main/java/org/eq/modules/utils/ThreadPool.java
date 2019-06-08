@@ -1,4 +1,4 @@
-package org.eq.modules.common.utils;
+package org.eq.modules.utils;
 
 import java.util.concurrent.Executors;
 

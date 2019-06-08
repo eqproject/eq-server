@@ -1,13 +1,16 @@
-package org.eq.modules.common.utils;
+package org.eq.modules.utils;
 
-import okhttp3.*;
-import org.apache.commons.collections.CollectionUtils;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+@SuppressWarnings("all")
 public class WebClientUtil {
 
     private static final OkHttpClient client = new OkHttpClient();

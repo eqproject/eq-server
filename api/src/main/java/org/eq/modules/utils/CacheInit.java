@@ -1,4 +1,4 @@
-package org.eq.modules.common.utils;
+package org.eq.modules.utils;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.eq.modules.common.cache.BaseCache;

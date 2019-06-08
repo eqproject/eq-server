@@ -1,4 +1,4 @@
-package org.eq.modules.common.utils;
+package org.eq.modules.utils;
 
 import org.eq.modules.enums.OrderAcceptStateEnum;
 import org.eq.modules.enums.OrderTransferStateEnum;

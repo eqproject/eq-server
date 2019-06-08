@@ -10,12 +10,11 @@ import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.DateUtil;
-import org.eq.basic.common.util.StringLowUtils;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
-import org.eq.modules.common.utils.OrderUtil;
-import org.eq.modules.common.utils.ProductUtil;
+import org.eq.modules.utils.OrderUtil;
+import org.eq.modules.utils.ProductUtil;
 import org.eq.modules.enums.OrderAdStateEnum;
 import org.eq.modules.enums.OrderAdTypeEnum;
 import org.eq.modules.order.dao.OrderAdMapper;
@@ -25,13 +24,10 @@ import org.eq.modules.order.entity.OrderAdLog;
 import org.eq.modules.order.service.OrderAdLogService;
 import org.eq.modules.order.service.OrderAdService;
 import org.eq.modules.order.vo.*;
-import org.eq.modules.product.dao.ProductMapper;
 import org.eq.modules.product.entity.Product;
 import org.eq.modules.product.entity.UserProductStock;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.service.UserProductStockService;
-import org.eq.modules.product.vo.ProductBaseVO;
-import org.eq.modules.product.vo.SearchPageProductVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -216,18 +212,19 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 			return result;
 		}
 		StringBuffer remarks = new StringBuffer();
-		if(orderAd.getType()==OrderAdTypeEnum.ORDER_SALE.getType()){
+		if(orderAd.getType()==OrderAdTypeEnum.ORDER_SALE.getType() && orderAd.getStatus() ==OrderAdStateEnum.ORDER_TRADEING.getState()){
 			int number  = orderAd.getProductNum() -orderAd.getTradedNum()  - orderAd.getTradingNum();
-			if(number<=0){
-				result.setErrMsg("订单库存异常");
-				return result;
-			}
-			boolean stockResult  = userProductStockService.updateStock(orderAd.getProductId(),user.getId(),-number);
-			if(stockResult){
-				remarks.append("取消成功,").append("退回库存成功,应退:").append(number).append(",执行快照为:").append(orderAd.toString());
+			if(number>0){
+				boolean stockResult  = userProductStockService.updateStock(orderAd.getProductId(),user.getId(),-number);
+				if(stockResult){
+					remarks.append("取消成功,").append("退回库存成功,应退:").append(number).append(",执行快照为:").append(orderAd.toString());
+				}else{
+					remarks.append("取消成功,").append("退回库存失败,应退回:").append(number).append(",执行快照为:").append(orderAd.toString());
+				}
 			}else{
-				remarks.append("取消成功,").append("退回库存失败,应退回:").append(number).append(",执行快照为:").append(orderAd.toString());
+				logger.error("库存存在异常 : {}",orderAd.getOrderNo());
 			}
+
 		}else{
 			remarks.append("取消成功,").append("执行快照为:").append(orderAd.toString());
 		}

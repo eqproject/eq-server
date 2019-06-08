@@ -6,6 +6,7 @@ package org.eq.modules.product.service;
 
 import org.eq.basic.common.base.ServiceExtend;
 import org.eq.modules.product.entity.Product;
+import org.eq.modules.product.entity.ProductAll;
 import org.eq.modules.product.entity.ProductExample;
 
 /**
@@ -22,5 +23,26 @@ public interface ProductService extends ServiceExtend<Product,ProductExample> {
      * @return
      */
     public Product getProductBetweenScore(int score, boolean isup);
+
+
+    /**
+     * 获取平台单个商品
+     * @param productId 查询实体
+     * @return
+     */
+    ProductAll getProductAll(long productId);
+
+
+
+
+    int updateProductState(int newState,int oldState,long productId);
+
+
+    /**
+     * 同步商品信息
+     * @return
+     */
+    int loadProduct();
+
 
 }

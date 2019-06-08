@@ -8,7 +8,8 @@ package org.eq.modules.enums;
 public enum ProductStateEnum {
     DEFAULT(0,"待上架状态"),
     ONLINE(1,"上线状态"),
-    OFFLINE(2,"下线状态");
+    OVERDUE(2,"过期状态"),
+    OFFLINE(3,"下线状态");
 
     /**
      * 状态

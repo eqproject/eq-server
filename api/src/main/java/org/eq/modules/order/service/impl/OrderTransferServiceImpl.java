@@ -4,7 +4,6 @@
  */
 package org.eq.modules.order.service.impl;
 
-import net.bytebuddy.asm.Advice;
 import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.BaseTableData;
@@ -17,11 +16,8 @@ import org.eq.modules.bc.entity.BcTxRecord;
 import org.eq.modules.common.cache.ProductCache;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
-import org.eq.modules.common.utils.OrderUtil;
-import org.eq.modules.common.utils.ProductUtil;
-import org.eq.modules.enums.OrderAcceptStateEnum;
-import org.eq.modules.enums.OrderAdStateEnum;
-import org.eq.modules.enums.OrderAdTypeEnum;
+import org.eq.modules.utils.OrderUtil;
+import org.eq.modules.utils.ProductUtil;
 import org.eq.modules.enums.OrderTransferStateEnum;
 import org.eq.modules.order.dao.OrderTransferMapper;
 import org.eq.modules.order.entity.*;
@@ -32,7 +28,6 @@ import org.eq.modules.product.entity.ProductAll;
 import org.eq.modules.product.entity.UserProductStock;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.service.UserProductStockService;
-import org.eq.modules.wallet.service.BcTxRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

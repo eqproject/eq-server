@@ -29,21 +29,9 @@
                             <input type="hidden" name="orderDir" id="orderDir" value="desc">
                             <input type="hidden" name="orderName" id="orderName" value="sort">
                             <div class="form-group col-md-4 col-sm-12 ">
-                                <label  class="col-md-4 col-sm-4 control-label">商品编号</label>
-                                <div class="col-md-8 col-sm-8">
-                                    <input type="text" class="form-control" id="code" name="code" maxlength="50" style="width: 100%;"/>
-                                </div>
-                            </div>
-                            <div class="form-group col-md-4 col-sm-12 ">
                                 <label  class="col-md-4 col-sm-4 control-label">商品名称</label>
                                 <div class="col-md-8 col-sm-8">
                                     <input type="text" class="form-control" id="name" name="name" maxlength="50" style="width: 100%;"/>
-                                </div>
-                            </div>
-                            <div class="form-group col-md-4 col-sm-12 ">
-                                <label  class="col-md-4 col-sm-4 control-label">品牌商</label>
-                                <div class="col-md-8 col-sm-8">
-                                    <input type="text" class="form-control" id="brand" name="brand" maxlength="50" style="width: 100%;"/>
                                 </div>
                             </div>
                             <div class="form-group col-md-4 col-sm-12 ">
@@ -51,13 +39,17 @@
                                 <div class="col-md-8 col-sm-8">
                                     <select class="select2-type select2-choice" id="status" name="status" style="width: 100%;">
                                         <option value="">全部</option>
+                                        <option value="0">待上架</option>
                                         <option value="1">已上线</option>
-                                        <option value="2">已下线</option>
+                                        <option value="2">已过期</option>
+                                        <option value="3">已下架</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="text-center operateBox row">
                                 <input id="select" class="btn btn-primary"  type="button" th:if="${#authorization.expression('hasRole(''sys:menu:view'')')}" value="查询"/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <input id="load" class="btn btn-primary" onclick="loadProduct()"  type="button" th:if="${#authorization.expression('hasRole(''sys:menu:view'')')}" value="导入"/>
                             </div>
                         </form>
                         <div id="dict_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
@@ -73,10 +65,9 @@
                                         <tr role="row">
                                             <th>序号</th>
                                             <th>商品名称</th>
-                                            <th>商品编号</th>
+                                            <th>商品单价</th>
                                             <th>商品标签</th>
-                                            <th>品牌商</th>
-                                            <th>创建人</th>
+                                            <th>过期时间</th>
                                             <th>更新时间</th>
                                             <th>排序</th>
                                             <th>状态</th>
@@ -95,14 +86,14 @@
     </section>
 
     <!-- 模态框（Modal） -->
-    <div class="modal fade" id="modifyModal" tabindex="-1" role="dialog" data-backdrop="static">
+    <div class="modal fade" id="lookModal" tabindex="-1" role="dialog" data-backdrop="static">
         <form id="modifyForm" class="modalForm" role="form" method="post">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">
                             <span>&times;</span></button>
-                        <h4 class="modal-title" id="modifyModalLabel">商品添加</h4>
+                        <h4 class="modal-title" id="modifyModalLabel">商品详情</h4>
                     </div>
                     <div class="modal-body">
                         <input id="id" name="id" type="hidden" value=""/>
@@ -114,158 +105,175 @@
                         </div>
                         <div class="form-group">
                             <div class="input-group">
-                                <span class="input-group-addon">商品编号：</span>
-                                <input type="text" readonly="readonly" class="form-control"  name="code" maxlength="50"/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="input-group">
                                 <span class="input-group-addon">商品图片地址：</span>
-                                <input type="text" class="form-control"   name="productImg" maxlength="50"/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="input-group">
-                                <span class="input-group-addon">品牌商：</span>
-                                <input type="text" class="form-control"   name="brand" maxlength="50"/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="input-group">
-                                <span class="input-group-addon">品牌商图片：</span>
-                                <input type="text" class="form-control"   name="brandImg" maxlength="50"/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="input-group">
-                                <span class="input-group-addon">品牌商描述：</span>
-                                <textarea rows="2" cols="2" type="text" class="form-control" id="brandDescription" name="brandDescription" maxlength="50"/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="input-group">
-                                <span class="input-group-addon">品牌商电话：</span>
-                                <input type="text" class="form-control" id="brandTele" name="brandTele" maxlength="50"/>
+                                <input type="text" readonly="true"  class="form-control"   name="productImg" maxlength="50"/>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="input-group">
                                 <span class="input-group-addon">商品单价：</span>
-                                <input type="text" class="form-control" id="unitPrice" name="unitPrice" maxlength="50"/>
+                                <input type="text" readonly="true"  class="form-control" id="unitPrice" name="unitPrice" maxlength="50"/>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="input-group">
-                                <span class="input-group-addon">商品描述：</span>
-                                <textarea rows="2" cols="2" type="text" class="form-control" id="description" name="description" maxlength="50"/>
+                                <span class="input-group-addon">创建时间：</span>
+                                <input type="text" readonly="true"  class="form-control" id="createDate" name="createDate" maxlength="50"/>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="input-group">
-                                <span class="input-group-addon">提货说明：</span>
-                                <textarea rows="2" cols="2" type="text" class="form-control" id="receive" name="receive" maxlength="50"/>
-                            </div>
-                        </div>
-                       <!-- <div class="form-group">
-                            <div class="input-group">
-                                <span class="input-group-addon">状态：</span>
-                                <select class="select2-type select2-choice" name="status" readonly="true" style="width: 100%;">
-                                    <option value="0">待上架</option>
-                                    <option value="1">上架</option>
-                                    <option value="2">下架</option>
-                                </select>
-                            </div>
-                        </div>-->
-                        <div class="form-group">
-                            <div class="input-group">
-                                <span class="input-group-addon">商品有效期开始时间：</span>
-                                <input type="text" readonly="readonly" class="form-control" id="expirationStart" name="expirationStart" maxlength="50"/>
+                                <span class="input-group-addon">有效期开始时间：</span>
+                                <input type="text" readonly="true"  class="form-control" name="expirationStart" maxlength="50"/>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="input-group">
-                                <span class="input-group-addon">商品有效期结束时间：</span>
-                                <input type="text" readonly="readonly" class="form-control" id="expirationEnd" name="expirationEnd" maxlength="50"/>
+                                <span class="input-group-addon">有效期结束时间：</span>
+                                <input type="text" readonly="true"  class="form-control" name="expirationEnd" maxlength="50"/>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="input-group">
                                 <span class="input-group-addon">标签名称：</span>
-                                <input type="hidden" class="form-control"   name="tagIds" />
-                                <select class="easyui-combobox" id="tagNames" name="tagNames" data-options="multiple:true,multiline:true" style="width:200px;height:50px">
-                                </select>
+                                <input type="text" readonly="true"  class="form-control" id="tagNames" name="tagNames" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">提货说明：</span>
+                                <textarea rows="2" readonly="true"   type="text" class="form-control" name="receive" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">券描述：</span>
+                                <textarea rows="2" readonly="true"   type="text" class="form-control" name="ticketDesc" maxlength="50"/>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="input-group">
                                 <span class="input-group-addon">备注：</span>
-                                <input type="text" class="form-control" id="remarks" name="remarks" maxlength="50"/>
+                                <textarea rows="2" readonly="true"   type="text" class="form-control" name="remarks" maxlength="50"/>
+                            </div>
+                        </div>
+                        <!--发行商信息-->
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">发行商名称：</span>
+                                <textarea rows="1" readonly="true"   type="text" class="form-control" name="issuerName" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">发行商图片：</span>
+                                <textarea rows="1" readonly="true"   type="text" class="form-control" name="issuerIcon" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">发行商地址：</span>
+                                <textarea rows="1" readonly="true"   type="text" class="form-control" name="issuerAddress" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">发行商简介：</span>
+                                <textarea rows="1" readonly="true"   type="text" class="form-control" name="issuerIntro" maxlength="50"/>
+                            </div>
+                        </div>
+                        <!--承兑商信息-->
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">承兑商名称：</span>
+                                <textarea rows="1" readonly="true"   type="text" class="form-control" name="acceptName" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">承兑商图片：</span>
+                                <textarea rows="1" readonly="true"   type="text" class="form-control" name="acceptIcon" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">承兑商地址：</span>
+                                <textarea rows="1" readonly="true"   type="text" class="form-control" name="acceptAddress" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">承兑商简介：</span>
+                                <textarea rows="1" readonly="true"   type="text" class="form-control" name="acceptIntro" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">承兑商电话：</span>
+                                <textarea rows="1"  readonly="true"  type="text" class="form-control" name="acceptMobile" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">资产CODE：</span>
+                                <textarea rows="1" readonly="true"   type="text" class="form-control" name="assetCode" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">资产发行人：</span>
+                                <textarea rows="1" readonly="true"   type="text" class="form-control" name="assetIssuer" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">合约地址：</span>
+                                <textarea rows="1" readonly="true"   type="text" class="form-control" name="contractAddress" maxlength="50"/>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
-                        <button id="save" type="button" class="btn btn-primary" data-type="save">保存</button>
                     </div>
                 </div>
             </div>
         </form>
     </div>
 
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="modelTag" tabindex="-1" role="dialog" data-backdrop="static">
+        <form id="modelTagForm" class="modalForm" role="form" method="post">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span></button>
+                        <h4 class="modal-title" id="modelTagTitle">商品标签</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input  name="id" type="hidden" value=""/>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">商品标签：</span>
+                                <input th:type="hidden" id="hiddenTag">
+                                <select class="js-example-basic-multiple" name="product-id-change" multiple="multiple" id="product-id-change">
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                        <button type="button" onclick="subTag()" class="btn btn-default pull-left" data-dismiss="modal">保存</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
 </section>
 <script type="text/javascript" src="/admin/c2c/product/list.js"></script>
-
-<script type="text/javascript">
-
-    function loadTag(){
-        $.post(urlPath+'/tag/listTag',function(data){
-            if(data.code!="10401"){
-                alert(data.msg);
-            }else{
-                var tagArray = data.list;
-                $.each(tagArray, function(i, n){
-                    $("#tagNames").append("<option value='"+n.id+"'>"+n.name+"</option>");
-                });
-            }
-        });
-    }
-
-
-    function saveOrUpdate(div){
-        div.find("#save").on("click",function(){
-            var form = div.find('.modalForm');
-            var button = $(this);
-            //数据操作方式
-            var opType = button.data("type");
-            //查找是select2的字段并赋值
-            var obj = {};
-            obj.opType = opType;
-            obj.id = form.find("input[name='id']").val();
-            obj.name = form.find("input[name='name']").val();
-            $.ajax({
-                url: urlPath+'/tag/modify',
-                type: 'POST',
-                data: $.param(obj),
-                success: function (data, status) {
-                    if(data.status=='success'){
-                        //操作成功 弹出提示信息 然后关闭弹出框 重新刷新list 页面
-                        base_alert_success_time(data.msg,1000,function(){
-                            div.modal('hide');
-                            var tagAuth = new Tag.TagAuth();
-                            tagAuth.init();
-                        })
-                    }else{
-                        //操作失败 弹出提示信息
-                        base_alert_time(data.msg,1000);
-                    }
-                }
-            });
-
-        })
-    }
-
-
-
-</script>
 </body>
 </html>

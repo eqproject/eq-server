@@ -271,4 +271,6 @@ public interface BaseService<Record, Example> {
      * @return
      */
     Example getExampleFromEntity(Record record, Map<String, Object> params);
+
+
 }
