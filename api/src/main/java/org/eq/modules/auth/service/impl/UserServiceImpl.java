@@ -1,7 +1,3 @@
-/**
- * 该类有generator 自动生成
- * Copyright &copy; 2017-2018 All rights reserved.
- */
 package org.eq.modules.auth.service.impl;
 
 import org.eq.basic.common.annotation.AutowiredService;
@@ -156,9 +152,13 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         User user = new User();
         user.setMobile(mobile);
         //检查是否已注册
-        if (checkDuplicateMobile(user)) {
-            return ResponseFactory.paramsError("该手机号已注册");
+        User checkUser = checkDuplicateMobile(user);
+        //已注册直接返回成功
+        if(checkUser != null){
+            user.setId(checkUser.getId());
+            return ResponseFactory.success(user);
         }
+
         Long userId = saveUser(user);
         // 2.生成钱包地址
         UserWallet wallet = WalletUtil.generate(userId);
@@ -285,14 +285,12 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
     }
 
     /**
-     * 检查手机号是否已注册
-     *
+     * 检查手机号重复注册
      * @param user
      * @return
      */
-    private boolean checkDuplicateMobile(User user) {
-        User checkUser = selectByRecord(user);
-        return checkUser != null;
+    private User checkDuplicateMobile(User user) {
+        return selectByRecord(user);
     }
 
 }
