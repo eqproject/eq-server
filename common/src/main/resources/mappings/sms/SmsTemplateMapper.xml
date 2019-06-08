@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.eq.modules.sms.dao.SmsTemplateMapper">
+    <resultMap id="BaseResultMap" type="org.eq.modules.sms.entity.SmsTemplate">
+        <id column="id" jdbcType="BIGINT" property="id" />
+	    <result column="code" jdbcType="VARCHAR" property="code" />
+	    <result column="name" jdbcType="VARCHAR" property="name" />
+	    <result column="limit_day" jdbcType="INTEGER" property="limitDay" />
+	    <result column="type" jdbcType="TINYINT" property="type" />
+	    <result column="content" jdbcType="VARCHAR" property="content" />
+	    <result column="create_by" jdbcType="BIGINT" property="createBy" />
+	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+	    <result column="update_by" jdbcType="BIGINT" property="updateBy" />
+	    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+    </resultMap>
+
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_List">
+        id,code,name,limit_day,type,content,create_by,create_date,update_by,update_date
+    </sql>
+
+    <select id="selectByExample" parameterType="org.eq.modules.sms.entity.SmsTemplateExample" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List" />
+        from sms_template
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from sms_template
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from sms_template
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByExample" parameterType="org.eq.modules.sms.entity.SmsTemplateExample">
+        delete from sms_template
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
+
+    <insert id="insert" parameterType="org.eq.modules.sms.entity.SmsTemplate">
+        insert into sms_template (code,name,limit_day,type,content,create_by,create_date,update_by,update_date)
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{code,jdbcType=VARCHAR},
+            #{name,jdbcType=VARCHAR},
+            #{limitDay,jdbcType=INTEGER},
+            #{type,jdbcType=TINYINT},
+            #{content,jdbcType=VARCHAR},
+            #{createBy,jdbcType=BIGINT},
+            #{createDate,jdbcType=TIMESTAMP},
+            #{updateBy,jdbcType=BIGINT},
+            #{updateDate,jdbcType=TIMESTAMP},
+        </trim>
+    </insert>
+
+    <insert id="insertSelective" parameterType="org.eq.modules.sms.entity.SmsTemplate">
+        insert into sms_template
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            code,
+            name,
+            limit_day,
+            type,
+            content,
+            create_by,
+            create_date,
+            update_by,
+            update_date,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{code,jdbcType=VARCHAR},
+            #{name,jdbcType=VARCHAR},
+            #{limitDay,jdbcType=INTEGER},
+            #{type,jdbcType=TINYINT},
+            #{content,jdbcType=VARCHAR},
+            #{createBy,jdbcType=BIGINT},
+            #{createDate,jdbcType=TIMESTAMP},
+            #{updateBy,jdbcType=BIGINT},
+            #{updateDate,jdbcType=TIMESTAMP},
+        </trim>
+    </insert>
+
+    <select id="countByExample" parameterType="org.eq.modules.sms.entity.SmsTemplateExample" resultType="java.lang.Long">
+        select count(*) from sms_template
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </select>
+
+    <update id="updateByExampleSelective" parameterType="map">
+        update sms_template
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.code != null">
+                code = #{record.code,jdbcType=VARCHAR},
+            </if>
+            <if test="record.name != null">
+                name = #{record.name,jdbcType=VARCHAR},
+            </if>
+            <if test="record.limitDay != null">
+                limit_day = #{record.limitDay,jdbcType=INTEGER},
+            </if>
+            <if test="record.type != null">
+                type = #{record.type,jdbcType=TINYINT},
+            </if>
+            <if test="record.content != null">
+                content = #{record.content,jdbcType=VARCHAR},
+            </if>
+            <if test="record.createBy != null">
+                create_by = #{record.createBy,jdbcType=BIGINT},
+            </if>
+            <if test="record.createDate != null">
+                create_date = #{record.createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.updateBy != null">
+                update_by = #{record.updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="record.updateDate != null">
+                update_date = #{record.updateDate,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByExample" parameterType="map">
+        update sms_template
+        set
+        <trim  suffixOverrides=",">
+            id = #{record.id,jdbcType=BIGINT},
+            code = #{record.code,jdbcType=VARCHAR},
+            name = #{record.name,jdbcType=VARCHAR},
+            limit_day = #{record.limitDay,jdbcType=INTEGER},
+            type = #{record.type,jdbcType=TINYINT},
+            content = #{record.content,jdbcType=VARCHAR},
+            create_by = #{record.createBy,jdbcType=BIGINT},
+            create_date = #{record.createDate,jdbcType=TIMESTAMP},
+            update_by = #{record.updateBy,jdbcType=BIGINT},
+            update_date = #{record.updateDate,jdbcType=TIMESTAMP},
+        </trim>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.modules.sms.entity.SmsTemplate">
+        update sms_template
+        <set>
+            <if test="code != null">
+            code = #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+            name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="limitDay != null">
+            limit_day = #{limitDay,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+            type = #{type,jdbcType=TINYINT},
+            </if>
+            <if test="content != null">
+            content = #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="createBy != null">
+            create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="createDate != null">
+            create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+            update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateDate != null">
+            update_date = #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="org.eq.modules.sms.entity.SmsTemplate">
+        update sms_template
+        set
+        <trim  suffixOverrides=",">
+              code = #{code,jdbcType=VARCHAR},
+              name = #{name,jdbcType=VARCHAR},
+              limit_day = #{limitDay,jdbcType=INTEGER},
+              type = #{type,jdbcType=TINYINT},
+              content = #{content,jdbcType=VARCHAR},
+              create_by = #{createBy,jdbcType=BIGINT},
+              create_date = #{createDate,jdbcType=TIMESTAMP},
+              update_by = #{updateBy,jdbcType=BIGINT},
+              update_date = #{updateDate,jdbcType=TIMESTAMP},
+        </trim>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+</mapper>
