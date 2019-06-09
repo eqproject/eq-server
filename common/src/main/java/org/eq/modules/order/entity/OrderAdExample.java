@@ -5,8 +5,8 @@
 package org.eq.modules.order.entity;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 广告订单EntityExample
@@ -163,6 +163,11 @@ public class OrderAdExample {
             return (Criteria) this;
         }
 
+        public Criteria andProductNameLikeForAll(String value) {
+            addCriterion("PP.name like  ", "%"+value+"%", "productName");
+            return (Criteria) this;
+        }
+
         public Criteria andProductNumEqualToForUpdate(Integer value) {
             addCriterion("product_num =", value, "productNum");
             return (Criteria) this;
@@ -239,6 +244,18 @@ public class OrderAdExample {
             addCriterion("update_date between", value1, value2, "updateDate");
             return (Criteria) this;
         }
+
+        public Criteria andCreateDateGreaterThanOrEqualToForAll(Date value) {
+            addCriterion("OA.create_date >=", value, "createDate");
+            return (Criteria) this;
+        }
+
+
+        public Criteria andCreateDateLessThanOrEqualToForAll(Date value) {
+            addCriterion("OA.create_date <=", value, "createDate");
+            return (Criteria) this;
+        }
+
 
     }
 

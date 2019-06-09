@@ -39,6 +39,25 @@ public class DateUtil {
     }
 
 
+
+    /**
+     * 获取当前时间 字符串
+     * 格式为yyyy-MM-dd HH:mm:ss
+     *
+     * @return
+     */
+    public static Date paseTimeStr(String timeStr) {
+        if (StringUtils.isEmpty(timeStr)) {
+            return null;
+        }
+        try {
+            return chinaFormat.parse(timeStr);
+        } catch (Exception e) {
+        }
+        return  null;
+    }
+
+
     /**
      * 获取当前时间
      *

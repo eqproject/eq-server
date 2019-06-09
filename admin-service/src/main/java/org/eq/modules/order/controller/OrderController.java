@@ -4,15 +4,19 @@
  */
 package org.eq.modules.order.controller;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.base.BaseController;
 import org.eq.basic.common.base.BaseOpMsg;
 import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.config.sysUtil.UserUtil;
 import org.eq.basic.common.status.StatusCode;
+import org.eq.basic.common.util.DateUtil;
 import org.eq.basic.modules.sys.entity.SysUser;
 import org.eq.basic.modules.sys.service.SysUserInfoService;
 import org.eq.modules.enums.OrderAdStateEnum;
 import org.eq.modules.order.entity.OrderAd;
+import org.eq.modules.order.entity.OrderAdExample;
 import org.eq.modules.order.service.OrderAdService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,7 +57,7 @@ public class OrderController extends BaseController {
 	@RequestMapping(value = {"list", ""})
 	public String list(HttpServletRequest request, HttpServletResponse response, Model model) {
 		//下拉选查询 自定义内容需要手动添加
-		return "modules/c2c/product/list";
+		return "modules/c2c/order/list";
 	}
 
 	/**
@@ -71,7 +76,30 @@ public class OrderController extends BaseController {
         params.put("orderDir",orderDir);
         params.put("orderName",orderName);
 
+        try{
+            Date startTime  =null;
+            Date endTime = null;
+            if(!StringUtils.isEmpty(request.getParameter("beginCreateDate"))){
+                String temp = request.getParameter("beginCreateDate").trim() +" 00:00:00";
+                startTime = DateUtil.paseTimeStr(temp);
+            }
+            if(!StringUtils.isEmpty(request.getParameter("endCreateDate"))){
+                String temp = request.getParameter("endCreateDate").trim()+" 23:59:59";
+                endTime = DateUtil.paseTimeStr(temp);
+
+            }
+            params.put("startTime",startTime);
+            params.put("endTime",endTime);
+
+        }catch (Exception e){
+            logger.error("UserOrderController dataList 格式化时间异常",e);
+        }
+
 		baseTableData = orderAdService.findDataTableByRecordForPage(orderAd,params);
+		if(baseTableData!=null && CollectionUtils.isEmpty(baseTableData.getData())){
+		    List<OrderAd> datalist = baseTableData.getData();
+
+        }
 		int draw = Integer.parseInt(request.getParameter("draw")==null?"0":request.getParameter("draw"));
 		baseTableData.setDraw(++draw);
 		return baseTableData;
@@ -115,7 +143,121 @@ public class OrderController extends BaseController {
 
 
 
-	/**
+
+    /**
+     * 查询订单数据
+     * @param product
+     * @return BaseOpMsg
+     */
+    @ResponseBody
+    @RequestMapping(value = "selectOrder")
+    public BaseOpMsg<OrderAd> selectOrder(long orderId) {
+        BaseOpMsg<OrderAd> result = new BaseOpMsg();
+        OrderAdExample example = new OrderAdExample();
+        OrderAdExample.Criteria ca = example.or();
+
+        OrderAd orderAd =null;
+        try {
+            if (orderId > 0) {
+                ca.andIdEqualToForAll(orderId);
+                List<OrderAd> list  = orderAdService.findListByExample(example);
+                if(!CollectionUtils.isEmpty(list)){
+                    orderAd = list.get(0);
+                }
+            }
+        }catch (Exception e){
+           e.printStackTrace();
+        }
+        if(orderAd!=null){
+            result.setCode(StatusCode.CURD_SELECT_SUCCESS);
+        }else{
+            result.setCode(StatusCode.REQUEST_CONTENT_ERROR);
+        }
+        result.setStatus("success");
+        result.setMsg("查询数据成功！");
+        result.setObject(orderAd);
+        return result;
+    }
+
+
+    /**
+     * 查询订单数据
+     * @param product
+     * @return BaseOpMsg
+     */
+    @ResponseBody
+    @RequestMapping(value = "close")
+    public BaseOpMsg<OrderAd> close(long orderId) {
+        BaseOpMsg<OrderAd> result = new BaseOpMsg();
+
+        OrderAd orderAd =null;
+        try {
+            if (orderId > 0) {
+                orderAd = orderAdService.selectByPrimaryKey(orderId);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        if(orderAd==null){
+            result.setCode(StatusCode.REQUEST_CONTENT_ERROR);
+            result.setMsg("订单不存在");
+            return result;
+        }
+        boolean closeResult = orderAdService.cacelOrderAd(orderId);
+        if(closeResult){
+            result.setCode(StatusCode.CURD_UPDATE_SUCCESS);
+        }else{
+            result.setCode(StatusCode.CURD_DELETE_FAILURE);
+        }
+        result.setStatus("success");
+        result.setMsg("查询数据成功！");
+        result.setObject(orderAd);
+        return result;
+    }
+
+
+    /**
+     * 查询订单数据
+     * @param product
+     * @return BaseOpMsg
+     */
+    @ResponseBody
+    @RequestMapping(value = "audit")
+    public BaseOpMsg<OrderAd> audit(long orderId,int op) {
+        BaseOpMsg<OrderAd> result = new BaseOpMsg();
+        OrderAd orderAd =null;
+        try {
+            if (orderId > 0) {
+                orderAd = orderAdService.selectByPrimaryKey(orderId);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        if(orderAd==null){
+            result.setCode(StatusCode.REQUEST_CONTENT_ERROR);
+            result.setMsg("订单不存在");
+            return result;
+        }
+        boolean ispass = false;
+        if(op>0){
+            ispass = true;
+        }
+        boolean closeResult = orderAdService.auditOrder(orderId,ispass);
+        if(closeResult){
+            result.setCode(StatusCode.CURD_UPDATE_SUCCESS);
+        }else{
+            result.setCode(StatusCode.CURD_DELETE_FAILURE);
+        }
+        result.setStatus("success");
+        result.setMsg("查询数据成功！");
+        result.setObject(orderAd);
+        return result;
+    }
+
+
+
+
+    /**
      * 保存or修改操作
      * @param request
      * @param product

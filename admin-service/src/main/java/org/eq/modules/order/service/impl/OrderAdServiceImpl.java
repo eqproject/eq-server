@@ -44,6 +44,7 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 
 	@Autowired
 	private UserProductStockService userProductStockService;
+
 	@Autowired
 	private OrderAdLogService orderAdLogService;
 
@@ -57,16 +58,49 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		}
 		String orderName = null;
 		String orderDir = null;
+		Date stateTime = null;
+		Date endTime = null;
 		if(params!=null){
 			orderDir = (String)params.get("orderDir");
 			orderName = (String)params.get("orderName");
+			stateTime = (Date) params.get("startTime");
+			endTime = (Date) params.get("endTime");
 		}
 		if(orderName!=null&&!"".equals(orderName)){
 			example.setOrderByClause(orderName+" "+orderDir);
 		}else{
-			example.setOrderByClause("id asc");
+			example.setOrderByClause("OA.update_date desc");
 		}
-		if(orderAd!=null && orderAd.getProductId()!=null){
+		if(!StringUtils.isEmpty(orderAd.getOrderNo())){
+			ca.andOrderNoEqualToForAll(orderAd.getOrderNo());
+		}
+		if(!StringUtils.isEmpty(orderAd.getProductName())){
+			ca.andProductNameLikeForAll(orderAd.getProductName());
+		}
+		if(orderAd.getStatus()!=null){
+			ca.andStatusEqualToForALL(orderAd.getStatus());
+		}
+		if(orderAd.getType()!=null){
+			ca.andTypeEqualToForAll(orderAd.getType());
+		}
+		if(stateTime!=null){
+			ca.andCreateDateGreaterThanOrEqualToForAll(stateTime);
+		}
+		if(endTime!=null){
+			ca.andCreateDateLessThanOrEqualToForAll(endTime);
+		}
+		return example;
+	}
+
+
+
+	private  OrderAdExample getSimpleExampleFromEntity(OrderAd orderAd) {
+		OrderAdExample example = new OrderAdExample();
+		OrderAdExample.Criteria ca = example.or();
+		if(orderAd==null){
+			return example;
+		}
+		if(orderAd.getProductId()!=null){
 			ca.andProductIdEqualToForUpdate(orderAd.getProductId());
 		}
 		return example;
@@ -84,7 +118,8 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		}
 		OrderAd updateWhere = new OrderAd();
 		updateWhere.setProductId(product.getId());
-		List<OrderAd> list = findListByRecord(updateWhere);
+		OrderAdExample orderAdExample = getSimpleExampleFromEntity(updateWhere);
+		List<OrderAd> list = findListByExample(orderAdExample);
 		if(CollectionUtils.isEmpty(list)){
 			return 0;
 		}
@@ -113,6 +148,9 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		if(orderAd==null){
 			return false;
 		}
+		if(orderAd.getStatus() == OrderAdStateEnum.ORDER_FINISH.getState() || orderAd.getStatus() == OrderAdStateEnum.ORDER_REJECT.getState()){
+			return false;
+		}
 		if(orderAd.getStatus() == OrderAdStateEnum.ORDER_CANCEL.getState()){
 			return true;
 		}
@@ -126,14 +164,12 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		}
 		StringBuffer remarks = new StringBuffer();
 		if(orderAd.getType()== OrderAdTypeEnum.ORDER_SALE.getType()){
-			if(orderAd.getStatus()==OrderAdStateEnum.ORDER_TRADEING.getState()){
-				int number  = orderAd.getProductNum() -orderAd.getTradedNum()  - orderAd.getTradingNum();
-				boolean stockResult  = userProductStockService.updateStock(orderAd.getProductId(),orderAd.getUserId(),-number);
-				if(stockResult){
-					remarks.append("取消成功,").append("退回库存成功,应退:").append(number).append(",执行快照为:").append(orderAd.toString());
-				}else{
-					remarks.append("取消成功,").append("退回库存失败,应退回:").append(number).append(",执行快照为:").append(orderAd.toString());
-				}
+			int number  = orderAd.getProductNum() -orderAd.getTradedNum()  - orderAd.getTradingNum();
+			boolean stockResult  = userProductStockService.updateStock(orderAd.getProductId(),orderAd.getUserId(),-number);
+			if(stockResult){
+				remarks.append("取消成功,").append("退回库存成功,应退:").append(number).append(",执行快照为:").append(orderAd.toString());
+			}else{
+				remarks.append("取消成功,").append("退回库存失败,应退回:").append(number).append(",执行快照为:").append(orderAd.toString());
 			}
 		}else{
 			remarks.append("取消成功,").append("执行快照为:").append(orderAd.toString());
@@ -152,6 +188,61 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		}
 		return true ;
 	}
+
+	@Override
+	public boolean auditOrder(long orderId,boolean ispass) {
+		if(orderId<=0){
+			return false;
+		}
+		OrderAd orderAd = selectByPrimaryKey(orderId);
+		if(orderAd==null){
+			return false;
+		}
+		if(orderAd.getStatus() != OrderAdStateEnum.ORDER_DEFAULT.getState()){
+			return false;
+		}
+		int newState = OrderAdStateEnum.ORDER_REJECT.getState();
+		if(ispass){
+			newState = OrderAdStateEnum.ORDER_TRADEING.getState();
+		}
+		OrderAd updateOrder = new OrderAd();
+		updateOrder.setStatus(newState);
+		updateOrder.setUpdateDate(new Date());
+		int updateResult = updateByExampleSelective(updateOrder,getExampleFromEntity(orderAd.getStatus(),orderAd.getId()));
+		if(updateResult<=0){
+			return false;
+		}
+		StringBuffer remarks = new StringBuffer();
+		if(orderAd.getType()== OrderAdTypeEnum.ORDER_SALE.getType()){
+			if(!ispass){
+				int number  = orderAd.getProductNum() -orderAd.getTradedNum()  - orderAd.getTradingNum();
+				boolean stockResult  = userProductStockService.updateStock(orderAd.getProductId(),orderAd.getUserId(),-number);
+				if(stockResult){
+					remarks.append("审核成功,").append("退回库存成功,应退:").append(number).append(",执行快照为:").append(orderAd.toString());
+				}else{
+					remarks.append("审核成功,").append("退回库存失败,应退回:").append(number).append(",执行快照为:").append(orderAd.toString());
+				}
+			}
+		}else{
+			remarks.append("审核成功,").append("执行快照为:").append(orderAd.toString());
+		}
+		OrderAdLog orderAdLog = new OrderAdLog();
+		orderAdLog.setCreateDate(new Date());
+		orderAdLog.setNewStatus(OrderAdStateEnum.ORDER_CANCEL.getState());
+		orderAdLog.setOldStatus(orderAd.getStatus());
+		orderAdLog.setOrderAdId(orderAd.getId());
+		orderAdLog.setRemarks(remarks.toString());
+		try{
+			orderAdLogService.insertRecord(orderAdLog);
+		}catch (Exception e){
+			e.printStackTrace();
+			logger.info("插入订单操作日志记录数据出错 {}",orderAdLog.toString());
+		}
+		return true ;
+	}
+
+
+
 
 
 	/**

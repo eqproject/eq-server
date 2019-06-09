@@ -2,33 +2,36 @@
  * @author syf
  */
 var User;
+
+
+function getObjValByKey(obj,key) {
+    for(var v in obj){
+        if (v == key) {
+            return obj[key];
+        }
+    }
+    return "";
+}
+// 交易类型
+var orderTypeObj = {1:'出售',2:'求购'};
+// 订单状态
+var orderStatusObj = {1:'待审核',2:'取消',3:'交易中',4:'已完成',5:"审核拒绝"};
+
+
 (function (User) {
     function UserTrade() {
         this.$orderNo = $("#orderNo");
-        this.$productCode = $("#productCode");
         this.$productName = $("#productName");
         this.$status = $("#status");
         this.$type = $("#type");
-
-        this.$beginCreateDate = $("#beginCreateDate");
+        this.$beginCreateDate = $("#beginCreavalteDate");
         this.$endCreateDate = $("#endCreateDate");
         this.$select = $("#select");
         this.$orderTable = $("#orderTable");
     }
 
-    // 交易类型
-    var orderTypeObj = {1:'出售',2:'求购'};
-    // 订单状态
-    var orderStatusObj = {1:'创建',2:'取消',3:'交易中',4:'已完成'};
 
-    function getObjValByKey(obj,key) {
-        for(var v in obj){
-            if (v == key) {
-                return obj[key];
-            }
-        }
-        return "";
-    }
+
 
 
     UserTrade.prototype = {
@@ -48,14 +51,18 @@ var User;
                     }
                 },{
                         orderable: false,
-                        targets: 10,//最后1列
+                        targets: 9,//最后1列
                         render: function (data, type, row, meta) {
                             var option = "";
-                            if(row.status ==1){
-                                option +=   '  <a href="javascript:void(0);" onclick="down(this);" id="delete" name="delete" data-id="' + row.id + '" >下架</a>';
+                            option +='<a href="javascript:void(0);" onclick="look(this);"   name="delete" data-id="' + row.id + '" >查看</a>'
+                            if(row.status ==1){//待审核
+                                option +='&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="audit(this,1);" id="delete" name="delete" data-id="' + row.id + '" >审核通过</a>';
+                                option +='&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="audit(this,-1);" id="delete" name="delete" data-id="' + row.id + '" >审核拒绝</a>';
+                                option +='&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="closeOrder(this);" id="delete" name="delete" data-id="' + row.id + '" >关闭</a>';
                             }
-
-                            //option += ' <a href="#" id="check" name="check" data-id="' + row.id + '" >查看</a>';
+                            if(row.status ==3){
+                                option +='&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="closeOrder(this);" id="delete" name="delete" data-id="' + row.id + '" >关闭</a>';;
+                            }
                             return option;
                         }
                     }
@@ -64,13 +71,12 @@ var User;
 
                 order: [ [0, null] ],//第一列排序图标改为默认
                 ajax: {
-                    url: urlPath + '/order/userOrder/dataList',
+                    url: urlPath + '/order/dataList',
                     data: function (d) {
                         //添加额外的数据请求参数
                         d.orderNo = curr.$orderNo.val();
                         d.status = curr.$status.val();
                         d.productName = curr.$productName.val();
-                        d.productCode = curr.$productCode.val();
                         if(curr.$beginCreateDate.val()!=""){
                             d.beginCreateDate = curr.$beginCreateDate.val();
                         }
@@ -86,14 +92,11 @@ var User;
                     {},
                     {data: 'orderNo', name: 'orderNo'},
                     {data: 'productName', name: 'productName'},
-                    {data: 'productCode', name: 'productCode'},
                     {data: 'productNum', name: 'productNum'},
                     {data: 'amount', name: 'amount'},
                     {data: 'type', name: 'type',render:function(data, type, row){return getObjValByKey(orderTypeObj,row.type)}},
                     {data: 'status', name: 'status',render:function(data, type, row){return getObjValByKey(orderStatusObj,row.status)}},
-
-
-                    {data: 'createByName', name: 'createByName'},
+                    {data: 'nickName', name: 'nickName'},
                     {data: 'createDate', name: 'createDate'},
                     {}
                 ],
@@ -129,16 +132,68 @@ $(function () {
     UserTrade.init();
 });
 
-//操作
-function down(op){
-    var id = $(op).attr("data-id");
 
-    $.post(urlPath +"/order/userOrder/downOrder",{"id":id},function(data){
+function look(op){
+    var id = $(op).attr("data-id");
+    $.ajax({
+        url: urlPath+'/order/selectOrder',
+        type: 'POST',
+        dataType:'json',
+        data:{orderId:id},
+        success: function (data) {
+            if(data.status=='success'){
+                var modifyModal = $("#lookModal");
+                modifyModal.modal({
+                    keyboard: false
+                })
+                var form = modifyModal.find(".modalForm");
+                var resultData = data.object;
+                form.find("input[name='id']").val(resultData.id);
+                form.find("input[name='orderNo']").val(resultData.orderNo);
+                form.find("input[name='productName']").val(resultData.productName);
+                form.find("input[name='title']").val(resultData.title);
+                form.find("input[name='productNum']").val(resultData.productNum);
+                form.find("input[name='tradingNum']").val(resultData.tradingNum);
+                form.find("input[name='tradedNum']").val(resultData.tradedNum);
+                var typeValue = getObjValByKey(orderTypeObj,resultData.type);
+                var stateValue = getObjValByKey(orderStatusObj,resultData.status);
+                form.find("input[name='orderType']").val(typeValue );
+                form.find("input[name='orderStatus']").val(stateValue);
+                form.find("input[name='price']").val(resultData.price);
+                form.find("input[name='amount']").val(resultData.amount);
+                form.find("textarea[name='cancelDesc']").text(resultData.cancelDesc);
+                form.find("input[name='createDate']").val(resultData.createDate);
+                form.find("textarea[name='remarks']").text(resultData.remarks);
+            }else{
+                //操作失败 弹出提示信息
+                base_alert_time(data.msg,1000);
+            }
+        }
+    });
+}
+function closeOrder(op){
+    var id = $(op).attr("data-id");
+    $.post(urlPath +"/order/close",{"orderId":id},function(data){
         if(data.code!="10401"){
             alert(data.msg);
         }else{
-            alert("下架成功!!");
-            $("#select").click();
+            alert("关闭成功!!");
+            var UserTrade = new User.UserTrade();
+            UserTrade.init();
+        }
+    });
+
+}
+
+function audit(data,op){
+    var id = $(data).attr("data-id");
+    $.post(urlPath +"/order/audit",{"orderId":id,"op":op},function(data){
+        if(data.code!="10401"){
+            alert(data.msg);
+        }else{
+            alert("审核成功!!");
+            var UserTrade = new User.UserTrade();
+            UserTrade.init();
         }
     });
 }

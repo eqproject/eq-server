@@ -32,6 +32,14 @@ public interface OrderAdService extends ServiceExtend<OrderAd, OrderAdExample> {
      */
     boolean cacelOrderAd(long orderId);
 
+    /**
+     * 审核订单
+     * @param orderId
+     * @param ispass
+     * @return
+     */
+    boolean auditOrder(long orderId,boolean ispass);
+
 
 
 }

@@ -11,7 +11,7 @@
     <section class="content-header">
         <h1>订单管理</h1>
         <ol class="breadcrumb">
-            <li><a href="#"><i class="fa fa-dashboard"></i> 订单管理</a></li>
+            <li><a href="#"><i class="fa fa-dashboard"></i> 广告订单管理</a></li>
         </ol>
     </section>
 
@@ -21,7 +21,7 @@
             <div class="col-xs-12">
                 <div class="box">
                     <div class="box-header">
-                        <h3 class="box-title">订单管理列表</h3>
+                        <h3 class="box-title">广告订单列表</h3>
                     </div>
                     <div class="box-body">
                         <form id="searchForm" class="form-inline" method="post">
@@ -30,12 +30,6 @@
                                 <label  class="col-md-4 col-sm-4 control-label">订单号：</label>
                                 <div class="col-md-8 col-sm-8">
                                     <input type="text" class="form-control" id="orderNo" name="orderNo" maxlength="50" style="width: 100%;"/>
-                                </div>
-                            </div>
-                            <div class="form-group col-md-4 col-sm-12 ">
-                                <label  class="col-md-4 col-sm-4 control-label">商品编码：</label>
-                                <div class="col-md-8 col-sm-8">
-                                    <input type="text" class="form-control" id="productCode" name="productCode" maxlength="50" style="width: 100%;"/>
                                 </div>
                             </div>
                             <div class="form-group col-md-4 col-sm-12 ">
@@ -50,10 +44,11 @@
                                 <div class="col-sm-8">
                                     <select class="select2-type select2-choice" id="status" name="status" style="width: 100%;">
                                         <option value="">全部</option>
-                                        <option value="1">创建</option>
+                                        <option value="1">待审核</option>
                                         <option value="2">取消</option>
-                                        <option value="3">进行中</option>
+                                        <option value="3">交易中</option>
                                         <option value="4">已完成</option>
+                                        <option value="5">审核拒绝</option>
                                     </select>
                                 </div>
                             </div>
@@ -68,13 +63,13 @@
                                 </div>
                             </div>
                             <div class="form-group col-md-4 col-sm-12 "  >
-                                <label  class="col-md-4 col-sm-4 control-label">订单开始时间：</label>
+                                <label  class="col-md-4 col-sm-4 control-label">订单创建开始时间：</label>
                                 <div class="col-md-8 col-sm-8">
                                     <input type="text" class="form-control pull-right" data-provide="datepicker" data-date-format="yyyy-mm-dd"  id="beginCreateDate" name="beginCreateDate" maxlength="50" style="width: 100%;"/>
                                 </div>
                             </div>
                             <div class="form-group col-md-4 col-sm-12 ">
-                                <label  class="col-md-4 col-sm-4 control-label">订单结束时间：</label>
+                                <label  class="col-md-4 col-sm-4 control-label">订单创建结束时间：</label>
                                 <div class="col-md-8 col-sm-8">
                                     <input type="text" class="form-control" id="endCreateDate" data-provide="datepicker" data-date-format="yyyy-mm-dd"  name="endCreateDate" maxlength="50" style="width: 100%;"/>
                                 </div>
@@ -97,10 +92,9 @@
                                             <th>序号</th>
                                             <th>订单号</th>
                                             <th>商品名称</th>
-                                            <th>商品编号</th>
                                             <th>商品数量</th>
-                                            <th>金额</th>
-                                            <th>交易类型</th>
+                                            <th>广告金额</th>
+                                            <th>广告类型</th>
                                             <th>状态</th>
                                             <th>创建人</th>
                                             <th>创建时间</th>
@@ -117,6 +111,106 @@
             </div>
         </div>
     </section>
+
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="lookModal" tabindex="-1" role="dialog" data-backdrop="static">
+        <form id="modifyForm" class="modalForm" role="form" method="post">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span></button>
+                        <h4 class="modal-title" id="modifyModalLabel">订单详情</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input id="id" name="id" type="hidden" value=""/>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">商品编号：</span>
+                                <input type="text" readonly="readonly" class="form-control"  name="orderNo" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">商品名称：</span>
+                                <input type="text" readonly="true"  class="form-control"   name="productName" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">标题：</span>
+                                <input type="text" readonly="true"  class="form-control"  name="title" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">商品数量：</span>
+                                <input type="text" readonly="true"  class="form-control"  name="productNum" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">正在交易量：</span>
+                                <input type="text" readonly="true"  class="form-control" name="tradingNum" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">已完成交易量：</span>
+                                <input type="text" readonly="true"  class="form-control" name="tradedNum" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">订单类型：</span>
+                                <input type="text"  readonly="true"    class="form-control" name="orderType" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">订单状态：</span>
+                                <input type="text"   readonly="true"    class="form-control" name="orderStatus" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">订单单价：</span>
+                                <input type="text"  readonly="true"   class="form-control" name="price" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">订单总金额：</span>
+                                <input type="text"  readonly="true"   class="form-control" name="amount" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">订单取消原因：</span>
+                                <textarea rows="1" readonly="true"   class="form-control" name="cancelDesc" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">创建时间：</span>
+                                <input type="text" readonly="true"   class="form-control" name="createDate" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">备注：</span>
+                                <textarea rows="2" readonly="true"   class="form-control" name="remarks" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                        </div>
+                </div>
+            </div>
+            </div>
+        </form>
+    </div>
 
 </section>
 <script type="text/javascript" src="/admin/c2c/order/list.js"></script>
