@@ -147,4 +147,22 @@ public class DateUtil {
         }
         return null;
     }
+
+    /**
+     * 返回30天之前的时间
+     * @param date
+     * @param day
+     * @return
+     */
+    public static Date beforeDateDay(Date date,int day) {
+        try {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.DAY_OF_MONTH,-day);
+            return calendar.getTime();
+        } catch (Exception e) {
+            logBase.error("beforeDateDay", e);
+        }
+        return null;
+    }
 }
