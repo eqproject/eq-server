@@ -180,12 +180,8 @@ public class UserController extends BaseController {
 
 	private User initUser(User user, boolean ifUpdate, SysUser sysUser) {
         if (!ifUpdate) {
-            user.setCreateBy(user.getId());
             user.setCreateDate(new Date());
-
-
         }
-        user.setUpdateBy(user.getId());
         user.setUpdateDate(new Date());
         return user;
     }
@@ -246,6 +242,7 @@ public class UserController extends BaseController {
             result.setMsg("数据有误或无权限操作");
             return result;
         }
+        Integer newDelFlag;
         if(!BaseEntity.DEL_FLAG_NORMAL.equals(commond)  && !BaseEntity.DEL_FLAG_DELETE.equals(commond)){
             result.setMsg("数据有误");
             return result;
@@ -255,13 +252,7 @@ public class UserController extends BaseController {
             result.setMsg("数据查询失败");
             return result;
         }
-        Integer delFlag = 0;
-
-        user = new User();
-        user.setId(id);
-        user.setUpdateBy(sysUser.getId());
-        user.setUpdateDate(new Date());
-        int opresult = userService.updateUserDelFlagById(user,delFlag);
+        int opresult = userService.updateUserDelFlagById(user.getId(),Integer.valueOf(commond),user.getDelFlag());
         if(opresult<=0){
             result.setMsg("请稍后重试");
             return result;

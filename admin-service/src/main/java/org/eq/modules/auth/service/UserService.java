@@ -10,9 +10,10 @@ public interface UserService extends ServiceExtend<User, UserExample> {
 
     /**
      * 通过条件更新订单状态
-     * @param user
+     * @param userId
+     * @param newDelFlag
      * @param oldDelFlag
      * @return
      */
-    int updateUserDelFlagById(User user, Integer oldDelFlag);
+    int updateUserDelFlagById(long userId,Integer newDelFlag,Integer oldDelFlag);
 }

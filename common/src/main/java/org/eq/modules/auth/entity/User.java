@@ -3,6 +3,7 @@ package org.eq.modules.auth.entity;
 import lombok.Data;
 import org.eq.basic.common.base.BaseEntity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Date;
  * @version 2019-05-30
  */
 @Data
-public class User extends BaseEntity {
+public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private Long id;        // 唯一标识
@@ -26,6 +27,10 @@ public class User extends BaseEntity {
     private Date birthday;        // 生日
     private String photoHead;        // 头像
     private String intro;        // 简介
+    private Date createDate;// 创建日期
+    private Date updateDate;// 更新日期
+    protected String remarks; // 备注
+    private Integer delFlag; // 删除标记
 
 
     /**

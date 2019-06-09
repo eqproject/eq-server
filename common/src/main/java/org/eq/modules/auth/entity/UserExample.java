@@ -280,7 +280,7 @@ public class UserExample {
         }
 
         public Criteria andNicknameLike(String value) {
-            addCriterion("nickname like", value, "nickname");
+            addCriterion("nickname like", "%"+value+"%", "nickname");
             return (Criteria) this;
         }
 

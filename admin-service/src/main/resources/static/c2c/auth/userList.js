@@ -1,27 +1,28 @@
 /**
  * @author gb
  */
+var stateObj = {1:'未认证',2:'已认证'};
+var delObj = {0:'正常',1:'禁用'};
+function getObjValByKey(obj,key) {
+    for(var v in obj){
+        if (v == key) {
+            return obj[key];
+        }
+    }
+    return "";
+}
 var User;
 (function (User) {
     function UserInfo() {
         this.$nickname = $("#nickname");
         this.$mobile = $("#mobile");
-        this.$status = $("#status");
+        this.$authStatus = $("#authStatus");
         this.$delFlag = $("#delFlag");
         this.$select = $("#select");//绑定点击事件
 
     }
 
-    var stateObj = {1:'未认证',2:'已认证'};
-    var delObj = {0:'正常',1:'已删除'};
-    function getObjValByKey(obj,key) {
-        for(var v in obj){
-            if (v == key) {
-                return obj[key];
-            }
-        }
-        return "";
-    }
+
 
     UserInfo.prototype = {
 
@@ -63,7 +64,7 @@ var User;
                         //添加额外的数据请求参数
                         d.nickname = curr.$nickname.val();
                         d.mobile = curr.$mobile.val();
-                        d.status = curr.$status.val();
+                        d.authStatus = curr.$authStatus.val();
                         d.delFlag = curr.$delFlag.val();
                     }
                 },
@@ -72,7 +73,7 @@ var User;
                     {data: 'nickname', name: 'nickname'},
                     {data: 'name', name: 'name'},
                     {data: 'mobile', name: 'mobile'},
-                    {data: 'status', name: 'status',render:function(data, type, row){return getObjValByKey(stateObj,row.status)}},
+                    {data: 'authStatus', name: 'authStatus',render:function(data, type, row){return getObjValByKey(stateObj,row.authStatus)}},
                     {data: 'createDate', name: 'createDate'},
                     {data: 'delFlag', name: 'delFlag',render:function(data, type, row){return getObjValByKey(delObj,row.delFlag)}},
                     {}
@@ -127,8 +128,6 @@ function check(row) {
     modifyModal.modal({
         keyboard: false
     })
-    modifyModal.find("[id='save']").remove();
-    //ajax 查询后台数据 放到模态框 修改模态框的保存按钮属性
     $.ajax({
         url: urlPath + '/user/auth/user/selectUser',
         type: 'POST',
@@ -137,27 +136,28 @@ function check(row) {
         success: function (data, status) {
             if (data.status == 'success') {
                 var form = modifyModal.find(".modalForm");
-                form.find("[id='modifyModalLabel']").text("用户详情");
                 var resultData = data.list[0];
                 form.find("input[name='id']").val(resultData.id);
                 form.find("input[name='name']").val(resultData.name);
                 form.find("input[name='nickname']").val(resultData.nickname);
-                form.find("input[name='sex']").eq(resultData.sex).attr("checked", 'checked');
+                var sex = "未知";;
+                if(resultData.sex =="1"){
+                    sex="男";
+                }
+                if(resultData.sex =="2"){
+                    sex="女";
+                }
+                form.find("input[name='sex']").val(sex);
                 form.find("input[name='mobile']").val(resultData.mobile);
-                form.find("input[name='idCard']").val(resultData.idCard);
-                form.find("select[name='status']").find("option").each(function(){
-                    if($(this).val()==resultData.status){
-                        $(this).attr("th:checked","true");
-                    }
-                });
+                var authStatus = getObjValByKey(stateObj,resultData.authStatus);
+
+                form.find("input[name='authStatus']").val(authStatus);
                 form.find("input[name='birthday']").val(resultData.birthday);
                 form.find("input[name='photoHead']").val(resultData.photoHead);
-                form.find("input[name='intro']").val(resultData.intro);
+                form.find("textarea[name='intro']").val(resultData.intro);
                 form.find("textarea[name='remarks']").text(resultData.remarks);
-                form.find("select[name='delFlag']").val(resultData.delFlag).trigger("change");
-                form.find("input").attr("disabled", true);
-                form.find("select").attr("disabled", true);
-                form.find("textarea").attr("disabled", true);
+                var status =  getObjValByKey(delObj,resultData.delFlag);
+                form.find("input[name='delFlag']").val(status);
             } else {
                 //操作失败 弹出提示信息
                 base_alert_time(data.msg, 1000);

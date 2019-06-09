@@ -5,7 +5,10 @@
 package org.eq.modules.auth.service.impl;
 
 
+import org.apache.commons.lang3.StringUtils;
+import org.eq.basic.common.base.BaseEntity;
 import org.eq.basic.common.base.ServiceImplExtend;
+import org.eq.basic.common.util.DateUtil;
 import org.eq.basic.common.util.StringLowUtils;
 import org.eq.modules.auth.dao.UserMapper;
 import org.eq.modules.auth.entity.User;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.eq.basic.common.annotation.AutowiredService;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -52,20 +56,37 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 		if(StringLowUtils.isNotBlank(user.getMobile())){
 			ca.andMobileEqualTo(user.getMobile());
 		}
+		if(user.getDelFlag()!=null){
+			ca.andDelFlagEqualTo(user.getDelFlag());
+		}
+		if(user.getAuthStatus()!=null){
+			ca.andAuthStatusEqualTo(user.getAuthStatus());
+		}
 
 		return example;
 	}
 
 
 	@Override
-	public int updateUserDelFlagById(User user, Integer oldDelFlag) {
-		UserExample example = new UserExample();
-		UserExample.Criteria ca = example.or();
-		if(user==null){
+	public int updateUserDelFlagById(long userId,Integer newDelFalg,Integer oldDelFlag) {
+		if(userId<=0 || newDelFalg ==null  || oldDelFlag ==null ){
 			return 0;
 		}
-
+		UserExample example = new UserExample();
+		UserExample.Criteria ca = example.or();
+		ca.andIdEqualTo(userId);
 		ca.andDelFlagEqualTo(oldDelFlag);
-		return this.updateByExampleSelective(user,example);
+
+		User updateUser = new User();
+		updateUser.setUpdateDate(new Date());
+		updateUser.setDelFlag(newDelFalg);
+		StringBuffer remarkBuffer = new StringBuffer(DateUtil.getNowTimeStr()+"变更用户状态为:");
+		if(BaseEntity.DEL_FLAG_NORMAL.equals(String.valueOf(newDelFalg))){
+			remarkBuffer.append("启用状态");
+		}else{
+			remarkBuffer.append("禁用状态");
+		}
+		updateUser.setRemarks(remarkBuffer.toString());
+		return this.updateByExampleSelective(updateUser,example);
 	}
 }
