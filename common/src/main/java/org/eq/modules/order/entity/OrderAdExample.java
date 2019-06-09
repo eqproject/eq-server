@@ -244,6 +244,10 @@ public class OrderAdExample {
             addCriterion("update_date between", value1, value2, "updateDate");
             return (Criteria) this;
         }
+        public Criteria andUpdateDateBetweenForAll(Date value1, Date value2) {
+            addCriterion("OA.update_date between", value1, value2, "updateDate");
+            return (Criteria) this;
+        }
 
         public Criteria andCreateDateGreaterThanOrEqualToForAll(Date value) {
             addCriterion("OA.create_date >=", value, "createDate");

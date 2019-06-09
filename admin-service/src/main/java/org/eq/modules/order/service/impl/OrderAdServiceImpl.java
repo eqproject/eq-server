@@ -125,7 +125,7 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		}
 		int result = 0;
 		for(OrderAd orderAd : list){
-			if(orderAd.getStatus() == OrderAdStateEnum.ORDER_CANCEL.getState() || orderAd.getStatus()==OrderAdStateEnum.ORDER_FINISH.getState()){
+			if(orderAd.getStatus() != OrderAdStateEnum.ORDER_DEFAULT.getState() &&  orderAd.getStatus()!=OrderAdStateEnum.ORDER_TRADEING.getState()){
 				continue;
 			}
 			boolean upresult = cacelOrderAd(orderAd.getId());

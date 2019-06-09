@@ -1,5 +1,10 @@
 package org.eq.modules.enums;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * 商品状态枚举类
  * @author  kaka
@@ -10,6 +15,25 @@ public enum ProductStateEnum {
     ONLINE(1,"上线状态"),
     OVERDUE(2,"过期状态"),
     OFFLINE(3,"下线状态");
+
+    /**
+     * 终止状态集合
+     */
+    private static Set<Integer> overState = new HashSet<>();
+
+    /**
+     * 中间状态集合
+     */
+    private static Set<Integer> runState = new HashSet<>();
+
+    static{
+        overState.add(ProductStateEnum.OVERDUE.getState());
+        overState.add(ProductStateEnum.OFFLINE.getState());
+
+        runState.add(ProductStateEnum.DEFAULT.getState());
+        runState.add(ProductStateEnum.ONLINE.getState());
+    }
+
 
     /**
      * 状态
@@ -46,6 +70,18 @@ public enum ProductStateEnum {
             }
         }
         return null;
+    }
+
+    public static boolean isOverState(int state){
+        return overState.contains(state);
+    }
+
+    /**
+     * 获取中间状态集合
+     * @return
+     */
+    public static List<Integer> getRunStatus(){
+        return new ArrayList<>(runState);
     }
 
 

@@ -124,6 +124,7 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 		return productList.get(0);
 	}
 
+
 	@Override
 	public int updateProductState(int newState,int oldState,long productId){
 		if(productId<=0){
@@ -136,10 +137,7 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 		if(product.getStatus() == newState){
 			return 1;
 		}
-		if(product.getStatus() !=oldState){
-			return 0;
-		}
-		if(newState==ProductStateEnum.ONLINE.getState() && oldState!=ProductStateEnum.DEFAULT.getState()){
+		if(ProductStateEnum.isOverState(oldState)){
 			return 0;
 		}
 		Product whereProduct = new Product();
@@ -155,7 +153,10 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 		if(upresult<=0){
 			return 0;
 		}
-		if(newState == ProductStateEnum.OFFLINE.getState()&& oldState == ProductStateEnum.ONLINE.getState()){
+		if(oldState != ProductStateEnum.ONLINE.getState()){
+			return 1;
+		}
+		if(ProductStateEnum.isOverState(newState)){
 			try{
 				orderAdService.offOrderByProductId(product.getId());
 			}catch (Exception e){
@@ -164,6 +165,7 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 			}
 		}
 		return 1;
+
 	}
 
 	/**

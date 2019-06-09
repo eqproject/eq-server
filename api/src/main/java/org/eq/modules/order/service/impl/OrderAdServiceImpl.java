@@ -198,6 +198,10 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 			result.setErrMsg("订单为空，无法取消");
 			return result;
 		}
+		if(OrderAdStateEnum.isOverState(orderAd.getStatus())){
+			result.setErrMsg("订单状态已经为最终状态，无法取消");
+			return result;
+		}
 		if(orderAd.getStatus() == OrderAdStateEnum.ORDER_CANCEL.getState()){
 			result.setErrMsg("订单已为取消状态，无法进行二次取消");
 			return result;
@@ -212,7 +216,7 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 			return result;
 		}
 		StringBuffer remarks = new StringBuffer();
-		if(orderAd.getType()==OrderAdTypeEnum.ORDER_SALE.getType() && orderAd.getStatus() ==OrderAdStateEnum.ORDER_TRADEING.getState()){
+		if(orderAd.getType()==OrderAdTypeEnum.ORDER_SALE.getType()){
 			int number  = orderAd.getProductNum() -orderAd.getTradedNum()  - orderAd.getTradingNum();
 			if(number>0){
 				boolean stockResult  = userProductStockService.updateStock(orderAd.getProductId(),user.getId(),-number);

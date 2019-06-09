@@ -33,8 +33,16 @@ public interface ProductService extends ServiceExtend<Product,ProductExample> {
     ProductAll getProductAll(long productId);
 
 
-
-
+    /**
+     * 更改商品状态
+     * 1、判定商品是否存在
+     * 2、商品已处于  过期  下线状态，不允许修改商品状态
+     * 3、如果商品新状态为下线、过期， 旧状态为上线，则关闭订单
+     * @param newState
+     * @param oldState
+     * @param productId
+     * @return  影响商品数据
+     */
     int updateProductState(int newState,int oldState,long productId);
 
 

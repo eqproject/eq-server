@@ -1,5 +1,8 @@
 package org.eq.modules.enums;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * 广告订单状态
  * @author kaka
@@ -12,6 +15,16 @@ public enum OrderAdStateEnum {
     ORDER_TRADEING(3,"交易中"),
     ORDER_FINISH(4,"完成"),
     ORDER_REJECT(5,"审核不通过");
+
+
+    private static Set<Integer> overStatus = new HashSet<>();
+
+    static {
+        overStatus.add(OrderAdStateEnum.ORDER_CANCEL.getState());
+        overStatus.add(OrderAdStateEnum.ORDER_FINISH.getState());
+        overStatus.add(OrderAdStateEnum.ORDER_REJECT.getState());
+
+    }
 
 
     OrderAdStateEnum(int state, String remark) {
@@ -52,4 +65,16 @@ public enum OrderAdStateEnum {
         }
         return null;
     }
+
+    /**
+     * 判断状态是否到达最终状态
+     * @param state
+     * @return
+     */
+    public static  boolean isOverState(int state){
+        return overStatus.contains(state);
+    }
+
+
+
 }

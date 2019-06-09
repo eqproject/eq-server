@@ -54,7 +54,7 @@ public class OrderFinishSnapshotBiz {
         TaskTime time = new TaskTime().build();
 
         ca.andStatusInForAll(status);
-        ca.andUpdateDateBetween(time.getStart(), time.getEnd());
+        ca.andUpdateDateBetweenForAll(time.getStart(), time.getEnd());
         return orderAdMapper.selectByExample(example);
     }
 

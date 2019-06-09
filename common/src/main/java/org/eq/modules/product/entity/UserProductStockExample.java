@@ -126,9 +126,12 @@ public class UserProductStockExample {
         }
 
 
-
         public Criteria andUserIdEqualTo(Long value) {
             addCriterion("stock.user_id =", value, "userId");
+            return (Criteria) this;
+        }
+        public Criteria andUserIdEqualToForUpdate(Long value) {
+            addCriterion("user_id =", value, "userId");
             return (Criteria) this;
         }
         public Criteria andUserIdIn(List<Long> values) {
@@ -138,6 +141,11 @@ public class UserProductStockExample {
 
         public Criteria andProductIdEqualTo(Long value) {
             addCriterion("stock.product_id =", value, "productId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProductIdEqualToForUpdate(Long value) {
+            addCriterion("product_id =", value, "productId");
             return (Criteria) this;
         }
 
@@ -158,6 +166,10 @@ public class UserProductStockExample {
         }
 
         public Criteria andLockNumForSimple(long value) {
+            addCriterion("locked_num = ", value, "lockNum");
+            return (Criteria) this;
+        }
+        public Criteria andLockNumForUpdate(long value) {
             addCriterion("locked_num = ", value, "lockNum");
             return (Criteria) this;
         }

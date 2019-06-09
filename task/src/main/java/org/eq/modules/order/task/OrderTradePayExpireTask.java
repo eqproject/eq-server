@@ -21,7 +21,7 @@ public class OrderTradePayExpireTask extends BaseLog {
 
     private final OrderTradePayExpireBiz orderTradePayExpireBiz;
 
-    @Scheduled(cron = "* 0/1 * * * ?")
+    //@Scheduled(cron = "* 0/1 * * * ?")
     public void process() {
         logger.info("OrderTradePayExpireTask 每分钟执行-开始");
         try {
