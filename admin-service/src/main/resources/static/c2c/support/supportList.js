@@ -1,20 +1,20 @@
 /**
  * @author gb
  */
-var Sms;
-(function (Sms) {
-    function SmsInfo() {
-        this.$code = $("#code");
-        this.$name = $("#name");
-        this.$limitDay = $("#limitDay");
+var Support;
+(function (Support) {
+    function SupportInfo() {
+        this.$grouping = $("#grouping");
         this.$type = $("#type");
+        this.$content = $("#content");
+        this.$value = $("#value");
+        this.$state = $("#state");
         this.$select = $("#select");//绑定点击事件
 
     }
 
-    var stateObj = {1:'未认证',2:'已认证'};
-    var delObj = {0:'正常',1:'已删除'};
-    var typeObj = {1:'注册验证码',2:'发布求购广告成功通知',3:'发布出售广告成功通知',4:'购买成功收货通知',5:'转出成功通知',6:'通知买家付款'};
+    var stateObj = {0:'正常',1:'删除'};
+    var typeObj = {1:'服务条款',2:'法务支持',3:'求购文案',4:'出售文案',5:'实名认证'};
     function getObjValByKey(obj,key) {
         for(var v in obj){
             if (v == key) {
@@ -24,9 +24,9 @@ var Sms;
         return "";
     }
 
-    SmsInfo.prototype = {
+   SupportInfo.prototype = {
 
-        constructor: SmsInfo,
+        constructor:SupportInfo,
         init: function () {
             var curr = this;
 
@@ -41,7 +41,7 @@ var Sms;
                     }
                 }, {
                         orderable: false,
-                        targets: 6,
+                        targets: 5,
                         render: function (data, type, row, meta) {
                             option ='  <a href="javascript:void(0);" onclick="check(this);" id="check" name="check" data-id="' + row.id + '" >编辑</a>';
                             return option;
@@ -52,18 +52,17 @@ var Sms;
 
                 order: [ [0, null] ],//第一列排序图标改为默认
                 ajax: {
-                    url: urlPath + '/sms/template/dataList',
+                    url: urlPath + '/support/dataList',
                     data: function (d) {
                         //添加额外的数据请求参数
                     }
                 },
                 columns: [
                     {},
-                    {data: 'code', name: 'code'},
-                    {data: 'name', name: 'name'},
-                    {data: 'limitDay', name: 'limitDay'},
+                    {data: 'grouping', name: 'grouping'},
                     {data: 'type', name: 'type',render:function(data, type, row){return getObjValByKey(typeObj,row.type)}},
-                    {data: 'content', name: 'content'},
+                    {data: 'value', name: 'value'},
+                    {data: 'state', name: 'state',render:function(data, type, row){return getObjValByKey(stateObj,row.state)}},
                     {}
                 ],
                 fnDrawCallback: function () {
@@ -71,14 +70,14 @@ var Sms;
                     //checkbox全选
                 }
             };
-            curr.$templateTable = initOriginalTable('templateTable', option);
+            curr.$supportTable = initOriginalTable('supportTable', option);
             this.loadTable(this);
             this.bindBtn();
 
         },
         loadTable: function (event) {
             var curr = getNow(event);
-            curr.$templateTable.ajax.reload();
+            curr.$supportTable.ajax.reload();
         },
         bindBtn: function () {
             var curr = this;
@@ -91,15 +90,17 @@ var Sms;
         return event.data ? event.data : event;
     }
 
-    Sms.SmsInfo = SmsInfo;
-})(Sms || (Sms = {}));
+   Support.SupportInfo =SupportInfo;
+})(Support || (Support = {}));
 $(function () {
-    var SmsInfo = new Sms.SmsInfo();
-    SmsInfo.init();
+    var SupportInfo = new Support.SupportInfo();
+   SupportInfo.init();
+
 });
 
 function check(row) {
     var modifyModal = $("#modifyModal");
+    modifyModal.find('#editor').wysiwyg();
     modifyModal.modal({
         keyboard: false
     });
@@ -131,23 +132,23 @@ function check(row) {
     //modifyModal.find("[id='save']").remove();
     //ajax 查询后台数据 放到模态框 修改模态框的保存按钮属性
     $.ajax({
-        url: urlPath + '/sms/template/select',
+        url: urlPath + '/support/select',
         type: 'POST',
         dataType: 'json',
         data: {id: $(row).attr("data-id")},
         success: function (data, status) {
             if (data.status == 'success') {
                 var form = modifyModal.find(".modalForm");
-                form.find("[id='modifyModalLabel']").text("模板详情");
+                form.find("[id='modifyModalLabel']").text("详情");
                 var resultData = data.list[0];
                 form.find("input[name='id']").val(resultData.id);
-                form.find("input[name='code']").val(resultData.code);
-                form.find("input[name='name']").val(resultData.name);
-                form.find("input[name='limitDay']").val(resultData.limitDay);
+                form.find("input[name='grouping']").val(resultData.grouping);
                 form.find("select[name='type']").find("[value = "+$(row).attr("data-id")+"]").attr("selected",true);
-                form.find("input[name='content']").val(resultData.content);
+                form.find("input[name='value']").val(resultData.value);
+                form.find("select[name='state']").find("[value = "+$(row).attr("data-id")+"]").attr("selected",true);
+                $('#editor').html(resultData.content);
                 form.find("input[name='id']").attr("disabled", true);
-                form.find("input[name='code']").attr("disabled", true);
+                form.find("input[name='grouping']").attr("disabled", true);
                 form.find("select[name='type']").attr("disabled", true);
             } else {
                 //操作失败 弹出提示信息
