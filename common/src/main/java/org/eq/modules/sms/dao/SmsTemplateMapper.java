@@ -16,5 +16,6 @@ import org.eq.modules.sms.entity.SmsTemplateExample;
  */
 @Mapper
 public interface SmsTemplateMapper extends BaseMapper<SmsTemplate,SmsTemplateExample> {
-	
+
+    SmsTemplate selectByType(int type);
 }

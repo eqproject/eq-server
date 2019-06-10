@@ -271,4 +271,10 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
+    <select id="selectByType" parameterType="int" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from sms_template
+        where type = #{type,jdbcType=TINYINT}
+    </select>
 </mapper>
