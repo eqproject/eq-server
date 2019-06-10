@@ -1,17 +1,12 @@
 package org.eq.modules.bc.enums;
 
 public enum BcTxRecordBizTypeEnum {
-	BUY_GOODS(1,"购买物品"),
-	DELIVERY_GOODS(2,"商品提货"),
-	REFUND(3,"商品退款"),
-	WITHDRAW(4,"提现"),
-	EARNINGS(5,"返利收益"),
-	TIMEOUT_DELIVERY_GOODS(6,"商品提货——超时情况"),
-    ACTIVITY_REWARD(7,"投票奖励"),
-    COUPON_PAY(8,"优惠券支付"),
-    VOTE(9,"投票"),
-	;
-    
+    ACTIVATE_ACCOUNT(1, "激活账户"),
+    SELL(2, "售卖券"),
+    BUY(3, "购买券"),
+    TRANSFER(4, "转让"),
+    ACCEPT(5, "承兑");
+
     private final Integer code;
     private final String message;
 
@@ -19,7 +14,7 @@ public enum BcTxRecordBizTypeEnum {
         this.code = code;
         this.message = message;
     }
-   
+
     public Integer getCode() {
         return code;
     }
