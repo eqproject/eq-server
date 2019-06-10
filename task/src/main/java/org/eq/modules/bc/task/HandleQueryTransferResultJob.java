@@ -1,5 +1,6 @@
-package org.eq.modules.bc.quartz;
+package org.eq.modules.bc.task;
 
+import com.google.common.reflect.Reflection;
 import io.bumo.model.response.result.data.TransactionHistory;
 import org.eq.modules.bc.common.ConstantsUtil;
 import org.eq.modules.bc.common.log.LoggerFactory;
@@ -10,12 +11,15 @@ import org.eq.modules.bc.entity.BcTxRecord;
 import org.eq.modules.bc.entity.BlockchainTx;
 import org.eq.modules.bc.enums.BcStatusEnum;
 import org.eq.modules.bc.external.bc.BlockChainManager;
+import org.eq.modules.bc.service.BcTaskCallBack;
 import org.eq.modules.bc.service.BcTxService;
 import org.eq.modules.bc.service.BlockChainTxService;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 
@@ -85,17 +89,9 @@ public class HandleQueryTransferResultJob {
 				Integer bizType = bcTxRecord.getBizType();
 				String txId = String.valueOf(bcTxRecord.getId());
 
-				/*
-				if(bizType.equals(BcTxRecordBizTypeEnum.DELIVERY_GOODS.getCode()) ){//商品提货
-					userDeliveryBiz.deliverySuccessExecute(txId);
-				}else if(bizType == BcTxRecordBizTypeEnum.REFUND.getCode()){ //商品退款
-					payBiz.refundExecute(txId);
-				}else if(bizType == BcTxRecordBizTypeEnum.WITHDRAW.getCode()){ //用户提现
-					withdrawBiz.wxWithdrawExecute(txId);
-				}else if(bizType == BcTxRecordBizTypeEnum.EARNINGS.getCode()){ //用户收益
-					earningsBiz.earningExecute(txId);
-				}
-				*/
+				Object instance = BcTaskCallBack.getInstance(bizType);
+				Method method = ReflectionUtils.findMethod(instance.getClass(),"success",String.class);
+				ReflectionUtils.invokeMethod(method,instance,txId);
 			}
 		}
 	}
