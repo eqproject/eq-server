@@ -124,7 +124,7 @@
         </trim>
     </insert>
 
-    <insert id="insertSelective" parameterType="org.eq.modules.product.entity.ProductAccept">
+    <insert id="insertSelective" parameterType="org.eq.modules.product.entity.ProductAccept" useGeneratedKeys="true" keyProperty="id">
         insert into platform_product_accept
         <trim prefix="(" suffix=")" suffixOverrides=",">
             name,

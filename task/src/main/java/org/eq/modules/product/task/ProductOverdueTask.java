@@ -23,7 +23,7 @@ public class ProductOverdueTask extends BaseLog {
     @Autowired
     private final ProductBiz productBiz;
 
-    @Scheduled(cron = "0 11 2 * * ?")
+    //@Scheduled(cron = "0 11 2 * * ?")
     public void process() {
         logger.info("ProductOverdueTask 每天执行-开始");
         try {
