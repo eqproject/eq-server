@@ -204,7 +204,7 @@
         </trim>
     </insert>
 
-    <insert id="insertSelective" parameterType="org.eq.modules.product.entity.Product">
+    <insert id="insertSelective" parameterType="org.eq.modules.product.entity.Product" useGeneratedKeys="true" keyProperty="id">
         insert into platform_product
         <trim prefix="(" suffix=")" suffixOverrides=",">
             name,
