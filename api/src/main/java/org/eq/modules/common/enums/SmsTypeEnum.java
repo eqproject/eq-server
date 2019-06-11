@@ -1,8 +1,8 @@
 package org.eq.modules.common.enums;
 
 public enum SmsTypeEnum {
-    REGISTER(1, "注册验证码"), BUY_AD(2, "发布求购广告成功通知"), SALE_AD(3, "发布出售广告成功通知"),
-    BUY_SUCESS(4, "购买成功收货通知"), SUCESS(5, "转出成功通知"), PAY(6, "通知买家付款");
+    REGISTER(1, "登陆注册验证码"), AD(2, "发布广告成功通知"), SALE_SUCCESS(3, "数字券已转到券包通知"),
+    SUCCESS(4, "数字券已成功转出通知"), ORDER(5, "订单确认通知");
 
     /**
      * 状态
@@ -46,6 +46,7 @@ public enum SmsTypeEnum {
 
     /**
      * 根据state获取枚举类型，在switch中使用
+     *
      * @param state
      * @return
      */

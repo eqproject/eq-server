@@ -13,6 +13,7 @@ public class SmsTask extends BaseLog {
     private final SmsBiz smsBiz;
 
     /**
+     * 迁移30天前的历史记录
      * 每天0:30执行
      */
     @Scheduled(cron = "0 30 0 * * ?")
@@ -24,5 +25,20 @@ public class SmsTask extends BaseLog {
             logger.error("30天的短信记录迁移到历史日志表异常", e);
         }
         logger.info("30天的短信记录迁移到历史日志表-结束");
+    }
+
+    /**
+     * 更新短信发送状态
+     * 频率：
+     */
+    @Scheduled(fixedDelay = 60*1000)
+    public void getSmsReport(){
+        logger.info("更新短信发送状态-开始");
+        try {
+            smsBiz.getSmsReport();
+        } catch (Exception e) {
+            logger.error("更新短信发送状态异常", e);
+        }
+        logger.info("更新短信发送状态-结束");
     }
 }

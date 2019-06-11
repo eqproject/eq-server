@@ -38,6 +38,15 @@ public class DateUtil {
         return chinaFormat.format(new Date());
     }
 
+    /**
+     * 获取当前时间
+     * 格式为yyyy-MM-dd
+     * @return
+     */
+    public static String getNowTimeShortStr() {
+        return simpleFormat.format(new Date());
+    }
+
 
 
     /**
