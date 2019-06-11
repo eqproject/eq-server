@@ -3,6 +3,7 @@ package org.eq.basic.common.base;
 import com.alibaba.fastjson.JSONObject;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.auth.service.UserService;
+import org.eq.modules.enums.WalletStateEnum;
 import org.eq.modules.wallet.entity.UserWallet;
 import org.eq.modules.wallet.service.UserWalletService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public abstract class BaseController extends BaseLog {
         try{
             user = userService.selectByPrimaryKey(userId);
             UserWallet userWallet = userWalletService.selectByPrimaryKey(userId);
-            if(userWallet!=null && userWallet.getStatus()==1){
+            if(userWallet!=null && userWallet.getStatus()== WalletStateEnum.ACTIVE.getState()){
                 user.setAddress(userWallet.getAddress());
             }
         }catch (Exception e){
