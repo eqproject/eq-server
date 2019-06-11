@@ -2245,9 +2245,8 @@
 > |参数|说明|
 |:----- |-----|
 |请求参数|除去sign，参数按ASCII表顺序排序后，使用拼接“&”|
-|timestamp|追加参数1，时间戳|
-|key|追加参数2,   密钥|
->  sha256(请求参数&timestamp&key)
+|key|追加参数1,   密钥|
+sha256(请求参数&key)
 
 ###### 签名示例
 
@@ -2272,9 +2271,7 @@
 
         Arrays.sort(params);
 
-        String sorted = StringUtils.join(params,"&");
-        //追加时间戳
-        sorted += "&"+System.currentTimeMillis();
+        String sorted = StringUtils.join(params,"&");      
         //追加key
         sorted += "&6ca71c636f5475e8bf2b5860267ef0e9";
 
