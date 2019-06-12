@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:security="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title>系统配置</title>
+    <meta charset="utf-8"/>
+    <style>
+        #editor {overflow:scroll; max-height:300px}
+    </style>
+</head>
+<body>
+<section th:fragment="content">
+    <section class="content-header">
+        <h1>系统配置</h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i>系统配置管理</a></li>
+        </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">配置列表</h3>
+                    </div>
+
+                    <div class="box-body">
+
+                        <form id="searchForm" class="form-inline" method="post">
+                            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">配置类型：</label>
+                                <div class="col-sm-8">
+                                    <select class="select2-type select2-choice" id="type" name="type" style="width: 100%;">
+                                        <option value="">请选择</option>
+                                        <option value="1">支付最大时长</option>
+                                        <option value="2">服务费比例</option>
+                                        <option value="3">短信风控</option>
+                                        <option value="4">订单最大时长</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">文案类型：</label>
+                                <div class="col-sm-8">
+                                    <select class="select2-type select2-choice" id="state" name="state" style="width: 100%;">
+                                        <option value="">请选择</option>
+                                        <option value="0">正常</option>
+                                        <option value="1">已删除</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="text-center operateBox row">
+                                <input id="select" class="btn btn-primary"  type="button" th:if="${#authorization.expression('hasRole(''sys:menu:view'')')}" value="查询"/>
+                            </div>
+                        </form>
+
+                        <div id="dict_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                            <div class="row">
+                                <div class="col-sm-6"></div>
+                                <div class="col-sm-6"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12" id="tableDiv">
+                                    <table id="supportTable" class="table table-bordered table-hover dataTable"
+                                           role="grid" aria-describedby="menu_info">
+                                        <thead>
+                                        <tr>
+                                            <th>序号</th>
+                                            <th>类型</th>
+                                            <th>描述</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="treeTableList"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="lookModal" tabindex="-1" role="dialog" data-backdrop="static" style="overflow:scroll;">
+        <form id="modifyForm" class="modalForm" role="form" method="post">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <input id="id" name="id" type="hidden" value="">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">类型：</span>
+                                <input type="text" readonly="true" class="form-control"  name="type" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">描述：</span>
+                                <input type="text" readonly="true"  class="form-control" name="remark" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">配置值：</span>
+                                <textarea rows="2" readonly="true"  type="text" class="form-control" name="value" maxlength="50"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">状态：</span>
+                                <input type="text" readonly="true"  class="form-control" name="status" maxlength="50"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+<script type="text/javascript" src="/admin/c2c/support/configList.js"></script>
+</body>
+</html>
