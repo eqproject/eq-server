@@ -17,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +38,8 @@ public class MyInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o)
             throws Exception {
+        return true;
+        /*
         JSONObject json = new JSONObject();
         json.put("status", 1);
 
@@ -82,6 +85,7 @@ public class MyInterceptor implements HandlerInterceptor {
 
         // System.out.println(">>>MyInterceptor>>>>>>>在请求处理之前进行调用（Controller方法调用之前）");
         return true;// 只有返回true才会继续向下执行，返回false取消当前请求
+        */
     }
 
     @Override
@@ -124,6 +128,8 @@ public class MyInterceptor implements HandlerInterceptor {
     private void write(HttpServletResponse httpServletResponse,String result)throws Exception{
         httpServletResponse.setCharacterEncoding("UTF-8");
         httpServletResponse.setHeader("Content-Type", "application/json; charset=UTF-8");
-        httpServletResponse.getWriter().write(result);
+        PrintWriter print = httpServletResponse.getWriter();
+        print.write(result);
+        print.close();
     }
 }
