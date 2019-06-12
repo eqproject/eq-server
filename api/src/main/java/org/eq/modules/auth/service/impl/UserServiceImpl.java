@@ -3,15 +3,20 @@ package org.eq.modules.auth.service.impl;
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.StringLowUtils;
+import org.eq.modules.auth.dao.UserAccountBindMapper;
 import org.eq.modules.auth.dao.UserMapper;
 import org.eq.modules.auth.entity.User;
+import org.eq.modules.auth.entity.UserAccountBind;
 import org.eq.modules.auth.entity.UserExample;
 import org.eq.modules.auth.entity.UserIdentityAuth;
+import org.eq.modules.auth.service.UserAccountBindService;
 import org.eq.modules.auth.service.UserIdentityAuthService;
 import org.eq.modules.auth.service.UserService;
 import org.eq.modules.bc.entity.BcTxRecord;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
+import org.eq.modules.enums.BindStatusEnum;
+import org.eq.modules.enums.DefaultReceipEnum;
 import org.eq.modules.utils.AESUtils;
 import org.eq.modules.utils.MD5Utils;
 import org.eq.modules.wallet.entity.UserWallet;
@@ -57,6 +62,9 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 
     @Autowired
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private UserAccountBindService userAccountBindService;
 
     @Override
     public int insertRecord(User user) {
@@ -270,6 +278,20 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             return ResponseFactory.paramsError("验证码错误");
         }
         return ResponseFactory.success(null);
+    }
+
+    @Override
+    public ResponseData payBind(UserAccountBind userAccountBind) {
+        userAccountBind.setCreateDate(new Date());
+        userAccountBind.setUpdateDate(new Date());
+        userAccountBind.setStatus(BindStatusEnum.YES.getState());
+        userAccountBind.setDefaultReceip(DefaultReceipEnum.NO.getState());
+        int cnt = userAccountBindService.insertRecord(userAccountBind);
+        if (cnt > 0) {
+            return ResponseFactory.success(null);
+        } else {
+            return ResponseFactory.error("绑定失败", "1");
+        }
     }
 
     /**

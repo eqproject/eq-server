@@ -5,6 +5,7 @@
 package org.eq.modules.auth.service;
 
 import org.eq.modules.auth.entity.User;
+import org.eq.modules.auth.entity.UserAccountBind;
 import org.eq.modules.auth.entity.UserExample;
 import org.eq.basic.common.base.ServiceExtend;
 import org.eq.modules.auth.entity.UserIdentityAuth;
@@ -21,4 +22,5 @@ public interface UserService extends ServiceExtend<User, UserExample> {
     ResponseData login(String userId, String pwd);
     ResponseData verify(UserIdentityAuth userIdentityAuth);
     ResponseData mobileLogin(String mobile, String captcha);
+    ResponseData payBind(UserAccountBind userAccountBind);
 }

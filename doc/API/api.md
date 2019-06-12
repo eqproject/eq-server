@@ -219,7 +219,7 @@
 |userId      |true    |long  | 用户id|
 |type     |true    |int  | 支付账号类型：1：支付宝；2：微信|
 |payLoginId       |true    |string  | 绑定支付账号|
-|identityNo       |true    |string  | 绑定支付账号对应证件号（待定加密算法）|
+|identityNo       |true    |string  | 绑定支付账号对应证件号（AES128） |
 |sign       |true    |string   |签名|
 
 ###### 返回字段
@@ -233,7 +233,7 @@
 > 地址：[/api/user/pay/bind](/api/user/pay/bind)
 ```
 {
-	"status": 0,
+	"status": 200,
 	"errMsg": ""
 }
 ```

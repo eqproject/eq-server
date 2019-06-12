@@ -1,8 +1,8 @@
 package org.eq.modules.auth.controller;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.eq.basic.common.base.BaseController;
 import org.eq.modules.auth.entity.User;
+import org.eq.modules.auth.entity.UserAccountBind;
 import org.eq.modules.auth.entity.UserIdentityAuth;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
@@ -24,7 +24,6 @@ import java.util.Date;
 @RestController
 @RequestMapping(value = "/api/user")
 public class UserController extends BaseController {
-
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -48,26 +47,27 @@ public class UserController extends BaseController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/reset",method = RequestMethod.POST)
+    @RequestMapping(value = "/reset", method = RequestMethod.POST)
     public ResponseData reset(HttpServletRequest request) {
         String userId = request.getParameter("userId");
         String pwd = request.getParameter("pwd");
-        return userService.reset(userId,pwd);
+        return userService.reset(userId, pwd);
     }
 
     /**
      * 用户信息维护接口
+     *
      * @param user
      * @return
      */
-    @RequestMapping(value = "/modify",method = RequestMethod.POST)
+    @RequestMapping(value = "/modify", method = RequestMethod.POST)
     public ResponseData modify(User user) {
         user.setUpdateDate(new Date());
         int cnt = userService.updateByPrimaryKeySelective(user);
-        if(cnt > 0){
+        if (cnt > 0) {
             return ResponseFactory.success(null);
-        }else{
-            return ResponseFactory.error("更新失败","1");
+        } else {
+            return ResponseFactory.error("更新失败", "1");
         }
     }
 
@@ -77,20 +77,21 @@ public class UserController extends BaseController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/login")
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseData login(HttpServletRequest request) {
         String userId = request.getParameter("userId");
         String pwd = request.getParameter("pwd");
-        return userService.login(userId,pwd);
+        return userService.login(userId, pwd);
     }
 
     /**
      * 用户登录接口(手机验证码登录)
+     *
      * @param request
      * @return
      */
-    @RequestMapping(value = "/mobileLogin")
-    public ResponseData mobileLogin(HttpServletRequest request){
+    @RequestMapping(value = "/mobileLogin", method = RequestMethod.POST)
+    public ResponseData mobileLogin(HttpServletRequest request) {
         String mobile = request.getParameter("mobile");
         String captcha = request.getParameter("captcha");
         return userService.mobileLogin(mobile, captcha);
@@ -98,20 +99,18 @@ public class UserController extends BaseController {
 
     /**
      * 用户实名认证接口
+     *
      * @param userIdentityAuth
      * @return
      */
-    @RequestMapping(value = "/identity/verify")
+    @RequestMapping(value = "/identity/verify", method = RequestMethod.POST)
     public ResponseData verify(UserIdentityAuth userIdentityAuth) {
         return userService.verify(userIdentityAuth);
     }
-    @RequestMapping(value = "/getCode")
-    public String getCode(String mobile){
-        String captcha = RandomStringUtils.random(4,false,true);
-        redisTemplate.opsForValue().set(mobile,captcha);
 
-        String captchaRedis = (String)redisTemplate.opsForValue().get(mobile);
-        System.out.println("captchaRedis:"+captchaRedis);
-        return captcha;
+    @RequestMapping(value = "/pay/bind", method = RequestMethod.POST)
+    public ResponseData payBind(UserAccountBind userAccountBind) {
+        return userService.payBind(userAccountBind);
     }
+
 }
