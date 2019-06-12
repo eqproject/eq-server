@@ -43,7 +43,7 @@ var Support;
                         orderable: false,
                         targets: 5,
                         render: function (data, type, row, meta) {
-                            option ='  <a href="javascript:void(0);" onclick="check(this);" id="check" name="check" data-id="' + row.id + '" >编辑</a>';
+                            option ='  <a href="javascript:void(0);" onclick="edit(this);" id="check" name="check" data-id="' + row.id + '" >编辑</a>';
                             return option;
                         }
                     }
@@ -98,24 +98,28 @@ $(function () {
 
 });
 
-function check(row) {
+function edit(row) {
     var modifyModal = $("#modifyModal");
-    modifyModal.find('#editor').wysiwyg();
+    var E = window.wangEditor;
+    var editor = new E('#editor');
+    editor.create();
     modifyModal.modal({
         keyboard: false
     });
 
+    //修改
     modifyModal.find("[id='save']").on("click",function(){
         var id = modifyModal.find("#id").val();
-        var limitDay = modifyModal.find("#limitDay").val();
-        var name = modifyModal.find("#name").val();
-        var content = modifyModal.find("#content").val();
+        var grouping = modifyModal.find("#grouping").val();
+        var value = modifyModal.find("#value").val();
+        var content = editor.txt.html();
+        var state = modifyModal.find("#state").val();
         //保存数据
         $.ajax({
-                url: urlPath + '/sms/template/modify',
+                url: urlPath + '/support/modify',
                 type: 'POST',
                 dataType: 'json',
-                data: {id:id,limitDay:limitDay,opType:"update"},
+                data: {id:id,grouping:grouping,value:value,content:content,state:state,opType:"update"},
                 success: function (data, status) {
                     if (data.status == 'success') {
                         base_alert_time("修改成功", 1000);
@@ -129,8 +133,7 @@ function check(row) {
     });
 
 
-    //modifyModal.find("[id='save']").remove();
-    //ajax 查询后台数据 放到模态框 修改模态框的保存按钮属性
+    //查询详情
     $.ajax({
         url: urlPath + '/support/select',
         type: 'POST',
@@ -146,7 +149,7 @@ function check(row) {
                 form.find("select[name='type']").find("[value = "+$(row).attr("data-id")+"]").attr("selected",true);
                 form.find("input[name='value']").val(resultData.value);
                 form.find("select[name='state']").find("[value = "+$(row).attr("data-id")+"]").attr("selected",true);
-                $('#editor').html(resultData.content);
+                editor.txt.html(resultData.content);
                 form.find("input[name='id']").attr("disabled", true);
                 form.find("input[name='grouping']").attr("disabled", true);
                 form.find("select[name='type']").attr("disabled", true);
