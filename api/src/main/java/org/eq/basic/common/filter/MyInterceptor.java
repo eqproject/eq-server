@@ -29,6 +29,8 @@ import java.util.Map;
  */
 public class MyInterceptor implements HandlerInterceptor {
     private final static String KEY = "1A9585B3C9F0854AD1B73C4ED80F7D31";
+    private final static String USER_ID = "userId";
+    private final static String SIGN = "sign";
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -39,15 +41,15 @@ public class MyInterceptor implements HandlerInterceptor {
         json.put("status", 1);
 
         Map<String, String[]> map = httpServletRequest.getParameterMap();
-        if(!map.containsKey("sign")){
+        if(!map.containsKey(SIGN)){
             json.put("errMsg","签名为空");
             write(httpServletResponse,json.toJSONString());
             return false;
         }
-        String reqSign = map.get("sign")[0];
+        String reqSign = map.get(SIGN)[0];
 
-        if(map.containsKey("userId")){
-            String userId = map.get("userId")[0];
+        if(map.containsKey(USER_ID)){
+            String userId = map.get(USER_ID)[0];
             boolean result = checkUser(userId,httpServletResponse);
             if(!result){
                 return false;
@@ -55,7 +57,11 @@ public class MyInterceptor implements HandlerInterceptor {
         }
 
         List<String> params = new ArrayList<>(map.size());
-        map.forEach((k,v)->params.add(k+"="+v[0]));
+        map.forEach((k,v)->{
+            if (!k.equals(SIGN)) {
+                params.add(k + "=" + v[0]);
+            }
+        });
 
         Collections.sort(params);
         params.add(KEY);
