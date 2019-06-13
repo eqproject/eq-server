@@ -93,7 +93,7 @@
             distinct
         </if>
         <include refid="Base_Column_List" />
-        from order_finish_snapshoot as OFS left join user UU on UU.id = OFS.user_id left join platform_product PP on PP.id = OFS.product_id
+        from order_finish_snapshoot as OFS left join user UU on UU.id = OFS.sell_user_id OR  UU.id = OFS.buy_user_id left join platform_product PP on PP.id = OFS.product_id
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>
@@ -105,7 +105,7 @@
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
-        from order_finish_snapshoot  as OFS left join user UU on UU.id = OFS.user_id left join platform_product PP on PP.id = OFS.product_id
+        from order_finish_snapshoot  as OFS left join user UU on UU.id = OFS.sell_user_id OR  UU.id = OFS.buy_user_id left join platform_product PP on PP.id = OFS.product_id
         where OFS.id = #{id,jdbcType=BIGINT}
     </select>
 

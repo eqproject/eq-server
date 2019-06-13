@@ -69,7 +69,7 @@ public class ApiInterceptor  implements HandlerInterceptor {
         String sign = Hashing.sha256().newHasher()
                 .putString(sorted, Charsets.UTF_8)
                 .hash().toString();
-
+        System.out.println(sign);
         if(!reqSign.equalsIgnoreCase(sign)){
             throw new BizException(BizExcetionMsg.SIGN_INVALID);
         }

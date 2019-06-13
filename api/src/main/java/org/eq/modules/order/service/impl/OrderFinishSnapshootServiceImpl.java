@@ -37,21 +37,6 @@ import java.util.Map;
 @AutowiredService
 public class OrderFinishSnapshootServiceImpl extends ServiceImplExtend<OrderFinishSnapshootMapper, OrderFinishSnapshoot, OrderFinishSnapshootExample> implements OrderFinishSnapshootService {
 
-	@Autowired
-	public OrderFinishSnapshootServiceImpl(OrderFinishSnapshootMapper orderFinishSnapshootMapper){
-		super.setMapper(orderFinishSnapshootMapper);
-	}
-
-	@Autowired
-	private UserProductStockService userProductStockService;
-
-	@Autowired
-	private ProductService productService;
-
-	@Autowired
-	private OrderAdLogService orderAdLogService;
-
-
 	@Override
 	public OrderFinishSnapshootExample getExampleFromEntity(OrderFinishSnapshoot orderFinishSnapshoot, Map<String, Object> params) {
 		OrderFinishSnapshootExample example = new OrderFinishSnapshootExample();
@@ -82,7 +67,7 @@ public class OrderFinishSnapshootServiceImpl extends ServiceImplExtend<OrderFini
 	public OrderFinishSnapshootExample getExampleFromEntity(long userId) {
 		OrderFinishSnapshootExample example = new OrderFinishSnapshootExample();
 		OrderFinishSnapshootExample.Criteria ca = example.or();
-	    ca.andUserIdEqualToForAll(userId);
+	    ca.andAllUserIdEqualToForAll(userId);
 		return example;
 	}
 

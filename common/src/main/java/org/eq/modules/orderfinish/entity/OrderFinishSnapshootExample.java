@@ -123,12 +123,26 @@ public class OrderFinishSnapshootExample {
             return (Criteria) this;
         }
 
-        public Criteria andUserIdEqualToForAll(long value) {
-            addCriterion("OFS.user_id =", value, "userId");
+        public Criteria andSellUserIdEqualToForAll(long value) {
+            addCriterion("OFS.sell_user_id =", value, "sellUserId");
             return (Criteria) this;
         }
-        public Criteria andUserIdEqualToForUpdate(long value) {
-            addCriterion("user_id =", value, "userId");
+        public Criteria andSellUserIdEqualToForUpdate(long value) {
+            addCriterion("sell_user_id =", value, "sellUserId");
+            return (Criteria) this;
+        }
+        public Criteria andBuyUserIdEqualToForAll(long value) {
+            addCriterion("OFS.buy_user_id =", value, "buyUserId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllUserIdEqualToForAll(long value) {
+            addCriterion("( OFS.buy_user_id = "+value +" or  OFS.sell_user_id = "+value + " )" );
+            return (Criteria) this;
+        }
+
+        public Criteria andBuyUserIdEqualToForUpdate(long value) {
+            addCriterion("buy_user_id =", value, "buyUserId");
             return (Criteria) this;
         }
 
