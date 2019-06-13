@@ -8,6 +8,7 @@ import org.eq.modules.bc.common.log.LoggerFactory;
 import org.eq.modules.enums.OrderAdStateEnum;
 import org.eq.modules.enums.OrderAdTypeEnum;
 import org.eq.modules.enums.ProductStateEnum;
+import org.eq.modules.order.biz.OrderAdExpireBiz;
 import org.eq.modules.order.dao.OrderAdLogMapper;
 import org.eq.modules.order.dao.OrderAdMapper;
 import org.eq.modules.order.entity.OrderAd;
@@ -44,24 +45,16 @@ public class ProductBiz {
     @Autowired
     private final ProductMapper productMapper;
 
+    @Autowired
+    private OrderAdExpireBiz orderAdExpireBiz;
+
     /**
      * 广告
      */
     @Autowired
     private OrderAdMapper orderAdMapper;
 
-    /**
-     * 广告日志
-     */
-    @Autowired
-    private OrderAdLogMapper orderAdLogMapper;
 
-
-    /**
-     * 用户库存
-     */
-    @Autowired
-    private UserProductStockMapper userProductStockMapper;
 
 
     /**
@@ -122,7 +115,7 @@ public class ProductBiz {
         if(product==null){
             return false;
         }
-        OrderAdExample orderAdExample = getEffectOrderExample(productId);
+        OrderAdExample orderAdExample = orderAdExpireBiz.getEffectOrderExample(productId);
         List<OrderAd> list = orderAdMapper.selectByExample(orderAdExample);
         if(CollectionUtils.isEmpty(list)){
             return true;
@@ -133,7 +126,7 @@ public class ProductBiz {
             if(orderAd.getStatus() != OrderAdStateEnum.ORDER_DEFAULT.getState() &&  orderAd.getStatus()!=OrderAdStateEnum.ORDER_TRADEING.getState()){
                 continue;
             }
-            boolean upresult = cacelOrderAd(orderAd.getId());
+            boolean upresult = orderAdExpireBiz.cacelOrderAd(orderAd.getId(),"定时任务下架商品，订单取消");
             if(!upresult){
                 logger.error("取消订单失败,订单编号为:{}",orderAd.getOrderNo());
             }
@@ -143,139 +136,7 @@ public class ProductBiz {
 
     }
 
-    /**
-     * 取消订单
-     * @param orderId
-     * @return
-     */
-    private  boolean cacelOrderAd(long orderId) {
-        if(orderId<=0){
-            return false;
-        }
-        OrderAd orderAd = orderAdMapper.selectByPrimaryKey(orderId);
-        if(orderAd==null){
-            return false;
-        }
-        if(orderAd.getStatus() == OrderAdStateEnum.ORDER_CANCEL.getState()){
-            return true;
-        }
-        if(OrderAdStateEnum.isOverState(orderAd.getStatus())){
-            return false;
-        }
 
-        OrderAd updateOrder = new OrderAd();
-        updateOrder.setStatus(OrderAdStateEnum.ORDER_CANCEL.getState());
-        updateOrder.setUpdateDate(new Date());
-        updateOrder.setCancelDesc("定时任务下架商品，订单取消");
-        int updateResult = orderAdMapper.updateByExampleSelective(updateOrder,getExampleFromEntity(orderAd.getStatus(),orderAd.getId()));
-        if(updateResult<=0){
-            return false;
-        }
-        StringBuffer remarks = new StringBuffer();
-        if(orderAd.getType()== OrderAdTypeEnum.ORDER_SALE.getType()){
-            int number  = orderAd.getProductNum() -orderAd.getTradedNum()  - orderAd.getTradingNum();
-            boolean stockResult  = updateStock(orderAd.getUserId(),orderAd.getProductId(),-number);
-            if(stockResult){
-                remarks.append("取消成功,").append("退回库存成功,应退:").append(number).append(",执行快照为:").append(orderAd.toString());
-            }else{
-                remarks.append("取消失败,").append("退回库存失败,应退回:").append(number).append(",执行快照为:").append(orderAd.toString());
-            }
-        }else{
-            remarks.append("取消成功,").append("执行快照为:").append(orderAd.toString());
-        }
-        OrderAdLog orderAdLog = new OrderAdLog();
-        orderAdLog.setCreateDate(new Date());
-        orderAdLog.setNewStatus(OrderAdStateEnum.ORDER_CANCEL.getState());
-        orderAdLog.setOldStatus(orderAd.getStatus());
-        orderAdLog.setOrderAdId(orderAd.getId());
-        orderAdLog.setRemarks(remarks.toString());
-        try{
-            orderAdLogMapper.insert(orderAdLog);
-        }catch (Exception e){
-            e.printStackTrace();
-            logger.info("插入订单操作日志记录数据出错 {}",orderAdLog.toString());
-        }
-        return true ;
-    }
-
-    /**
-     * 更改用户库存信息
-     * @param userId
-     * @param productId
-     * @param number
-     * @return
-     */
-    private boolean updateStock(long userId,long productId,int number){
-
-        List<UserProductStock> userProductStockList = userProductStockMapper.selectByExample(getUserProductStockExapple(userId,productId));
-        if(CollectionUtils.isEmpty(userProductStockList)){
-            return false;
-        }
-        UserProductStock userProductStock = userProductStockList.get(0);
-        int lockNum = userProductStock.getLockedNum();
-
-        UserProductStock update = new UserProductStock();
-        update.setLockedNum(userProductStock.getLockedNum()+number);
-        update.setUpdateDate(new Date());
-
-        UserProductStockExample example = new UserProductStockExample();
-        UserProductStockExample.Criteria ca = example.or();
-        ca.andIdEqualToForSimple(userProductStock.getId());
-        ca.andLockNumForUpdate(lockNum);
-        int updateResult = userProductStockMapper.updateByExampleSelective(update,example);
-        if(updateResult>0){
-            return true;
-        }
-        return false;
-    }
-
-
-    /**
-     * 获取有效的广告订单
-     * @param productId
-     * @return
-     */
-    private  OrderAdExample getEffectOrderExample(long productId) {
-        OrderAdExample example = new OrderAdExample();
-        OrderAdExample.Criteria ca = example.or();
-        if(productId>0){
-            ca.andProductIdEqualToForAll(productId);
-        }
-        List<Integer> states = new ArrayList<>();
-        states.add(OrderAdStateEnum.ORDER_TRADEING.getState());
-        states.add(OrderAdStateEnum.ORDER_DEFAULT.getState());
-        ca.andStatusInForAll(states);
-        return example;
-    }
-
-
-    /**
-     * 获取简单查询实体
-     * @param statue
-     * @param id
-     * @return
-     */
-    private OrderAdExample getExampleFromEntity(int statue,long id) {
-        OrderAdExample example = new OrderAdExample();
-        OrderAdExample.Criteria ca = example.or();
-        ca.andIdEqualToForUpdate(id);
-        ca.andStatusEqualToForUpdate(statue);
-        return example;
-    }
-
-
-
-    private UserProductStockExample getUserProductStockExapple(Long userId,Long productId) {
-        UserProductStockExample example = new UserProductStockExample();
-        UserProductStockExample.Criteria ca = example.or();
-        if(userId!=null){
-            ca.andUserIdEqualTo(userId);
-        }
-        if(productId!=null){
-           ca.andProductIdEqualTo(productId);
-        }
-        return example;
-    }
 
 
 

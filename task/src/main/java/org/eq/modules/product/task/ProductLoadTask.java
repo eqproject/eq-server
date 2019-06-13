@@ -27,7 +27,7 @@ public class ProductLoadTask extends BaseLog {
     @Autowired
     private final ProductLoadBiz  productLoadBiz;
 
-    @Scheduled(cron = "0 44 1 * * ?")
+    //@Scheduled(cron = "0 44 1 * * ?")
     public void process() {
         logger.info("ProductLoadTask 每天执行-开始");
         try {
