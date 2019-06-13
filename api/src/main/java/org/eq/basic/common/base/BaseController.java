@@ -43,6 +43,9 @@ public abstract class BaseController extends BaseLog {
      * @return
      */
     public User getUserInfo(long userId){
+        if(userId<=0){
+            return null;
+        }
         User user =null;
         try{
             user = userService.selectByPrimaryKey(userId);

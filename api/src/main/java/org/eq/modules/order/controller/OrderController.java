@@ -122,10 +122,9 @@ public class OrderController extends BaseController {
 		if(searchPageAdOrderVO==null){
 			return ResponseFactory.signError("查询条件为空");
 		}
+		//获取平台求购订单不需要用户
 		User user = getUserInfo(searchPageAdOrderVO.getUserId());
-		if(user==null){
-			return ResponseFactory.signError("用户不存在");
-		}
+
 		if(searchPageAdOrderVO.getOrderType()!=1 && searchPageAdOrderVO.getOrderType()!=2){
 			return ResponseFactory.signError("订单类型出错");
 		}

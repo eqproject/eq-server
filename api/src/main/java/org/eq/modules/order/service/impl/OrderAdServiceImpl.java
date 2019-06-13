@@ -13,6 +13,7 @@ import org.eq.basic.common.util.DateUtil;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
+import org.eq.modules.common.factory.ResponseFactory;
 import org.eq.modules.utils.OrderUtil;
 import org.eq.modules.utils.ProductUtil;
 import org.eq.modules.enums.OrderAdStateEnum;
@@ -263,12 +264,12 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		if(searchPageAdOrderVO.getOrderType()!=1 && searchPageAdOrderVO.getOrderType()!=2){
 			return result;
 		}
-		if(user==null){
-			return result;
-		}
 		OrderAdExample orderAdExample = null;
 		//我要卖 难
 		if(searchPageAdOrderVO.getOrderType()==1){
+			if(user==null){
+				return result;
+			}
 			List<Long> userProductId = new ArrayList<>();
 			userProductId.add(-1L);
 			userProductId.addAll(userProductStockService.listUserProdutId(user));
