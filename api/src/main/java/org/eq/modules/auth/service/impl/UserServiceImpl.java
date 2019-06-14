@@ -3,7 +3,6 @@ package org.eq.modules.auth.service.impl;
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.StringLowUtils;
-import org.eq.modules.auth.dao.UserAccountBindMapper;
 import org.eq.modules.auth.dao.UserMapper;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.auth.entity.UserAccountBind;
@@ -17,6 +16,7 @@ import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
 import org.eq.modules.enums.BindStatusEnum;
 import org.eq.modules.enums.DefaultReceipEnum;
+import org.eq.modules.enums.StateEnum;
 import org.eq.modules.utils.AESUtils;
 import org.eq.modules.utils.MD5Utils;
 import org.eq.modules.wallet.entity.UserWallet;
@@ -162,12 +162,19 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         //检查是否已注册
         User checkUser = checkDuplicateMobile(user);
         //已注册直接返回成功
-        if(checkUser != null){
+        if (checkUser != null) {
             user.setId(checkUser.getId());
             return ResponseFactory.success(user);
         }
 
         Long userId = saveUser(user);
+
+        if (userId == null) {
+            return ResponseFactory.systemError("注册失败");
+        }
+        //清除redis验证码
+        clearCaptcha(mobile);
+
         // 2.生成钱包地址
         UserWallet wallet = WalletUtil.generate(userId);
 
@@ -184,7 +191,17 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
     }
 
     /**
+     * 注册或登陆成功清楚验证码
+     *
+     * @param mobile
+     */
+    private void clearCaptcha(String mobile) {
+        redisTemplate.delete(mobile);
+    }
+
+    /**
      * bc_tx_record添加一条激活账户的记录
+     *
      * @param bcTxRecord
      * @return
      */
@@ -210,6 +227,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
     private Long saveUser(User user) {
         user.setCreateDate(new Date());
         user.setUpdateDate(new Date());
+        user.setDelFlag(StateEnum.VALID.getState());
         insertRecordReturnId(user);
         return user.getId();
     }
@@ -277,6 +295,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         if (!checkCaptcha(mobile, captcha)) {
             return ResponseFactory.paramsError("验证码错误");
         }
+        clearCaptcha(mobile);
         return ResponseFactory.success(null);
     }
 
@@ -308,6 +327,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 
     /**
      * 检查手机号重复注册
+     *
      * @param user
      * @return
      */
