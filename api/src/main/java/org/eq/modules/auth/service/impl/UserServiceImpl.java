@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -146,6 +147,8 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 
     @Override
     public ResponseData register(String mobile, String captcha) {
+        Map dataMap = new HashMap();
+
         if (mobile == null) {
             return ResponseFactory.businessError("电话号码为空");
         }
@@ -165,8 +168,8 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         User checkUser = checkDuplicateMobile(user);
         //已注册直接返回成功
         if (checkUser != null) {
-            user.setId(checkUser.getId());
-            return ResponseFactory.success(user);
+            dataMap.put("userId", checkUser.getId());
+            return ResponseFactory.success(dataMap);
         }
 
         Long userId = saveUser(user);
@@ -189,11 +192,12 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         wallet.setTxId(txId);
         userWalletService.insertRecordReturnId(wallet);
 
-        return ResponseFactory.success(user);
+        dataMap.put("userId", userId);
+        return ResponseFactory.success(dataMap);
     }
 
     /**
-     * 注册或登陆成功清楚验证码
+     * 注册或登陆成功清除验证码
      *
      * @param mobile
      */
@@ -266,7 +270,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             user.setMobile(mobile);
             //手机号获取userId
             User checkUser = selectByRecord(user);
-            if(checkUser == null){
+            if (checkUser == null) {
                 return ResponseFactory.businessError("手机号未注册");
             }
             //AES解密
