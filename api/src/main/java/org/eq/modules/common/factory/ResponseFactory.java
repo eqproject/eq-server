@@ -43,6 +43,17 @@ public class ResponseFactory<T> {
         return result;
     }
 
+    /**
+     * 参数错误构建方法
+     * @param errMsg 错误信息
+     * @return
+     */
+    public static  ResponseData businessError(String errMsg){
+        ResponseData result = initError(errMsg);
+        result.setStatus(ResponseStateEnum.BUSINESS_ERROR.getStatus());
+        return result;
+    }
+
 
     /**
      * 返回错误实体

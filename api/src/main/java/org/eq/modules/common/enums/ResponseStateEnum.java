@@ -9,6 +9,8 @@ public enum ResponseStateEnum {
 
     SUCCESS("200","成功"),
 
+    BUSINESS_ERROR("302", "失败"),
+
     ERROR_SIGN("300","认证失败"),
 
     ERROR_PARAMS("301","参数错误"),

@@ -6,8 +6,6 @@ import org.eq.modules.auth.entity.UserAccountBind;
 import org.eq.modules.auth.entity.UserIdentityAuth;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,10 +22,6 @@ import java.util.Date;
 @RestController
 @RequestMapping(value = "/api/user")
 public class UserController extends BaseController {
-
-    @Autowired
-    private RedisTemplate redisTemplate;
-
     /**
      * 用户注册接口
      *
@@ -79,9 +73,9 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseData login(HttpServletRequest request) {
-        String userId = request.getParameter("userId");
+        String mobile = request.getParameter("mobile");
         String pwd = request.getParameter("pwd");
-        return userService.login(userId, pwd);
+        return userService.login(mobile, pwd);
     }
 
     /**

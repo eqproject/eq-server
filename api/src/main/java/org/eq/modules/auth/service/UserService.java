@@ -19,7 +19,7 @@ import org.eq.modules.common.entitys.ResponseData;
 public interface UserService extends ServiceExtend<User, UserExample> {
     ResponseData register(String mobile, String captcha);
     ResponseData reset(String userId, String pwd);
-    ResponseData login(String userId, String pwd);
+    ResponseData login(String mobile, String pwd);
     ResponseData verify(UserIdentityAuth userIdentityAuth);
     ResponseData mobileLogin(String mobile, String captcha);
     ResponseData payBind(UserAccountBind userAccountBind);

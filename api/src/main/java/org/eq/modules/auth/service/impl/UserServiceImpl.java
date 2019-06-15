@@ -42,6 +42,8 @@ import java.util.Map;
 @Transactional
 @AutowiredService
 public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExample> implements UserService {
+
+
     public UserServiceImpl(UserMapper mapper) {
         super.setMapper(mapper);
     }
@@ -145,15 +147,15 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
     @Override
     public ResponseData register(String mobile, String captcha) {
         if (mobile == null) {
-            return ResponseFactory.paramsError("电话号码为空");
+            return ResponseFactory.businessError("电话号码为空");
         }
 
         if (captcha == null) {
-            return ResponseFactory.paramsError("验证码为空");
+            return ResponseFactory.businessError("验证码为空");
         }
         //检查验证码
         if (!checkCaptcha(mobile, captcha)) {
-            return ResponseFactory.paramsError("验证码错误");
+            return ResponseFactory.businessError("验证码错误");
         }
 
         // 1.添加用户
@@ -170,7 +172,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         Long userId = saveUser(user);
 
         if (userId == null) {
-            return ResponseFactory.systemError("注册失败");
+            return ResponseFactory.businessError("注册失败");
         }
         //清除redis验证码
         clearCaptcha(mobile);
@@ -248,31 +250,38 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             if (cnt > 0) {
                 return ResponseFactory.success(null);
             } else {
-                return ResponseFactory.error("密码修改失败", "1");
+                return ResponseFactory.businessError("密码修改失败");
             }
         } catch (Exception e) {
-            return ResponseFactory.error("密码修改失败", "1");
+            logger.error("密码修改失败", e);
+            return ResponseFactory.businessError("密码修改失败");
         }
 
     }
 
     @Override
-    public ResponseData login(String userId, String pwd) {
+    public ResponseData login(String mobile, String pwd) {
         try {
             User user = new User();
-            user.setId(Long.parseLong(userId));
+            user.setMobile(mobile);
+            //手机号获取userId
+            User checkUser = selectByRecord(user);
+            if(checkUser == null){
+                return ResponseFactory.businessError("手机号未注册");
+            }
             //AES解密
             String password = AESUtils.decrypt(pwd, aesKey);
-            String content = userId + password + MD5_KEY;
+            String content = checkUser.getId() + password + MD5_KEY;
             user.setPassword(MD5Utils.digestAsHex(content));
             User currUser = selectByRecord(user);
             if (currUser != null) {
                 return ResponseFactory.success(null);
             } else {
-                return ResponseFactory.error("登陆失败", "1");
+                return ResponseFactory.businessError("登陆失败");
             }
         } catch (Exception e) {
-            return ResponseFactory.error("登陆失败", "1");
+            logger.error("登陆失败", e);
+            return ResponseFactory.businessError("登陆失败");
         }
     }
 
@@ -286,14 +295,14 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         if (cnt > 0) {
             return ResponseFactory.success(null);
         } else {
-            return ResponseFactory.error("认证失败", "1");
+            return ResponseFactory.businessError("认证失败");
         }
     }
 
     @Override
     public ResponseData mobileLogin(String mobile, String captcha) {
         if (!checkCaptcha(mobile, captcha)) {
-            return ResponseFactory.paramsError("验证码错误");
+            return ResponseFactory.businessError("验证码错误");
         }
         clearCaptcha(mobile);
         return ResponseFactory.success(null);
@@ -309,7 +318,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         if (cnt > 0) {
             return ResponseFactory.success(null);
         } else {
-            return ResponseFactory.error("绑定失败", "1");
+            return ResponseFactory.businessError("绑定失败");
         }
     }
 
