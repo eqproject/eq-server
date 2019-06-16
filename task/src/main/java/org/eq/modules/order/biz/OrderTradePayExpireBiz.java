@@ -3,9 +3,7 @@ package org.eq.modules.order.biz;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.eq.basic.common.util.DateUtil;
-import org.eq.modules.enums.OrderTradeStateEnum;
-import org.eq.modules.enums.SystemConfigStateEnum;
-import org.eq.modules.enums.SystemConfigTypeEnum;
+import org.eq.modules.enums.*;
 import org.eq.modules.order.dao.OrderAdLogMapper;
 import org.eq.modules.order.dao.OrderAdMapper;
 import org.eq.modules.order.entity.OrderAd;
@@ -132,20 +130,33 @@ public class OrderTradePayExpireBiz {
         criteria.andTradeNoEqualTo(orderTrade.getTradeNo());
         List<OrderPaymentTrade> orderPaymentTradeList = orderPaymentTradeMapper.selectByExample(orderPaymentTradeExample);
         if (CollectionUtils.isNotEmpty(orderPaymentTradeList)) {
-            orderPaymentTradeList.forEach(b->{
+            orderPaymentTradeList.forEach(orderPaymentTrade->{
 
-                Integer paymentOldStatus = b.getStatus();
+                Integer paymentOldStatus = orderPaymentTrade.getStatus();
+
+                OrderPaymentTradeExample orderTradeWhereExample = new OrderPaymentTradeExample();
+                OrderPaymentTradeExample.Criteria orderTradeCa = orderTradeWhereExample.or();
+                orderTradeCa.andStatusEqualTo(paymentOldStatus);
+                orderTradeCa.andIdEqualTo(orderPaymentTrade.getId());
+
+                OrderPaymentTrade updateObj = new OrderPaymentTrade();
+                updateObj.setStatus(OrderPaymentTradeStateEnum.PAY_CANCEL.getState());
+                updateObj.setUpdateDate(nowDate);
+                int udpateResult = orderPaymentTradeMapper.updateByExampleSelective(updateObj,orderTradeWhereExample);
+
+                StringBuffer remark = new StringBuffer("定时任务关闭交易订单，交易流水开始关闭");
+                if(udpateResult>0){
+                    remark.append(",关闭成功");
+                }else{
+                    remark.append(",关闭失败");
+                }
                 OrderPaymentTradeLog orderPaymentTradeLog = new OrderPaymentTradeLog();
                 orderPaymentTradeLog.setCreateDate(nowDate);
                 orderPaymentTradeLog.setOldStatus(paymentOldStatus);
-                orderPaymentTradeLog.setNewStatus(2);
-                orderPaymentTradeLog.setOrderPayTradeId(b.getId());
-                orderPaymentTradeLog.setRemarks("关闭交易(支付超时)支付订单状态改为支付失败");
+                orderPaymentTradeLog.setNewStatus(OrderPaymentTradeStateEnum.PAY_CANCEL.getState());
+                orderPaymentTradeLog.setOrderPayTradeId(orderTrade.getId());
+                orderPaymentTradeLog.setRemarks(remark.toString());
                 orderPaymentTradeLogMapper.insertSelective(orderPaymentTradeLog);
-
-                b.setStatus(2);
-                b.setUpdateDate(nowDate);
-                orderPaymentTradeMapper.updateByPrimaryKeySelective(b);
             });
         }
 
@@ -153,15 +164,34 @@ public class OrderTradePayExpireBiz {
         OrderAdExample.Criteria criteria1 = orderAdExample.or();
         criteria1.andOrderNoEqualToForAll(orderTrade.getAdNo());
         List<OrderAd> orderAdList =  orderAdMapper.selectByExample(orderAdExample);
-        if (CollectionUtils.isNotEmpty(orderAdList)) {
-           orderAdList.forEach(b->{
-               Integer num = b.getTradingNum()-orderTrade.getOrderNum();
-               num=num<=0?0:num;
-               b.setTradingNum(num);
-               b.setUpdateDate(nowDate);
-               orderAdMapper.updateByPrimaryKeySelective(b);
-           });
+        OrderAd orderAd = null;
+        if(!CollectionUtils.isEmpty(orderAdList)){
+            orderAd = orderAdList.get(0);
         }
+        if(orderAd==null ){
+            return;
+        }
+
+        OrderAdExample orderAdWhereExample = new OrderAdExample();
+        OrderAdExample.Criteria orderAdCa = orderAdWhereExample.or();
+        orderAdCa.andIdEqualToForUpdate(orderAd.getId());
+        orderAdCa.andTradingNumEqualToForUpdate(orderAd.getTradingNum());
+
+        Integer num = orderAd.getTradingNum() - orderTrade.getOrderNum();
+        OrderAd updateObj = new OrderAd();
+        updateObj.setTradingNum(num);
+        updateObj.setUpdateDate(nowDate);
+        int update = 0;
+        try{
+            update = orderAdMapper.updateByExampleSelective(updateObj,orderAdWhereExample);
+        }catch (Exception e){
+            logger.error("更新交易订单锁定量失败",e);
+        }
+        if(update<=0){
+            logger.error("更新交易订单锁定量失败,{} 执行条件为:正在交易量为 :{}",updateObj.toString(),orderAd.getTradingNum());
+        }
+
+
     }
 
 

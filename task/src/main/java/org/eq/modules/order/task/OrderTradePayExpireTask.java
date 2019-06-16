@@ -18,7 +18,7 @@ public class OrderTradePayExpireTask extends BaseLog {
 
     private final OrderTradePayExpireBiz orderTradePayExpireBiz;
 
-    @Scheduled(cron = "0 40 14 * * ?")
+    //@Scheduled(cron = "0 28 17 * * ?")
     public void process() {
         logger.info("OrderTradePayExpireTask  过期交易订单 & 过期交易中订单过期");
         try {

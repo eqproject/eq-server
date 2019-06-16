@@ -91,7 +91,6 @@ public class OrderAdExpireBiz {
 
         OrderAdExample orderAdexample = new OrderAdExample();
         OrderAdExample.Criteria orderCa = orderAdexample.or();
-
         List<Integer> status = new ArrayList<>();
         status.add(OrderAdStateEnum.ORDER_TRADEING.getState());
 
