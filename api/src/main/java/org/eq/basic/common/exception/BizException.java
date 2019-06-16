@@ -1,35 +1,37 @@
 package org.eq.basic.common.exception;
 
+import org.eq.modules.common.enums.ResponseStateEnum;
+
 /**
  * * @author gb
  *
  * @version 2019/6/12
  */
 public class BizException extends RuntimeException {
-    private final static int ERROR = 1;
-    private int code;
+    private final static String ERROR = "500";
+    private String code;
 
     public BizException() {
         this.code = ERROR;
     }
 
-    public BizException(BizExcetionMsg bizExcetionMsg) {
-        this(bizExcetionMsg.getCode(), bizExcetionMsg.getMsg());
+    public BizException(ResponseStateEnum state) {
+        this(state.getStatus(), state.getErrMsg());
     }
 
-    public BizException(int code, String message) {
+    public BizException(String code, String message) {
         super(message);
         this.code = code;
     }
 
-    public BizException(String message, Throwable cause, int code) {
+    public BizException(String message, Throwable cause, String code) {
         super(message, cause);
         this.code = code;
     }
 
     public BizException(String message) {
         super(message);
-        this.code = 1;
+        this.code = ERROR;
     }
 
     public BizException(String message, Throwable cause) {
@@ -42,11 +44,11 @@ public class BizException extends RuntimeException {
         this.code = ERROR;
     }
 
-    public int getCode() {
+    public String getCode() {
         return this.code;
     }
 
-    public void setCode(int code) {
+    public void setCode(String code) {
         this.code = code;
     }
 }

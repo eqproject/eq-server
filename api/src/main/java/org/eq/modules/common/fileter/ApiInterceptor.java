@@ -4,10 +4,10 @@ import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
 import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.exception.BizException;
-import org.eq.basic.common.exception.BizExcetionMsg;
 import org.eq.basic.common.util.SpringContextUtil;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.auth.service.UserService;
+import org.eq.modules.common.enums.ResponseStateEnum;
 import org.eq.modules.enums.WalletStateEnum;
 import org.eq.modules.wallet.entity.UserWallet;
 import org.eq.modules.wallet.service.UserWalletService;
@@ -42,14 +42,14 @@ public class ApiInterceptor  implements HandlerInterceptor {
 
         Map<String, String[]> map = httpServletRequest.getParameterMap();
         if(!map.containsKey(SIGN)){
-            throw new BizException(BizExcetionMsg.SIGN_NULL);
+            throw new BizException(ResponseStateEnum.SIGN_NULL);
         }
 
         String reqSign = map.get(SIGN)[0];
 
         if(map.containsKey(USER_ID)){
             String userId = map.get(USER_ID)[0];
-            checkUser(userId,httpServletResponse);
+            checkUser(userId,httpServletRequest);
         }
 
         List<String> params = new ArrayList<>(map.size());
@@ -71,7 +71,7 @@ public class ApiInterceptor  implements HandlerInterceptor {
                 .hash().toString();
         System.out.println(sign);
         if(!reqSign.equalsIgnoreCase(sign)){
-            throw new BizException(BizExcetionMsg.SIGN_INVALID);
+            throw new BizException(ResponseStateEnum.SIGN_INVALID);
         }
         return true;
     }
@@ -90,7 +90,8 @@ public class ApiInterceptor  implements HandlerInterceptor {
         // System.out.println(">>>MyInterceptor>>>>>>>在整个请求结束之后被调用，也就是在DispatcherServlet 渲染了对应的视图之后执行（主要是用于进行资源清理工作）");
     }
 
-    private void checkUser(String userIdStr,HttpServletResponse httpServletResponse)throws Exception{
+    private void checkUser(String userIdStr,
+                           HttpServletRequest httpServletRequest)throws Exception{
         UserService userService = SpringContextUtil.getBean(UserService.class);
         UserWalletService userWalletService =  SpringContextUtil.getBean(UserWalletService.class);
 
@@ -98,12 +99,17 @@ public class ApiInterceptor  implements HandlerInterceptor {
         User user = userService.selectByPrimaryKey(userId);
 
         if(user==null){
-            throw new BizException(BizExcetionMsg.USER_NULL);
+            throw new BizException(ResponseStateEnum.USER_NULL);
+        }
+
+        //用户API不验证钱包地址
+        if(httpServletRequest.getRequestURI().startsWith("/api/user")){
+            return;
         }
 
         UserWallet userWallet = userWalletService.selectByPrimaryKey(userId);
         if(userWallet==null || userWallet.getStatus()== WalletStateEnum.NO_ACTIVE.getState()){
-            throw new BizException(BizExcetionMsg.USER_WALLET_INACTIVE);
+            throw new BizException(ResponseStateEnum.USER_WALLET_INACTIVE);
         }
     }
 }
