@@ -326,6 +326,16 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         }
     }
 
+    @Override
+    public ResponseData getUserInfo(Long userId) {
+        User user = selectByPrimaryKey(userId);
+        if (user != null) {
+            return ResponseFactory.success(user);
+        } else {
+            return ResponseFactory.businessError("用户信息获取失败");
+        }
+    }
+
     /**
      * 检查手机验证码是否正确
      *

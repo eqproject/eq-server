@@ -238,6 +238,74 @@
 }
 ```
 
+##### 1-07\.用户信息查询
+
+###### 接口功能
+
+> 获取用户信息
+
+###### URL
+
+> [/api/user/getInfo](/api/user/getInfo)
+
+###### 支持格式
+
+> JSON
+
+###### HTTP请求方式
+
+> GET
+
+###### 请求参数
+
+> | 参数   | 必选 | 类型   | 说明   |
+> | :----- | :--- | :----- | ------ |
+> | userId | true | long   | 用户id |
+> | sign   | true | string | 签名   |
+
+###### 返回字段
+
+> | 返回字段 | 字段类型 | 说明                                 |
+> | :------- | :------- | :----------------------------------- |
+> | status   | int      | 返回结果状态。200：正常；302：错误。 |
+> | errMsg   | string   | 错误描述                             |
+> | data     | Object   | user                                 |
+
+###### 接口示例
+
+> 地址：[/api/user/getInfo](/api/user/getInfo)
+
+```json
+{
+    "status": "200",
+    "errMsg": "",
+    "data": {
+        "id": 2,
+        "name": "张木子",
+        "nickname": "今晚吃鸡",
+        "password": null,
+        "txPassword": null,
+        "sex": null,
+        "level": null,
+        "mobile": "13345895682",
+        "authStatus": 1,
+        "birthday": null,
+        "photoHead": null,
+        "intro": null,
+        "createDate": null,
+        "updateDate": "2019-06-09",
+        "remarks": "更改禁用状态:启用此用户",
+        "delFlag": 1,
+        "address": null
+    },
+    "datas": null
+}
+```
+
+
+
+
+
 #### 2\.商品接口
 
 ##### 2-00 导入商品信息（L）

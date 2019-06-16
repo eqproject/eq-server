@@ -36,6 +36,17 @@ public class UserController extends BaseController {
     }
 
     /**
+     * 获取用户信息
+     *
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/getInfo")
+    public ResponseData getUserInfo(Long userId) {
+        return userService.getUserInfo(userId);
+    }
+
+    /**
      * 用户重置密码接口
      *
      * @param request

@@ -1,7 +1,3 @@
-/**
- * 该类有generator 自动生成
- * Copyright &copy; 2017-2018 All rights reserved.
- */
 package org.eq.modules.auth.service;
 
 import org.eq.modules.auth.entity.User;
@@ -23,4 +19,5 @@ public interface UserService extends ServiceExtend<User, UserExample> {
     ResponseData verify(UserIdentityAuth userIdentityAuth);
     ResponseData mobileLogin(String mobile, String captcha);
     ResponseData payBind(UserAccountBind userAccountBind);
+    ResponseData getUserInfo(Long userId);
 }
