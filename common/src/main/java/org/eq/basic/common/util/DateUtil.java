@@ -176,4 +176,23 @@ public class DateUtil {
     }
 
 
+    /**
+     * 格式化固定时间
+     * @param date
+     * @return
+     */
+    public static String foramtChinaFormat(Date date){
+        String result = "";
+        if(date==null){
+            return result;
+        }
+        try{
+            return chinaFormat.format(date);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
 }

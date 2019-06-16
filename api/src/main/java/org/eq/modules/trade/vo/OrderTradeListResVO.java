@@ -1,6 +1,7 @@
 package org.eq.modules.trade.vo;
 
 import lombok.Data;
+import org.eq.modules.product.vo.ProductDetailVO;
 
 import java.io.Serializable;
 
@@ -17,7 +18,7 @@ public class OrderTradeListResVO implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
-    private OrderTradeDetailProduct product;
+    private ProductDetailVO product;
     private OrderTradeDetailUser user;
     private OrderTradeDetailTrade trade;
 

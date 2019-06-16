@@ -73,14 +73,23 @@ public class OrderTradePayExpireBiz {
             logger.error(" 获取过期交易订单配置时长异常，请持续关注");
             return null;
         }
+        List<OrderTrade> result = new ArrayList<>();
         OrderTradeExample example = new OrderTradeExample();
         OrderTradeExample.Criteria ca = example.or();
         List<Integer> status = new ArrayList<>();
         status.add(OrderTradeStateEnum.WAIT_PAY.getState());
         ca.andStatusIn(status);
+        ca.andCreateDateLessThan(DateUtil.beforeDateHour(DateUtil.getNowTime(),hour));
+        result.addAll(orderTradeMapper.selectByExample(example));
 
-        ca.andCreateDateLessThan(DateUtil.beforeDateHour(DateUtil.getNowTime(),24));
-        return orderTradeMapper.selectByExample(example);
+        example = new OrderTradeExample();
+        ca = example.or();
+        status = new ArrayList<>();
+        status.add(OrderTradeStateEnum.PAY_ING.getState());
+        ca.andStatusIn(status);
+        ca.andUpdateDateLessThan(DateUtil.beforeDateHour(DateUtil.getNowTime(),hour));
+        result.addAll(orderTradeMapper.selectByExample(example));
+        return result;
     }
 
     /**
@@ -92,18 +101,31 @@ public class OrderTradePayExpireBiz {
         Integer oldStatus = orderTrade.getStatus();
         Integer newStatus = OrderTradeStateEnum.CANCEL_PAY_TIMEOUT.getState();
 
-        orderTrade.setStatus(newStatus);
-        orderTrade.setUpdateDate(nowDate);
+        OrderTrade updateOrderTrade  = new OrderTrade();
+        updateOrderTrade.setStatus(newStatus);
+        updateOrderTrade.setUpdateDate(nowDate);
+        OrderTradeExample whereExample = new OrderTradeExample();
+        OrderTradeExample.Criteria ca = whereExample.or();
+        ca.andStatusEqualTo(oldStatus);
+        ca.andIdEqualTo(orderTrade.getId());
 
-        orderTradeMapper.updateByPrimaryKeySelective(orderTrade);
+
+        int result = orderTradeMapper.updateByExampleSelective(updateOrderTrade,whereExample);
+        if(result<=0){
+            logger.error("更新交易订单状态失败");
+            return ;
+        }
 
         OrderTradeLog orderTradeLog = new OrderTradeLog();
         orderTradeLog.setOldStatus(oldStatus);
         orderTradeLog.setNewStatus(newStatus);
         orderTradeLog.setCreateDate(nowDate);
         orderTradeLog.setOrderTradeId(orderTrade.getId());
-        orderTradeLog.setRemarks("关闭交易(支付超时)");
-        orderTradeLogMapper.insert(orderTradeLog);
+        orderTradeLog.setRemarks("定时任务关闭交易(支付超时/订单超时)");
+        result = orderTradeLogMapper.insert(orderTradeLog);
+        if(result<=0){
+            logger.error("插入交易订单状态日志记录失败");
+        }
 
         OrderPaymentTradeExample orderPaymentTradeExample = new OrderPaymentTradeExample();
         OrderPaymentTradeExample.Criteria criteria = orderPaymentTradeExample.or();
