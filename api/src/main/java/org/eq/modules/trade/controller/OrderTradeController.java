@@ -106,7 +106,7 @@ public class OrderTradeController extends BaseController {
      * @param orderTradeDetailReqVO
      * @return
      */
-    @GetMapping("/detail")
+    @PostMapping("/detail")
     public ResponseData<OrderTradeDetailResVO> tradeOrderDetail(OrderTradeDetailReqVO orderTradeDetailReqVO) {
         if (orderTradeDetailReqVO == null) {
             logger.error("tradeOrderDetail 失败，原因是 orderTradeDetailReqVO is null");

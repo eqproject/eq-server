@@ -11,9 +11,15 @@ import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.DateUtil;
 import org.eq.modules.auth.entity.User;
+import org.eq.modules.auth.entity.UserIdentityAuth;
+import org.eq.modules.auth.service.UserIdentityAuthService;
+import org.eq.modules.auth.service.UserService;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.common.factory.ResponseFactory;
+import org.eq.modules.enums.OrderTradeStateEnum;
+import org.eq.modules.trade.entity.OrderTradeExample;
+import org.eq.modules.trade.service.OrderTradeService;
 import org.eq.modules.utils.OrderUtil;
 import org.eq.modules.utils.ProductUtil;
 import org.eq.modules.enums.OrderAdStateEnum;
@@ -57,6 +63,14 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 
 	@Autowired
 	private OrderAdLogService orderAdLogService;
+	/**
+	 * 用户服务
+	 */
+	@Autowired
+	private UserIdentityAuthService userIdentityAuthService;
+
+	@Autowired
+	private OrderTradeService orderTradeService;
 
 
 	@Override
@@ -189,6 +203,7 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 			result.setErrMsg("订单号为空");
 			return result;
 		}
+
 		OrderAd orderAd = new OrderAd();
 		orderAd.setOrderNo(searchAdOrderVO.getOrderCode());
 		orderAd = selectByRecord(orderAd);
@@ -196,8 +211,24 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 			result.setErrMsg("订单不存在");
 			return result;
 		}
+		int allNum  = 0;
+		int finishNum =0;
+		try{
+			OrderTradeExample orderTradeExample = new OrderTradeExample();
+			OrderTradeExample.Criteria ca = orderTradeExample.or();
+			ca.andAllUserIdEqualTo(orderAd.getUserId());
+			allNum = orderTradeService.countByExample(orderTradeExample);
 
-		OrderAdSimpleVO orderAdSimpleVO =OrderUtil.transObjForSimple(orderAd);
+			orderTradeExample = new OrderTradeExample();
+			ca = orderTradeExample.or();
+			ca.andAllUserIdEqualTo(orderAd.getUserId());
+			ca.andStatusEqualTo(OrderTradeStateEnum.TRADE_SUCCESS.getState());
+			finishNum = orderTradeService.countByExample(orderTradeExample);
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+
+		OrderAdSimpleVO orderAdSimpleVO =OrderUtil.transObjForSimple(orderAd,allNum,finishNum);
 		if(orderAdSimpleVO!=null){
 			result.setData(orderAdSimpleVO);
 			return result;

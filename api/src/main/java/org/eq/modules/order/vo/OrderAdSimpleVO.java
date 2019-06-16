@@ -4,6 +4,7 @@ package org.eq.modules.order.vo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 广告订单返回实体
@@ -86,6 +87,22 @@ public class OrderAdSimpleVO implements Serializable {
      * 订单类型
      */
     private int orderType;
+
+
+    /**
+     * 创建时间
+     */
+    private String createTime;
+
+    /**
+     * 交易数
+     */
+    private int tradeNum;
+
+    /**
+     * 完成率
+     */
+    private double tradeRate;
 
 
 }

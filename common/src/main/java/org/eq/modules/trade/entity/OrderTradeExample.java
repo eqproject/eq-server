@@ -4,6 +4,8 @@
  */
 package org.eq.modules.trade.entity;
 
+import org.eq.modules.orderfinish.entity.OrderFinishSnapshootExample;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
@@ -246,6 +248,11 @@ public class OrderTradeExample {
 
         public Criteria andBuyUserIdEqualTo(Long value) {
             addCriterion("buy_user_id =", value, "buyUserId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllUserIdEqualTo(long value) {
+            addCriterion("(buy_user_id = "+value +" or  sell_user_id = "+value + " )" );
             return (Criteria) this;
         }
 

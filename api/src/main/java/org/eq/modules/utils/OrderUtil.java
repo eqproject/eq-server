@@ -1,5 +1,6 @@
 package org.eq.modules.utils;
 
+import org.eq.basic.common.util.DateUtil;
 import org.eq.modules.enums.OrderAcceptStateEnum;
 import org.eq.modules.enums.OrderTransferStateEnum;
 import org.eq.modules.order.entity.OrderAccept;
@@ -7,6 +8,8 @@ import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.order.entity.OrderTransfer;
 import org.eq.modules.order.vo.*;
 import org.eq.modules.orderfinish.entity.OrderFinishSnapshoot;
+
+import java.math.BigDecimal;
 
 /**
  * 订单工具类
@@ -59,8 +62,30 @@ public class OrderUtil{
         orderAdSimpleVO.setNickName(orderAd.getNickName());
         orderAdSimpleVO.setUserBoundState(orderAd.getAuthStatus());
         orderAdSimpleVO.setOrderType(orderAd.getType());
+        orderAdSimpleVO.setCreateTime(DateUtil.foramtChinaFormat(orderAd.getCreateDate()));
         return orderAdSimpleVO;
     }
+
+
+    /**
+     * 转化对象实体
+     * @param orderAd
+     * @param tradeNum 总共订单数
+     * @param treadedNum 已完成交易订单数
+     * @return
+     */
+    public static OrderAdSimpleVO transObjForSimple(OrderAd orderAd,int tradeNum,int treadedNum){
+        if(orderAd==null){
+            return null;
+        }
+        OrderAdSimpleVO orderAdSimpleVO = transObjForSimple(orderAd);
+        if(tradeNum>0){
+            orderAdSimpleVO.setTradeNum(tradeNum);
+            orderAdSimpleVO.setTradeRate(new BigDecimal(treadedNum).divide(new BigDecimal(tradeNum)).setScale(2,BigDecimal.ROUND_HALF_DOWN).doubleValue());
+        }
+        return orderAdSimpleVO;
+    }
+
 
 
 

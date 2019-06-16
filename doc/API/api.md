@@ -1044,21 +1044,25 @@
 > | data     | Object   | 参考对象                         |
 >
 > Object对象
->|返回字段|字段类型|说明                              |
->|:-----   |:------|:-----------------------------   |
->| orderCode    | 字符串 | 订单号    |
->| productName     | 字符串 | 商品名称     |
->| orderType     |整型 | 订单类型     |
->| img             | 字符串 | 商品图片     |
->| price | 整形   | 订单单价 |
->| orderNumber | 整形   | 订单总量     |
->|saleedNumber | 整形   |已完成量    |
->|saleNumber | 整形   |可交易量   |
->| title | 字符串  | 订单标题       |
->| userId            | 字符串 | 用户Id     |
->| userImg | 字符串 | 用户头像 |
->| nickName | 字符串 | 用户昵称 |
->| orderType | 整形 | d订单类型(1:出售广告2:求购广告) |
+> |返回字段|字段类型|说明                              |
+> |:-----   |:------|:-----------------------------   |
+> | orderCode    | 字符串 | 订单号    |
+> | productName     | 字符串 | 商品名称     |
+> | orderType     |整型 | 订单类型     |
+> | img             | 字符串 | 商品图片     |
+> | price | 整形   | 订单单价 |
+> | orderNumber | 整形   | 订单总量     |
+> |saleedNumber | 整形   |已完成量    |
+> |saleNumber | 整形   |可交易量   |
+> | title | 字符串  | 订单标题       |
+> | userId            | 字符串 | 用户Id     |
+> | userImg | 字符串 | 用户头像 |
+> | nickName | 字符串 | 用户昵称 |
+> | orderType | 整形 | d订单类型(1:出售广告2:求购广告) |
+> | createTime | 字符串 | 创建时间 |
+> | userBoundState | 整形 | 2:已经认证 |
+> | tradeNum | 整形 | 交易订单数 |
+> | tradeRate | 小数 | 交易完成率 |
 ###### 返回实例
 
 ```
@@ -1079,7 +1083,10 @@
      "userImg": "用户头像地址",
      "nickName": "齐木卡卡西",
      "userBoundState": 0,
-     "orderType": 1
+     "orderType": 1,
+     "createTime": "2019-06-02 17:19:27",
+     "tradeNum": 9,
+     "tradeRate": 0
  }
 }
 ```
@@ -1198,7 +1205,7 @@
 > JSON
 
 ###### HTTP请求方式
-> GET
+> POST
 
 ###### 请求参数
 > |参数|必选|类型|说明|
@@ -1213,8 +1220,8 @@
 |errMsg   |string    |错误描述   |
 |data |object |交易订单商品详情                        |
 |-    product |object |商品信息 |
-|--        productImg |string |图片url |
-|--        name |string |名称|
+|--        img |string |图片url |
+|--        productName |string |名称|
 |--        unitPrice |int |面值(单位:分)|
 |-    user |object |用户信息 |
 |--        sellUserId |long |售卖用户id|
@@ -1236,8 +1243,6 @@
 |--        payTime |string |支付完成时间|
 
 ###### 接口示例
-
-> 地址： [/api/order/trade/info](/api/order/trade/info)
 
 ```
 {
