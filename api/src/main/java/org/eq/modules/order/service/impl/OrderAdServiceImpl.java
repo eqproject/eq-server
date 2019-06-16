@@ -180,6 +180,32 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		return result;
 	}
 
+
+	@Override
+	public ServieReturn<OrderAdSimpleVO> getResOrderAdVO(SearchAdOrderVO searchAdOrderVO) {
+
+		ServieReturn<OrderAdSimpleVO> result  = new ServieReturn<>();
+		if(searchAdOrderVO==null || StringUtils.isEmpty(searchAdOrderVO.getOrderCode())){
+			result.setErrMsg("订单号为空");
+			return result;
+		}
+		OrderAd orderAd = new OrderAd();
+		orderAd.setOrderNo(searchAdOrderVO.getOrderCode());
+		orderAd = selectByRecord(orderAd);
+		if(orderAd == null){
+			result.setErrMsg("订单不存在");
+			return result;
+		}
+
+		OrderAdSimpleVO orderAdSimpleVO =OrderUtil.transObjForSimple(orderAd);
+		if(orderAdSimpleVO!=null){
+			result.setData(orderAdSimpleVO);
+			return result;
+		}
+		result.setErrMsg("获取订单失败");
+		return result;
+	}
+
 	@Override
 	public ServieReturn<ResOrderAdVO> cacelResOrderAdVO(SearchAdOrderVO searchAdOrderVO, User user) {
 		ServieReturn<ResOrderAdVO> result  = new ServieReturn<>();

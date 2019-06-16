@@ -1009,6 +1009,83 @@
 }
 ```
 
+##### 3-05  获取订单详情（L）
+
+###### 接口功能
+
+> 获取平台订单详情
+
+###### URL
+
+> /api/adOrder/plat/details
+
+###### 支持格式
+
+> JSON
+
+###### HTTP请求方式
+
+> POST
+
+###### 请求参数
+
+> | 参数      | 必选  | 类型   | 说明       |
+> | --------- | ----- | ------ | ---------- |
+> | orderCode | true  | 字符串 | 广告订单号 |
+> | userId    | false | 字符串 | 用户ID     |
+> | sign      | true  | 字符串 | 平台签名   |
+
+###### 响应参数
+
+> | 返回字段 | 字段类型 | 说明                             |
+> | :------- | :------- | :------------------------------- |
+> | status   | int      | 返回结果状态。0：正常；1：错误。 |
+> | errMsg   | string   | 错误描述                         |
+> | data     | Object   | 参考对象                         |
+>
+> Object对象
+>|返回字段|字段类型|说明                              |
+>|:-----   |:------|:-----------------------------   |
+>| orderCode    | 字符串 | 订单号    |
+>| productName     | 字符串 | 商品名称     |
+>| orderType     |整型 | 订单类型     |
+>| img             | 字符串 | 商品图片     |
+>| price | 整形   | 订单单价 |
+>| orderNumber | 整形   | 订单总量     |
+>|saleedNumber | 整形   |已完成量    |
+>|saleNumber | 整形   |可交易量   |
+>| title | 字符串  | 订单标题       |
+>| userId            | 字符串 | 用户Id     |
+>| userImg | 字符串 | 用户头像 |
+>| nickName | 字符串 | 用户昵称 |
+>| orderType | 整形 | d订单类型(1:出售广告2:求购广告) |
+###### 返回实例
+
+```
+{
+ "status":1,
+ "errMsg":"",
+ "data":{ 
+     "orderCode": "AD20190602171926304504",
+     "productId": "1",
+     "productName": "京东E卡",
+     "img": "b66a.jpg",
+     "price": 100,
+     "orderNumber": 10,
+     "saleedNumber": 4,
+     "saleNumber": 6,
+     "title": "测试正在进行中订单",
+     "userId": 1,
+     "userImg": "用户头像地址",
+     "nickName": "齐木卡卡西",
+     "userBoundState": 0,
+     "orderType": 1
+ }
+}
+```
+
+
+
 #### 4、交易订单
 
 ##### 4-01\. 创建交易订单接口
@@ -1108,13 +1185,13 @@
 
 ```
 
-
 ##### 4-03\. 查询交易订单详情接口
 
 ###### 接口功能
 > 查询交易订单详情接口
 
 ###### URL
+
 > [/api/order/trade/detail](/api/order/trade/detail)
 
 ###### 支持格式

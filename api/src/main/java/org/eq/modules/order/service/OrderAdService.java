@@ -29,6 +29,14 @@ public interface OrderAdService extends ServiceExtend<OrderAd, OrderAdExample> {
 
 
 
+    /**
+     * 获取广告详情
+     * @param searchAdOrderVO
+     * @return
+     */
+    ServieReturn<OrderAdSimpleVO> getResOrderAdVO(SearchAdOrderVO searchAdOrderVO);
+
+
 
     /**
      * 取消订单

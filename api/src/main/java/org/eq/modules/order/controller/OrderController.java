@@ -89,6 +89,25 @@ public class OrderController extends BaseController {
 	}
 
 
+
+	/**
+	 * 获取平台订单
+	 * @return
+	 */
+	@PostMapping("/plat/details")
+	public ResponseData<OrderAdSimpleVO> orderDetail(SearchAdOrderVO searchAdOrderVO) {
+		if(searchAdOrderVO==null || StringUtils.isEmpty(searchAdOrderVO.getOrderCode())){
+			return ResponseFactory.signError("订单号为空");
+		}
+		ServieReturn<OrderAdSimpleVO>  resOrderAdVO =  orderAdService.getResOrderAdVO(searchAdOrderVO);
+		if(!StringUtils.isEmpty(resOrderAdVO.getErrMsg())){
+			return ResponseFactory.signError(resOrderAdVO.getErrMsg());
+		}
+		return ResponseFactory.success(resOrderAdVO.getData());
+	}
+
+
+
 	/**
 	 * 集市订单查询
 	 * @return

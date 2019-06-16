@@ -4,15 +4,22 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.eq.basic.common.util.DateUtil;
 import org.eq.modules.enums.OrderTradeStateEnum;
+import org.eq.modules.enums.SystemConfigStateEnum;
+import org.eq.modules.enums.SystemConfigTypeEnum;
 import org.eq.modules.order.dao.OrderAdLogMapper;
 import org.eq.modules.order.dao.OrderAdMapper;
 import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.order.entity.OrderAdExample;
+import org.eq.modules.support.dao.SystemConfigMapper;
+import org.eq.modules.support.entity.SystemConfig;
+import org.eq.modules.support.entity.SystemConfigExample;
 import org.eq.modules.trade.dao.OrderPaymentTradeLogMapper;
 import org.eq.modules.trade.dao.OrderPaymentTradeMapper;
 import org.eq.modules.trade.dao.OrderTradeLogMapper;
 import org.eq.modules.trade.dao.OrderTradeMapper;
 import org.eq.modules.trade.entity.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,11 +35,28 @@ import java.util.List;
  * @Company: 123.com
  * @Created on 2019/6/3下午11:43
  */
+@SuppressWarnings("all")
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class OrderTradePayExpireBiz {
 
+    protected final Logger logger = LoggerFactory.getLogger(OrderTradePayExpireBiz.class);
+
+
+    /**
+     * 系统配置表
+     */
+    @Autowired
+    private SystemConfigMapper systemConfigMapper;
+
+    /**
+     * 订单交易
+     */
     private final OrderTradeMapper orderTradeMapper;
+
+    /**
+     * 交易日志
+     */
     private final OrderTradeLogMapper orderTradeLogMapper;
     private final OrderPaymentTradeMapper orderPaymentTradeMapper;
     private final OrderPaymentTradeLogMapper orderPaymentTradeLogMapper;
@@ -40,16 +64,21 @@ public class OrderTradePayExpireBiz {
 
 
     /**
-     * 查询支付过期的交易信息
+     * 查询交易订单
      * @return
      */
     public List<OrderTrade> searchPayExpireOrderTrade() {
+        int hour = getOverHour();
+        if(hour<=0){
+            logger.error(" 获取过期交易订单配置时长异常，请持续关注");
+            return null;
+        }
         OrderTradeExample example = new OrderTradeExample();
         OrderTradeExample.Criteria ca = example.or();
-
         List<Integer> status = new ArrayList<>();
         status.add(OrderTradeStateEnum.WAIT_PAY.getState());
         ca.andStatusIn(status);
+
         ca.andCreateDateLessThan(DateUtil.beforeDateHour(DateUtil.getNowTime(),24));
         return orderTradeMapper.selectByExample(example);
     }
@@ -111,6 +140,32 @@ public class OrderTradePayExpireBiz {
                orderAdMapper.updateByPrimaryKeySelective(b);
            });
         }
+    }
+
+
+    private int getOverHour(){
+        int result = -1;
+        SystemConfigExample example = new SystemConfigExample();
+        SystemConfigExample.Criteria ca = example.or();
+        ca.andTypeEqualTo(SystemConfigTypeEnum.TRADE_HOUR.getType());
+        ca.andStateEqualTo(SystemConfigStateEnum.DEFAULT.getState());
+
+        try{
+            List<SystemConfig> list = systemConfigMapper.selectByExample(example);
+            if(CollectionUtils.isEmpty(list)){
+                logger.info("系统未配置订单过期数据");
+                return result;
+            }
+            SystemConfig systemConfig = list.get(0);
+            result = Integer.valueOf(String.valueOf(systemConfig.getValue()).trim());
+
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.error("获取交易订单关闭时长配置异常");
+        }
+        return result;
+
+
     }
 
 }

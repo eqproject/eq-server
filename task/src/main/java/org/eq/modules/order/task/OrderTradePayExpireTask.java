@@ -8,12 +8,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
- * @author admin
- * @Title: OrderTradePayExpireTask
- * @Copyright: Copyright (c) 2018
- * @Description: 关闭交易(支付超时)
- * @Company: 123.com
- * @Created on 2019/6/3下午11:44
+ *  交易订单过期  交易订单支付过期
+ * @author kaka
+ * @date  20190616
  */
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -21,9 +18,9 @@ public class OrderTradePayExpireTask extends BaseLog {
 
     private final OrderTradePayExpireBiz orderTradePayExpireBiz;
 
-    //@Scheduled(cron = "* 0/1 * * * ?")
+    @Scheduled(cron = "* 0/1 * * * ?")
     public void process() {
-        logger.info("OrderTradePayExpireTask 每分钟执行-开始");
+        logger.info("OrderTradePayExpireTask  过期交易订单 & 过期交易中订单过期");
         try {
             orderTradePayExpireBiz.searchPayExpireOrderTrade().forEach(b->{
                 orderTradePayExpireBiz.updateOrderTradeStatus(b);
@@ -31,6 +28,6 @@ public class OrderTradePayExpireTask extends BaseLog {
         } catch (Exception e) {
             logger.error("OrderTradePayExpireTask 执行异常:",e);
         }
-        logger.info("OrderTradePayExpireTask 每分钟执行-结束");
+        logger.info("OrderTradePayExpireTask 每小时执行一次");
     }
 }
