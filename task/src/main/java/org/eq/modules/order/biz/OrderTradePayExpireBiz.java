@@ -8,6 +8,9 @@ import org.eq.modules.order.dao.OrderAdLogMapper;
 import org.eq.modules.order.dao.OrderAdMapper;
 import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.order.entity.OrderAdExample;
+import org.eq.modules.product.dao.UserProductStockMapper;
+import org.eq.modules.product.entity.UserProductStock;
+import org.eq.modules.product.entity.UserProductStockExample;
 import org.eq.modules.support.dao.SystemConfigMapper;
 import org.eq.modules.support.entity.SystemConfig;
 import org.eq.modules.support.entity.SystemConfigExample;
@@ -59,6 +62,13 @@ public class OrderTradePayExpireBiz {
     private final OrderPaymentTradeMapper orderPaymentTradeMapper;
     private final OrderPaymentTradeLogMapper orderPaymentTradeLogMapper;
     private final OrderAdMapper orderAdMapper;
+
+
+    /**
+     * 用户库存
+     */
+    @Autowired
+    private UserProductStockMapper userProductStockMapper;
 
 
     /**
@@ -159,37 +169,7 @@ public class OrderTradePayExpireBiz {
                 orderPaymentTradeLogMapper.insertSelective(orderPaymentTradeLog);
             });
         }
-
-        OrderAdExample orderAdExample = new OrderAdExample();
-        OrderAdExample.Criteria criteria1 = orderAdExample.or();
-        criteria1.andOrderNoEqualToForAll(orderTrade.getAdNo());
-        List<OrderAd> orderAdList =  orderAdMapper.selectByExample(orderAdExample);
-        OrderAd orderAd = null;
-        if(!CollectionUtils.isEmpty(orderAdList)){
-            orderAd = orderAdList.get(0);
-        }
-        if(orderAd==null ){
-            return;
-        }
-
-        OrderAdExample orderAdWhereExample = new OrderAdExample();
-        OrderAdExample.Criteria orderAdCa = orderAdWhereExample.or();
-        orderAdCa.andIdEqualToForUpdate(orderAd.getId());
-        orderAdCa.andTradingNumEqualToForUpdate(orderAd.getTradingNum());
-
-        Integer num = orderAd.getTradingNum() - orderTrade.getOrderNum();
-        OrderAd updateObj = new OrderAd();
-        updateObj.setTradingNum(num);
-        updateObj.setUpdateDate(nowDate);
-        int update = 0;
-        try{
-            update = orderAdMapper.updateByExampleSelective(updateObj,orderAdWhereExample);
-        }catch (Exception e){
-            logger.error("更新交易订单锁定量失败",e);
-        }
-        if(update<=0){
-            logger.error("更新交易订单锁定量失败,{} 执行条件为:正在交易量为 :{}",updateObj.toString(),orderAd.getTradingNum());
-        }
+        concelOrderTradeStock(orderTrade);
 
 
     }
@@ -216,8 +196,98 @@ public class OrderTradePayExpireBiz {
             logger.error("获取交易订单关闭时长配置异常");
         }
         return result;
+    }
 
+
+    public void concelOrderTradeStock(OrderTrade orderTrade){
+        OrderAdExample orderAdExample = new OrderAdExample();
+        OrderAdExample.Criteria criteria1 = orderAdExample.or();
+        criteria1.andOrderNoEqualToForAll(orderTrade.getAdNo());
+        List<OrderAd> orderAdList =  orderAdMapper.selectByExample(orderAdExample);
+        OrderAd orderAd = null;
+        if(!CollectionUtils.isEmpty(orderAdList)){
+            orderAd = orderAdList.get(0);
+        }
+        if(orderAd==null ){
+            return;
+        }
+
+        OrderAdExample orderAdWhereExample = new OrderAdExample();
+        OrderAdExample.Criteria orderAdCa = orderAdWhereExample.or();
+        orderAdCa.andIdEqualToForUpdate(orderAd.getId());
+        orderAdCa.andTradingNumEqualToForUpdate(orderAd.getTradingNum());
+
+        Integer num = orderAd.getTradingNum() - orderTrade.getOrderNum();
+        OrderAd updateObj = new OrderAd();
+        updateObj.setTradingNum(num);
+        updateObj.setUpdateDate(new Date());
+        int update = 0;
+        try{
+            update = orderAdMapper.updateByExampleSelective(updateObj,orderAdWhereExample);
+        }catch (Exception e){
+            logger.error("更新交易订单锁定量失败",e);
+        }
+        if(update<=0){
+            logger.error("更新交易订单锁定量失败,{} 执行条件为:正在交易量为 :{}",updateObj.toString(),orderAd.getTradingNum());
+        }
+        //出售广告，说明库存已锁定
+        if(orderAd.getType() == OrderAdTypeEnum.ORDER_SALE.getType()){
+
+            if(orderAd.getStatus() == OrderAdStateEnum.ORDER_CANCEL.getState()){
+                updateStock(orderAd.getUserId(),orderAd.getProductId(),-num);
+            }
+
+        }else{
+            if(orderAd.getStatus() == OrderAdStateEnum.ORDER_CANCEL.getState()){
+                updateStock(orderTrade.getSellUserId(),orderTrade.getProductId(),-num);
+            }
+        }
 
     }
+
+
+    /**
+     * 更改用户库存信息
+     * @param userId
+     * @param productId
+     * @param number
+     * @return
+     */
+    private boolean updateStock(long userId,long productId,int number){
+
+        List<UserProductStock> userProductStockList = userProductStockMapper.selectByExample(getUserProductStockExapple(userId,productId));
+        if(CollectionUtils.isEmpty(userProductStockList)){
+            return false;
+        }
+        UserProductStock userProductStock = userProductStockList.get(0);
+        int lockNum = userProductStock.getLockedNum();
+
+        UserProductStock update = new UserProductStock();
+        update.setLockedNum(userProductStock.getLockedNum()+number);
+        update.setUpdateDate(new Date());
+
+        UserProductStockExample example = new UserProductStockExample();
+        UserProductStockExample.Criteria ca = example.or();
+        ca.andIdEqualToForSimple(userProductStock.getId());
+        ca.andLockNumForUpdate(lockNum);
+        int updateResult = userProductStockMapper.updateByExampleSelective(update,example);
+        if(updateResult>0){
+            return true;
+        }
+        return false;
+    }
+
+    private UserProductStockExample getUserProductStockExapple(Long userId,Long productId) {
+        UserProductStockExample example = new UserProductStockExample();
+        UserProductStockExample.Criteria ca = example.or();
+        if(userId!=null){
+            ca.andUserIdEqualTo(userId);
+        }
+        if(productId!=null){
+            ca.andProductIdEqualTo(productId);
+        }
+        return example;
+    }
+
 
 }
