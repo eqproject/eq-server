@@ -6,12 +6,15 @@ package org.eq.modules.trade.controller;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.base.BaseController;
 import org.eq.basic.common.base.BaseServiceException;
+import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
 import org.eq.modules.enums.OrderTradeStateEnum;
+import org.eq.modules.order.vo.ServieReturn;
 import org.eq.modules.trade.entity.OrderPaymentTrade;
 import org.eq.modules.trade.entity.OrderTrade;
 import org.eq.modules.trade.service.OrderTradeService;
@@ -45,31 +48,30 @@ public class OrderTradeController extends BaseController {
      */
     @PostMapping("/create")
     public ResponseData<OrderTradeCreateResVO> createTradeOrder(OrderTradeCreateReqVO orderTradeCreateReqVO) {
-        if (orderTradeCreateReqVO == null) {
-            logger.error("createTradeOrder 失败，原因是 orderTradeCreateReqVO is null");
-            return ResponseFactory.paramsError("请求参数不能为空");
+        String errMsg = VolidOrderTradeInfo.volidCreate(orderTradeCreateReqVO);
+        if(!StringUtils.isEmpty(errMsg)){
+            return ResponseFactory.paramsError(errMsg);
+        }
+        User user = getUserInfo(orderTradeCreateReqVO.getUserId());
+        if(user==null){
+            return ResponseFactory.signError("用户不存在");
         }
         logger.info("createTradeOrder 请求参数:{}",JSON.toJSONString(orderTradeCreateReqVO));
-        OrderTrade orderTrade =new OrderTrade();
+        ServieReturn<OrderTrade> inserResult =  null;
         try {
-            BeanUtils.copyProperties(orderTrade, orderTradeCreateReqVO);
-        } catch (IllegalAccessException e) {
-            logger.error("createTradeOrder 失败，原因是",e);
-            return ResponseFactory.paramsError("请求参数错误");
-        } catch (InvocationTargetException e) {
-            logger.error("createTradeOrder 失败，原因是",e);
-            return ResponseFactory.paramsError("请求参数错误");
-        }
-        try {
-            orderTrade = orderTradeService.createTradeOrder(orderTrade);
-        } catch (BaseServiceException e) {
-            logger.error("createTradeOrder 失败，原因是:{}",e.getMessage());
-            return ResponseFactory.paramsError(e.getMessage());
+            inserResult = orderTradeService.createTradeOrder(orderTradeCreateReqVO,user);
         } catch (Exception e) {
             logger.error("createTradeOrder 失败，原因是",e);
             return ResponseFactory.systemError(SYSTEM_ERROR_MSG);
         }
-        OrderTradeCreateResVO orderTradeCreateResVO = new OrderTradeCreateResVO(orderTrade.getTradeNo());
+        if(inserResult ==null ){
+            return ResponseFactory.systemError(SYSTEM_ERROR_MSG);
+        }
+        if(!StringUtils.isEmpty(inserResult.getErrMsg())){
+            return ResponseFactory.systemError(inserResult.getErrMsg());
+        }
+        String code = inserResult.getData()==null ? "": (inserResult.getData().getTradeNo());
+        OrderTradeCreateResVO orderTradeCreateResVO = new OrderTradeCreateResVO(code);
         logger.info("createTradeOrder 响应内容:{}",JSON.toJSONString(orderTradeCreateResVO));
         return ResponseFactory.success(orderTradeCreateResVO);
     }

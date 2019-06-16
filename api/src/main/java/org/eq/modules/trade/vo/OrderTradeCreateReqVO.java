@@ -15,13 +15,38 @@ import org.eq.modules.common.entitys.SearchBase;
 public class OrderTradeCreateReqVO extends SearchBase{
     private static final long serialVersionUID = 1L;
 
-    private Long buyUserId;
+    /**
+     * 购买人用户ID
+     */
+    private long userId;
+    /**
+     * 订单号
+     */
     private String adNo;
-    private Long productId;
-    private Integer orderNum;
-    private Integer salePrice;
-    private Integer serviceFee;
-    private Integer type;
+    /**
+     * 商品ID
+     */
+    private long productId;
+    /**
+     * 订单数量
+     */
+    private int orderNum;
+    /**
+     * 出价
+     */
+    private int salePrice;
+    /**
+     * 服务费
+     */
+    private double serviceFee;
+
+    /**
+     * 交易订单类型
+     */
+    private int type;
+    /**
+     * 备注
+     */
     private String remarks;
 
 }

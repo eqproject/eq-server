@@ -147,6 +147,24 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		return example;
 	}
 
+    /**
+     * 获取code以及用户查询实体
+     * @param orderCode
+     * @param userId
+     * @return
+     */
+	private OrderAdExample getExampleFromUserAndCode(String orderCode,long userId){
+        OrderAdExample example = new OrderAdExample();
+        OrderAdExample.Criteria ca = example.or();
+        if(!StringUtils.isEmpty(orderCode)){
+            ca.andOrderNoEqualToForAll(orderCode);
+        }
+        if(userId>0){
+            ca.andUserIdEqualToForAll(userId);
+        }
+        return example;
+    }
+
 	@Override
 	public ServieReturn<ResOrderAdVO> createResOrderAdVO(SearchAdOrderVO searchAdOrderVO, User user) {
 		String volidResult = VolidOrderInfo.volidSearchOrderAd(searchAdOrderVO);
@@ -203,10 +221,11 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 			result.setErrMsg("订单号为空");
 			return result;
 		}
-
-		OrderAd orderAd = new OrderAd();
-		orderAd.setOrderNo(searchAdOrderVO.getOrderCode());
-		orderAd = selectByRecord(orderAd);
+		OrderAd orderAd = null;
+		List<OrderAd> list =  findListByExample(getExampleFromUserAndCode(searchAdOrderVO.getOrderCode(),0));
+		if(!CollectionUtils.isEmpty(list)){
+            orderAd = list.get(0);
+        }
 		if(orderAd == null){
 			result.setErrMsg("订单不存在");
 			return result;
@@ -248,10 +267,11 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 			result.setErrMsg("用户信息为空");
 			return result;
 		}
-		OrderAd orderAd = new OrderAd();
-		orderAd.setUserId(user.getId());
-		orderAd.setOrderNo(searchAdOrderVO.getOrderCode());
-		orderAd = selectByRecord(orderAd);
+        OrderAd orderAd = null;
+        List<OrderAd> list =  findListByExample(getExampleFromUserAndCode(searchAdOrderVO.getOrderCode(),user.getId()));
+        if(!CollectionUtils.isEmpty(list)){
+            orderAd = list.get(0);
+        }
 		if(orderAd==null){
 			result.setErrMsg("订单为空，无法取消");
 			return result;

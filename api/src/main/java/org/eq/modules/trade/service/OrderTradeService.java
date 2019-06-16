@@ -4,16 +4,15 @@
  */
 package org.eq.modules.trade.service;
 
+import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.enums.OrderTradeStateEnum;
+import org.eq.modules.order.vo.ServieReturn;
 import org.eq.modules.trade.entity.OrderPaymentTrade;
 import org.eq.modules.trade.entity.OrderTrade;
 import org.eq.modules.trade.entity.OrderTradeExample;
 import org.eq.basic.common.base.ServiceExtend;
-import org.eq.modules.trade.vo.OrderTradeDetailResVO;
-import org.eq.modules.trade.vo.OrderTradeListReqVO;
-import org.eq.modules.trade.vo.OrderTradeListResVO;
-import org.eq.modules.trade.vo.OrderTradePaymentResVO;
+import org.eq.modules.trade.vo.*;
 
 import java.util.List;
 
@@ -24,7 +23,13 @@ import java.util.List;
  */
 public interface OrderTradeService extends ServiceExtend<OrderTrade,OrderTradeExample> {
 
-    OrderTrade createTradeOrder(OrderTrade orderTrade);
+    /**
+     * 创建交易订单
+     * @param orderTradeCreateReqVO
+     * @param user
+     * @return
+     */
+    ServieReturn<OrderTrade> createTradeOrder(OrderTradeCreateReqVO orderTradeCreateReqVO, User user);
 
     void cancelTradeOrder(String tradeNo);
 

@@ -195,7 +195,7 @@
     </insert>
 
 
-    <insert id="insertSelectiveAndReturnId" parameterType="org.eq.modules.trade.entity.OrderTrade">
+    <insert id="insertSelectiveAndReturnId" parameterType="org.eq.modules.trade.entity.OrderTrade"  useGeneratedKeys="true" keyProperty="id">
         <!-- 插入数据后 返回主键 -->
         <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
             SELECT LAST_INSERT_ID()

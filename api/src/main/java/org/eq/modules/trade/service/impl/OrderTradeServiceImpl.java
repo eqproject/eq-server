@@ -5,6 +5,7 @@
 package org.eq.modules.trade.service.impl;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
@@ -14,18 +15,25 @@ import org.eq.basic.common.util.StringLowUtils;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.auth.exception.UserNotExistsException;
 import org.eq.modules.auth.service.UserService;
+import org.eq.modules.bc.dao.BcTxRecordMapper;
+import org.eq.modules.bc.entity.BcTxRecord;
+import org.eq.modules.common.cache.ProductCache;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
-import org.eq.modules.enums.OrderNoPreFixEnum;
-import org.eq.modules.enums.OrderTradeStateEnum;
-import org.eq.modules.enums.SystemConfigStateEnum;
-import org.eq.modules.enums.SystemConfigTypeEnum;
+import org.eq.modules.common.factory.ResponseFactory;
+import org.eq.modules.enums.*;
+import org.eq.modules.order.entity.OrderAccept;
 import org.eq.modules.order.entity.OrderAd;
+import org.eq.modules.order.entity.OrderAdExample;
 import org.eq.modules.order.exception.OrderAdNotExistsException;
 import org.eq.modules.order.service.OrderAdService;
+import org.eq.modules.order.vo.ServieReturn;
 import org.eq.modules.product.entity.Product;
+import org.eq.modules.product.entity.ProductAll;
+import org.eq.modules.product.entity.UserProductStock;
 import org.eq.modules.product.exception.ProductNotExistsException;
 import org.eq.modules.product.service.ProductService;
+import org.eq.modules.product.service.UserProductStockService;
 import org.eq.modules.product.vo.BSearchProduct;
 import org.eq.modules.product.vo.ProductDetailVO;
 import org.eq.modules.support.dao.SystemConfigMapper;
@@ -40,6 +48,7 @@ import org.eq.modules.trade.service.OrderPaymentTradeService;
 import org.eq.modules.trade.service.OrderTradeLogService;
 import org.eq.modules.trade.service.OrderTradeService;
 import org.eq.modules.trade.vo.*;
+import org.eq.modules.utils.ProductUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +63,7 @@ import java.util.Map;
  * @author yufei.sun
  * @version 1.0
  */
+@SuppressWarnings("all")
 @Service
 @Transactional
 @AutowiredService
@@ -61,6 +71,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 
 	@Autowired
 	OrderTradeLogService  orderTradeLogService;
+
 	@Autowired
 	ProductService productService;
 
@@ -76,11 +87,25 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 	@Autowired
 	OrderPaymentTradeLogService orderPaymentTradeLogService;
 
+	@Autowired
+	private BcTxRecordMapper bcTxRecordMapper;
+
 	/**
 	 * 系统配置表
 	 */
 	@Autowired
 	private SystemConfigMapper systemConfigMapper;
+
+	@Autowired
+	private UserProductStockService userProductStockService;
+
+	@Autowired
+	private OrderTradeMapper orderTradeMapper;
+
+	@Autowired
+	private ProductCache productCache;
+
+
 
 
 	@Override
@@ -164,61 +189,145 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		return example;
 	}
 
+	/**
+	 * 获取code以及用户查询实体
+	 * @param orderCode
+	 * @param userId
+	 * @return
+	 */
+	private OrderAdExample getExampleFromUserAndCode(String orderCode,long userId){
+		OrderAdExample example = new OrderAdExample();
+		OrderAdExample.Criteria ca = example.or();
+		if(!StringUtils.isEmpty(orderCode)){
+			ca.andOrderNoEqualToForAll(orderCode);
+		}
+		if(userId>0){
+			ca.andUserIdEqualToForAll(userId);
+		}
+		return example;
+	}
+
 	@Override
-	public OrderTrade createTradeOrder(OrderTrade orderTrade) {
-
-		Product product = productService.selectByPrimaryKey(orderTrade.getProductId());
-		if (product == null) {
-			logger.error("createTradeOrder 商品ID[{}]记录不存在",orderTrade.getProductId());
-			throw new ProductNotExistsException("商品ID记录不存在");
+	public ServieReturn<OrderTrade> createTradeOrder(OrderTradeCreateReqVO orderTradeCreateReqVO,User user) {
+		ServieReturn<OrderTrade> result  = new ServieReturn<>();
+		String errMsg = VolidOrderTradeInfo.volidCreate(orderTradeCreateReqVO);
+		if(!StringUtils.isEmpty(errMsg)){
+			result.setErrMsg(errMsg);
+			return  result;
 		}
-		OrderAd orderAd = new OrderAd();
-		orderAd.setOrderNo(orderTrade.getAdNo());
-		orderAd = orderAdService.selectByRecord(orderAd);
-		if (orderAd == null) {
-			logger.error("createTradeOrder 广告订单[{}]记录不存在",orderTrade.getAdNo());
-			throw new OrderAdNotExistsException("广告订单记录不存在");
+		if(StringUtils.isEmpty(user.getAddress())){
+			result.setErrMsg("用户钱包地址未激活");
+			return  result;
+		}
+		Product product = productService.selectByPrimaryKey(orderTradeCreateReqVO.getProductId());
+		if (!ProductUtil.isEffect(product)) {
+			result.setErrMsg("商品不存在或已下架");
+			return  result;
+		}
+		ProductAll productAll = productCache.getProduct(String.valueOf(orderTradeCreateReqVO.getProductId()));
+		if(productAll==null){
+			result.setErrMsg("商品无效");
+			return result;
+		}
+		OrderAd orderAd = null;
+		List<OrderAd> list =  orderAdService.findListByExample(getExampleFromUserAndCode(orderTradeCreateReqVO.getAdNo(),0));
+		if(!CollectionUtils.isEmpty(list)){
+			orderAd = list.get(0);
+		}
+		if (orderAd == null || (orderAd.getStatus()!= OrderAdStateEnum.ORDER_TRADEING.getState())) {
+			result.setErrMsg("广告订单不存在或已下架");
+			return  result;
+		}
+		//TODO 验证用户
+		User orderUser = new User();
+
+		long sellUserId = 0;
+		long buyUserId = 0;
+		String sellAddress ="";
+		String buyAddress = "";
+		//求购订单 发生交易需要锁定用户库存
+		if(orderAd.getType() == OrderTradeTypeEnum.ORDER_BUY.getType()){
+			UserProductStock userProductStock =  userProductStockService.getUserProductStock(product.getId(),user);
+			if(userProductStock==null){
+				result.setErrMsg("用户无此商品库存信息");
+				return result;
+			}
+			int balance = userProductStock.getStockNum() - userProductStock.getLockedNum();
+			if((balance-orderTradeCreateReqVO.getOrderNum())<=0){
+				result.setErrMsg("可售卖量不足");
+				return result;
+			}
+			sellUserId = user.getId();
+			buyUserId = orderAd.getUserId();
+			sellAddress = user.getAddress();
+			buyAddress = orderUser.getAddress();
+		}else{
+			sellUserId = orderAd.getUserId();
+			buyUserId = user.getId();
+			sellAddress = orderUser.getAddress();
+			buyAddress =user.getAddress();
 		}
 
-		User buserUser = userService.selectByPrimaryKey(orderTrade.getBuyUserId());
-		if (buserUser == null) {
-			logger.error("createTradeOrder 买家[{}]用户记录不存在",orderTrade.getBuyUserId());
-			throw new UserNotExistsException("买家用户记录不存在");
+		int lockNum = 3;
+		boolean islock = false;
+		while(lockNum>0 && !islock){
+			islock = lockOrderAd(orderAd,orderTradeCreateReqVO.getOrderNum());
+			lockNum--;
 		}
-
-		User sellUser = userService.selectByPrimaryKey(orderAd.getUserId());
-		if (sellUser == null) {
-			logger.error("createTradeOrder 卖家[{}]用户记录不存在",orderAd.getUserId());
-			throw new UserNotExistsException("卖家用户记录不存在");
+		if(!islock){
+			result.setErrMsg("交易量超出订单量");
+			return  result;
 		}
-		Date nowDate = DateUtil.getNowTime();
-
-		orderTrade.setCreateDate(nowDate);
-		orderTrade.setUpdateDate(nowDate);
-		orderTrade.setUnitPrice(product.getUnitPrice());
-		orderTrade.setAmount(orderTrade.getOrderNum()*orderTrade.getSalePrice());
-		orderTrade.setSellUserId(orderAd.getUserId());
+		OrderTrade orderTrade = new OrderTrade();
+		orderTrade.setSellUserId(sellUserId);
+		orderTrade.setBuyUserId(buyUserId);
+		orderTrade.setTradeNo(OrderNoGenerateUtil.generateNo(OrderNoPreFixEnum.TRADE_NO));
+		orderTrade.setAdNo(orderAd.getOrderNo());
+		orderTrade.setProductId(product.getId());
+		orderTrade.setOrderNum(orderTradeCreateReqVO.getOrderNum());
+		orderTrade.setType(orderAd.getType());
 		orderTrade.setStatus(OrderTradeStateEnum.WAIT_PAY.getState());
-		orderTrade.setRemindPay(0);// 未催款
+		orderTrade.setBlockchainStatus(OrderTradeBlockChainStateEnum.PROCESSING.getState());
+		orderTrade.setSalePrice(orderTradeCreateReqVO.getSalePrice());
+		orderTrade.setUnitPrice(product.getUnitPrice());
+		orderTrade.setAmount(orderTrade.getOrderNum() * orderTrade.getSalePrice());
+		orderTrade.setRemindPay(0);
+		orderTrade.setCreateDate(new Date());
+		orderTrade.setFinishTime(DateUtil.afterDateHour(orderTrade.getCreateDate(),getOverHour()));
+		orderTrade.setRemarks("");
+		orderTrade.setUpdateDate(new Date());
 
-		String tradeNo = OrderNoGenerateUtil.generateNo(OrderNoPreFixEnum.TRADE_NO);
-		orderTrade.setTradeNo(tradeNo);
-		Long orderTradeId = getMapper().insertSelectiveAndReturnId(orderTrade);
+		long insertId=orderTradeMapper.insertSelectiveAndReturnId(orderTrade);
+		if(insertId<=0){
+			result.setErrMsg("创建交易订单失败");
+			return  result;
+		}
+		BcTxRecord bcTxRecord = insertBx(productAll,sellAddress,buyAddress,orderTrade.getOrderNum());
+		if(bcTxRecord==null || bcTxRecord.getId()<=0 ){
+			result.setErrMsg("创建失败");
+			return  result;
+		}
+
+		OrderTrade updateOrderTrade = new OrderTrade();
+		updateOrderTrade.setId(insertId);
+		updateOrderTrade.setTxId(bcTxRecord.getId());
+		updateByPrimaryKeySelective(updateOrderTrade);
+
 
 		// 插入交易日志
 		OrderTradeLog orderTradeLog = new OrderTradeLog();
 		orderTradeLog.setOldStatus(OrderTradeStateEnum.WAIT_PAY.getState());
 		orderTradeLog.setNewStatus(OrderTradeStateEnum.WAIT_PAY.getState());
-		orderTradeLog.setOrderTradeId(orderTradeId);
+		orderTradeLog.setOrderTradeId(insertId);
 		orderTradeLog.setCreateDate(orderTrade.getCreateDate());
-		orderTradeLog.setRemarks(tradeNo);
+		orderTradeLog.setRemarks(orderTrade.getTradeNo());
 		orderTradeLogService.insertSelective(orderTradeLog);
 
 		// 插入支付记录
 		OrderPaymentTrade orderPaymentTrade = new OrderPaymentTrade();
-		orderPaymentTrade.setTradeNo(tradeNo);
-		orderPaymentTrade.setCreateDate(nowDate);
-		orderPaymentTrade.setUpdateDate(nowDate);
+		orderPaymentTrade.setTradeNo(orderTrade.getTradeNo());
+		orderPaymentTrade.setCreateDate(new Date());
+		orderPaymentTrade.setUpdateDate(new Date());
 		orderPaymentTrade.setProductId(orderTrade.getProductId());
 		orderPaymentTrade.setOrderNum(orderTrade.getOrderNum());
 		orderPaymentTrade.setServiceFee(orderTrade.getServiceFee());
@@ -227,17 +336,12 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		// 插入支付日志记录
 		OrderPaymentTradeLog orderPaymentTradeLog = new OrderPaymentTradeLog();
 		orderPaymentTradeLog.setOrderPayTradeId(orderPaymentTradeId);
-		orderPaymentTradeLog.setCreateDate(nowDate);
+		orderPaymentTradeLog.setCreateDate(new Date());
 		orderPaymentTradeLog.setOldStatus(orderPaymentTrade.getStatus());
 		orderPaymentTradeLog.setNewStatus(orderPaymentTrade.getStatus());
 		orderPaymentTradeLogService.insertSelective(orderPaymentTradeLog);
-
-		// 增加广告订单交易中的数量
-		orderAd.setTradingNum(orderAd.getTradingNum()+orderTrade.getOrderNum());
-		orderAd.setUpdateDate(nowDate);
-		orderAdService.updateByPrimaryKeySelective(orderAd);
-
-		return orderTrade;
+		result.setData(orderTrade);
+		return result;
 	}
 
 	@Override
@@ -506,7 +610,62 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 			logger.error("获取交易订单关闭时长配置异常");
 		}
 		return result;
+	}
 
+	/**
+	 * 锁定交易量
+	 * @param orderAd
+	 * @param addLockNum
+	 * @return
+	 */
+	private boolean lockOrderAd(OrderAd orderAd,int addLockNum){
+		if(orderAd==null || orderAd.getProductNum() ==null){
+			return false;
+		}
+		if(orderAd.getProductNum()<addLockNum){
+			return false;
+		}
+		if(orderAd.getId()<=0){
+			return false;
+		}
+		int oldProductNum = orderAd.getProductNum()==null?0:orderAd.getProductNum();
+		int oldTradingNm  = orderAd.getTradingNum()==null?0:orderAd.getTradingNum();
+		OrderAd updateOrderAd = new OrderAd();
+		updateOrderAd.setProductNum(oldProductNum-addLockNum);
+		updateOrderAd.setTradingNum(oldTradingNm+addLockNum);
+		updateOrderAd.setUpdateDate(new Date());
+
+		OrderAdExample example = new OrderAdExample();
+		OrderAdExample.Criteria ca = example.or();
+		ca.andIdEqualToForUpdate(orderAd.getId());
+		ca.andProductNumEqualToForUpdate(oldProductNum);
+		ca.andTradingNumEqualToForUpdate(oldTradingNm);
+
+		if(orderAdService.updateByExampleSelective(updateOrderAd,example)<=0){
+			return  false;
+		}
+		return true;
+
+	}
+
+	private BcTxRecord insertBx(ProductAll productAll,String fromAddress,String toAddress,int number){
+		BcTxRecord bcTxRecord = new BcTxRecord();
+		bcTxRecord.setFromAddress(fromAddress);
+		bcTxRecord.setToAddress(toAddress);
+		bcTxRecord.setTransferAmount(String.valueOf(number));
+		bcTxRecord.setTicketid(productAll.getTicketid());
+		bcTxRecord.setTrancheid(productAll.getTrancheid());
+		bcTxRecord.setAssetCode(productAll.getAssetCode());
+		bcTxRecord.setAssetIssuer(productAll.getAssetIssuer());
+		bcTxRecord.setContractAddress(productAll.getContractAddress());
+		bcTxRecord.setAssetType(1);
+		bcTxRecord.setTxStatus(0);
+		bcTxRecord.setBizType(2);
+		bcTxRecord.setCreateTime(new Date());
+		bcTxRecord.setUpdateTime(new Date());
+		bcTxRecord.setOptMetadata("用户地址:"+fromAddress+" 转往"+toAddress);
+		bcTxRecordMapper.insertSelective(bcTxRecord);
+		return bcTxRecord;
 
 	}
 }

@@ -157,6 +157,25 @@ public class DateUtil {
         return null;
     }
 
+
+    /**
+     * 返回多少小时之前的时间
+     * @param date
+     * @param hour
+     * @return
+     */
+    public static Date afterDateHour(Date date,int hour) {
+        try {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.HOUR,hour);
+            return calendar.getTime();
+        } catch (Exception e) {
+            logBase.error("beforeDateHour异常", e);
+        }
+        return null;
+    }
+
     /**
      * 返回30天之前的时间
      * @param date

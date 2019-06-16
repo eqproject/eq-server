@@ -1181,7 +1181,7 @@
 ###### 请求参数
 > |参数|必选|类型|说明|
 |:-----  |:-------|:-----|----- |
-|buyUserId|true|long  |购买用户id|
+|userId|true|long  |用户ID|
 |adNo|true|string  |广告订单号|
 |productId|true| long |商品id|
 |orderNum|true|int  |订单数量|
