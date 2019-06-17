@@ -246,7 +246,9 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             user.setId(Long.parseLong(userId));
             //AES解密
             String password = AESUtils.decrypt(pwd, aesKey);
-
+            if(password == null || "".equals(password)){
+                return ResponseFactory.businessError("密码修改失败");
+            }
             String content = userId + password + MD5_KEY;
             user.setPassword(MD5Utils.digestAsHex(content));
             user.setUpdateDate(new Date());
@@ -275,6 +277,9 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             }
             //AES解密
             String password = AESUtils.decrypt(pwd, aesKey);
+            if(password == null || "".equals(password)){
+                return ResponseFactory.businessError("登陆失败");
+            }
             String content = checkUser.getId() + password + MD5_KEY;
             user.setPassword(MD5Utils.digestAsHex(content));
             User currUser = selectByRecord(user);
