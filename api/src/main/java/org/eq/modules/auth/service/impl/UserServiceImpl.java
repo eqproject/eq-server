@@ -275,6 +275,9 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             }
             //AES解密
             String password = AESUtils.decrypt(pwd, aesKey);
+            if(password == null || "".equals(password)){
+                return ResponseFactory.businessError("登陆失败");
+            }
             String content = checkUser.getId() + password + MD5_KEY;
             user.setPassword(MD5Utils.digestAsHex(content));
             User currUser = selectByRecord(user);
