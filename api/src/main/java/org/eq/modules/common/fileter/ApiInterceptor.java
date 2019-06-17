@@ -107,9 +107,11 @@ public class ApiInterceptor  implements HandlerInterceptor {
             return;
         }
 
+        /*
+        暂时不验证钱包是否激活
         UserWallet userWallet = userWalletService.selectByPrimaryKey(userId);
         if(userWallet==null || userWallet.getStatus()== WalletStateEnum.NO_ACTIVE.getState()){
             throw new BizException(ResponseStateEnum.USER_WALLET_INACTIVE);
-        }
+        }*/
     }
 }
