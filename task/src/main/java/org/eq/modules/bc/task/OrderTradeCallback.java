@@ -2,7 +2,7 @@ package org.eq.modules.bc.task;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.eq.modules.bc.enums.BcTxRecordBizTypeEnum;
-import org.eq.modules.bc.service.BcTaskCallBack;
+import org.eq.modules.bc.service.AbstractTaskCallBack;
 import org.eq.modules.enums.OrderTransferStateEnum;
 import org.eq.modules.order.dao.OrderTransferLogMapper;
 import org.eq.modules.order.dao.OrderTransferMapper;
@@ -34,7 +34,7 @@ public class OrderTradeCallback {
     private static OrderTransferLogMapper orderTransferLogMapper;
 
     public static void main(String[] args) {
-        new BcTaskCallBack(BcTxRecordBizTypeEnum.TRANSFER,new OrderTradeCallback()){
+        new AbstractTaskCallBack(BcTxRecordBizTypeEnum.TRANSFER,new OrderTradeCallback()){
 
             @Override
             public void success(String txId) {

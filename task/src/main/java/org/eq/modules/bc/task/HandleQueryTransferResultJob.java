@@ -1,6 +1,5 @@
 package org.eq.modules.bc.task;
 
-import com.google.common.reflect.Reflection;
 import io.bumo.model.response.result.data.TransactionHistory;
 import org.eq.modules.bc.common.ConstantsUtil;
 import org.eq.modules.bc.common.log.LoggerFactory;
@@ -11,7 +10,7 @@ import org.eq.modules.bc.entity.BcTxRecord;
 import org.eq.modules.bc.entity.BlockchainTx;
 import org.eq.modules.bc.enums.BcStatusEnum;
 import org.eq.modules.bc.external.bc.BlockChainManager;
-import org.eq.modules.bc.service.BcTaskCallBack;
+import org.eq.modules.bc.service.AbstractTaskCallBack;
 import org.eq.modules.bc.service.BcTxService;
 import org.eq.modules.bc.service.BlockChainTxService;
 import org.slf4j.Logger;
@@ -89,7 +88,7 @@ public class HandleQueryTransferResultJob {
 				Integer bizType = bcTxRecord.getBizType();
 				String txId = String.valueOf(bcTxRecord.getId());
 
-				Object instance = BcTaskCallBack.getInstance(bizType);
+				Object instance = AbstractTaskCallBack.getInstance(bizType);
 				Method method = ReflectionUtils.findMethod(instance.getClass(),"success",String.class);
 				ReflectionUtils.invokeMethod(method,instance,txId);
 			}

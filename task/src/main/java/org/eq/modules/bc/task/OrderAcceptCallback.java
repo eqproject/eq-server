@@ -1,9 +1,8 @@
 package org.eq.modules.bc.task;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.eq.modules.bc.dao.BcTxRecordMapper;
 import org.eq.modules.bc.enums.BcTxRecordBizTypeEnum;
-import org.eq.modules.bc.service.BcTaskCallBack;
+import org.eq.modules.bc.service.AbstractTaskCallBack;
 import org.eq.modules.enums.OrderAcceptStateEnum;
 import org.eq.modules.order.dao.OrderAcceptLogMapper;
 import org.eq.modules.order.dao.OrderAcceptMapper;
@@ -34,7 +33,7 @@ public class OrderAcceptCallback {
     private static OrderAcceptLogMapper orderAcceptLogMapper;
 
     public static void main(String[] args) {
-        new BcTaskCallBack(BcTxRecordBizTypeEnum.ACCEPT,new OrderAcceptCallback()){
+        new AbstractTaskCallBack(BcTxRecordBizTypeEnum.ACCEPT,new OrderAcceptCallback()){
 
             @Override
             public void success(String txId) {
