@@ -52,7 +52,8 @@ public class OrderTradeController extends BaseController {
         if(!StringUtils.isEmpty(errMsg)){
             return ResponseFactory.paramsError(errMsg);
         }
-        User user = getUserInfo(orderTradeCreateReqVO.getBuyUserId());
+        //TODO 验证用户可用性
+        User user = getUserInfo(orderTradeCreateReqVO.getUserId());
         if(user==null){
             return ResponseFactory.signError("用户不存在");
         }
@@ -81,7 +82,7 @@ public class OrderTradeController extends BaseController {
      * @param orderTradeCancelReqVO
      * @return
      */
-    @GetMapping("/cancel")
+    @PostMapping("/cancel")
     public ResponseData<OrderTradeCancelResVO> cancelTradeOrder(OrderTradeCancelReqVO orderTradeCancelReqVO) {
         if (orderTradeCancelReqVO == null) {
             logger.error("cancelTradeOrder 失败，原因是 orderTradeCancelReqVO is null");
@@ -172,7 +173,7 @@ public class OrderTradeController extends BaseController {
      * @param orderTradeListReqVO
      * @return
      */
-    @GetMapping("/paying/list")
+    @PostMapping("/paying/list")
     public ResponseData<PageResultData> payingOrderTradeList(OrderTradeListReqVO orderTradeListReqVO) {
         if (orderTradeListReqVO == null) {
             logger.error("payingOrderTradeList 失败，原因是 orderTradeListReqVO is null");
@@ -200,7 +201,7 @@ public class OrderTradeController extends BaseController {
      * @param orderTradeListReqVO
      * @return
      */
-    @GetMapping("/porcessing/list")
+    @PostMapping("/porcessing/list")
     public ResponseData<PageResultData> porcessingOrderTradeList(OrderTradeListReqVO orderTradeListReqVO) {
         if (orderTradeListReqVO == null) {
             logger.error("porcessingOrderTradeList 失败，原因是 orderTradeListReqVO is null");

@@ -27,11 +27,8 @@ public class VolidOrderTradeInfo {
         if(orderTradeCreateReqVO==null){
             return  "请求参数为空";
         }
-        if(orderTradeCreateReqVO.getBuyUserId()<=0){
+        if(orderTradeCreateReqVO.getUserId()<=0){
             return "用户为空";
-        }
-        if(orderTradeCreateReqVO.getProductId()<=0){
-            return "商品Id为空";
         }
         if(orderTradeCreateReqVO.getOrderNum()<=0){
             return "交易订单数量必须大于0";
@@ -41,10 +38,6 @@ public class VolidOrderTradeInfo {
         }
         if(orderTradeCreateReqVO.getSalePrice()<=0){
             return "价格必须大于0";
-        }
-        String result = OrderTradeTypeEnum.getRemarkByType(orderTradeCreateReqVO.getType());
-        if(StringUtils.isEmpty(result)){
-            return "交易订单类型非法";
         }
         return null;
     }

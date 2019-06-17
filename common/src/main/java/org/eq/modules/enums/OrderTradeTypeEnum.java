@@ -7,8 +7,8 @@ package org.eq.modules.enums;
  */
 public enum OrderTradeTypeEnum {
 
-    ORDER_SALE(1,"出售广告"),
-    ORDER_BUY(2,"求购广告");
+    ORDER_SALE(1,"售卖类型(求购广告)"),
+    ORDER_BUY(2,"购买交易(售卖广告)");
 
 
     OrderTradeTypeEnum(int type, String remark) {

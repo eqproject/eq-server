@@ -16,7 +16,8 @@ import java.io.Serializable;
 public class OrderTradeCancelResVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String tradeNo; // 交易订单号
+    // 交易订单号
+    private String tradeNo;
 
     public OrderTradeCancelResVO(String tradeNo) {
         this.tradeNo = tradeNo;

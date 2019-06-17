@@ -31,8 +31,17 @@ public interface OrderTradeService extends ServiceExtend<OrderTrade,OrderTradeEx
      */
     ServieReturn<OrderTrade> createTradeOrder(OrderTradeCreateReqVO orderTradeCreateReqVO, User user);
 
+    /**
+     * 取消交易订单
+     * @param tradeNo 交易订单号
+     */
     void cancelTradeOrder(String tradeNo);
 
+    /**
+     * 获取详情
+     * @param tradeNo
+     * @return
+     */
     OrderTradeDetailResVO tradeOrderDetail(String tradeNo);
 
     OrderTradePaymentResVO orderPaymentTradeNotify(OrderPaymentTrade orderPaymentTrade);

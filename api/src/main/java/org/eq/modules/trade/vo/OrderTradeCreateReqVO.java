@@ -18,15 +18,12 @@ public class OrderTradeCreateReqVO extends SearchBase{
     /**
      * 购买人用户ID
      */
-    private long buyUserId;
+    private long userId;
     /**
      * 订单号
      */
     private String adNo;
-    /**
-     * 商品ID
-     */
-    private long productId;
+
     /**
      * 订单数量
      */
@@ -35,15 +32,7 @@ public class OrderTradeCreateReqVO extends SearchBase{
      * 出价
      */
     private int salePrice;
-    /**
-     * 服务费
-     */
-    private double serviceFee;
 
-    /**
-     * 交易订单类型
-     */
-    private int type;
     /**
      * 备注
      */

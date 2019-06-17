@@ -1179,15 +1179,16 @@
 > POST
 
 ###### 请求参数
+
 > |参数|必选|类型|说明|
 |:-----  |:-------|:-----|----- |
-|userId|true|long  |用户ID|
+|**userId**|true|long  |用户ID|
 |adNo|true|string  |广告订单号|
-|productId|true| long |商品id|
+|~~**productId**~~|true| long |商品id|
 |orderNum|true|int  |订单数量|
 |salePrice |true|int  |商品售价(单位:分)|
-|serviceFee|true|int  |服务费(单位:分)|
-|type|true|int|订单类型:(1:出售;2:求购)|
+|~~**serviceFee**~~|true|int  |服务费(单位:分)|
+|~~**type**~~|true|int|订单类型:(1:出售;2:求购)|
 |remarks|false|string|交易描述|
 |sign|true|string|签名|
 
@@ -1228,7 +1229,7 @@
 > JSON
 
 ###### HTTP请求方式
-> GET
+> **POST**
 
 ###### 请求参数
 > |参数|必选|类型|说明|
@@ -1401,7 +1402,7 @@
 > JSON
 
 ###### HTTP请求方式
-> GET
+> post
 
 ###### 请求参数
 > |参数|必选|类型|说明|
@@ -1488,7 +1489,7 @@
 > JSON
 
 ###### HTTP请求方式
-> GET
+> POST
 
 ###### 请求参数
 > |参数|必选|类型|说明|
