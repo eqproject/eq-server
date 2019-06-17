@@ -18,7 +18,7 @@ public class OrderTradeCreateReqVO extends SearchBase{
     /**
      * 购买人用户ID
      */
-    private long userId;
+    private long buyUserId;
     /**
      * 订单号
      */

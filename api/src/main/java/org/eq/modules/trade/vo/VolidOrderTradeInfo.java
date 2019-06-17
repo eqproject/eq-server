@@ -27,7 +27,7 @@ public class VolidOrderTradeInfo {
         if(orderTradeCreateReqVO==null){
             return  "请求参数为空";
         }
-        if(orderTradeCreateReqVO.getUserId()<=0){
+        if(orderTradeCreateReqVO.getBuyUserId()<=0){
             return "用户为空";
         }
         if(orderTradeCreateReqVO.getProductId()<=0){

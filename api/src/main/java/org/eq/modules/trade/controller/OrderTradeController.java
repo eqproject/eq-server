@@ -52,7 +52,7 @@ public class OrderTradeController extends BaseController {
         if(!StringUtils.isEmpty(errMsg)){
             return ResponseFactory.paramsError(errMsg);
         }
-        User user = getUserInfo(orderTradeCreateReqVO.getUserId());
+        User user = getUserInfo(orderTradeCreateReqVO.getBuyUserId());
         if(user==null){
             return ResponseFactory.signError("用户不存在");
         }
