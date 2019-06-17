@@ -1,4 +1,4 @@
-package org.eq.modules.bc.task;
+package org.eq.modules.order.biz;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.eq.modules.bc.enums.BcTxRecordBizTypeEnum;
@@ -23,7 +23,7 @@ import java.util.List;
  * @version 2019/6/10
  */
 @Component
-public class OrderTradeCallback {
+public class OrderTradeCallback extends AbstractTaskCallBack {
 
     private static Logger logger = LoggerFactory.getLogger(OrderTradeCallback.class);
 
@@ -33,33 +33,33 @@ public class OrderTradeCallback {
     @Autowired
     private static OrderTransferLogMapper orderTransferLogMapper;
 
-    public static void main(String[] args) {
-        new AbstractTaskCallBack(BcTxRecordBizTypeEnum.TRANSFER,new OrderTradeCallback()){
+    public OrderTradeCallback() {
+        super(BcTxRecordBizTypeEnum.TRANSFER.getCode());
+    }
 
-            @Override
-            public void success(String txId) {
-                OrderTransfer orderTransfer =   getTransferByTxId(txId);
-                if(orderTransfer ==null){
-                    return ;
-                }
-                boolean updateResult = opTransfer(orderTransfer,true);
-                if(!updateResult){
-                    logger.error("更新转让表数据失败,转让表Id:{}",orderTransfer.getId());
-                }
-            }
 
-            @Override
-            public void fail(String txId) {
-                OrderTransfer orderTransfer =   getTransferByTxId(txId);
-                if(orderTransfer ==null){
-                    return ;
-                }
-                boolean updateResult = opTransfer(orderTransfer,false);
-                if(!updateResult){
-                    logger.error("更新转让表数据失败,转让表Id:{}",orderTransfer.getId());
-                }
-            }
-        };
+    @Override
+    public void success(String txId) {
+        OrderTransfer orderTransfer =   getTransferByTxId(txId);
+        if(orderTransfer ==null){
+            return ;
+        }
+        boolean updateResult = opTransfer(orderTransfer,true);
+        if(!updateResult){
+            logger.error("更新转让表数据失败,转让表Id:{}",orderTransfer.getId());
+        }
+    }
+
+    @Override
+    public void fail(String txId) {
+        OrderTransfer orderTransfer =   getTransferByTxId(txId);
+        if(orderTransfer ==null){
+            return ;
+        }
+        boolean updateResult = opTransfer(orderTransfer,false);
+        if(!updateResult){
+            logger.error("更新转让表数据失败,转让表Id:{}",orderTransfer.getId());
+        }
     }
 
     /**
@@ -111,9 +111,5 @@ public class OrderTradeCallback {
         orderTransferLog.setRemarks("区块链接口回调结果。返回"+isSuccess +", 更新转让表");
         orderTransferLogMapper.insertSelective(orderTransferLog);
         return true;
-
-
-
-
     }
 }

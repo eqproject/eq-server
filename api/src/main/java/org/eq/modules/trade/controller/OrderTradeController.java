@@ -137,26 +137,16 @@ public class OrderTradeController extends BaseController {
      */
     @PostMapping("/pay/notify")
     public ResponseData<OrderTradePaymentResVO> orderPaymentTradeNotify(OrderTradePaymentReqVO orderTradePaymentReqVO) {
-        if (orderTradePaymentReqVO == null) {
-            logger.error("createOrderTradePayment 失败，原因是 orderTradePaymentReqVO is null");
-            return ResponseFactory.paramsError("请求参数不能为空");
+        String errMsg = VolidOrderTradeInfo.volidPayNotify(orderTradePaymentReqVO);
+        if(!StringUtils.isEmpty(errMsg)){
+            return ResponseFactory.paramsError(errMsg);
         }
+
         logger.info("createOrderTradePayment 请求参数:{}",JSON.toJSONString(orderTradePaymentReqVO));
-        OrderPaymentTrade orderPaymentTrade = new OrderPaymentTrade();
-        try {
-            BeanUtils.copyProperties(orderPaymentTrade, orderTradePaymentReqVO);
-            orderPaymentTrade.setAmount(orderTradePaymentReqVO.getPayAmout());
-            orderPaymentTrade.setStatus(orderTradePaymentReqVO.getPayStatus());
-        } catch (IllegalAccessException e) {
-            logger.error("createOrderTradePayment 失败，原因是",e);
-            return ResponseFactory.paramsError("请求参数错误");
-        } catch (InvocationTargetException e) {
-            logger.error("createOrderTradePayment 失败，原因是",e);
-            return ResponseFactory.paramsError("请求参数错误");
-        }
+
         OrderTradePaymentResVO orderTradePaymentResVO;
         try {
-            orderTradePaymentResVO = orderTradeService.orderPaymentTradeNotify(orderPaymentTrade);
+            orderTradePaymentResVO = orderTradeService.orderPaymentTradeNotify(orderTradePaymentReqVO);
         } catch (BaseServiceException e) {
             logger.error("createOrderTradePayment 失败，原因是:{}",e.getMessage());
             return ResponseFactory.paramsError(e.getMessage());

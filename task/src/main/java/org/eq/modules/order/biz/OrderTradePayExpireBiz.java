@@ -199,6 +199,10 @@ public class OrderTradePayExpireBiz {
     }
 
 
+    /**
+     * 只有在交易订单关闭的情况下方可进行此操作
+     * @param orderTrade
+     */
     public void concelOrderTradeStock(OrderTrade orderTrade){
         OrderAdExample orderAdExample = new OrderAdExample();
         OrderAdExample.Criteria criteria1 = orderAdExample.or();
@@ -232,15 +236,11 @@ public class OrderTradePayExpireBiz {
         }
         //出售广告，说明库存已锁定
         if(orderAd.getType() == OrderAdTypeEnum.ORDER_SALE.getType()){
-
             if(orderAd.getStatus() == OrderAdStateEnum.ORDER_CANCEL.getState()){
-                updateStock(orderAd.getUserId(),orderAd.getProductId(),-num);
+                updateStock(orderAd.getUserId(),orderAd.getProductId(),-orderTrade.getOrderNum());
             }
-
-        }else{
-            if(orderAd.getStatus() == OrderAdStateEnum.ORDER_CANCEL.getState()){
-                updateStock(orderTrade.getSellUserId(),orderTrade.getProductId(),-num);
-            }
+        }else{//求购广告 广告不锁定库存，但是交易订单锁定
+            updateStock(orderTrade.getSellUserId(),orderTrade.getProductId(),-orderTrade.getOrderNum());
         }
 
     }
@@ -288,6 +288,9 @@ public class OrderTradePayExpireBiz {
         }
         return example;
     }
+
+
+
 
 
 }

@@ -44,7 +44,12 @@ public interface OrderTradeService extends ServiceExtend<OrderTrade,OrderTradeEx
      */
     OrderTradeDetailResVO tradeOrderDetail(String tradeNo);
 
-    OrderTradePaymentResVO orderPaymentTradeNotify(OrderPaymentTrade orderPaymentTrade);
+    /**
+     * 支付结果通知
+     * @param orderTradePaymentReqVO
+     * @return
+     */
+    OrderTradePaymentResVO orderPaymentTradeNotify(OrderTradePaymentReqVO orderTradePaymentReqVO);
 
 
     PageResultData<OrderTradeListResVO> pageTradeOrderList(OrderTradeListReqVO orderTradeListReqVO,List<Integer> orderTradeStatus);

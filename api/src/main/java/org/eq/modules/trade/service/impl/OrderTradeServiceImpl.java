@@ -407,61 +407,65 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 	}
 
 	@Override
-	public OrderTradePaymentResVO orderPaymentTradeNotify(OrderPaymentTrade orderPaymentTrade) {
+	public OrderTradePaymentResVO orderPaymentTradeNotify(OrderTradePaymentReqVO orderTradePaymentReqVO) {
+
+		OrderTradePaymentResVO result = new OrderTradePaymentResVO();
 
 		OrderTrade orderTrade = new OrderTrade();
-		orderTrade.setTradeNo(orderPaymentTrade.getTradeNo());
+		orderTrade.setTradeNo(orderTradePaymentReqVO.getTradeNo());
 		orderTrade = selectByRecord(orderTrade);
 		if (orderTrade == null) {
-			logger.error("orderPaymentTradeNotify 交易单号[{}]记录不存在",orderPaymentTrade.getTradeNo());
 			throw new TradeOrderException("交易单号记录不存在");
 		}
+		boolean isSuccess= "1".equals(String.valueOf(orderTradePaymentReqVO.getPayStatus()))? true : false;
 
-		OrderPaymentTrade orderPaymentTradeOld = orderPaymentTradeService.findOrderPaymentTradeByTradeNo(orderPaymentTrade.getTradeNo());
-		if (orderPaymentTradeOld == null) {
-			logger.error("orderPaymentTradeNotify 交易单号[{}]支付记录不存在",orderPaymentTrade.getTradeNo());
-			throw new PaymentTradeOrderNotExistsException("交易单号支付记录不存在");
+		OrderPaymentTrade orderPaymentTrade = insertOrderPayment(orderTrade,isSuccess,orderTradePaymentReqVO.getPayNo(),orderTradePaymentReqVO.getPayType());
+		if(orderPaymentTrade ==null){
+			logger.error(" 插入支付流水失败");
+			throw new TradeOrderException("插入支付流水记录失败");
 		}
+		result.setTradeNo(orderTrade.getTradeNo());
 
-		Integer oldStatus = orderPaymentTradeOld.getStatus();
-		Date nowDate = DateUtil.getNowTime();
+		Integer oldStatus = orderTrade.getStatus();
+		OrderTradeExample updateOrderTrade = new OrderTradeExample();
+		OrderTradeExample.Criteria updateOrderCa = updateOrderTrade.or();
+		updateOrderCa.andIdEqualTo(orderTrade.getId());
+		updateOrderCa.andStatusEqualTo(oldStatus);
 
-		orderPaymentTradeOld.setPayTime(nowDate);
-		orderPaymentTradeOld.setStatus(orderPaymentTrade.getStatus());
-		orderPaymentTradeOld.setUpdateDate(nowDate);
-		orderPaymentTradeOld.setPayNo(orderPaymentTrade.getPayNo());
-		orderPaymentTradeOld.setPayType(orderPaymentTrade.getPayType());
-		orderPaymentTradeOld.setAmount(orderPaymentTrade.getAmount());
-		orderPaymentTradeService.updateByPrimaryKeySelective(orderPaymentTradeOld);
-
-		OrderPaymentTradeLog orderPaymentTradeLog = new OrderPaymentTradeLog();
-		orderPaymentTradeLog.setOrderPayTradeId(orderPaymentTradeOld.getId());
-		orderPaymentTradeLog.setCreateDate(nowDate);
-		orderPaymentTradeLog.setOldStatus(oldStatus);
-		orderPaymentTradeLog.setNewStatus(orderPaymentTrade.getStatus());
-		orderPaymentTradeLogService.insertSelective(orderPaymentTradeLog);
-
-
-		oldStatus = orderTrade.getStatus();
-		if (OrderTradeStateEnum.PAY_SUCCESS.getState() == orderPaymentTrade.getStatus()) { // 支付成功
-			orderTrade.setStatus(OrderTradeStateEnum.VOUCHER_ING.getState());
-		} else if (OrderTradeStateEnum.PAY_FAIL.getState() == orderPaymentTrade.getStatus()) { // 支付失败
-			orderTrade.setStatus(orderPaymentTrade.getStatus());
+		OrderTrade updateObj = new OrderTrade();
+		updateObj.setId(orderTrade.getId());
+		if(isSuccess){
+			updateObj.setStatus(OrderTradeStateEnum.PAY_SUCCESS.getState());
+		}else{
+			updateObj.setStatus(OrderTradeStateEnum.PAY_FAIL.getState());
 		}
-		orderTrade.setUpdateDate(nowDate);
-		getMapper().updateByPrimaryKeySelective(orderTrade);
+		updateObj.setUpdateDate(new Date());
+		int number = updateByExampleSelective(updateObj,updateOrderTrade);
+		if(number<=0){
+			throw new TradeOrderException("更改交易订单失败");
+		}
 
 		OrderTradeLog orderTradeLog = new OrderTradeLog();
 		orderTradeLog.setOldStatus(oldStatus);
-		orderTradeLog.setNewStatus(orderTrade.getStatus());
+		orderTradeLog.setNewStatus(updateObj.getStatus());
 		orderTradeLog.setOrderTradeId(orderTrade.getId());
-		orderTradeLog.setCreateDate(nowDate);
-		orderTradeLog.setRemarks(orderTrade.getTradeNo());
+		orderTradeLog.setCreateDate(new Date());
+		orderTradeLog.setRemarks("通知成功，完成支付流水入库");
 		orderTradeLogService.insertSelective(orderTradeLog);
+		if(!isSuccess){
+			return result;
+		}
+		BSearchProduct bSearchProduct = new BSearchProduct();
+		bSearchProduct.setProductId(orderTrade.getProductId());
+		ProductDetailVO productDetailVO = productService.getProductAll(bSearchProduct);
+		if(productDetailVO==null){
+			logger.error("交易订单:{}",orderTrade.getTradeNo()+" 支付成功，但获取商品失败，状态无法变为放券中");
+			return result;
+		}
+		orderTrade.setStatus(OrderTradeStateEnum.VOUCHER_ING.getState());
 
-		OrderTradePaymentResVO orderTradePaymentResVO = new OrderTradePaymentResVO();
-		orderTradePaymentResVO.setTradeNo(orderPaymentTrade.getTradeNo());
-		return orderTradePaymentResVO;
+
+		return result;
 	}
 
 	@Override
@@ -658,16 +662,25 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 	 * 插入交易流水表数据
 	 * @param orderTrade
 	 */
-	private void insertOrderPayment(OrderTrade orderTrade){
+	private OrderPaymentTrade insertOrderPayment(OrderTrade orderTrade,boolean ispass,String payNo,int payType){
 
 		// 插入支付记录
 		OrderPaymentTrade orderPaymentTrade = new OrderPaymentTrade();
 		orderPaymentTrade.setTradeNo(orderTrade.getTradeNo());
-		orderPaymentTrade.setCreateDate(new Date());
-		orderPaymentTrade.setUpdateDate(new Date());
+		orderPaymentTrade.setPayNo(payNo);
+		orderPaymentTrade.setPayType(payType);
+		orderPaymentTrade.setPayeeUser(String.valueOf(orderTrade.getBuyUserId()));
+		orderPaymentTrade.setPayeeUser(String.valueOf(orderTrade.getSellUserId()));
 		orderPaymentTrade.setProductId(orderTrade.getProductId());
 		orderPaymentTrade.setOrderNum(orderTrade.getOrderNum());
 		orderPaymentTrade.setServiceFee(orderTrade.getServiceFee());
+		orderPaymentTrade.setAmount(orderTrade.getAmount());
+		orderPaymentTrade.setRemarks("回调");
+		orderPaymentTrade.setCreateDate(new Date());
+		orderPaymentTrade.setUpdateDate(new Date());
+		int state = ispass?OrderPaymentTradeStateEnum.PAY_SUCCESS.getState() : OrderPaymentTradeStateEnum.PAY_FAIL.getState();
+		orderPaymentTrade.setStatus(state);
+
 		Long orderPaymentTradeId = orderPaymentTradeService.insertOrderPaymentTradeReturnId(orderPaymentTrade);
 
 		// 插入支付日志记录
@@ -677,6 +690,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderPaymentTradeLog.setOldStatus(orderPaymentTrade.getStatus());
 		orderPaymentTradeLog.setNewStatus(orderPaymentTrade.getStatus());
 		orderPaymentTradeLogService.insertSelective(orderPaymentTradeLog);
+		return orderPaymentTrade;
 	}
 
 

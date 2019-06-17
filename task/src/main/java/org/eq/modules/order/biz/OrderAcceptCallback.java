@@ -1,4 +1,4 @@
-package org.eq.modules.bc.task;
+package org.eq.modules.order.biz;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.eq.modules.bc.enums.BcTxRecordBizTypeEnum;
@@ -22,43 +22,41 @@ import java.util.List;
  * @version 2019/6/10
  */
 @Component
-public class OrderAcceptCallback {
+public class OrderAcceptCallback extends AbstractTaskCallBack {
 
     private static Logger logger = LoggerFactory.getLogger(OrderAcceptCallback.class);
-
 
     @Autowired
     private static OrderAcceptMapper orderAcceptMapper;
     @Autowired
     private static OrderAcceptLogMapper orderAcceptLogMapper;
 
-    public static void main(String[] args) {
-        new AbstractTaskCallBack(BcTxRecordBizTypeEnum.ACCEPT,new OrderAcceptCallback()){
+    public OrderAcceptCallback() {
+        super(BcTxRecordBizTypeEnum.ACCEPT.getCode());
+    }
 
-            @Override
-            public void success(String txId) {
-                OrderAccept accept  =  getAcceptByTxId(txId);
-                if(accept ==null){
-                    return ;
-                }
-                boolean updateResult = opAccept(accept,true);
-                if(!updateResult){
-                    logger.error("更新承兑表数据失败,承兑表Id:{}",accept.getId());
-                }
-            }
+    @Override
+    public void success(String txId) {
+        OrderAccept accept  =  getAcceptByTxId(txId);
+        if(accept ==null){
+            return ;
+        }
+        boolean updateResult = opAccept(accept,true);
+        if(!updateResult){
+            logger.error("更新承兑表数据失败,承兑表Id:{}",accept.getId());
+        }
+    }
 
-            @Override
-            public void fail(String txId) {
-                OrderAccept accept  =  getAcceptByTxId(txId);
-                if(accept ==null){
-                    return ;
-                }
-                boolean updateResult = opAccept(accept,false);
-                if(!updateResult){
-                    logger.error("更新承兑表数据失败,承兑表Id:{}",accept.getId());
-                }
-            }
-        };
+    @Override
+    public void fail(String txId) {
+        OrderAccept accept  =  getAcceptByTxId(txId);
+        if(accept ==null){
+            return ;
+        }
+        boolean updateResult = opAccept(accept,false);
+        if(!updateResult){
+            logger.error("更新承兑表数据失败,承兑表Id:{}",accept.getId());
+        }
     }
 
     /**
@@ -110,9 +108,5 @@ public class OrderAcceptCallback {
         orderAcceptLog.setRemarks("区块链接口回调结果。返回"+isSuccess +", 更新承兑表");
         orderAcceptLogMapper.insertSelective(orderAcceptLog);
         return true;
-
-
-
-
     }
 }

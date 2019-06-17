@@ -87,17 +87,14 @@ public class HandleQueryTransferResultJob {
 			for(BcTxRecord bcTxRecord : bcTxlist){
 				Integer bizType = bcTxRecord.getBizType();
 				String txId = String.valueOf(bcTxRecord.getId());
-
-				Object instance = AbstractTaskCallBack.getInstance(bizType);
-				Method method = ReflectionUtils.findMethod(instance.getClass(),"success",String.class);
-				ReflectionUtils.invokeMethod(method,instance,txId);
+				AbstractTaskCallBack.get(bizType).success(txId);
 			}
 		}
 	}
 	
 	private void processBizFail(List<BcTxRecord> bcTxlist){
 		if(!Tools.isNull(bcTxlist)){
-			
+
 		}
 	}
 }

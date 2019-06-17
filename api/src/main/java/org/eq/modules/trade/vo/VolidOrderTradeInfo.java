@@ -43,5 +43,39 @@ public class VolidOrderTradeInfo {
     }
 
 
+    /**
+     * 验证支付回调接口
+     * @param orderTradePaymentReqVO
+     * @return
+     */
+    public static String volidPayNotify(OrderTradePaymentReqVO orderTradePaymentReqVO){
+        if(orderTradePaymentReqVO==null){
+            return  "请求参数为空";
+        }
+        if(StringUtils.isEmpty(orderTradePaymentReqVO.getPayNo())){
+            return  "支付流水号为空";
+        }
+        if(StringUtils.isEmpty(orderTradePaymentReqVO.getTradeNo())){
+            return  "交易号为空";
+        }
+        if(orderTradePaymentReqVO.getPayAmout()<=0){
+            return  "支付费用小于0";
+        }
+        if(orderTradePaymentReqVO.getPayType()==null){
+            return "支付方式不存在";
+        }
+        if(orderTradePaymentReqVO.getPayType()!=1 && orderTradePaymentReqVO.getPayType()!=2){
+            return "支付方式不存在";
+        }
+        if(orderTradePaymentReqVO.getPayStatus()==null){
+            return "支付结果未知";
+        }
+        if(orderTradePaymentReqVO.getPayStatus()!=1 && orderTradePaymentReqVO.getPayStatus()!=2){
+            return "支付结果未知";
+        }
+        return null;
+    }
+
+
 
 }
