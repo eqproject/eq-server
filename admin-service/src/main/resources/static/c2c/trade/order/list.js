@@ -75,7 +75,6 @@ var User;
                         d.tradeNo=curr.$tradeNo.val();
                         d.productName=curr.$productName.val();
                         d.blockchainStatus =curr.$blockchainStatus.val();
-                        d.mobile=curr.$mobile.val();
                         d.status=curr.$status.val();
                         d.type=curr.$type.val();
                         d.payType=curr.$payType.val();
