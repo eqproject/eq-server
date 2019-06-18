@@ -1,14 +1,12 @@
 /**
- *  该类有generator 自动生成
+ * 该类有generator 自动生成
  * Copyright &copy; 2017-2018 All rights reserved.
  */
 package org.eq.modules.trade.entity;
 
-import org.eq.modules.orderfinish.entity.OrderFinishSnapshootExample;
-
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 订单交易EntityExample
@@ -127,7 +125,7 @@ public class OrderTradeExample {
         }
 
         public Criteria andIdEqualTo(Long value) {
-            addCriterion("id =", value, "id");
+            addCriterion("OT.id =", value, "id");
             return (Criteria) this;
         }
 
@@ -252,7 +250,7 @@ public class OrderTradeExample {
         }
 
         public Criteria andAllUserIdEqualTo(long value) {
-            addCriterion("(buy_user_id = "+value +" or  sell_user_id = "+value + " )" );
+            addCriterion("(buy_user_id = " + value + " or  sell_user_id = " + value + " )");
             return (Criteria) this;
         }
 
@@ -341,7 +339,7 @@ public class OrderTradeExample {
             return (Criteria) this;
         }
 
-		public Criteria andAdNoLike(String value) {
+        public Criteria andAdNoLike(String value) {
             addCriterion("ad_no like", value, "adNo");
             return (Criteria) this;
         }
@@ -411,7 +409,7 @@ public class OrderTradeExample {
             return (Criteria) this;
         }
 
-		public Criteria andTradeNoLike(String value) {
+        public Criteria andTradeNoLike(String value) {
             addCriterion("trade_no like", value, "tradeNo");
             return (Criteria) this;
         }
@@ -1081,7 +1079,7 @@ public class OrderTradeExample {
             return (Criteria) this;
         }
 
-		public Criteria andRemarksLike(String value) {
+        public Criteria andRemarksLike(String value) {
             addCriterion("remarks like", value, "remarks");
             return (Criteria) this;
         }
@@ -1151,7 +1149,7 @@ public class OrderTradeExample {
             return (Criteria) this;
         }
 
-		public Criteria andCancelDescLike(String value) {
+        public Criteria andCancelDescLike(String value) {
             addCriterion("cancel_desc like", value, "cancelDesc");
             return (Criteria) this;
         }
@@ -1358,6 +1356,11 @@ public class OrderTradeExample {
 
         public Criteria andTxIdNotBetween(Long value1, Long value2) {
             addCriterion("tx_id not between", value1, value2, "txId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProductNameLikeForAll(String value) {
+            addCriterion("PP.name like  ", "%" + value + "%", "productName");
             return (Criteria) this;
         }
     }
