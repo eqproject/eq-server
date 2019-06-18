@@ -82,6 +82,22 @@ public class VolidOrderTradeInfo {
         return null;
     }
 
+    /**
+     * 获取交易中，代付款等数据个数
+     * @param orderTradeSearchVO
+     * @return
+     */
+    public static String volidPoolInfo(OrderTradeSearchVO orderTradeSearchVO){
+        if(orderTradeSearchVO==null){
+            return  "请求参数为空";
+        }
+        if(orderTradeSearchVO.getUserId()<=0){
+            return "用户为空";
+        }
+        return null;
+    }
+
+
 
 
     /**

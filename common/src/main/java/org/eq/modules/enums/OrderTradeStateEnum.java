@@ -1,6 +1,8 @@
 package org.eq.modules.enums;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -36,12 +38,27 @@ public enum OrderTradeStateEnum {
      */
     private static Set<Integer> allowCancelStatus = new HashSet<>();
 
+    /**
+     * 未结束的状态
+     */
+    private static Set<Integer> runningStatus = new HashSet<>();
+
     static {
         runPayStatus.add(OrderTradeStateEnum.WAIT_PAY.getState());
         runPayStatus.add(OrderTradeStateEnum.PAY_FAIL.getState());
 
         allowCancelStatus.add(OrderTradeStateEnum.CANCEL.getState());
         allowCancelStatus.add(OrderTradeStateEnum.PAY_FAIL.getState());
+
+        runningStatus.add(OrderTradeStateEnum.WAIT_PAY.getState());
+        runningStatus.add(OrderTradeStateEnum.PAY_ING.getState());
+        runningStatus.add(OrderTradeStateEnum.PAY_SUCCESS.getState());
+        runningStatus.add(OrderTradeStateEnum.PAY_FAIL.getState());
+        runningStatus.add(OrderTradeStateEnum.VOUCHER_ING.getState());
+        runningStatus.add(OrderTradeStateEnum.LOAN_ING.getState());
+        runningStatus.add(OrderTradeStateEnum.LOAN_FAIL.getState());
+        runningStatus.add(OrderTradeStateEnum.REFUND_ING.getState());
+
     }
 
 
@@ -108,6 +125,23 @@ public enum OrderTradeStateEnum {
      */
     public static  boolean isAllCancel(int state){
         return allowCancelStatus.contains(state);
+    }
+
+    /**
+     * 判断是否正在进行
+     * @param state
+     * @return
+     */
+    public static  boolean isRunningState(int state){
+        return runningStatus.contains(state);
+    }
+
+    /**
+     * 获取正在进行中的集合
+     * @return
+     */
+    public static List<Integer> getRunningStates(){
+        return new ArrayList<>(runningStatus);
     }
 
 

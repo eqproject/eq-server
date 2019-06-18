@@ -170,6 +170,36 @@ public class OrderTradeController extends BaseController {
     }
 
     /**
+     * 获取交易数量
+     * @param orderTradeSearchVO
+     * @return
+     */
+    @PostMapping("/poolInfo")
+    public ResponseData<OrderTradePoolInfoVO> poolInfo(OrderTradeSearchVO orderTradeSearchVO) {
+        String errMsg = VolidOrderTradeInfo.volidPoolInfo(orderTradeSearchVO);
+        if(!StringUtils.isEmpty(errMsg)){
+            return ResponseFactory.paramsError(errMsg);
+        }
+        OrderTradePoolInfoVO result = null;
+        logger.info("poolInfo 请求参数:{}",JSON.toJSONString(orderTradeSearchVO));
+        try {
+            result = orderTradeService.poolInfolTradeOrder(orderTradeSearchVO.getUserId());
+        } catch (BaseServiceException e) {
+            logger.error("poolInfo 失败，原因是:{}",e.getMessage());
+            return ResponseFactory.paramsError(e.getMessage());
+        } catch (Exception e) {
+            logger.error("poolInfo 失败，原因是",e);
+            return ResponseFactory.systemError(SYSTEM_ERROR_MSG);
+        }
+        if(result==null){
+            result = new OrderTradePoolInfoVO();
+        }
+        logger.info("cancelTradeOrder 响应内容:{}",JSON.toJSONString(result));
+        return ResponseFactory.success(result);
+    }
+
+
+    /**
      * 支付结果回调
      * @param orderTradePaymentReqVO
      * @return

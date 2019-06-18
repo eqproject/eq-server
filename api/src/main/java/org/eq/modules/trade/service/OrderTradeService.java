@@ -47,6 +47,15 @@ public interface OrderTradeService extends ServiceExtend<OrderTrade,OrderTradeEx
      */
     void cancelTradeOrder(String tradeNo);
 
+
+
+
+    /**
+     * 获取汇总信息
+     * @param userId 用户ID
+     */
+    OrderTradePoolInfoVO poolInfolTradeOrder(long userId);
+
     /**
      * 获取详情
      * @param tradeNo

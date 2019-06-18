@@ -396,6 +396,37 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		insertOrderTradeLog(orderTrade.getId(),oldStatus,OrderTradeStateEnum.CANCEL.getState(),"API调用方式取消交易，库存相关备注:"+errMsgBuilder.toString());
 	}
 
+
+	@Override
+	public OrderTradePoolInfoVO poolInfolTradeOrder(long userId) {
+		OrderTradePoolInfoVO result = new OrderTradePoolInfoVO();
+
+		OrderTradeExample orderTradeExample = new OrderTradeExample();
+		OrderTradeExample.Criteria ca = orderTradeExample.or();
+		ca.andStatusIn(OrderTradeStateEnum.getRunningStates());
+		ca.andAllUserIdEqualTo(userId);
+
+		List<OrderTrade> list = findListByExample(orderTradeExample);
+		if(CollectionUtils.isEmpty(list)){
+			return result;
+		}
+
+		int waitPay = 0;
+		int progress = 0;
+		for(OrderTrade tem : list){
+			if(OrderTradeStateEnum.isRunPay(tem.getStatus()) && tem.getBuyUserId()==userId){
+				waitPay ++;
+			}else{
+				progress++;
+			}
+		}
+		result.setProgress(progress);
+		result.setWaitPay(waitPay);
+		return result;
+	}
+
+
+
 	@Override
 	public OrderTradeDetailResVO tradeOrderDetail(String tradeNo) {
 		OrderTrade orderTrade = new OrderTrade();
