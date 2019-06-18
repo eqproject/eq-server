@@ -1,5 +1,8 @@
 package org.eq.modules.enums;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author admin
  * @Title: OrderTradeStateEnum
@@ -21,9 +24,25 @@ public enum OrderTradeStateEnum {
     LOAN_FAIL(9,"放款失败"),
     TRADE_SUCCESS(10,"交易成功"),
     REFUND_ING(11,"退款中"),
-    REFUND_SUCCESS(12,"退款成功"),
+    REFUND_SUCCESS(12,"退款成功");
 
-    ;
+    /**
+     * 可发起支付状态集合
+     */
+    private static Set<Integer> runPayStatus = new HashSet<>();
+
+    /**
+     * 允许可取消的订单
+     */
+    private static Set<Integer> allowCancelStatus = new HashSet<>();
+
+    static {
+        runPayStatus.add(OrderTradeStateEnum.WAIT_PAY.getState());
+        runPayStatus.add(OrderTradeStateEnum.PAY_FAIL.getState());
+
+        allowCancelStatus.add(OrderTradeStateEnum.CANCEL.getState());
+        allowCancelStatus.add(OrderTradeStateEnum.PAY_FAIL.getState());
+    }
 
 
     /**
@@ -57,4 +76,39 @@ public enum OrderTradeStateEnum {
     public void setRemark(String remark) {
         this.remark = remark;
     }
+
+    /**
+     * 获取枚举类介绍
+     * @param state
+     * @return
+     */
+    public static String  getRemarkByState(int state){
+        OrderTradeStateEnum[] values = OrderTradeStateEnum.values();
+        for(OrderTradeStateEnum temp : values ){
+            if(temp.state == state){
+                return temp.remark;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 判断是否允许发起支付
+     * @param state
+     * @return
+     */
+    public static  boolean isRunPay(int state){
+        return runPayStatus.contains(state);
+    }
+
+    /**
+     * 判断是否允许用户自主取消
+     * @param state
+     * @return
+     */
+    public static  boolean isAllCancel(int state){
+        return allowCancelStatus.contains(state);
+    }
+
+
 }

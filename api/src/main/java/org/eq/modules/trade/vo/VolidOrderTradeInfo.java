@@ -43,6 +43,47 @@ public class VolidOrderTradeInfo {
     }
 
 
+
+    /**
+     * 新建交易订单验证
+     * @param orderTradeSearchVO
+     * @return
+     */
+    public static String volidSearch(OrderTradeSearchVO orderTradeSearchVO){
+        if(orderTradeSearchVO==null){
+            return  "请求参数为空";
+        }
+        if(StringUtils.isEmpty(orderTradeSearchVO.getTradeNo())){
+            return "交易单号为空";
+        }
+        if(orderTradeSearchVO.getUserId()<=0){
+            return "用户为空";
+        }
+        return null;
+    }
+
+
+
+    /**
+     * 取消交易订单验证
+     * @param orderTradeSearchVO
+     * @return
+     */
+    public static String volidConcel(OrderTradeSearchVO orderTradeSearchVO){
+        if(orderTradeSearchVO==null){
+            return  "请求参数为空";
+        }
+        if(StringUtils.isEmpty(orderTradeSearchVO.getTradeNo())){
+            return "交易单号为空";
+        }
+        if(orderTradeSearchVO.getUserId()<=0){
+            return "用户为空";
+        }
+        return null;
+    }
+
+
+
     /**
      * 验证支付回调接口
      * @param orderTradePaymentReqVO

@@ -222,7 +222,6 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 			result.setErrMsg("商品不存在或已下架");
 			return  result;
 		}
-		//TODO 验证用户
 		User orderUser = userService.selectByPrimaryKey(orderAd.getUserId());
 		if(orderUser==null){
 			result.setErrMsg("用户信息有误");
@@ -289,27 +288,72 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 			return  result;
 		}
 		// 插入交易日志
-		OrderTradeLog orderTradeLog = new OrderTradeLog();
-		orderTradeLog.setOldStatus(OrderTradeStateEnum.WAIT_PAY.getState());
-		orderTradeLog.setNewStatus(OrderTradeStateEnum.WAIT_PAY.getState());
-		orderTradeLog.setOrderTradeId(insertId);
-		orderTradeLog.setCreateDate(orderTrade.getCreateDate());
-		orderTradeLog.setRemarks(orderTrade.getTradeNo());
-		orderLogService.save(LogTypeEnum.TRADE,orderTradeLog);
+		insertOrderTradeLog(orderTrade.getId(),-1,orderTrade.getStatus(),"初始化创建");
 		result.setData(orderTrade);
 		return result;
 	}
+
+
+
+    @Override
+    public ServieReturn<OrderTrade> prePayTradeOrder(OrderTradeSearchVO orderTradeSearchVO,User user) {
+        ServieReturn<OrderTrade> result  = new ServieReturn<>();
+        String errMsg = VolidOrderTradeInfo.volidSearch(orderTradeSearchVO);
+        if(!StringUtils.isEmpty(errMsg)){
+            result.setErrMsg(errMsg);
+            return  result;
+        }
+        OrderTrade orderTrade = new OrderTrade();
+        orderTrade.setTradeNo(orderTradeSearchVO.getTradeNo());
+        orderTrade = selectByRecord(orderTrade);
+        if (orderTrade == null || !OrderTradeStateEnum.isRunPay(orderTrade.getStatus())) {
+            result.setErrMsg("交易订单不能进行交易");
+            return  result;
+        }
+
+        OrderAd orderAd = getOrderAdForCode(orderTrade.getAdNo());
+        if (orderAd == null || !OrderAdStateEnum.isEffectState(orderAd.getStatus())) {
+            result.setErrMsg("广告无效，不能发起交易");
+            return  result;
+        }
+        Product product = productService.selectByPrimaryKey(orderAd.getProductId());
+        if (!ProductUtil.isEffect(product)) {
+            result.setErrMsg("商品不存在或已下架");
+            return  result;
+        }
+
+		Integer oldStatus = orderTrade.getStatus();
+
+		OrderTradeExample updateOrderTrade = new OrderTradeExample();
+		OrderTradeExample.Criteria updateOrderCa = updateOrderTrade.or();
+		updateOrderCa.andIdEqualTo(orderTrade.getId());
+		updateOrderCa.andStatusEqualTo(oldStatus);
+
+		OrderTrade updateObj = new OrderTrade();
+		updateObj.setId(orderTrade.getId());
+		updateObj.setStatus(OrderTradeStateEnum.PAY_ING.getState());
+		updateObj.setUpdateDate(new Date());
+		int number = updateByExampleSelective(updateObj,updateOrderTrade);
+		if(number<=0){
+			result.setErrMsg("前置支付设置出错");
+			return  result;
+		}
+		// 插入交易日志
+		insertOrderTradeLog(orderTrade.getId(),orderTrade.getStatus(),OrderTradeStateEnum.PAY_ING.getState(),"支付前置回调");
+        result.setData(orderTrade);
+        return result;
+    }
+
+
 
 	@Override
 	public void cancelTradeOrder(String tradeNo) {
 		OrderTrade orderTrade = new OrderTrade();
 		orderTrade.setTradeNo(tradeNo);
 		orderTrade = selectByRecord(orderTrade);
-		if (orderTrade == null || OrderTradeStateEnum.WAIT_PAY.getState() != orderTrade.getStatus()) {
-			logger.error("cancelTradeOrder 失败，交易单号[{}]记录不存在",tradeNo);
-			throw new TradeOrderException("交易单号记录不存在");
+		if (orderTrade == null || !OrderTradeStateEnum.isAllCancel(orderTrade.getStatus())) {
+			throw new TradeOrderException("交易单号记录不存在或者不能进行取消");
 		}
-
 		OrderAd orderAd = getOrderAdForCode(orderTrade.getAdNo());
 		if(orderAd==null){
 			throw new TradeOrderException("广告订单不存在");
@@ -330,36 +374,26 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		if(number<=0){
 			throw new TradeOrderException("取消失败");
 		}
-		boolean isback = false;
+		StringBuilder errMsgBuilder = new StringBuilder("[");
 		//需要释放库存
 		if(orderTrade.getType() == OrderTradeTypeEnum.ORDER_SALE.getType()){
 			boolean lockResult = lockUserStock(orderTrade.getProductId(),orderTrade.getSellUserId(),orderTrade.getOrderNum());
 			if(!lockResult){
-				throw new TradeOrderException("释放库存失败");
+				errMsgBuilder.append("释放用户库存失败");
 			}
-			isback = true;
-		}else{
-			isback = true;
 		}
 
 		int retryNum = 3;
 		boolean retryResult = false;
-
 		retryResult = lockOrderAd(orderAd,-orderTrade.getOrderNum());
 		while(retryNum>0 && !retryResult){
 			retryResult = lockOrderAd(getOrderAdForCode(orderAd.getOrderNo()),-orderTrade.getOrderNum());
 			retryNum--;
 		}
 		if(!retryResult){
-			throw new TradeOrderException("释放订单库存失败");
+			errMsgBuilder.append(",释放订单在途交易量:").append(orderTrade.getOrderNum()).append("失败");
 		}
-		OrderTradeLog orderTradeLog = new OrderTradeLog();
-		orderTradeLog.setOldStatus(oldStatus);
-		orderTradeLog.setNewStatus(OrderTradeStateEnum.CANCEL.getState());
-		orderTradeLog.setOrderTradeId(orderTrade.getId());
-		orderTradeLog.setCreateDate(new Date());
-		orderTradeLog.setRemarks("API调用方式取消交易，库存释放结果:"+isback);
-		orderLogService.save(LogTypeEnum.TRADE,orderTradeLog);
+		insertOrderTradeLog(orderTrade.getId(),oldStatus,OrderTradeStateEnum.CANCEL.getState(),"API调用方式取消交易，库存相关备注:"+errMsgBuilder.toString());
 	}
 
 	@Override
@@ -729,6 +763,24 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 			e.printStackTrace();
 		}
 		return updateStockResult;
+	}
+
+
+	/**
+	 * 插入交易日志
+	 * @param trandId
+	 * @param oldState
+	 * @param newState
+	 * @param remark
+	 */
+	private void  insertOrderTradeLog(long trandId,int oldState,int newState,String remark){
+		OrderTradeLog orderTradeLog = new OrderTradeLog();
+		orderTradeLog.setOldStatus(oldState);
+		orderTradeLog.setNewStatus(newState);
+		orderTradeLog.setOrderTradeId(trandId);
+		orderTradeLog.setCreateDate(new Date());
+		orderTradeLog.setRemarks(remark);
+		orderLogService.save(LogTypeEnum.TRADE,orderTradeLog);
 	}
 
 }
