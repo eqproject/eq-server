@@ -31,6 +31,16 @@ public interface OrderTradeService extends ServiceExtend<OrderTrade,OrderTradeEx
      */
     ServieReturn<OrderTrade> createTradeOrder(OrderTradeCreateReqVO orderTradeCreateReqVO, User user);
 
+
+    /**
+     * 支付前置接口
+     * @param orderTradeSearchVO
+     * @param user
+     * @return
+             */
+    ServieReturn<OrderTrade> prePayTradeOrder(OrderTradeSearchVO orderTradeSearchVO, User user);
+
+
     /**
      * 取消交易订单
      * @param tradeNo 交易订单号

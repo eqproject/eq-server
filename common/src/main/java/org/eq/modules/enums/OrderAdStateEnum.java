@@ -19,10 +19,17 @@ public enum OrderAdStateEnum {
 
     private static Set<Integer> overStatus = new HashSet<>();
 
+    /**
+     * 有效状态
+     */
+    private static Set<Integer> effectiveStatus = new HashSet<>();
+
     static {
         overStatus.add(OrderAdStateEnum.ORDER_CANCEL.getState());
         overStatus.add(OrderAdStateEnum.ORDER_FINISH.getState());
         overStatus.add(OrderAdStateEnum.ORDER_REJECT.getState());
+
+        effectiveStatus.add(OrderAdStateEnum.ORDER_TRADEING.getState());
 
     }
 
@@ -75,6 +82,15 @@ public enum OrderAdStateEnum {
         return overStatus.contains(state);
     }
 
+
+    /**
+     * 判断状态是否有效
+     * @param state
+     * @return
+     */
+    public static  boolean isEffectState(int state){
+        return effectiveStatus.contains(state);
+    }
 
 
 }

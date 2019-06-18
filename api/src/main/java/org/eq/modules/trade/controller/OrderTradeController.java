@@ -5,7 +5,6 @@
 package org.eq.modules.trade.controller;
 
 import com.alibaba.fastjson.JSON;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.base.BaseController;
 import org.eq.basic.common.base.BaseServiceException;
@@ -15,17 +14,14 @@ import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
 import org.eq.modules.enums.OrderTradeStateEnum;
 import org.eq.modules.order.vo.ServieReturn;
-import org.eq.modules.trade.entity.OrderPaymentTrade;
 import org.eq.modules.trade.entity.OrderTrade;
 import org.eq.modules.trade.service.OrderTradeService;
 import org.eq.modules.trade.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,12 +43,12 @@ public class OrderTradeController extends BaseController {
      * @return
      */
     @PostMapping("/create")
-    public ResponseData<OrderTradeCreateResVO> createTradeOrder(OrderTradeCreateReqVO orderTradeCreateReqVO) {
+    public ResponseData<OrderTradeBaseResVO> createTradeOrder(OrderTradeCreateReqVO orderTradeCreateReqVO) {
         String errMsg = VolidOrderTradeInfo.volidCreate(orderTradeCreateReqVO);
         if(!StringUtils.isEmpty(errMsg)){
             return ResponseFactory.paramsError(errMsg);
         }
-        //TODO 验证用户可用性
+        OrderTradeBaseResVO result  = new OrderTradeBaseResVO();
         User user = getUserInfo(orderTradeCreateReqVO.getUserId());
         if(user==null){
             return ResponseFactory.signError("用户不存在");
@@ -65,32 +61,75 @@ public class OrderTradeController extends BaseController {
             logger.error("createTradeOrder 失败，原因是",e);
             return ResponseFactory.systemError(SYSTEM_ERROR_MSG);
         }
-        if(inserResult ==null ){
-            return ResponseFactory.systemError(SYSTEM_ERROR_MSG);
-        }
-        if(!StringUtils.isEmpty(inserResult.getErrMsg())){
+        if(inserResult!=null && !StringUtils.isEmpty(inserResult.getErrMsg())){
             return ResponseFactory.systemError(inserResult.getErrMsg());
         }
-        String code = inserResult.getData()==null ? "": (inserResult.getData().getTradeNo());
-        OrderTradeCreateResVO orderTradeCreateResVO = new OrderTradeCreateResVO(code);
-        logger.info("createTradeOrder 响应内容:{}",JSON.toJSONString(orderTradeCreateResVO));
-        return ResponseFactory.success(orderTradeCreateResVO);
+        if(inserResult ==null || inserResult.getData()==null){
+            return ResponseFactory.systemError(SYSTEM_ERROR_MSG);
+        }
+        result.setTradeNo(inserResult.getData().getTradeNo());
+        logger.info("createTradeOrder 响应内容:{}",JSON.toJSONString(result));
+        return ResponseFactory.success(result);
+    }
+
+
+
+    /**
+     * 支付前回调
+     * @param orderTradeSearchVO
+     * @return
+     */
+    @PostMapping("/prePay")
+    public ResponseData<OrderTradeBaseResVO> prePay(OrderTradeSearchVO orderTradeSearchVO) {
+        String errMsg = VolidOrderTradeInfo.volidSearch(orderTradeSearchVO);
+        if(!StringUtils.isEmpty(errMsg)){
+            return ResponseFactory.paramsError(errMsg);
+        }
+        OrderTradeBaseResVO result = new OrderTradeBaseResVO();
+
+        User user = getUserInfo(orderTradeSearchVO.getUserId());
+        if(user==null){
+            return ResponseFactory.signError("用户不存在");
+        }
+        logger.info("prePay 请求参数:{}",orderTradeSearchVO.toString());
+        OrderTrade orderTrade = null;
+        try {
+            ServieReturn<OrderTrade> inserResult = orderTradeService.prePayTradeOrder(orderTradeSearchVO,user);
+            if(inserResult!=null && !StringUtils.isEmpty(inserResult.getErrMsg())){
+                return ResponseFactory.systemError(inserResult.getErrMsg());
+            }
+
+            if(inserResult==null || inserResult.getData()==null){
+                return ResponseFactory.systemError(SYSTEM_ERROR_MSG);
+            }
+            orderTrade = inserResult.getData();
+        } catch (Exception e) {
+            logger.error("prePay 失败，原因是",e);
+        }
+        if(orderTrade ==null){
+            return ResponseFactory.systemError("数据查询异常");
+        }
+        result.setTradeNo(orderTrade.getTradeNo());
+        logger.info("prePay 响应内容:{}",JSON.toJSONString(result));
+        return ResponseFactory.success(result);
     }
 
     /**
      * 取消交易订单
-     * @param orderTradeCancelReqVO
+     * @param orderTradeSearchVO
      * @return
      */
     @PostMapping("/cancel")
-    public ResponseData<OrderTradeCancelResVO> cancelTradeOrder(OrderTradeCancelReqVO orderTradeCancelReqVO) {
-        if (orderTradeCancelReqVO == null) {
-            logger.error("cancelTradeOrder 失败，原因是 orderTradeCancelReqVO is null");
-            return ResponseFactory.paramsError("请求参数不能为空");
+    public ResponseData<OrderTradeBaseResVO> cancelTradeOrder(OrderTradeSearchVO orderTradeSearchVO) {
+
+        String errMsg = VolidOrderTradeInfo.volidConcel(orderTradeSearchVO);
+        if(!StringUtils.isEmpty(errMsg)){
+            return ResponseFactory.paramsError(errMsg);
         }
-        logger.info("cancelTradeOrder 请求参数:{}",JSON.toJSONString(orderTradeCancelReqVO));
+        OrderTradeBaseResVO result = new OrderTradeBaseResVO();
+        logger.info("cancelTradeOrder 请求参数:{}",JSON.toJSONString(orderTradeSearchVO));
         try {
-            orderTradeService.cancelTradeOrder(orderTradeCancelReqVO.getTradeNo());
+            orderTradeService.cancelTradeOrder(orderTradeSearchVO.getTradeNo());
         } catch (BaseServiceException e) {
             logger.error("cancelTradeOrder 失败，原因是:{}",e.getMessage());
             return ResponseFactory.paramsError(e.getMessage());
@@ -98,27 +137,27 @@ public class OrderTradeController extends BaseController {
             logger.error("cancelTradeOrder 失败，原因是",e);
             return ResponseFactory.systemError(SYSTEM_ERROR_MSG);
         }
-        OrderTradeCancelResVO orderTradeCancelResVO = new OrderTradeCancelResVO(orderTradeCancelReqVO.getTradeNo());
-        logger.info("cancelTradeOrder 响应内容:{}",JSON.toJSONString(orderTradeCancelResVO));
-        return ResponseFactory.success(orderTradeCancelResVO);
+        result.setTradeNo(orderTradeSearchVO.getTradeNo());
+        logger.info("cancelTradeOrder 响应内容:{}",JSON.toJSONString(result));
+        return ResponseFactory.success(result);
     }
 
 
     /**
      * 查询交易订单详情
-     * @param orderTradeDetailReqVO
+     * @param orderTradeSearchVO
      * @return
      */
     @PostMapping("/detail")
-    public ResponseData<OrderTradeDetailResVO> tradeOrderDetail(OrderTradeDetailReqVO orderTradeDetailReqVO) {
-        if (orderTradeDetailReqVO == null) {
+    public ResponseData<OrderTradeDetailResVO> tradeOrderDetail(OrderTradeSearchVO orderTradeSearchVO) {
+        if (orderTradeSearchVO == null) {
             logger.error("tradeOrderDetail 失败，原因是 orderTradeDetailReqVO is null");
             return ResponseFactory.paramsError("请求参数不能为空");
         }
-        logger.info("tradeOrderDetail 请求参数:{}",JSON.toJSONString(orderTradeDetailReqVO));
+        logger.info("tradeOrderDetail 请求参数:{}",JSON.toJSONString(orderTradeSearchVO));
         OrderTradeDetailResVO orderTradeCancelResVO;
         try {
-            orderTradeCancelResVO = orderTradeService.tradeOrderDetail(orderTradeDetailReqVO.getTradeNo());
+            orderTradeCancelResVO = orderTradeService.tradeOrderDetail(orderTradeSearchVO.getTradeNo());
         } catch (BaseServiceException e) {
             logger.error("tradeOrderDetail 失败，原因是:{}",e.getMessage());
             return ResponseFactory.paramsError(e.getMessage());
