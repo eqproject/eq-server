@@ -32,12 +32,12 @@ public class OrderLogService {
 
     private static Map<LogTypeEnum,String> MAPPING = new HashMap();
     static {
-        MAPPING.put(LogTypeEnum.AD,"OrderAdLogServiceImpl");
-        MAPPING.put(LogTypeEnum.TRADE,"OrderTradeLogServiceImpl");
-        MAPPING.put(LogTypeEnum.TRADE_PAYMENT,"OrderPaymentTradeLogServiceImpl");
-        MAPPING.put(LogTypeEnum.TRADE_REFUND,"OrderRefundTradeLogServiceImpl");
-        MAPPING.put(LogTypeEnum.ACCEPT,"OrderAcceptLogServiceImpl");
-        MAPPING.put(LogTypeEnum.TRANSFER,"OrderTransferLogServiceImpl");
+        MAPPING.put(LogTypeEnum.AD,"orderAdLogServiceImpl");
+        MAPPING.put(LogTypeEnum.TRADE,"orderTradeLogServiceImpl");
+        MAPPING.put(LogTypeEnum.TRADE_PAYMENT,"orderPaymentTradeLogServiceImpl");
+        MAPPING.put(LogTypeEnum.TRADE_REFUND,"orderRefundTradeLogServiceImpl");
+        MAPPING.put(LogTypeEnum.ACCEPT,"orderAcceptLogServiceImpl");
+        MAPPING.put(LogTypeEnum.TRANSFER,"orderTransferLogServiceImpl");
     }
 
     private CommonLogService get(LogTypeEnum type) {
