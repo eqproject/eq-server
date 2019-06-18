@@ -11,15 +11,11 @@ import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.utils.OrderUtil;
-import org.eq.modules.order.service.OrderAdLogService;
 import org.eq.modules.order.service.OrderFinishSnapshootService;
 import org.eq.modules.order.vo.*;
 import org.eq.modules.orderfinish.dao.OrderFinishSnapshootMapper;
 import org.eq.modules.orderfinish.entity.OrderFinishSnapshoot;
 import org.eq.modules.orderfinish.entity.OrderFinishSnapshootExample;
-import org.eq.modules.product.service.ProductService;
-import org.eq.modules.product.service.UserProductStockService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

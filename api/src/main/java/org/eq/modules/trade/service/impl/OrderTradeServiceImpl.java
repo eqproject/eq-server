@@ -20,11 +20,12 @@ import org.eq.modules.bc.entity.BcTxRecord;
 import org.eq.modules.common.cache.ProductCache;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
+import org.eq.modules.common.enums.LogTypeEnum;
 import org.eq.modules.enums.*;
+import org.eq.modules.log.OrderLogService;
 import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.order.entity.OrderAdExample;
 import org.eq.modules.order.service.OrderAdService;
-import org.eq.modules.order.vo.SearchAdOrderVO;
 import org.eq.modules.order.vo.ServieReturn;
 import org.eq.modules.product.entity.Product;
 import org.eq.modules.product.entity.ProductAll;
@@ -39,11 +40,8 @@ import org.eq.modules.support.entity.SystemConfig;
 import org.eq.modules.support.entity.SystemConfigExample;
 import org.eq.modules.trade.dao.OrderTradeMapper;
 import org.eq.modules.trade.entity.*;
-import org.eq.modules.trade.exception.PaymentTradeOrderNotExistsException;
 import org.eq.modules.trade.exception.TradeOrderException;
-import org.eq.modules.trade.service.OrderPaymentTradeLogService;
 import org.eq.modules.trade.service.OrderPaymentTradeService;
-import org.eq.modules.trade.service.OrderTradeLogService;
 import org.eq.modules.trade.service.OrderTradeService;
 import org.eq.modules.trade.vo.*;
 import org.eq.modules.utils.ProductUtil;
@@ -68,7 +66,7 @@ import java.util.Map;
 public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, OrderTrade, OrderTradeExample> implements OrderTradeService {
 
 	@Autowired
-	OrderTradeLogService  orderTradeLogService;
+	OrderLogService orderLogService;
 
 	@Autowired
 	ProductService productService;
@@ -81,9 +79,6 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 
 	@Autowired
 	OrderPaymentTradeService orderPaymentTradeService;
-
-	@Autowired
-	OrderPaymentTradeLogService orderPaymentTradeLogService;
 
 	@Autowired
 	private BcTxRecordMapper bcTxRecordMapper;
@@ -300,7 +295,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderTradeLog.setOrderTradeId(insertId);
 		orderTradeLog.setCreateDate(orderTrade.getCreateDate());
 		orderTradeLog.setRemarks(orderTrade.getTradeNo());
-		orderTradeLogService.insertSelective(orderTradeLog);
+		orderLogService.save(LogTypeEnum.TRADE,orderTradeLog);
 		result.setData(orderTrade);
 		return result;
 	}
@@ -364,7 +359,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderTradeLog.setOrderTradeId(orderTrade.getId());
 		orderTradeLog.setCreateDate(new Date());
 		orderTradeLog.setRemarks("API调用方式取消交易，库存释放结果:"+isback);
-		orderTradeLogService.insertSelective(orderTradeLog);
+		orderLogService.save(LogTypeEnum.TRADE,orderTradeLog);
 	}
 
 	@Override
@@ -451,7 +446,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderTradeLog.setOrderTradeId(orderTrade.getId());
 		orderTradeLog.setCreateDate(new Date());
 		orderTradeLog.setRemarks("通知成功，完成支付流水入库");
-		orderTradeLogService.insertSelective(orderTradeLog);
+		orderLogService.save(LogTypeEnum.TRADE,orderTradeLog);
 		if(!isSuccess){
 			return result;
 		}
@@ -689,7 +684,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderPaymentTradeLog.setCreateDate(new Date());
 		orderPaymentTradeLog.setOldStatus(orderPaymentTrade.getStatus());
 		orderPaymentTradeLog.setNewStatus(orderPaymentTrade.getStatus());
-		orderPaymentTradeLogService.insertSelective(orderPaymentTradeLog);
+		orderLogService.save(LogTypeEnum.TRADE_PAYMENT,orderPaymentTradeLog);
 		return orderPaymentTrade;
 	}
 

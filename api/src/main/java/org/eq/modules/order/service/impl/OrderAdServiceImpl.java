@@ -11,30 +11,28 @@ import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.DateUtil;
 import org.eq.modules.auth.entity.User;
-import org.eq.modules.auth.entity.UserIdentityAuth;
 import org.eq.modules.auth.service.UserIdentityAuthService;
-import org.eq.modules.auth.service.UserService;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
-import org.eq.modules.common.factory.ResponseFactory;
-import org.eq.modules.enums.OrderTradeStateEnum;
-import org.eq.modules.trade.entity.OrderTradeExample;
-import org.eq.modules.trade.service.OrderTradeService;
-import org.eq.modules.utils.OrderUtil;
-import org.eq.modules.utils.ProductUtil;
+import org.eq.modules.common.enums.LogTypeEnum;
 import org.eq.modules.enums.OrderAdStateEnum;
 import org.eq.modules.enums.OrderAdTypeEnum;
+import org.eq.modules.enums.OrderTradeStateEnum;
+import org.eq.modules.log.OrderLogService;
 import org.eq.modules.order.dao.OrderAdMapper;
 import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.order.entity.OrderAdExample;
 import org.eq.modules.order.entity.OrderAdLog;
-import org.eq.modules.order.service.OrderAdLogService;
 import org.eq.modules.order.service.OrderAdService;
 import org.eq.modules.order.vo.*;
 import org.eq.modules.product.entity.Product;
 import org.eq.modules.product.entity.UserProductStock;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.service.UserProductStockService;
+import org.eq.modules.trade.entity.OrderTradeExample;
+import org.eq.modules.trade.service.OrderTradeService;
+import org.eq.modules.utils.OrderUtil;
+import org.eq.modules.utils.ProductUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,7 +60,7 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 	private ProductService productService;
 
 	@Autowired
-	private OrderAdLogService orderAdLogService;
+	private OrderLogService orderLogService;
 	/**
 	 * 用户服务
 	 */
@@ -293,7 +291,7 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 			result.setErrMsg("订单取消失败");
 			return result;
 		}
-		StringBuffer remarks = new StringBuffer();
+		StringBuilder remarks = new StringBuilder();
 		if(orderAd.getType()==OrderAdTypeEnum.ORDER_SALE.getType()){
 			int number  = orderAd.getProductNum() -orderAd.getTradedNum()  - orderAd.getTradingNum();
 			if(number>0){
@@ -310,18 +308,9 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		}else{
 			remarks.append("取消成功,").append("执行快照为:").append(orderAd.toString());
 		}
-		OrderAdLog orderAdLog = new OrderAdLog();
-		orderAdLog.setCreateDate(new Date());
-		orderAdLog.setNewStatus(OrderAdStateEnum.ORDER_CANCEL.getState());
-		orderAdLog.setOldStatus(orderAd.getStatus());
-		orderAdLog.setOrderAdId(orderAd.getId());
-		orderAdLog.setRemarks(remarks.toString());
-		try{
-			orderAdLogService.insertRecord(orderAdLog);
-		}catch (Exception e){
-			e.printStackTrace();
-			logger.info("插入订单操作日志记录数据出错 {}",orderAdLog.toString());
-		}
+
+		saveLog(orderAd,remarks);
+
 		result.setData(OrderUtil.transObj(orderAd));
 		return  result ;
 	}
@@ -501,6 +490,21 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		}
 		buffer.append(DateUtil.getLockNowTime()).append(number);
 		return buffer.toString();
+	}
+
+	private void saveLog(OrderAd orderAd,StringBuilder remarks){
+		OrderAdLog orderAdLog = new OrderAdLog();
+		orderAdLog.setCreateDate(new Date());
+		orderAdLog.setNewStatus(OrderAdStateEnum.ORDER_CANCEL.getState());
+		orderAdLog.setOldStatus(orderAd.getStatus());
+		orderAdLog.setOrderAdId(orderAd.getId());
+		orderAdLog.setRemarks(remarks.toString());
+		try{
+			orderLogService.save(LogTypeEnum.AD,orderAdLog);
+		}catch (Exception e){
+			e.printStackTrace();
+			logger.info("插入订单操作日志记录数据出错 {}",orderAdLog.toString());
+		}
 	}
 
 }
