@@ -93,8 +93,10 @@
         <if test="distinct">
             distinct
         </if>
-        <include refid="Base_Column_List" />
-        from order_trade
+        OT.id,OT.sell_user_id,OT.buy_user_id,OT.ad_no,OT.trade_no,OT.product_id,OT.order_num,OT.type,OT.status,OT.blockchain_status,
+        OT.sale_price,OT.unit_price,OT.amount,OT.remind_pay,OT.finish_time,OT.remarks,OT.cancel_desc,OT.create_date,OT.update_date,OT.tx_id,
+        PP.name as productName
+        from order_trade  OT left join  platform_product PP on OT.product_id = PP.id
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>

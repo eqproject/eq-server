@@ -1,16 +1,15 @@
-/**
- *  该类有generator 自动生成
- * Copyright &copy; 2017-2018 All rights reserved.
- */
 package org.eq.modules.trade.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.base.BaseController;
-import org.eq.basic.common.base.BaseEntity;
 import org.eq.basic.common.base.BaseOpMsg;
 import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.config.sysUtil.UserUtil;
 import org.eq.basic.common.status.StatusCode;
+import org.eq.basic.common.util.DateUtil;
 import org.eq.basic.modules.sys.entity.SysUser;
+import org.eq.modules.trade.entity.OrderTrade;
+import org.eq.modules.trade.service.OrderTradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,10 +18,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
-
-import org.eq.modules.trade.entity.OrderTrade;
-import org.eq.modules.trade.service.OrderTradeService;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 订单交易Controller
@@ -33,60 +32,79 @@ import org.eq.modules.trade.service.OrderTradeService;
 @RequestMapping(value = "/trade/order")
 public class OrderTradeController extends BaseController {
 
-	@Autowired
-	private OrderTradeService orderTradeService;
+    @Autowired
+    private OrderTradeService orderTradeService;
 
-	/**
-	 * List页面
-	 * @param request
-	 * @param response
-	 * @param model
-	 * @return
-	 */
-	@RequestMapping(value = {"list", ""})
-	public String list(HttpServletRequest request, HttpServletResponse response, Model model) {
-		//下拉选查询 自定义内容需要手动添加
+    /**
+     * List页面
+     * @param request
+     * @param response
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = {"list", ""})
+    public String list(HttpServletRequest request, HttpServletResponse response, Model model) {
+        //下拉选查询 自定义内容需要手动添加
         return "modules/c2c/trade/order/list";
-	}
+    }
 
-	/**
-	 * datatable 返回列表数据
-	 {
-		 "draw": 4,
-		 "recordsTotal": 57,
-		 "recordsFiltered": 57,
-		 "data": [
-			 [
-				 "Charde",
-				 "Marshall",
-				 "Regional Director",
-				 "San Francisco",
-				 "16th Oct 08",
-				 "$470,600"
-			 ],[]...
-	 	]
-	 }
-	 *
-	 *
-	 * @param request
-	 * @param response
-	 * @param orderTrade
-	 * @return
-	 */
-	@ResponseBody
-	@RequestMapping(value = {"dataList"})
-	public BaseTableData dataList(HttpServletRequest request, HttpServletResponse response, OrderTrade orderTrade) {
-		Map<String,Object> params = new HashMap<>();
-		//取出 request 的参数信息分页信息 排序信息
-		getInfoFromRequest(request,params);
-		//数据的draw自增
-		baseTableData = orderTradeService.findDataTableByRecordForPage(orderTrade,params);
-		int draw = Integer.parseInt(request.getParameter("draw")==null?"0":request.getParameter("draw"));
-		baseTableData.setDraw(++draw);
-		return baseTableData;
-	}
+    /**
+     * datatable 返回列表数据
+     {
+     "draw": 4,
+     "recordsTotal": 57,
+     "recordsFiltered": 57,
+     "data": [
+     [
+     "Charde",
+     "Marshall",
+     "Regional Director",
+     "San Francisco",
+     "16th Oct 08",
+     "$470,600"
+     ],[]...
+     ]
+     }
+     *
+     *
+     * @param request
+     * @param response
+     * @param orderTrade
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = {"dataList"})
+    public BaseTableData dataList(HttpServletRequest request, HttpServletResponse response, OrderTrade orderTrade) {
+        Map<String, Object> params = new HashMap<>();
+        //取出 request 的参数信息分页信息 排序信息
+        getInfoFromRequest(request, params);
 
-	/**
+        try {
+            Date beginCreateDate = null;
+            Date endCreateDate = null;
+            if (!StringUtils.isEmpty(request.getParameter("beginCreateDate"))) {
+                String temp = request.getParameter("beginCreateDate").trim() + " 00:00:00";
+                beginCreateDate = DateUtil.paseTimeStr(temp);
+            }
+            if (!StringUtils.isEmpty(request.getParameter("endCreateDate"))) {
+                String temp = request.getParameter("endCreateDate").trim() + " 23:59:59";
+                endCreateDate = DateUtil.paseTimeStr(temp);
+
+            }
+            params.put("beginCreateDate", beginCreateDate);
+            params.put("endCreateDate", endCreateDate);
+
+        } catch (Exception e) {
+            logger.error("OrderTradeController dataList 格式化时间异常", e);
+        }
+        //数据的draw自增
+        baseTableData = orderTradeService.findDataTableByRecordForPage(orderTrade, params);
+        int draw = Integer.parseInt(request.getParameter("draw") == null ? "0" : request.getParameter("draw"));
+        baseTableData.setDraw(++draw);
+        return baseTableData;
+    }
+
+    /**
      * 根据条件 查询数据 返回页面json数据
      * 条件为空时 查询失败
      * @param orderTrade
@@ -122,7 +140,7 @@ public class OrderTradeController extends BaseController {
         return result;
     }
 
-	/**
+    /**
      * 保存or修改操作
      * @param request
      * @param orderTrade
@@ -150,7 +168,7 @@ public class OrderTradeController extends BaseController {
                     }
                 }
             } else if ("update".equals(opType)) {//修改保存
-            	orderTrade = initOrderTrade(orderTrade, true, user);
+                orderTrade = initOrderTrade(orderTrade, true, user);
                 if (orderTradeService.updateByPrimaryKeySelective(orderTrade) > 0) {
                     result.setCode(StatusCode.CURD_UPDATE_SUCCESS);
                     result.setStatus("success");
@@ -182,7 +200,7 @@ public class OrderTradeController extends BaseController {
         return result;
     }
 
-	private OrderTrade initOrderTrade(OrderTrade orderTrade, boolean ifUpdate, SysUser user) {
+    private OrderTrade initOrderTrade(OrderTrade orderTrade, boolean ifUpdate, SysUser user) {
         if (!ifUpdate) {
             orderTrade.setCreateDate(new Date());
         }

@@ -28,7 +28,6 @@ var User;
         this.$tradeNo = $("#tradeNo");
         this.$productName = $("#productName");
         this.$blockchainStatus = $("#blockchainStatus");
-        this.$mobile = $("#mobile");
         this.$status = $("#status");
         this.$type = $("#type");
         this.$payType = $("#payType");
@@ -89,7 +88,7 @@ var User;
                     {},
                     {data: 'adNo', name: 'adNo'},
                     {data: 'tradeNo', name: 'tradeNo'},
-                    {data: 'productId', name: 'productId'},
+                    {data: 'productName', name: 'productName'},
                     {data: 'orderNum', name: 'orderNum'},
                     {data: 'amount', name: 'amount'},
                     {data: 'type', name: 'type',render:function(data, type, row){return getObjValByKey(tradeTypeObj,row.type)}},
@@ -154,7 +153,7 @@ function detail(row) {
                 var resultData = data.list[0];
                 form.find("input[name='adNo']").val(resultData.adNo);
                 form.find("input[name='tradeNo']").val(resultData.tradeNo);
-                form.find("input[name='productId']").val(resultData.productId);
+                form.find("input[name='productName']").val(resultData.productName);
                 form.find("input[name='orderNum']").val(resultData.orderNum);
                 form.find("input[name='amount']").val(resultData.amount);
                 form.find("input[name='type']").val(getObjValByKey(tradeTypeObj,resultData.type));
