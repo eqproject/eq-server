@@ -6,6 +6,7 @@ import org.eq.modules.common.factory.ResponseFactory;
 import org.eq.modules.support.service.SupportService;
 import org.eq.modules.support.vo.ConfigVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,7 +42,7 @@ public class SupportController extends BaseController {
      * 获取平台配置项
      * @return
      */
-    @RequestMapping(value = "/getConfig")
+    @PostMapping(value = "/getConfig")
     public ResponseData<ConfigVO> getConfig() {
         ConfigVO configVO = supportService.getConfigVo();
         return ResponseFactory.success(configVO);
