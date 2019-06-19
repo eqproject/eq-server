@@ -1,5 +1,6 @@
 package org.eq.modules.product.biz;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,6 @@ import java.util.*;
 public class ProductLoadBiz {
 
     private static Logger logger = LoggerFactory.getLogger(ProductLoadBiz.class);
-
     /**
      * 商品
      */
@@ -56,9 +56,9 @@ public class ProductLoadBiz {
     @Autowired
     private final ProductIssuerMapper productIssuerMapper;
 
-    private static final String TICKET_URL = "http://baidu.com";
-    private static final String APPID = "appId";
-    private static final String APPKEY = "";
+    private static final String TICKET_URL = "http://1.119.48.42:8858";
+    private static final String APPID = "19d0bc0e3b13615271";
+    private static final String APPKEY = "e4629469d2cdff53a6cf733377614062";
 
 
     /**
@@ -66,14 +66,13 @@ public class ProductLoadBiz {
      * @return
      */
     public List<TicketProduct> listProduct() {
-        List<TicketProduct> result = new ArrayList<>();
-
+       /* List<TicketProduct> result = new ArrayList<>();
 
         String txt ="{\"contractAddress\":\"合约地址\",\"ticketId\":\"10001\",\"ticketName\":\"定时任务券\",\"ticketIcon\":\"url\",\"ticketDesc\":\"此卡用于定时任务同步\",\"ticketIssuer\":{\"address\":\"发行方区块链地址\",\"icon\":\"\",\"name\":\"京东方\"},\"ticketAcceptance\":{\"address\":\"承兑方区块链地址\",\"icon\":\"\",\"name\":\"海马科技\"},\"ticketFaceValue\":\"600\",\"ticketSpe\":[{\"key\":\"颜色\",\"value\":\"红色\"},{\"key\":\"尺寸\",\"value\":\"42\"}],\"startTime\":\"2019-01-22\",\"endTime\":\"2029-01-22\",\"trancheId\":\"定时任务分组\"}";
         TicketProduct ticketProduct = JSONObject.parseObject(txt,TicketProduct.class);
         result.add(ticketProduct);
-        return result;
-        //return pageList();
+        return result;*/
+        return pageList();
     }
 
 
@@ -189,6 +188,7 @@ public class ProductLoadBiz {
         }
         int startPage =1;
         int pageSize =10;
+
         Map<String,Object> params = new HashMap<>();
         params.put("startPage",startPage);
         params.put("pageSize",pageSize);
@@ -196,7 +196,7 @@ public class ProductLoadBiz {
         while(!isall){
             TicketPlatProductRes  ticketPlatProductRes = null;
             try{
-                String platResponse = WebClientUtil.asynchronousPost(platProductUrl,params);
+                String platResponse = WebClientUtil.syncPostByForm(platProductUrl,params);
                 if(!StringUtil.isEmpty(platProductUrl)){
                     ticketPlatProductRes = JSONObject.parseObject(platResponse,TicketPlatProductRes.class);
                 }
@@ -236,14 +236,15 @@ public class ProductLoadBiz {
      */
     private static String getToken(){
         String tokenUrl = TICKET_URL+"/auth/accessToken";
-        Map<String,Object> params = new HashMap<>();
+        JSONObject params = new JSONObject();
         params.put("appId",APPID);
         params.put("appKey",APPKEY);
         String token = "";
         try{
             int i = 3;
             while(i>0 && StringUtil.isEmpty(token)){
-                String result = WebClientUtil.asynchronousPost(tokenUrl,params);
+                String result = WebClientUtil.synchPostForPayload(tokenUrl,params);
+                System.out.println(result);
                 JSONObject resultObj = JSONObject.parseObject(result);
                 if("0".equals(resultObj.getString("errCode"))){
                     JSONObject data = resultObj.getJSONObject("data");
@@ -270,6 +271,7 @@ public class ProductLoadBiz {
         ca.andTrancheidEqualTo(trancheid);
         return example;
     }
+
 
 
 
