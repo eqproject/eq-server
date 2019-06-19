@@ -720,7 +720,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		if(addLockNum>0){
 			updateOrderAd.setTradingNum(oldTradingNm+addLockNum);
 			int residueNum = orderAd.getProductNum()-orderAd.getTradedNum()-updateOrderAd.getTradingNum();
-			if(residueNum<=0){
+			if(residueNum<0){
 				return false;
 			}
 			if(residueNum<addLockNum){

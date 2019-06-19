@@ -68,6 +68,7 @@ public class ProductLoadBiz {
     public List<TicketProduct> listProduct() {
         List<TicketProduct> result = new ArrayList<>();
 
+
         String txt ="{\"contractAddress\":\"合约地址\",\"ticketId\":\"10001\",\"ticketName\":\"定时任务券\",\"ticketIcon\":\"url\",\"ticketDesc\":\"此卡用于定时任务同步\",\"ticketIssuer\":{\"address\":\"发行方区块链地址\",\"icon\":\"\",\"name\":\"京东方\"},\"ticketAcceptance\":{\"address\":\"承兑方区块链地址\",\"icon\":\"\",\"name\":\"海马科技\"},\"ticketFaceValue\":\"600\",\"ticketSpe\":[{\"key\":\"颜色\",\"value\":\"红色\"},{\"key\":\"尺寸\",\"value\":\"42\"}],\"startTime\":\"2019-01-22\",\"endTime\":\"2029-01-22\",\"trancheId\":\"定时任务分组\"}";
         TicketProduct ticketProduct = JSONObject.parseObject(txt,TicketProduct.class);
         result.add(ticketProduct);
