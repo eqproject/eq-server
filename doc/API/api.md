@@ -2335,7 +2335,7 @@
 
 ###### 接口示例
 >地址： /api/user/send
-​```json
+```json
 {
     "status": "200",
     "errMsg": "",
@@ -2382,14 +2382,16 @@
 
 ###### 接口示例
 >地址： /api/support/terms
-​```json
+>
+
+```json
 {
 	
     "status": 200,
     "errMsg": "",
-	"data": {
-		"content":""
-	}
+    "data": {
+    	"content":""
+    }
 }
 ```
 
@@ -2427,7 +2429,6 @@
 >|-content|stirng|内容|
 >
 ###### 接口示例
->地址： /api/support/legal
 ```json
 {
 	"status": 0,

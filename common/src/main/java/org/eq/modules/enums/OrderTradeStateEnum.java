@@ -43,12 +43,22 @@ public enum OrderTradeStateEnum {
      */
     private static Set<Integer> runningStatus = new HashSet<>();
 
+
+    /**
+     * 可支付回调的状态
+     */
+    private static Set<Integer> payBackStatus = new HashSet<>();
+
     static {
         runPayStatus.add(OrderTradeStateEnum.WAIT_PAY.getState());
         runPayStatus.add(OrderTradeStateEnum.PAY_FAIL.getState());
 
         allowCancelStatus.add(OrderTradeStateEnum.CANCEL.getState());
         allowCancelStatus.add(OrderTradeStateEnum.PAY_FAIL.getState());
+
+
+        payBackStatus.add(OrderTradeStateEnum.CANCEL.getState());
+        payBackStatus.add(OrderTradeStateEnum.PAY_FAIL.getState());
 
         runningStatus.add(OrderTradeStateEnum.WAIT_PAY.getState());
         runningStatus.add(OrderTradeStateEnum.PAY_ING.getState());
@@ -123,7 +133,7 @@ public enum OrderTradeStateEnum {
      * @param state
      * @return
      */
-    public static  boolean isAllCancel(int state){
+    public static  boolean isAllowCancel(int state){
         return allowCancelStatus.contains(state);
     }
 
@@ -142,6 +152,15 @@ public enum OrderTradeStateEnum {
      */
     public static List<Integer> getRunningStates(){
         return new ArrayList<>(runningStatus);
+    }
+
+    /**
+     * 是否允许支付回调
+     * @param state
+     * @return
+     */
+    public static boolean isPayBack(int state){
+        return payBackStatus.contains(state);
     }
 
 

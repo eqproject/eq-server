@@ -23,6 +23,7 @@ import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.common.enums.LogTypeEnum;
 import org.eq.modules.enums.*;
 import org.eq.modules.log.OrderLogService;
+import org.eq.modules.log.impl.OrderPaymentTradeLogServiceImpl;
 import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.order.entity.OrderAdExample;
 import org.eq.modules.order.service.OrderAdService;
@@ -45,6 +46,8 @@ import org.eq.modules.trade.service.OrderPaymentTradeService;
 import org.eq.modules.trade.service.OrderTradeService;
 import org.eq.modules.trade.vo.*;
 import org.eq.modules.utils.ProductUtil;
+import org.eq.modules.wallet.entity.UserWallet;
+import org.eq.modules.wallet.service.UserWalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,9 +68,15 @@ import java.util.Map;
 @AutowiredService
 public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, OrderTrade, OrderTradeExample> implements OrderTradeService {
 
+    /**
+     * 订单日志服务
+     */
 	@Autowired
 	OrderLogService orderLogService;
 
+    /**
+     * 商品服务
+     */
 	@Autowired
 	ProductService productService;
 
@@ -79,6 +88,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 
 	@Autowired
 	OrderPaymentTradeService orderPaymentTradeService;
+
 
 	@Autowired
 	private BcTxRecordMapper bcTxRecordMapper;
@@ -97,6 +107,12 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 
 	@Autowired
 	private ProductCache productCache;
+
+    /**
+     * 用户钱包服务
+     */
+	@Autowired
+    private UserWalletService userWalletService;
 
 
 
@@ -208,15 +224,24 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 			result.setErrMsg(errMsg);
 			return  result;
 		}
-		if(StringUtils.isEmpty(user.getAddress())){
-			result.setErrMsg("用户钱包地址未激活");
-			return  result;
-		}
 		OrderAd orderAd = getOrderAdForCode(orderTradeCreateReqVO.getAdNo());
 		if (orderAd == null || (orderAd.getStatus()!= OrderAdStateEnum.ORDER_TRADEING.getState())) {
 			result.setErrMsg("广告订单不存在或已下架");
 			return  result;
 		}
+		if(String.valueOf(orderAd.getUserId()).equals(String.valueOf(user.getId()))){
+            result.setErrMsg("买卖双方同一人");
+            return  result;
+        }
+        UserWallet fromUser = userWalletService.selectByPrimaryKey(orderAd.getUserId());
+        UserWallet toUser = userWalletService.selectByPrimaryKey(user.getId());
+        String fromAddress = fromUser==null? "" :(fromUser.getStatus()==0? "" : fromUser.getAddress());
+        String toAddress = toUser==null? "" :(toUser.getStatus()==0? "" : toUser.getAddress());
+        if(StringUtils.isEmpty(fromAddress) || StringUtils.isEmpty(toAddress)){
+            result.setErrMsg("用户钱包地址未激活");
+            return  result;
+        }
+
 		Product product = productService.selectByPrimaryKey(orderAd.getProductId());
 		if (!ProductUtil.isEffect(product)) {
 			result.setErrMsg("商品不存在或已下架");
@@ -351,7 +376,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		OrderTrade orderTrade = new OrderTrade();
 		orderTrade.setTradeNo(tradeNo);
 		orderTrade = selectByRecord(orderTrade);
-		if (orderTrade == null || !OrderTradeStateEnum.isAllCancel(orderTrade.getStatus())) {
+		if (orderTrade == null || !OrderTradeStateEnum.isAllowCancel(orderTrade.getStatus())) {
 			throw new TradeOrderException("交易单号记录不存在或者不能进行取消");
 		}
 		OrderAd orderAd = getOrderAdForCode(orderTrade.getAdNo());
@@ -470,14 +495,19 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 	public OrderTradePaymentResVO orderPaymentTradeNotify(OrderTradePaymentReqVO orderTradePaymentReqVO) {
 
 		OrderTradePaymentResVO result = new OrderTradePaymentResVO();
-
 		OrderTrade orderTrade = new OrderTrade();
 		orderTrade.setTradeNo(orderTradePaymentReqVO.getTradeNo());
 		orderTrade = selectByRecord(orderTrade);
 		if (orderTrade == null) {
 			throw new TradeOrderException("交易单号记录不存在");
 		}
+
+
+		if(!OrderTradeStateEnum.isPayBack(orderTrade.getStatus())){
+            throw new TradeOrderException("非支付回调状态");
+        }
 		boolean isSuccess= "1".equals(String.valueOf(orderTradePaymentReqVO.getPayStatus()))? true : false;
+
 
 		OrderPaymentTrade orderPaymentTrade = insertOrderPayment(orderTrade,isSuccess,orderTradePaymentReqVO.getPayNo(),orderTradePaymentReqVO.getPayType());
 		if(orderPaymentTrade ==null){
@@ -504,27 +534,42 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		if(number<=0){
 			throw new TradeOrderException("更改交易订单失败");
 		}
-
-		OrderTradeLog orderTradeLog = new OrderTradeLog();
-		orderTradeLog.setOldStatus(oldStatus);
-		orderTradeLog.setNewStatus(updateObj.getStatus());
-		orderTradeLog.setOrderTradeId(orderTrade.getId());
-		orderTradeLog.setCreateDate(new Date());
-		orderTradeLog.setRemarks("通知成功，完成支付流水入库");
-		orderLogService.save(LogTypeEnum.TRADE,orderTradeLog);
+		insertOrderTradeLog(orderTrade.getId(),oldStatus,updateObj.getStatus(),"通知成功，完成支付流水入库");
 		if(!isSuccess){
-			return result;
-		}
-		BSearchProduct bSearchProduct = new BSearchProduct();
-		bSearchProduct.setProductId(orderTrade.getProductId());
-		ProductDetailVO productDetailVO = productService.getProductAll(bSearchProduct);
-		if(productDetailVO==null){
-			logger.error("交易订单:{}",orderTrade.getTradeNo()+" 支付成功，但获取商品失败，状态无法变为放券中");
-			return result;
-		}
-		orderTrade.setStatus(OrderTradeStateEnum.VOUCHER_ING.getState());
+            return result;
+        }
+        UserWallet fromUser = userWalletService.selectByPrimaryKey(orderTrade.getSellUserId());
+        UserWallet toUser = userWalletService.selectByPrimaryKey(orderTrade.getBuyUserId());
+        String fromAddress = fromUser==null? "" :(fromUser.getStatus()==0? "" : fromUser.getAddress());
+        String toAddress = toUser==null? "" :(toUser.getStatus()==0? "" : toUser.getAddress());
+		int bizType=2;
+        if(orderTrade.getType() == OrderTradeTypeEnum.ORDER_BUY.getType()){
+            //当前用户发起购买
+            bizType = 3;
+        }
 
+        ProductAll productAll =  productCache.getProduct(String.valueOf(orderTrade.getProductId()));
+        BcTxRecord bcTxRecord  = insertBx(productAll,fromAddress,toAddress,orderTrade.getOrderNum(),bizType);
+        if(bcTxRecord==null){
+            logger.info("交易订单支付成功，但插入区块链表失败,交易ID 为 : {}",orderTrade.getId());
+        }
 
+        updateOrderTrade = new OrderTradeExample();
+        updateOrderCa = updateOrderTrade.or();
+        updateOrderCa.andIdEqualTo(orderTrade.getId());
+        updateOrderCa.andStatusEqualTo(OrderTradeStateEnum.PAY_SUCCESS.getState());
+
+        updateObj = new OrderTrade();
+        updateObj.setId(orderTrade.getId());
+        updateObj.setStatus(OrderTradeStateEnum.VOUCHER_ING.getState());
+        updateObj.setUpdateDate(new Date());
+        updateObj.setTxId(bcTxRecord==null?-1:bcTxRecord.getId());
+        number = updateByExampleSelective(updateObj,updateOrderTrade);
+        if(number<=0){
+            logger.error("订单支付成功，区块量");
+            throw new TradeOrderException("更改交易订单失败");
+        }
+        insertOrderTradeLog(orderTrade.getId(),OrderTradeStateEnum.PAY_SUCCESS.getState(),updateObj.getStatus(),"支付成功后，状态变更为放券中");
 		return result;
 	}
 
@@ -698,7 +743,16 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 
 	}
 
-	private BcTxRecord insertBx(ProductAll productAll,String fromAddress,String toAddress,int number){
+    /**
+     * 插入交易券记录
+     * @param productAll 商品信息
+     * @param fromAddress 收方地址
+     * @param toAddress
+     * @param number
+     * @param bizType
+     * @return
+     */
+	private BcTxRecord insertBx(ProductAll productAll,String fromAddress,String toAddress,int number,int bizType){
 		BcTxRecord bcTxRecord = new BcTxRecord();
 		bcTxRecord.setFromAddress(fromAddress);
 		bcTxRecord.setToAddress(toAddress);
@@ -710,7 +764,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		bcTxRecord.setContractAddress(productAll.getContractAddress());
 		bcTxRecord.setAssetType(1);
 		bcTxRecord.setTxStatus(0);
-		bcTxRecord.setBizType(2);
+		bcTxRecord.setBizType(bizType);
 		bcTxRecord.setCreateTime(new Date());
 		bcTxRecord.setUpdateTime(new Date());
 		bcTxRecord.setOptMetadata("用户地址:"+fromAddress+" 转往"+toAddress);
@@ -742,14 +796,11 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderPaymentTrade.setStatus(state);
 
 		Long orderPaymentTradeId = orderPaymentTradeService.insertOrderPaymentTradeReturnId(orderPaymentTrade);
-
-		// 插入支付日志记录
-		OrderPaymentTradeLog orderPaymentTradeLog = new OrderPaymentTradeLog();
-		orderPaymentTradeLog.setOrderPayTradeId(orderPaymentTradeId);
-		orderPaymentTradeLog.setCreateDate(new Date());
-		orderPaymentTradeLog.setOldStatus(orderPaymentTrade.getStatus());
-		orderPaymentTradeLog.setNewStatus(orderPaymentTrade.getStatus());
-		orderLogService.save(LogTypeEnum.TRADE_PAYMENT,orderPaymentTradeLog);
+		if(orderPaymentTradeId<=0){
+		    logger.error("插入交易支付记录失败 {}",orderPaymentTrade.toString());
+		    return null;
+        }
+        insertOrderTradePayMentLog(orderPaymentTrade.getId(),-1,state,"支付回调日志插入");
 		return orderPaymentTrade;
 	}
 
@@ -813,5 +864,24 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderTradeLog.setRemarks(remark);
 		orderLogService.save(LogTypeEnum.TRADE,orderTradeLog);
 	}
+
+
+    /**
+     * 插入交易流水日志
+     * @param trandId
+     * @param oldState
+     * @param newState
+     * @param remark
+     */
+    private void  insertOrderTradePayMentLog(long trandId,int oldState,int newState,String remark){
+        // 插入支付日志记录
+        OrderPaymentTradeLog orderPaymentTradeLog = new OrderPaymentTradeLog();
+        orderPaymentTradeLog.setOrderPayTradeId(trandId);
+        orderPaymentTradeLog.setCreateDate(new Date());
+        orderPaymentTradeLog.setOldStatus(oldState);
+        orderPaymentTradeLog.setNewStatus(newState);
+        orderPaymentTradeLog.setRemarks(remark);
+        orderLogService.save(LogTypeEnum.TRADE_PAYMENT,orderPaymentTradeLog);
+    }
 
 }
