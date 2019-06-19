@@ -93,10 +93,6 @@ public class ProductController extends BaseController {
 		BSearchProduct bsearchProduct = new BSearchProduct();
 		bsearchProduct.setProductId(searchProductVO.getId());
 		ProductDetailVO productDetailVO =  productService.getProductAll(bsearchProduct);
-		if(productDetailVO==null){
-			productDetailVO = new ProductDetailVO();
-		}
-
 		return ResponseFactory.success(productDetailVO);
 	}
 
