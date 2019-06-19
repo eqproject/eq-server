@@ -18,10 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * api 拦截器
@@ -36,9 +33,23 @@ public class ApiInterceptor  implements HandlerInterceptor {
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    private static Set<String> noSignUrl = new HashSet<>();
+    static {
+        noSignUrl.add("api/support/terms");
+        noSignUrl.add("api/support/legal");
+        noSignUrl.add("api/support/buydoc");
+        noSignUrl.add("api/support/getConfig");
+    }
+
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o)
             throws Exception {
+
+        String url = httpServletRequest.getRequestURL().toString();
+        url = url.substring(url.indexOf("api"));
+        if(noSignUrl.contains(url)){
+            return true;
+        }
 
         Map<String, String[]> map = httpServletRequest.getParameterMap();
         if(!map.containsKey(SIGN)){

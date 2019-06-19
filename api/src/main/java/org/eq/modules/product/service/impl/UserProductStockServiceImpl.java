@@ -328,10 +328,10 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 		return result>0?userProductStock:null;
 	}
 
-	/*private static List<ProductBaseVO> pageBySubList(List<ProductBaseVO> list, int pagesize, int currentPage) {
+	/*private static List<ConfigVO> pageBySubList(List<ConfigVO> list, int pagesize, int currentPage) {
 		int totalcount = list.size();
 		int pagecount = 0;
-		List<ProductBaseVO> subList = new ArrayList<>();
+		List<ConfigVO> subList = new ArrayList<>();
 		int m = totalcount % pagesize;
 		if (m > 0) {
 			pagecount = totalcount / pagesize + 1;

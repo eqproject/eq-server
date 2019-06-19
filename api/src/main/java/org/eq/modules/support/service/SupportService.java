@@ -8,6 +8,7 @@ import org.eq.basic.common.base.ServiceExtend;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.support.entity.Support;
 import org.eq.modules.support.entity.SupportExample;
+import org.eq.modules.support.vo.ConfigVO;
 
 /**
  * 文案相关Service
@@ -21,4 +22,10 @@ public interface SupportService extends ServiceExtend<Support, SupportExample> {
     ResponseData getLegal();
 
     ResponseData getBuydoc();
+
+    /**
+     * 获取平台配置项
+     * @return
+     */
+    ConfigVO getConfigVo();
 }

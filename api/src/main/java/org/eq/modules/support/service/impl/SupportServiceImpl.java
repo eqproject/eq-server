@@ -15,6 +15,8 @@ import org.eq.modules.support.dao.SupportMapper;
 import org.eq.modules.support.entity.Support;
 import org.eq.modules.support.entity.SupportExample;
 import org.eq.modules.support.service.SupportService;
+import org.eq.modules.support.vo.ConfigVO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,9 +33,8 @@ import java.util.Map;
 @AutowiredService
 public class SupportServiceImpl extends ServiceImplExtend<SupportMapper, Support, SupportExample> implements SupportService {
 
-    public SupportServiceImpl(SupportMapper mapper) {
-        super.setMapper(mapper);
-    }
+    @Value("${aes.key}")
+    private String aesKey;
 
     @Override
     public SupportExample getExampleFromEntity(Support support, Map<String, Object> params) {
@@ -114,5 +115,13 @@ public class SupportServiceImpl extends ServiceImplExtend<SupportMapper, Support
         } else {
             return ResponseFactory.error("获取失败", "1");
         }
+    }
+
+
+    @Override
+    public ConfigVO getConfigVo() {
+        ConfigVO configVO = new ConfigVO();
+        configVO.setAesKey(aesKey);
+        return configVO;
     }
 }
