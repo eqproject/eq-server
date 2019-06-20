@@ -7,3 +7,5 @@
 /api/*.iml
 /*.iml
 /logs/*.log
+/api/logs
+/*/logs
