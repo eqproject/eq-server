@@ -234,16 +234,16 @@ public class OrderTradeController extends BaseController {
      */
     @PostMapping("/paying/list")
     public ResponseData<PageResultData> payingOrderTradeList(OrderTradeListReqVO orderTradeListReqVO) {
-        if (orderTradeListReqVO == null) {
-            logger.error("payingOrderTradeList 失败，原因是 orderTradeListReqVO is null");
+
+        if (orderTradeListReqVO == null || orderTradeListReqVO.getUserId()<=0) {
             return ResponseFactory.paramsError("请求参数不能为空");
         }
+
         logger.info("payingOrderTradeList 请求参数:{}",JSON.toJSONString(orderTradeListReqVO));
-        PageResultData<OrderTradeListResVO> orderTradeListResVOPageResultData;
+        PageResultData<OrderTradeSimpleResVO> orderTradeListResVOPageResultData;
         try {
-            List<Integer> orderTradeStatus = new ArrayList<>();
-            orderTradeStatus.add(OrderTradeStateEnum.WAIT_PAY.getState());
-            orderTradeListResVOPageResultData = orderTradeService.pageTradeOrderList(orderTradeListReqVO,orderTradeStatus);
+
+            orderTradeListResVOPageResultData = orderTradeService.pageWaitPayList(orderTradeListReqVO);
         } catch (BaseServiceException e) {
             logger.error("payingOrderTradeList 失败，原因是:{}",e.getMessage());
             return ResponseFactory.paramsError(e.getMessage());
@@ -267,7 +267,7 @@ public class OrderTradeController extends BaseController {
             return ResponseFactory.paramsError("请求参数不能为空");
         }
         logger.info("porcessingOrderTradeList 请求参数:{}",JSON.toJSONString(orderTradeListReqVO));
-        PageResultData<OrderTradeListResVO> orderTradeListResVOPageResultData;
+        PageResultData<OrderTradeSimpleResVO> orderTradeListResVOPageResultData;
         try {
             List<Integer> orderTradeStatus = new ArrayList<>();
             orderTradeStatus.add(OrderTradeStateEnum.WAIT_PAY.getState());

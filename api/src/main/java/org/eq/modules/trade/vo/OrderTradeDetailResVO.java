@@ -1,7 +1,6 @@
 package org.eq.modules.trade.vo;
 
 import lombok.Data;
-import org.eq.modules.product.entity.ProductAll;
 import org.eq.modules.product.vo.ProductDetailVO;
 
 import java.io.Serializable;
@@ -27,7 +26,7 @@ public class OrderTradeDetailResVO implements Serializable {
     /**
      * 用户详情
      */
-    private OrderTradeDetailUser user;
+    private OrderTradeUser user;
 
 
     /**

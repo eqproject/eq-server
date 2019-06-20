@@ -86,7 +86,7 @@ public class OrderTradePayExpireBiz {
         OrderTradeExample.Criteria ca = example.or();
         List<Integer> status = new ArrayList<>();
         status.add(OrderTradeStateEnum.WAIT_PAY.getState());
-        ca.andStatusIn(status);
+        ca.andStatusInForAll(status);
         ca.andCreateDateLessThan(DateUtil.beforeDateHour(DateUtil.getNowTime(),hour));
         result.addAll(orderTradeMapper.selectByExample(example));
 
@@ -95,7 +95,7 @@ public class OrderTradePayExpireBiz {
         status = new ArrayList<>();
         status.add(OrderTradeStateEnum.PAY_ING.getState());
         status.add(OrderTradeStateEnum.PAY_FAIL.getState());
-        ca.andStatusIn(status);
+        ca.andStatusInForAll(status);
         ca.andUpdateDateLessThan(DateUtil.beforeDateHour(DateUtil.getNowTime(),hour));
         result.addAll(orderTradeMapper.selectByExample(example));
         return result;
@@ -113,6 +113,7 @@ public class OrderTradePayExpireBiz {
         OrderTrade updateOrderTrade  = new OrderTrade();
         updateOrderTrade.setStatus(newStatus);
         updateOrderTrade.setUpdateDate(nowDate);
+        updateOrderTrade.setFinishTime(new Date());
         OrderTradeExample whereExample = new OrderTradeExample();
         OrderTradeExample.Criteria ca = whereExample.or();
         ca.andStatusEqualTo(oldStatus);

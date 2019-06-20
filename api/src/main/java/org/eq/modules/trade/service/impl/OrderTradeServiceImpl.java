@@ -23,7 +23,6 @@ import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.common.enums.LogTypeEnum;
 import org.eq.modules.enums.*;
 import org.eq.modules.log.OrderLogService;
-import org.eq.modules.log.impl.OrderPaymentTradeLogServiceImpl;
 import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.order.entity.OrderAdExample;
 import org.eq.modules.order.service.OrderAdService;
@@ -52,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -134,66 +134,6 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 			example.setOrderByClause(orderName+" "+orderDir);
 		}else{
 			example.setOrderByClause("id asc");
-		}
-		if(orderTrade.getId()!=null){
-			ca.andIdEqualTo(orderTrade.getId());
-		}
-		if(orderTrade.getSellUserId()!=null){
-			ca.andSellUserIdEqualTo(orderTrade.getSellUserId());
-		}
-		if(orderTrade.getBuyUserId()!=null){
-			ca.andBuyUserIdEqualTo(orderTrade.getBuyUserId());
-		}
-		if(StringLowUtils.isNotBlank(orderTrade.getAdNo())){
-			ca.andAdNoEqualTo(orderTrade.getAdNo());
-		}
-		if(StringLowUtils.isNotBlank(orderTrade.getTradeNo())){
-			ca.andTradeNoEqualTo(orderTrade.getTradeNo());
-		}
-		if(orderTrade.getProductId()!=null){
-			ca.andProductIdEqualTo(orderTrade.getProductId());
-		}
-		if(orderTrade.getOrderNum()!=null){
-			ca.andOrderNumEqualTo(orderTrade.getOrderNum());
-		}
-		if(orderTrade.getType()!=null){
-			ca.andTypeEqualTo(orderTrade.getType());
-		}
-		if(orderTrade.getStatus()!=null){
-			ca.andStatusEqualTo(orderTrade.getStatus());
-		}
-		if(orderTrade.getBlockchainStatus()!=null){
-			ca.andBlockchainStatusEqualTo(orderTrade.getBlockchainStatus());
-		}
-		if(orderTrade.getSalePrice()!=null){
-			ca.andSalePriceEqualTo(orderTrade.getSalePrice());
-		}
-		if(orderTrade.getUnitPrice()!=null){
-			ca.andUnitPriceEqualTo(orderTrade.getUnitPrice());
-		}
-		if(orderTrade.getAmount()!=null){
-			ca.andAmountEqualTo(orderTrade.getAmount());
-		}
-		if(orderTrade.getRemindPay()!=null){
-			ca.andRemindPayEqualTo(orderTrade.getRemindPay());
-		}
-		if(orderTrade.getFinishTime()!=null){
-			ca.andFinishTimeEqualTo(orderTrade.getFinishTime());
-		}
-		if(StringLowUtils.isNotBlank(orderTrade.getRemarks())){
-			ca.andRemarksEqualTo(orderTrade.getRemarks());
-		}
-		if(StringLowUtils.isNotBlank(orderTrade.getCancelDesc())){
-			ca.andCancelDescEqualTo(orderTrade.getCancelDesc());
-		}
-		if(orderTrade.getCreateDate()!=null){
-			ca.andCreateDateEqualTo(orderTrade.getCreateDate());
-		}
-		if(orderTrade.getUpdateDate()!=null){
-			ca.andUpdateDateEqualTo(orderTrade.getUpdateDate());
-		}
-		if(orderTrade.getTxId()!=null){
-			ca.andTxIdEqualTo(orderTrade.getTxId());
 		}
 		return example;
 	}
@@ -297,14 +237,16 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderTrade.setOrderNum(orderTradeCreateReqVO.getOrderNum());
 		orderTrade.setType(tradeType);
 		orderTrade.setStatus(OrderTradeStateEnum.WAIT_PAY.getState());
-		orderTrade.setBlockchainStatus(OrderTradeBlockChainStateEnum.PROCESSING.getState());
 		orderTrade.setSalePrice(orderTradeCreateReqVO.getSalePrice());
 		orderTrade.setUnitPrice(product.getUnitPrice());
 		orderTrade.setAmount(orderTrade.getOrderNum() * orderTrade.getSalePrice());
+		BigDecimal bigDecimal = new BigDecimal(Double.valueOf(getServiceFee())).multiply(new BigDecimal(orderTrade.getAmount()));
+		int servicefee = bigDecimal.setScale(0, BigDecimal.ROUND_UP).intValue();
+		orderTrade.setServiceFee(servicefee);
 		orderTrade.setRemindPay(0);
 		orderTrade.setCreateDate(new Date());
 		orderTrade.setFinishTime(DateUtil.afterDateHour(orderTrade.getCreateDate(),getOverHour()));
-		orderTrade.setRemarks("");
+		orderTrade.setRemarks("创建订单");
 		orderTrade.setUpdateDate(new Date());
 
 		long insertId=orderTradeMapper.insertSelectiveAndReturnId(orderTrade);
@@ -319,7 +261,12 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 	}
 
 
-
+	/**
+	 * 支付回调前接口
+	 * @param orderTradeSearchVO
+	 * @param user
+	 * @return
+	 */
     @Override
     public ServieReturn<OrderTrade> prePayTradeOrder(OrderTradeSearchVO orderTradeSearchVO,User user) {
         ServieReturn<OrderTrade> result  = new ServieReturn<>();
@@ -335,6 +282,12 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
             result.setErrMsg("交易订单不能进行交易");
             return  result;
         }
+        Date date = DateUtil.afterDateHour(orderTrade.getCreateDate(),getOverHour());
+        Date nowTime = new Date();
+        if(nowTime.getTime()>date.getTime()){
+			result.setErrMsg("交易订单已过期");
+			return  result;
+		}
 
         OrderAd orderAd = getOrderAdForCode(orderTrade.getAdNo());
         if (orderAd == null || !OrderAdStateEnum.isEffectState(orderAd.getStatus())) {
@@ -358,6 +311,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		updateObj.setId(orderTrade.getId());
 		updateObj.setStatus(OrderTradeStateEnum.PAY_ING.getState());
 		updateObj.setUpdateDate(new Date());
+
 		int number = updateByExampleSelective(updateObj,updateOrderTrade);
 		if(number<=0){
 			result.setErrMsg("前置支付设置出错");
@@ -370,7 +324,10 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
     }
 
 
-
+	/**
+	 * 取消订单
+	 * @param tradeNo 交易订单号
+	 */
 	@Override
 	public void cancelTradeOrder(String tradeNo) {
 		OrderTrade orderTrade = new OrderTrade();
@@ -395,6 +352,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 
 		updateObj.setStatus(OrderTradeStateEnum.CANCEL.getState());
 		updateObj.setUpdateDate(new Date());
+		updateObj.setFinishTime(new Date());
 		int number = updateByExampleSelective(updateObj,updateOrderTrade);
 		if(number<=0){
 			throw new TradeOrderException("取消失败");
@@ -422,13 +380,18 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 	}
 
 
+	/**
+	 * 获取交易数
+	 * @param userId 用户ID
+	 * @return
+	 */
 	@Override
 	public OrderTradePoolInfoVO poolInfolTradeOrder(long userId) {
 		OrderTradePoolInfoVO result = new OrderTradePoolInfoVO();
 
 		OrderTradeExample orderTradeExample = new OrderTradeExample();
 		OrderTradeExample.Criteria ca = orderTradeExample.or();
-		ca.andStatusIn(OrderTradeStateEnum.getRunningStates());
+		ca.andStatusInForAll(OrderTradeStateEnum.getRunningStates());
 		ca.andAllUserIdEqualTo(userId);
 
 		List<OrderTrade> list = findListByExample(orderTradeExample);
@@ -451,7 +414,11 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 	}
 
 
-
+	/**
+	 * 交易订单详情
+	 * @param tradeNo
+	 * @return
+	 */
 	@Override
 	public OrderTradeDetailResVO tradeOrderDetail(String tradeNo) {
 		OrderTrade orderTrade = new OrderTrade();
@@ -479,18 +446,21 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		}
 		orderTradeDetailResVO.setTrade(initTradDetail(orderTrade));
 
-		OrderTradeDetailUser orderTradeDetailUser = new OrderTradeDetailUser();
+		OrderTradeUser orderTradeDetailUser = new OrderTradeUser();
 		orderTradeDetailUser.setBuyUserId(orderTrade.getBuyUserId());
 		orderTradeDetailUser.setSellUserId(orderTrade.getSellUserId());
 		orderTradeDetailUser.setBuyUserNickName(buserUser.getNickname());
-		orderTradeDetailUser.setSellUserName(sellUser.getName());
 		orderTradeDetailUser.setSellUserNickName(sellUser.getNickname());
-		orderTradeDetailUser.setSellUserAccount("");// TODO 从用户绑定账户表中获取卖家支付账户
 
 		orderTradeDetailResVO.setUser(orderTradeDetailUser);
 		return orderTradeDetailResVO;
 	}
 
+	/**
+	 * 支付结果通知
+	 * @param orderTradePaymentReqVO
+	 * @return
+	 */
 	@Override
 	public OrderTradePaymentResVO orderPaymentTradeNotify(OrderTradePaymentReqVO orderTradePaymentReqVO) {
 
@@ -501,13 +471,10 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		if (orderTrade == null) {
 			throw new TradeOrderException("交易单号记录不存在");
 		}
-
-
 		if(!OrderTradeStateEnum.isPayBack(orderTrade.getStatus())){
             throw new TradeOrderException("非支付回调状态");
         }
 		boolean isSuccess= "1".equals(String.valueOf(orderTradePaymentReqVO.getPayStatus()))? true : false;
-
 
 		OrderPaymentTrade orderPaymentTrade = insertOrderPayment(orderTrade,isSuccess,orderTradePaymentReqVO.getPayNo(),orderTradePaymentReqVO.getPayType());
 		if(orderPaymentTrade ==null){
@@ -573,9 +540,71 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		return result;
 	}
 
+	/**
+	 * 获取待付款数据
+	 * @param orderTradeListReqVO
+	 * @return
+	 */
 	@Override
-	public PageResultData<OrderTradeListResVO> pageTradeOrderList(OrderTradeListReqVO orderTradeListReqVO,List<Integer> orderTradeStatus) {
-		PageResultData<OrderTradeListResVO> result = new PageResultData<>();
+	public PageResultData<OrderTradeSimpleResVO> pageWaitPayList(OrderTradeListReqVO orderTradeListReqVO){
+		PageResultData<OrderTradeSimpleResVO> result = new PageResultData<>();
+
+		if(orderTradeListReqVO ==null  || orderTradeListReqVO.getUserId()<=0){
+			result.setList(new ArrayList<>());
+			result.setTotal(0);
+			return result;
+		}
+		if(orderTradeListReqVO.getPageSize()<=0 || orderTradeListReqVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
+			orderTradeListReqVO.setPageSize(StaticEntity.MAX_PAGE_SIZE);
+		}
+		if(orderTradeListReqVO.getPageNum()<=0){
+			orderTradeListReqVO.setPageNum(1);
+		}
+		OrderTradeExample orderTradeExample = new OrderTradeExample();
+		OrderTradeExample.Criteria ca = orderTradeExample.or();
+		orderTradeExample.setOrderByClause(" create_date desc");
+
+		ca.andStatusInForAll(OrderTradeStateEnum.getRunPay());
+		ca.andBuyUserIdEqualTo(orderTradeListReqVO.getUserId());
+
+		BaseTableData baseTableData = findDataTableByExampleForPage(orderTradeExample,orderTradeListReqVO.getPageNum(), orderTradeListReqVO.getPageSize());
+		if(baseTableData==null || CollectionUtils.isEmpty(baseTableData.getData())){
+			return result;
+		}
+		List<OrderTradeSimpleResVO> dataList = new ArrayList<>(baseTableData.getData().size());
+		List<OrderTrade> pList = baseTableData.getData();
+		for(OrderTrade orderTrade : pList){
+			Product product = productService.selectByPrimaryKey(orderTrade.getProductId());
+			if (product == null) {
+				logger.error("tradeOrderDetail 商品ID[{}]记录不存在",orderTrade.getProductId());
+				continue;
+			}
+			User sellUser = userService.selectByPrimaryKey(orderTrade.getSellUserId());
+			if (sellUser == null) {
+				logger.error("pageTradeOrderList 交易订单号[{}] 卖家[{}]用户记录不存在",orderTrade.getTradeNo(),orderTrade.getSellUserId());
+				continue;
+			}
+			OrderTradeSimpleResVO temp = new OrderTradeSimpleResVO();
+			OrderTradeDetailTrade trade = initTradDetailForWaitPay(orderTrade);
+			trade.setProductImg(product.getProductImg());
+			trade.setProductName(product.getName());
+			temp.setTrade(trade);
+
+			OrderTradeUser orderTradeUser = new OrderTradeUser();
+			orderTradeUser.setSellUserId(sellUser.getId());
+			orderTradeUser.setSellUserNickName(sellUser.getNickname());
+			temp.setOrderTradeUser(orderTradeUser);
+
+			dataList.add(temp);
+		}
+		result.setList(dataList);
+		result.setTotal(baseTableData.getRecordsTotal());
+		return result;
+	}
+
+	@Override
+	public PageResultData<OrderTradeSimpleResVO> pageTradeOrderList(OrderTradeListReqVO orderTradeListReqVO, List<Integer> orderTradeStatus) {
+		PageResultData<OrderTradeSimpleResVO> result = new PageResultData<>();
 		if(orderTradeListReqVO ==null){
 			orderTradeListReqVO = new OrderTradeListReqVO();
 		}
@@ -589,21 +618,18 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		OrderTradeExample.Criteria ca = orderTradeExample.or();
 		orderTradeExample.setOrderByClause(" create_date desc");
 
-		ca.andStatusIn(orderTradeStatus);
+		ca.andStatusInForAll(orderTradeStatus);
 		ca.andBuyUserIdEqualTo(orderTradeListReqVO.getUserId());
 
 		BaseTableData baseTableData = findDataTableByExampleForPage(orderTradeExample,orderTradeListReqVO.getPageNum(), orderTradeListReqVO.getPageSize());
 		if(baseTableData==null || CollectionUtils.isEmpty(baseTableData.getData())){
 			return result;
 		}
-		List<OrderTradeListResVO> dataList = new ArrayList<>(baseTableData.getData().size());
+		List<OrderTradeSimpleResVO> dataList = new ArrayList<>(baseTableData.getData().size());
 		List<OrderTrade> pList = baseTableData.getData();
 		for(OrderTrade orderTrade : pList){
-
-			BSearchProduct bsearchProduct =  new BSearchProduct();
-			bsearchProduct.setProductId(orderTrade.getProductId());
-			ProductDetailVO productDetailVO = productService.getProductAll(bsearchProduct);
-			if (productDetailVO == null) {
+			Product product = productService.selectByPrimaryKey(orderTrade.getProductId());
+			if (product == null) {
 				logger.error("tradeOrderDetail 商品ID[{}]记录不存在",orderTrade.getProductId());
 				continue;
 			}
@@ -620,18 +646,20 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 				continue;
 			}
 			OrderTradeDetailTrade trade = initTradDetail(orderTrade);
-
-			OrderTradeDetailUser orderTradeDetailUser = new OrderTradeDetailUser();
+			trade.setProductImg(product.getProductImg());
+			trade.setProductName(product.getName());
+			OrderTradeUser orderTradeDetailUser = new OrderTradeUser();
 			orderTradeDetailUser.setBuyUserId(orderTrade.getBuyUserId());
 			orderTradeDetailUser.setSellUserId(orderTrade.getSellUserId());
 			orderTradeDetailUser.setBuyUserNickName(buserUser.getNickname());
-			orderTradeDetailUser.setSellUserName(sellUser.getName());
-			orderTradeDetailUser.setSellUserNickName(sellUser.getNickname());
-			orderTradeDetailUser.setSellUserAccount("");// todo 从用户绑定账户表中获取卖家支付账户
 
-			OrderTradeListResVO orderTradeListResVO = new OrderTradeListResVO();
-			orderTradeListResVO.setUser(orderTradeDetailUser);
-			orderTradeListResVO.setProduct(productDetailVO);
+			orderTradeDetailUser.setSellUserNickName(sellUser.getNickname());
+
+
+			OrderTradeSimpleResVO orderTradeListResVO = new OrderTradeSimpleResVO();
+			orderTradeListResVO.setOrderTradeUser(orderTradeDetailUser);
+
+
 			orderTradeListResVO.setTrade(trade);
 			dataList.add(orderTradeListResVO);
 		}
@@ -640,9 +668,35 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		return result;
 	}
 
-
 	/**
 	 * 格式化交易订单数据
+	 * @param orderTrade
+	 * @return
+	 */
+	private OrderTradeDetailTrade initTradDetailForWaitPay(OrderTrade orderTrade){
+		if(orderTrade ==null){
+			return null;
+		}
+		OrderTradeDetailTrade result = new OrderTradeDetailTrade();
+		result.setTradeNo(orderTrade.getTradeNo());
+		result.setAmount(orderTrade.getAmount());
+		result.setCreateTime(DateUtil.foramtChinaFormat(orderTrade.getCreateDate()));
+		result.setUpdateTime(DateUtil.foramtChinaFormat(orderTrade.getUpdateDate()));
+		result.setOrderNum(orderTrade.getOrderNum());
+		result.setRemindPay(orderTrade.getRemindPay());
+		result.setSalePrice(orderTrade.getSalePrice());
+		result.setStatus(orderTrade.getStatus());
+		result.setPayTimeOut(getOverHour());
+		result.setServiceFee(orderTrade.getServiceFee()==null?0:orderTrade.getServiceFee());
+		result.setUnitPrice(orderTrade.getUnitPrice());
+		return result;
+	}
+
+
+
+
+	/**
+	 * 格式化正在交易数据
 	 * @param orderTrade
 	 * @return
 	 */
@@ -650,16 +704,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		if(orderTrade ==null){
 			return null;
 		}
-		OrderTradeDetailTrade result = new OrderTradeDetailTrade();
-		result.setTradeNo(orderTrade.getTradeNo());
-		result.setAmount(orderTrade.getAmount());
-		result.setCreateTime(DateUtil.dateToStr(orderTrade.getCreateDate(),DateUtil.DATE_FORMAT_FULL_01));
-		result.setOrderNum(orderTrade.getOrderNum());
-		result.setRemindPay(orderTrade.getRemindPay());
-		result.setSalePrice(orderTrade.getSalePrice());
-		result.setStatus(orderTrade.getStatus());
-		result.setRemindPay(orderTrade.getRemindPay());
-		result.setPayTimeOut(getOverHour());
+		OrderTradeDetailTrade result = initTradDetailForWaitPay(orderTrade);
 		OrderPaymentTrade orderPaymentTrade = new OrderPaymentTrade();
 		try{
 			orderPaymentTrade.setTradeNo(orderTrade.getTradeNo());
@@ -670,7 +715,6 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 
 		if (orderPaymentTrade != null) {
 			result.setPayNo(orderPaymentTrade.getPayNo());
-			result.setServiceFee(orderPaymentTrade.getServiceFee());
 			result.setPayTime(DateUtil.foramtChinaFormat(orderPaymentTrade.getPayTime()));
 		}
 		return result;
@@ -696,6 +740,33 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		}catch (Exception e){
 			e.printStackTrace();
 			logger.error("获取交易订单关闭时长配置异常");
+		}
+		return result;
+	}
+
+
+	/**
+	 * 获取服务费
+	 * @return
+	 */
+	private String getServiceFee(){
+		String result = "0" ;
+		SystemConfigExample example = new SystemConfigExample();
+		SystemConfigExample.Criteria ca = example.or();
+		ca.andTypeEqualTo(SystemConfigTypeEnum.FEE_SERVICE.getType());
+		ca.andStateEqualTo(SystemConfigStateEnum.DEFAULT.getState());
+
+		try{
+			List<SystemConfig> list = systemConfigMapper.selectByExample(example);
+			if(CollectionUtils.isEmpty(list)){
+				logger.info("系统未配置服务费");
+				return result;
+			}
+			SystemConfig systemConfig = list.get(0);
+			result =systemConfig.getValue();
+		}catch (Exception e){
+			e.printStackTrace();
+			logger.error("获取服务费配置异常");
 		}
 		return result;
 	}

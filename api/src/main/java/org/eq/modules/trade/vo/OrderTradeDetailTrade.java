@@ -21,29 +21,73 @@ public class OrderTradeDetailTrade implements Serializable{
      * 交易号
      */
     private String tradeNo;
-    private String payNo;
+
+    /**
+     * 面值
+     */
+    private int unitPrice;
+
+    /**
+     * 订单总价
+     */
     private Integer amount;
+    /**
+     * 订单数量
+     */
     private Integer orderNum;
+    /**
+     * 售卖单价
+     */
     private Integer salePrice;
     /**
      * 服务费
      */
-    private Integer serviceFee;
+    private int serviceFee;
+
+    /**
+     * 是否已催
+     */
     private Integer remindPay;
 
+    /**
+     * 状态
+     */
     private Integer status;
     /**
      * 创建时间
      */
     private String createTime;
-    /**
-     * 支付时间
-     */
-    private String payTime;
+
 
     /**
      * 交易最大时长
      */
     private int payTimeOut;
+
+    /**
+     * 最后一次交易时间
+     */
+    private String updateTime;
+
+    /**
+     * 商品图片
+     */
+    private String productImg;
+
+    /**
+     * 商品名称
+     */
+    private String productName;
+
+
+    /**
+     * 支付单号
+     */
+    private String payNo;
+
+    /**
+     * 支付时间
+     */
+    private String payTime;
 
 }

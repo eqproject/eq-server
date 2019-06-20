@@ -15,6 +15,7 @@
 	    <result column="sale_price" jdbcType="INTEGER" property="salePrice" />
 	    <result column="unit_price" jdbcType="INTEGER" property="unitPrice" />
 	    <result column="amount" jdbcType="INTEGER" property="amount" />
+        <result column="service_fee" jdbcType="INTEGER" property="serviceFee" />
 	    <result column="remind_pay" jdbcType="TINYINT" property="remindPay" />
 	    <result column="finish_time" jdbcType="TIMESTAMP" property="finishTime" />
 	    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
@@ -22,6 +23,8 @@
 	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
 	    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
 	    <result column="tx_id" jdbcType="BIGINT" property="txId" />
+        <result column="productName" jdbcType="BIGINT" property="productName" />
+        <result column="productImg" jdbcType="BIGINT" property="productImg" />
     </resultMap>
 
     <sql id="Example_Where_Clause">
@@ -85,7 +88,9 @@
     </sql>
 
     <sql id="Base_Column_List">
-        id,sell_user_id,buy_user_id,ad_no,trade_no,product_id,order_num,type,status,blockchain_status,sale_price,unit_price,amount,remind_pay,finish_time,remarks,cancel_desc,create_date,update_date,tx_id
+        OT.id,OT.sell_user_id,OT.buy_user_id,OT.ad_no,OT.trade_no,OT.product_id,OT.order_num,OT.type,OT.status,OT.blockchain_status,
+        OT.sale_price,OT.unit_price,OT.amount,OT.remind_pay,OT.finish_time,OT.remarks,OT.cancel_desc,OT.create_date,OT.update_date,OT.tx_id,
+        PP.name as productName,PP.product_img as productImg
     </sql>
 
     <select id="selectByExample" parameterType="org.eq.modules.trade.entity.OrderTradeExample" resultMap="BaseResultMap">
@@ -93,9 +98,8 @@
         <if test="distinct">
             distinct
         </if>
-        OT.id,OT.sell_user_id,OT.buy_user_id,OT.ad_no,OT.trade_no,OT.product_id,OT.order_num,OT.type,OT.status,OT.blockchain_status,
-        OT.sale_price,OT.unit_price,OT.amount,OT.remind_pay,OT.finish_time,OT.remarks,OT.cancel_desc,OT.create_date,OT.update_date,OT.tx_id,
-        PP.name as productName
+        <include refid="Base_Column_List" />
+
         from order_trade  OT left join  platform_product PP on OT.product_id = PP.id
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
@@ -108,7 +112,7 @@
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
-        from order_trade
+        from order_trade  OT left join  platform_product PP on OT.product_id = PP.id
         where id = #{id,jdbcType=BIGINT}
     </select>
 

@@ -659,8 +659,12 @@ public class OrderTradeExample {
             return (Criteria) this;
         }
 
-        public Criteria andStatusIn(List<Integer> values) {
+        public Criteria andStatusInForUpdate(List<Integer> values) {
             addCriterion("status in", values, "status");
+            return (Criteria) this;
+        }
+        public Criteria andStatusInForAll(List<Integer> values) {
+            addCriterion("OT.status in", values, "status");
             return (Criteria) this;
         }
 

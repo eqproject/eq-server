@@ -6,9 +6,7 @@ package org.eq.modules.trade.service;
 
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.entitys.PageResultData;
-import org.eq.modules.enums.OrderTradeStateEnum;
 import org.eq.modules.order.vo.ServieReturn;
-import org.eq.modules.trade.entity.OrderPaymentTrade;
 import org.eq.modules.trade.entity.OrderTrade;
 import org.eq.modules.trade.entity.OrderTradeExample;
 import org.eq.basic.common.base.ServiceExtend;
@@ -71,7 +69,17 @@ public interface OrderTradeService extends ServiceExtend<OrderTrade,OrderTradeEx
     OrderTradePaymentResVO orderPaymentTradeNotify(OrderTradePaymentReqVO orderTradePaymentReqVO);
 
 
-    PageResultData<OrderTradeListResVO> pageTradeOrderList(OrderTradeListReqVO orderTradeListReqVO,List<Integer> orderTradeStatus);
+    /**
+     * 查询待付款数据
+     * @param orderTradeListReqVO
+     * @return
+     */
+    PageResultData<OrderTradeSimpleResVO> pageWaitPayList(OrderTradeListReqVO orderTradeListReqVO);
+
+
+
+
+    PageResultData<OrderTradeSimpleResVO> pageTradeOrderList(OrderTradeListReqVO orderTradeListReqVO, List<Integer> orderTradeStatus);
 
 
 

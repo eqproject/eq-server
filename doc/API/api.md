@@ -1294,11 +1294,11 @@
 |--        productName |string |名称|
 |--        unitPrice |int |面值(单位:分)|
 |-    user |object |用户信息 |
-|--        sellUserId |long |售卖用户id|
+|~~--        sellUserId~~ |~~long~~ |~~售卖用户id~~|
 |--        sellUserNickName | string |卖家昵称|
-|--        sellUserName | string |卖家名称|
-|--        sellUserAccount |string|卖家收款账户|
-|--        buyUserId |long |买家用户id|
+|~~--        **sellUserName**~~ | ~~**string**~~ |~~**卖家名称**~~|
+|--        ~~sellUserAccount~~ |~~string~~|~~卖家收款账户~~|
+|~~--        buyUserId~~ |~~long~~ |~~买家用户id~~|
 |--        buyUserNickName | string |买家昵称|
 |-    trade |object |交易订单信息 |
 |--        tradeNo|string |交易订单号|
@@ -1422,24 +1422,22 @@
 |data   |Object|返回结果对象|
 |- total  |int | 订单总记录数|
 |- list |list |交易订单列表|
-|--    product |object |商品信息 |
-|---        productImg |string |图片url |
-|---        name |string |名称|
-|---        unitPrice |int |面值(单位:分)|
-|--    user |object |用户信息 |
+|--    orderTradeUser |object |用户信息 |
 |---        sellUserId |long |售卖用户id|
 |---        sellUserNickName | string |卖家昵称|
-|---        buyUserId |long |买家用户id|
-|---       buyUserNickName | string |买家昵称|
 |--    trade |object |交易订单信息 |
 |---        tradeNo |string |交易订单号|
 |---        payNo |string |支付流水号|
 |---        amount |string |商品售卖价格(单位:分)|
 |---        orderNum |int |订单数量|
 |---        salePrice |int |商品售价(单位:分)|
-|---        serviceFee |int |服务费(单位:分)|
 |---        status |int |状态:(1:待支付)|
 |---        createTime |string |交易时间 |
+|--         updateTime |string |更新时间() |
+|--        productName |String |商品名称 |
+|----      productImg |String |商品图片 |
+|----      unitPrice |int |面值 |
+|---      payTimeOut |int |交易最大时长(小时) |
 
 ###### 接口示例
 
@@ -1452,27 +1450,30 @@
 		"total":1,
 		"list": [
 			{
-				"product": {
-					"productImg": "http://product.png",
-					"unitPrice": 100,
-					"name": "东券-001"
-				},
-				"trade": {
-					"tradeNo": "100000001",
-					"payNo": "200000001",
-					"amount": 300,
-					"createTime": "2019-05-16 12:30:28",
-					"orderNum": 3,
-					"salePrice": 100,
-				   "serviceFee":1,
-					"status":1
-				},
-				"user": {
-				      "buyUserId": 2,
-				      "buyUserNickName": "买家昵称",
-				      "sellUserNickName": "卖家昵称",
-				      "sellUserId": 1
-				}
+			"orderTradeUser": {
+                    "sellUserId": 1,
+                    "sellUserNickName": "骚情的流氓",
+                    "buyUserId": null,
+                    "buyUserNickName": null
+                 },
+            "trade": {
+                    "tradeNo": "JY20190619201359",
+                    "unitPrice": 10000,
+                    "amount": 10,
+                    "orderNum": 1,
+                    "salePrice": 10,
+                    "serviceFee": 2,
+                    "remindPay": 0,
+                    "status": 1,
+                    "createTime": "2019-06-19 20:14:00",
+                    "payTimeOut": 24,
+                    "updateTime": "2019-06-19 20:14:00",
+                    "productImg": "https://gss0.baidu.com/9vo3dSag_xI4khGko9WTAnF6hhy/zhidao/wh%3D600%2C800/sign=6d06d91632a85edffad9f6257964251b/37d3d539b6003af3ebb06c26332ac65c1038b66a.jpg",
+                    "productName": "京东E卡",
+                    "payNo": null,
+                    "payTime": null
+                }
+            
 			}
 		]
 	}

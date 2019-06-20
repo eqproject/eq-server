@@ -128,6 +128,15 @@ public enum OrderTradeStateEnum {
         return runPayStatus.contains(state);
     }
 
+
+    /**
+     * 获取待支付状态集合
+     * @return
+     */
+    public static  List<Integer> getRunPay(){
+        return  new ArrayList<>(runPayStatus);
+    }
+
     /**
      * 判断是否允许用户自主取消
      * @param state

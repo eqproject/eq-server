@@ -6,22 +6,34 @@ import java.io.Serializable;
 
 /**
  * @author admin
- * @Title: OrderTradeDetailUser
+ * @Title: OrderTradeUser
  * @Copyright: Copyright (c) 2018
  * @Description: <br>
  * @Company: 123.com
  * @Created on 2019/6/2下午2:23
  */
 @Data
-public class OrderTradeDetailUser implements Serializable {
+public class OrderTradeUser implements Serializable {
     private static final long serialVersionUID = 1L;
 
 
+    /**
+     * 售卖用户ID
+     */
     private Long sellUserId;
+    /**
+     * 售卖用户昵称
+     */
     private String sellUserNickName;
-    private String sellUserName;
-    private String sellUserAccount;
+
+    /**
+     * 购买用户ID
+     */
     private Long buyUserId;
+
+    /**
+     * 购买用户昵称
+     */
     private String buyUserNickName;
 
 
