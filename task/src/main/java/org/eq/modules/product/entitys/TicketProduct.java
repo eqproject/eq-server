@@ -18,28 +18,28 @@ public class TicketProduct {
     /**
      * 券ID
      */
-    private String ticketId;
+    private String voucherId;
 
     /**
      * 券名称
      */
-    private String ticketName;
+    private String voucherName;
 
 
     /**
-     * 券地址
+     * 券icon
      */
-    private String ticketIcon;
+    private String voucherIcon;
 
     /**
      * 券描述
      */
-    private String ticketDesc;
+    private String description;
 
     /**
      * 券面值
      */
-    private String ticketFaceValue;
+    private String faceValue;
 
     /**
      * 券开始时间
@@ -60,21 +60,21 @@ public class TicketProduct {
     /**
      * 发行方
      */
-    private TicketIssuer ticketIssuer;
+    private VoucherIssuer voucherIssuer;
 
     /**
      * 承兑方
      */
-    private TicketAcceptance ticketAcceptance;
+    private List<VoucherAcceptance> voucherAcceptance;
 
 
     /**
      * 规格
      */
-    private List<TicketSpe> ticketSpe;
+    private List<TicketSpe> voucherProperties;
 
     @Data
-    public class TicketIssuer{
+    public class VoucherIssuer{
         private  String address;
         private  String icon;
         private  String name;
@@ -82,7 +82,7 @@ public class TicketProduct {
 
 
     @Data
-    public class TicketAcceptance{
+    public class VoucherAcceptance{
         private  String address;
         private  String icon;
         private  String name;

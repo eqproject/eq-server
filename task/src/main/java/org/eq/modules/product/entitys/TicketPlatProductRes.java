@@ -14,32 +14,32 @@ public class TicketPlatProductRes  implements Serializable {
 
     private TicketData data;
 
-    private String errCode;
-
-    private String msg;
+    private Meta meta;
 
 
 
     @lombok.Data
     public static class TicketData{
 
-        private List<TicketProduct> ticketList;
+        private List<TicketProduct> voucherList;
 
         private Page page;
 
     }
 
     @lombok.Data
+    public static class Meta{
+
+        private int code;
+
+        private String message;
+
+    }
+
+    @lombok.Data
     public static class Page{
-        private int count;
-        private int curSize;
-        private int endOfGroup;
-        private int firstResultNumber;
-        private boolean nextFlag;
-        private boolean queryTotal;
-        private int size;
-        private int start;
-        private int startOfGroup;
-        private int total;
+        private int pageSize;
+        private int pageStart;
+        private int pageTotal;
     }
 }

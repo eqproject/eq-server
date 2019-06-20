@@ -22,8 +22,10 @@ import org.eq.modules.order.entity.OrderAdLog;
 import org.eq.modules.product.dao.*;
 import org.eq.modules.product.entity.*;
 import org.eq.modules.product.entitys.TicketPlatProductRes;
+import org.eq.modules.product.entitys.TicketPlatTokenRes;
 import org.eq.modules.product.entitys.TicketProduct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,9 +58,13 @@ public class ProductLoadBiz {
     @Autowired
     private final ProductIssuerMapper productIssuerMapper;
 
-    private static final String TICKET_URL = "http://1.119.48.42:8858";
-    private static final String APPID = "19d0bc0e3b13615271";
-    private static final String APPKEY = "e4629469d2cdff53a6cf733377614062";
+    @Value("${tick.url}")
+    private  String TICKET_URL;
+    @Value("${tick.appid}")
+    private  String APPID;
+    @Value("${tick.appkey}")
+    private  String APPKEY ;
+
 
 
     /**
@@ -105,7 +111,10 @@ public class ProductLoadBiz {
         long acceptId =0;
         long issuerId =0;
         //插入 productAcceptMapper
-        TicketProduct.TicketAcceptance ticketAcceptance = ticketProduct.getTicketAcceptance();
+        TicketProduct.VoucherAcceptance ticketAcceptance = null;
+        if(!CollectionUtils.isEmpty(ticketProduct.getVoucherAcceptance())){
+            ticketAcceptance = ticketProduct.getVoucherAcceptance().get(0);
+        }
         if(ticketAcceptance!=null){
             ProductAccept productAccept = new ProductAccept();
             productAccept.setName(ticketAcceptance.getName());
@@ -122,7 +131,7 @@ public class ProductLoadBiz {
         }
 
         //插入 productAcceptMapper
-        TicketProduct.TicketIssuer ticketIssuer = ticketProduct.getTicketIssuer();
+        TicketProduct.VoucherIssuer ticketIssuer = ticketProduct.getVoucherIssuer();
         if(ticketIssuer!=null){
             ProductIssuer productIssuer = new ProductIssuer();
             productIssuer.setName(ticketIssuer.getName());
@@ -138,11 +147,11 @@ public class ProductLoadBiz {
             issuerId  = productIssuer.getId();
         }
         Product product = new Product();
-        product.setName(ticketProduct.getTicketName());
-        product.setProductImg(ticketProduct.getTicketIcon());
+        product.setName(ticketProduct.getVoucherName());
+        product.setProductImg(ticketProduct.getVoucherIcon());
         product.setProductAcceptId(acceptId);
         product.setProductIssuerId(issuerId);
-        product.setUnitPrice(Integer.valueOf(ticketProduct.getTicketFaceValue()));
+        product.setUnitPrice(Integer.valueOf(ticketProduct.getFaceValue()));
         product.setSort(1);
         product.setStatus(ProductStateEnum.DEFAULT.getState());
         product.setCreateDate(new Date());
@@ -156,7 +165,7 @@ public class ProductLoadBiz {
         //{"receive":"京东E卡提货说明","ticketDesc":"E卡说明"}
         JSONObject extend = new JSONObject();
         extend.put("receive","");
-        extend.put("ticketDesc",ticketProduct.getTicketDesc());
+        extend.put("ticketDesc",ticketProduct.getDescription());
         product.setExtendInfo(extend.toJSONString());
         int inserNum = productMapper.insertSelective(product);
         if(inserNum<=0){
@@ -167,7 +176,7 @@ public class ProductLoadBiz {
         productBlockchain.setAssetCode("未知");
         productBlockchain.setAssetIssuer("不确定");
         productBlockchain.setContractAddress(ticketProduct.getContractAddress());
-        productBlockchain.setTicketid(ticketProduct.getTicketId());
+        productBlockchain.setTicketid(ticketProduct.getVoucherId());
         productBlockchain.setProductId(product.getId());
         productBlockchain.setCreateDate(new Date());
         productBlockchain.setUpdateDate(new Date());
@@ -178,52 +187,47 @@ public class ProductLoadBiz {
         return productId;
     }
 
-    private static List<TicketProduct> pageList(){
+    private  List<TicketProduct> pageList(){
         List<TicketProduct>  result = new ArrayList<>();
-        String platProductUrl = TICKET_URL+"/ticket/v1/list";
         String token = getToken();
         if(StringUtil.isEmpty(token)){
             logger.error("获取Token 失败");
             return result;
         }
-        int startPage =1;
-        int pageSize =10;
+        System.out.println(token);
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("startPage",startPage);
-        params.put("pageSize",pageSize);
-        boolean isall  = false;
-        while(!isall){
+        String url = TICKET_URL+"/voucher/v1/list";
+        JSONObject params = new JSONObject();
+        params.put("pageSize",10);
+        params.put("accessToken",token);
+        int pageStart =1;
+        while(true){
+            params.put("pageStart",pageStart);
             TicketPlatProductRes  ticketPlatProductRes = null;
             try{
-                String platResponse = WebClientUtil.syncPostByForm(platProductUrl,params);
-                if(!StringUtil.isEmpty(platProductUrl)){
-                    ticketPlatProductRes = JSONObject.parseObject(platResponse,TicketPlatProductRes.class);
+                String productResult = WebClientUtil.synchPostForPayload(url,params);
+                if(!StringUtil.isEmpty(productResult)){
+                    ticketPlatProductRes = JSONObject.parseObject(productResult,TicketPlatProductRes.class);
                 }
             }catch (Exception e){
                 logger.error("获取商品信息异常",e);
                 e.printStackTrace();
             }
-            if(ticketPlatProductRes ==null){
-                ticketPlatProductRes = new TicketPlatProductRes();
+            Integer code = -1;
+            if(ticketPlatProductRes ==null || ticketPlatProductRes.getMeta()==null){
+                logger.error("获取商品信息异常");
             }
-            if(!"0".equals(ticketPlatProductRes.getErrCode())){
+            code = ticketPlatProductRes.getMeta().getCode();
+            if(code.intValue()!=0){
                 break;
             }
-            TicketPlatProductRes.TicketData  datas =  ticketPlatProductRes.getData();
-            if(datas!=null){
-                result.addAll(datas.getTicketList());
-            }
-            TicketPlatProductRes.Page  page =  datas.getPage();
-            if(page ==null){
+
+            TicketPlatProductRes.TicketData  ticketData =  ticketPlatProductRes.getData();
+            if(ticketData==null || CollectionUtils.isEmpty(ticketData.getVoucherList())){
                 break;
             }
-            if(page.isNextFlag()){
-                startPage ++;
-                params.put("startPage",startPage);
-            }else {
-                break;
-            }
+            result.addAll(ticketData.getVoucherList());
+            pageStart++;
         }
         return  result;
 
@@ -234,7 +238,7 @@ public class ProductLoadBiz {
      * 获取token
      * @return
      */
-    private static String getToken(){
+    private  String getToken(){
         String tokenUrl = TICKET_URL+"/auth/accessToken";
         JSONObject params = new JSONObject();
         params.put("appId",APPID);
@@ -244,12 +248,15 @@ public class ProductLoadBiz {
             int i = 3;
             while(i>0 && StringUtil.isEmpty(token)){
                 String result = WebClientUtil.synchPostForPayload(tokenUrl,params);
-                System.out.println(result);
-                JSONObject resultObj = JSONObject.parseObject(result);
-                if("0".equals(resultObj.getString("errCode"))){
-                    JSONObject data = resultObj.getJSONObject("data");
-                    token = data.getString("accessToken");
+                if(StringUtil.isEmpty(result)){
+                    continue;
                 }
+                TicketPlatTokenRes ticketPlatTokenRes = JSONObject.parseObject(result,TicketPlatTokenRes.class);
+                TicketPlatTokenRes.Meta meta = ticketPlatTokenRes==null?null:ticketPlatTokenRes.getMeta();
+                if(meta==null || meta.getCode()==null ||  meta.getCode()!=0){
+                    continue;
+                }
+                token = ticketPlatTokenRes.getData().getAccessToken();
             }
         }catch (Exception e){
             logger.error("获取Token异常",e);

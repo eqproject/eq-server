@@ -27,7 +27,7 @@ public class ProductLoadTask extends BaseLog {
     @Autowired
     private final ProductLoadBiz  productLoadBiz;
 
-    @Scheduled(cron = "0 24 0 * * ?")
+    @Scheduled(cron = "0 15 14 * * ?")
     public void process() {
         logger.info("ProductLoadTask 每天执行-开始");
         try {
@@ -37,10 +37,10 @@ public class ProductLoadTask extends BaseLog {
             }
 
             for(TicketProduct ticketProduct : tickList){
-                if(StringUtil.isEmpty(ticketProduct.getTicketId()) || StringUtil.isEmpty(ticketProduct.getTrancheId())){
+                if(StringUtil.isEmpty(ticketProduct.getVoucherId()) || StringUtil.isEmpty(ticketProduct.getTrancheId())){
                    continue;
                 }
-                ProductBlockchain productBlockchain =  productLoadBiz.getProductBlockchain(ticketProduct.getTicketId(),ticketProduct.getTrancheId());
+                ProductBlockchain productBlockchain =  productLoadBiz.getProductBlockchain(ticketProduct.getVoucherId(),ticketProduct.getTrancheId());
                 if(productBlockchain!=null){
                     continue;
                 }

@@ -68,7 +68,7 @@ public class WebClientUtil {
         Call call = okHttpClient.newCall(request);
         Response response = call.execute();
         if (response.isSuccessful()) {
-            return response.body().toString();
+            return response.body().string();
         }
         return null;
     }
@@ -87,13 +87,11 @@ public class WebClientUtil {
         if(params!=null){
             paramStr = params.toJSONString();
         }
-        System.out.println(paramStr);
         RequestBody body = RequestBody.create(JSON_MEDIA_TYPE, paramStr);
-
         Request request = new Request.Builder().url(url).post(body).build();
         Response response = okHttpClient.newCall(request).execute();
         if (response.isSuccessful()){
-            return response.body().toString();
+            return response.body().string();
         }
         return null;
     }
@@ -101,12 +99,19 @@ public class WebClientUtil {
     public static void main(String[] args) {
         try{
             JSONObject obj  = new JSONObject();
-            obj.put("appId","19d0bc0e3b13615271");
-            obj.put("appKey","e4629469d2cdff53a6cf733377614062");
+            obj.put("appId","FC21g7bs1R6N2FZ3");
+            obj.put("appKey","n17kLF3EsghE9Vj+P+PZNqNgHPS1tNLIlNVoQNmW2FKS8zOu2W54lg==");
             String result =  synchPostForPayload("http://1.119.48.42:8858/auth/accessToken",obj);
             System.out.println(result);
-        }catch (Exception e){
+            JSONObject obj2  = new JSONObject();
+            obj2.put("pageSize",10);
+            obj2.put("accessToken","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6IkZDMjFnN2JzMVI2TjJGWjMiLCJpc3MiOiJidW1vIiwiZXhwIjoxNTYxMDA5NDE1fQ.PjwJumGv1zXsfHBq7RMGdSY5J2b5a4jTL60SrpJU4lk");
+            obj2.put("start",1);
+            String result2 =  synchPostForPayload("http://1.119.48.42:8858/voucher/v1/list",obj2);
+            System.out.println(result2);
 
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
