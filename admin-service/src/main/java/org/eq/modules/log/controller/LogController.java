@@ -1,6 +1,9 @@
 package org.eq.modules.log.controller;
 
 import org.eq.basic.common.base.BaseController;
+import org.eq.modules.order.entity.OrderAdLog;
+import org.eq.modules.order.entity.OrderAdLogExample;
+import org.eq.modules.order.service.OrderAdLogService;
 import org.eq.modules.trade.entity.*;
 import org.eq.modules.trade.service.OrderPaymentTradeLogService;
 import org.eq.modules.trade.service.OrderRefundTradeLogService;
@@ -24,6 +27,9 @@ public class LogController extends BaseController {
 
     @Autowired
     OrderRefundTradeLogService orderRefundTradeLogService;
+
+    @Autowired
+    OrderAdLogService orderAdLogService;
 
 
     @ResponseBody
@@ -59,6 +65,18 @@ public class LogController extends BaseController {
         //时间排序
         example.setOrderByClause("create_date desc");
         List<OrderRefundTradeLog> logList = orderRefundTradeLogService.findListByExample(example);
+        return logList;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/ad")
+    public List<OrderAdLog> getAdLogList(HttpServletRequest request) {
+        Long id = Long.parseLong(request.getParameter("id"));
+        OrderAdLogExample example = new OrderAdLogExample();
+        example.or().andOrderAdIdEqualTo(id);
+        //时间排序
+        example.setOrderByClause("create_date desc");
+        List<OrderAdLog> logList = orderAdLogService.findListByExample(example);
         return logList;
     }
 }

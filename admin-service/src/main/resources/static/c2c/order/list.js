@@ -54,7 +54,8 @@ var orderStatusObj = {1:'待审核',2:'取消',3:'交易中',4:'已完成',5:"�
                         targets: 9,//最后1列
                         render: function (data, type, row, meta) {
                             var option = "";
-                            option +='<a href="javascript:void(0);" onclick="look(this);"   name="delete" data-id="' + row.id + '" >查看</a>'
+                            option +='<a href="javascript:void(0);" onclick="look(this);"   name="delete" data-id="' + row.id + '" >查看</a>';
+                            option +='&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="getLog(this,\'ad\');"   name="delete" data-id="' + row.id + '" >查看日志</a>'
                             if(row.status ==1){//待审核
                                 option +='&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="audit(this,1);" id="delete" name="delete" data-id="' + row.id + '" >审核通过</a>';
                                 option +='&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="audit(this,-1);" id="delete" name="delete" data-id="' + row.id + '" >审核拒绝</a>';
@@ -194,6 +195,47 @@ function audit(data,op){
             alert("审核成功!!");
             var UserTrade = new User.UserTrade();
             UserTrade.init();
+        }
+    });
+}
+
+//获取日志
+function getLog(row,type) {
+    var logModal = $("#logModal");
+
+    logModal.modal({
+        keyboard: false
+    });
+
+    //查询详情
+    $.ajax({
+        url: urlPath + '/log/' + type,
+        type: 'POST',
+        dataType: 'json',
+        data: {id: $(row).attr("data-id")},
+        success: function (data, status) {
+            if (status == 'success') {
+                var resultData = data[0];
+                var logListHtml = "";
+                logListHtml += "<table class=\"table\">";
+                logListHtml += "<thead><tr><th>日期</th><th>旧状态</th><th>新状态</th><th>内容</th></tr></thead>";
+                logListHtml += "<tbody>";
+                data.forEach(v =>{
+                    logListHtml += "<tr><td>"+v.createDate+"</td><td>"
+                                + (getObjValByKey(orderStatusObj,v.newStatus) || "")+"</td><td>"
+                                + (getObjValByKey(orderStatusObj,v.oldStatus) || "")+"</td><td>"
+                                + (v.remarks || "") +"</td></tr>"
+                });
+                logListHtml += "</tbody>";
+                logListHtml += "</table>";
+                if(logListHtml == ""){
+                    logListHtml = "暂无信息";
+                }
+                logModal.find("#logList").html(logListHtml);
+            } else {
+                //操作失败 弹出提示信息
+                base_alert_time(data.msg, 1000);
+            }
         }
     });
 }

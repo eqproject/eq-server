@@ -217,3 +217,44 @@ function getLog(row,type) {
         }
     });
 }
+
+//获取日志
+function getLog(row,type) {
+    var logModal = $("#logModal");
+
+    logModal.modal({
+        keyboard: false
+    });
+
+    //查询详情
+    $.ajax({
+        url: urlPath + '/log/' + type,
+        type: 'POST',
+        dataType: 'json',
+        data: {id: $(row).attr("data-id")},
+        success: function (data, status) {
+            if (status == 'success') {
+                var resultData = data[0];
+                var logListHtml = "";
+                logListHtml += "<table class=\"table\">";
+                logListHtml += "<thead><tr><th>日期</th><th>旧状态</th><th>新状态</th><th>内容</th></tr></thead>";
+                logListHtml += "<tbody>";
+                data.forEach(v =>{
+                    logListHtml += "<tr><td>"+v.createDate+"</td><td>"
+                                + (getObjValByKey(statusObj[type],v.oldStatus) || "")+"</td><td>"
+                                + (getObjValByKey(statusObj[type],v.newStatus) || "")+"</td><td>"
+                                + (v.remarks || "") +"</td></tr>"
+                });
+                logListHtml += "</tbody>";
+                logListHtml += "</table>";
+                if(logListHtml == ""){
+                    logListHtml = "暂无信息";
+                }
+                logModal.find("#logList").html(logListHtml);
+            } else {
+                //操作失败 弹出提示信息
+                base_alert_time(data.msg, 1000);
+            }
+        }
+    });
+}
