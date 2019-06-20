@@ -77,9 +77,12 @@ public interface OrderTradeService extends ServiceExtend<OrderTrade,OrderTradeEx
     PageResultData<OrderTradeSimpleResVO> pageWaitPayList(OrderTradeListReqVO orderTradeListReqVO);
 
 
-
-
-    PageResultData<OrderTradeSimpleResVO> pageTradeOrderList(OrderTradeListReqVO orderTradeListReqVO, List<Integer> orderTradeStatus);
+    /**
+     * 获取交易中订单
+     * @param orderTradeListReqVO
+     * @return
+     */
+    PageResultData<OrderTradeSimpleResVO> pageTradeOrderList(OrderTradeListReqVO orderTradeListReqVO);
 
 
 

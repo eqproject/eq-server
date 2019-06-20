@@ -603,11 +603,15 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 	}
 
 	@Override
-	public PageResultData<OrderTradeSimpleResVO> pageTradeOrderList(OrderTradeListReqVO orderTradeListReqVO, List<Integer> orderTradeStatus) {
+	public PageResultData<OrderTradeSimpleResVO> pageTradeOrderList(OrderTradeListReqVO orderTradeListReqVO) {
 		PageResultData<OrderTradeSimpleResVO> result = new PageResultData<>();
-		if(orderTradeListReqVO ==null){
-			orderTradeListReqVO = new OrderTradeListReqVO();
+
+		if(orderTradeListReqVO ==null  || orderTradeListReqVO.getUserId()<=0){
+			result.setList(new ArrayList<>());
+			result.setTotal(0);
+			return result;
 		}
+
 		if(orderTradeListReqVO.getPageSize()<=0 || orderTradeListReqVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
 			orderTradeListReqVO.setPageSize(StaticEntity.MAX_PAGE_SIZE);
 		}
@@ -618,8 +622,9 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		OrderTradeExample.Criteria ca = orderTradeExample.or();
 		orderTradeExample.setOrderByClause(" create_date desc");
 
-		ca.andStatusInForAll(orderTradeStatus);
+		ca.andStatusInForAll(OrderTradeStateEnum.getRunningStates());
 		ca.andBuyUserIdEqualTo(orderTradeListReqVO.getUserId());
+		ca.andNoWaitBuyUserIdForAll(orderTradeListReqVO.getUserId(),OrderTradeStateEnum.getRunPay());
 
 		BaseTableData baseTableData = findDataTableByExampleForPage(orderTradeExample,orderTradeListReqVO.getPageNum(), orderTradeListReqVO.getPageSize());
 		if(baseTableData==null || CollectionUtils.isEmpty(baseTableData.getData())){

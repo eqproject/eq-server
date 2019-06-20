@@ -4,6 +4,9 @@
  */
 package org.eq.modules.trade.entity;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.eq.modules.enums.OrderTradeStateEnum;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -248,6 +251,20 @@ public class OrderTradeExample {
             addCriterion("buy_user_id =", value, "buyUserId");
             return (Criteria) this;
         }
+
+        public Criteria andNoWaitBuyUserIdForAll(Long value,List<Integer> status) {
+            StringBuilder stateBuffer = new StringBuilder("(-1 ");
+            if(!CollectionUtils.isEmpty(status)){
+                for(Integer state : status){
+                    stateBuffer.append(",").append(state);
+                }
+            }
+            stateBuffer.append( " )");
+
+            addCriterion(" (  OT.status in  "+ stateBuffer+ " and  buy_user_id =  "+ value  +")");
+            return (Criteria) this;
+        }
+
 
         public Criteria andAllUserIdEqualTo(long value) {
             addCriterion("(buy_user_id = " + value + " or  sell_user_id = " + value + " )");

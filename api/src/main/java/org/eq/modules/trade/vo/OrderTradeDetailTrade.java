@@ -90,4 +90,9 @@ public class OrderTradeDetailTrade implements Serializable{
      */
     private String payTime;
 
+    /**
+     * 状态描述
+     */
+    private String stateRemark;
+
 }

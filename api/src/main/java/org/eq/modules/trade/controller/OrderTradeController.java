@@ -269,14 +269,7 @@ public class OrderTradeController extends BaseController {
         logger.info("porcessingOrderTradeList 请求参数:{}",JSON.toJSONString(orderTradeListReqVO));
         PageResultData<OrderTradeSimpleResVO> orderTradeListResVOPageResultData;
         try {
-            List<Integer> orderTradeStatus = new ArrayList<>();
-            orderTradeStatus.add(OrderTradeStateEnum.WAIT_PAY.getState());
-            orderTradeStatus.add(OrderTradeStateEnum.PAY_SUCCESS.getState());
-            orderTradeStatus.add(OrderTradeStateEnum.VOUCHER_ING.getState());
-            orderTradeStatus.add(OrderTradeStateEnum.LOAN_ING.getState());
-            orderTradeStatus.add(OrderTradeStateEnum.PAY_ING.getState());
-            orderTradeStatus.add(OrderTradeStateEnum.REFUND_ING.getState());
-            orderTradeListResVOPageResultData = orderTradeService.pageTradeOrderList(orderTradeListReqVO,orderTradeStatus);
+            orderTradeListResVOPageResultData = orderTradeService.pageTradeOrderList(orderTradeListReqVO);
         } catch (BaseServiceException e) {
             logger.error("porcessingOrderTradeList 失败，原因是:{}",e.getMessage());
             return ResponseFactory.paramsError(e.getMessage());
