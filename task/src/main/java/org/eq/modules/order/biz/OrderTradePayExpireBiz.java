@@ -94,6 +94,7 @@ public class OrderTradePayExpireBiz {
         ca = example.or();
         status = new ArrayList<>();
         status.add(OrderTradeStateEnum.PAY_ING.getState());
+        status.add(OrderTradeStateEnum.PAY_FAIL.getState());
         ca.andStatusIn(status);
         ca.andUpdateDateLessThan(DateUtil.beforeDateHour(DateUtil.getNowTime(),hour));
         result.addAll(orderTradeMapper.selectByExample(example));
@@ -134,8 +135,10 @@ public class OrderTradePayExpireBiz {
         if(result<=0){
             logger.error("插入交易订单状态日志记录失败");
         }
+        //取消交易订单库存
+        cancelTradeStock(orderTrade);
 
-        OrderPaymentTradeExample orderPaymentTradeExample = new OrderPaymentTradeExample();
+       /* OrderPaymentTradeExample orderPaymentTradeExample = new OrderPaymentTradeExample();
         OrderPaymentTradeExample.Criteria criteria = orderPaymentTradeExample.or();
         criteria.andTradeNoEqualTo(orderTrade.getTradeNo());
         List<OrderPaymentTrade> orderPaymentTradeList = orderPaymentTradeMapper.selectByExample(orderPaymentTradeExample);
@@ -168,8 +171,8 @@ public class OrderTradePayExpireBiz {
                 orderPaymentTradeLog.setRemarks(remark.toString());
                 orderPaymentTradeLogMapper.insertSelective(orderPaymentTradeLog);
             });
-        }
-        concelOrderTradeStock(orderTrade);
+        }*/
+
 
 
     }
@@ -203,7 +206,7 @@ public class OrderTradePayExpireBiz {
      * 只有在交易订单关闭的情况下方可进行此操作
      * @param orderTrade
      */
-    public void concelOrderTradeStock(OrderTrade orderTrade){
+    public void cancelTradeStock(OrderTrade orderTrade){
         OrderAdExample orderAdExample = new OrderAdExample();
         OrderAdExample.Criteria criteria1 = orderAdExample.or();
         criteria1.andOrderNoEqualToForAll(orderTrade.getAdNo());
@@ -213,6 +216,7 @@ public class OrderTradePayExpireBiz {
             orderAd = orderAdList.get(0);
         }
         if(orderAd==null ){
+            logger.error("释放交易订单{} 在途库存，查询失败",orderTrade.getTradeNo());
             return;
         }
 
@@ -234,13 +238,20 @@ public class OrderTradePayExpireBiz {
         if(update<=0){
             logger.error("更新交易订单锁定量失败,{} 执行条件为:正在交易量为 :{}",updateObj.toString(),orderAd.getTradingNum());
         }
-        //出售广告，说明库存已锁定
+        boolean release = true;
+        long userId = 0;
         if(orderAd.getType() == OrderAdTypeEnum.ORDER_SALE.getType()){
+            // 出售订单，库存广告订单锁定。广告订单是取消状态。说明广告取消时广告库存未释放
             if(orderAd.getStatus() == OrderAdStateEnum.ORDER_CANCEL.getState()){
-                updateStock(orderAd.getUserId(),orderAd.getProductId(),-orderTrade.getOrderNum());
+                release = updateStock(orderAd.getUserId(),orderAd.getProductId(),-orderTrade.getOrderNum());
+                userId = orderAd.getUserId();
             }
         }else{//求购广告 广告不锁定库存，但是交易订单锁定
-            updateStock(orderTrade.getSellUserId(),orderTrade.getProductId(),-orderTrade.getOrderNum());
+            release = updateStock(orderTrade.getSellUserId(),orderTrade.getProductId(),-orderTrade.getOrderNum());
+            userId = orderTrade.getSellUserId();
+        }
+        if(!release){
+            logger.error("用户:{} 释放商品ID:{},释放量:{}",userId,orderTrade.getProductId(),orderTrade.getOrderNum());
         }
 
     }
