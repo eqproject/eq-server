@@ -13,6 +13,7 @@ import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.cache.ProductCache;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
+import org.eq.modules.product.service.ProductLoadService;
 import org.eq.modules.utils.ProductUtil;
 import org.eq.modules.order.vo.ServieReturn;
 import org.eq.modules.product.dao.ProductMapper;
@@ -55,6 +56,9 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 
 	@Autowired
 	private UserProductStockService userProductStockService;
+
+	@Autowired
+	private ProductLoadService productLoadService;
 
 
 	@Override
@@ -194,7 +198,7 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 		}
 		ProductAll  productAll = productList.get(0);
 		boolean ishave = false;
-		Map<String, TicketProductVO> ticketMap = ProductUtil.getTicketUserProduct(user.getTxPassword());
+		Map<String, TicketProductVO> ticketMap = productLoadService.getTicketUserProduct(user.getTxPassword());
 		if(ticketMap!=null && ticketMap.size()>0) {
 			Iterator<String> ite = ticketMap.keySet().iterator();
 			while (ite.hasNext()) {

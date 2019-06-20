@@ -18,6 +18,7 @@ import org.eq.modules.bc.entity.BcTxRecord;
 import org.eq.modules.common.cache.ProductCache;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
+import org.eq.modules.product.service.ProductLoadService;
 import org.eq.modules.utils.OrderUtil;
 import org.eq.modules.utils.PageUtils;
 import org.eq.modules.utils.ProductUtil;
@@ -64,6 +65,9 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 
 	@Autowired
 	private ProductAcceptService productAcceptService;
+
+	@Autowired
+	private ProductLoadService productLoadService;
 
 	@Override
 	public OrderAcceptExample getExampleFromEntity(OrderAccept orderAccept, Map<String, Object> params) {
@@ -257,7 +261,7 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 				dataList.add(overdueVO);
 			}
 		}
-		Map<String, TicketProductVO> ticketMap = ProductUtil.getTicketUserProduct(user.getTxPassword());
+		Map<String, TicketProductVO> ticketMap = productLoadService.getTicketUserProduct(user.getTxPassword());
 		if(ticketMap!=null && ticketMap.size()>0){
 			Iterator<String> ite = ticketMap.keySet().iterator();
 			while(ite.hasNext()){

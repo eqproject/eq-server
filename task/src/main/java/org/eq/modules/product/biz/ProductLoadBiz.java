@@ -1,25 +1,17 @@
 package org.eq.modules.product.biz;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
-import org.eq.basic.common.util.DateUtil;
-import org.eq.basic.common.util.StringLowUtils;
+import org.eq.basic.common.util.WebClientUtil;
 import org.eq.modules.bc.common.log.Logger;
 import org.eq.modules.bc.common.log.LoggerFactory;
 import org.eq.modules.bc.common.util.StringUtil;
-import org.eq.modules.bc.common.util.WebClientUtil;
-import org.eq.modules.enums.OrderAdStateEnum;
-import org.eq.modules.enums.OrderAdTypeEnum;
 import org.eq.modules.enums.ProductStateEnum;
-import org.eq.modules.order.dao.OrderAdLogMapper;
-import org.eq.modules.order.dao.OrderAdMapper;
-import org.eq.modules.order.entity.OrderAd;
-import org.eq.modules.order.entity.OrderAdExample;
-import org.eq.modules.order.entity.OrderAdLog;
-import org.eq.modules.product.dao.*;
+import org.eq.modules.product.dao.ProductAcceptMapper;
+import org.eq.modules.product.dao.ProductBlockchainMapper;
+import org.eq.modules.product.dao.ProductIssuerMapper;
+import org.eq.modules.product.dao.ProductMapper;
 import org.eq.modules.product.entity.*;
 import org.eq.modules.product.entitys.TicketPlatProductRes;
 import org.eq.modules.product.entitys.TicketPlatTokenRes;
@@ -29,7 +21,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 商品过期任务类
@@ -151,7 +145,7 @@ public class ProductLoadBiz {
         product.setProductImg(ticketProduct.getVoucherIcon());
         product.setProductAcceptId(acceptId);
         product.setProductIssuerId(issuerId);
-        product.setUnitPrice(Integer.valueOf(ticketProduct.getFaceValue()));
+        product.setUnitPrice(Integer.valueOf(ticketProduct.getFaceValue())*100);
         product.setSort(1);
         product.setStatus(ProductStateEnum.DEFAULT.getState());
         product.setCreateDate(new Date());

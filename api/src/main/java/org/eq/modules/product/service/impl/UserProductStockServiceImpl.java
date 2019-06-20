@@ -11,6 +11,7 @@ import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.cache.ProductCache;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
+import org.eq.modules.product.service.ProductLoadService;
 import org.eq.modules.utils.PageUtils;
 import org.eq.modules.utils.ProductUtil;
 import org.eq.modules.product.dao.UserProductStockMapper;
@@ -53,6 +54,9 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 	@Autowired
 	private ProductService productService;
 
+	@Autowired
+	private ProductLoadService productLoadService;
+
 	@Override
 	public UserProductStockExample getExampleFromEntity(UserProductStock userProductStock, Map<String, Object> params) {
 		UserProductStockExample example = new UserProductStockExample();
@@ -89,7 +93,7 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 		if(user ==null || StringUtils.isEmpty(user.getTxPassword())){
 			return result;
 		}
-		Map<String,TicketProductVO> tickMap = ProductUtil.getTicketUserProduct(user.getTxPassword());
+		Map<String,TicketProductVO> tickMap = productLoadService.getTicketUserProduct(user.getTxPassword());
 		if(tickMap ==null || tickMap.size()<=0){
 			return result;
 		}
@@ -145,7 +149,7 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 		if(StringUtils.isEmpty(ticketKey)){
 			return null;
 		}
-		Map<String,TicketProductVO> ticketMap = ProductUtil.getTicketUserProduct(user.getTxPassword());
+		Map<String,TicketProductVO> ticketMap = productLoadService.getTicketUserProduct(user.getTxPassword());
 		if(ticketMap ==null || ticketMap.size()<=0 ){
 			return null;
 		}
@@ -186,7 +190,7 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 	@Override
 	public List<Long> listUserProdutId(User user) {
 		List<Long> result = new ArrayList<>();
-		Map<String,TicketProductVO> tickMap = ProductUtil.getTicketUserProduct(user.getTxPassword());
+		Map<String,TicketProductVO> tickMap = productLoadService.getTicketUserProduct(user.getTxPassword());
 		if(tickMap ==null || tickMap.size()<=0){
 			return result;
 		}
@@ -217,7 +221,7 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 		if(user ==null || StringUtils.isEmpty(user.getTxPassword())){
 			return result;
 		}
-		Map<String,TicketProductVO> tickMap = ProductUtil.getTicketUserProduct(user.getTxPassword());
+		Map<String,TicketProductVO> tickMap = productLoadService.getTicketUserProduct(user.getTxPassword());
 		if(tickMap ==null || tickMap.size()<=0){
 			return result;
 		}

@@ -1,12 +1,16 @@
 package org.eq.modules.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.eq.basic.common.util.WebClientUtil;
 import org.eq.modules.business.ProductBusines;
 import org.eq.modules.enums.ProductStateEnum;
 import org.eq.basic.common.util.DateUtil;
 import org.eq.modules.product.entity.*;
 import org.eq.modules.product.vo.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +24,6 @@ import java.util.Map;
  */
 @SuppressWarnings("all")
 public class ProductUtil  extends ProductBusines {
-
 
     /**
      * 转化对象实体
@@ -154,7 +157,6 @@ public class ProductUtil  extends ProductBusines {
             }else{
                 ca.andIdEqualTo(bsearchProduct.getProductId());
             }
-
         }
         if(bsearchProduct.getState()!=null){
             ca.andStatusEqualTo(bsearchProduct.getState().intValue());
@@ -192,7 +194,6 @@ public class ProductUtil  extends ProductBusines {
         }
         return example;
     }
-
 
 
 
@@ -239,69 +240,6 @@ public class ProductUtil  extends ProductBusines {
         ticketProductVO.setTicketDesc("区块链商品简介");
         result.add(ticketProductVO);
         return result;
-    }
-
-
-    /**
-     * 获取区块链平台商品信息
-     * @return
-     * TODO 实现区块链同步商品接口
-     */
-    public static Map<String,TicketProductVO> getTicketUserProduct(String address){
-        Map<String,TicketProductVO> result = new HashMap<>();
-        if("KAKA".equals(address)){
-            TicketProductVO ticketProductVO = new TicketProductVO();
-            ticketProductVO.setTicketId("TICKET01");
-            ticketProductVO.setTrancheId("TRANCEID01");
-            ticketProductVO.setTicketName("区块链商品名称");
-            ticketProductVO.setTicketFaceValue("1000");
-            ticketProductVO.setBalance("1000");
-            ticketProductVO.setTicketDesc("区块链商品简介");
-            String key = ticketProductVO.getTicketId()+"_"+ticketProductVO.getTrancheId();
-            result.put(key,ticketProductVO);
-
-            ticketProductVO = new TicketProductVO();
-            ticketProductVO.setTicketId("TICKET02");
-            ticketProductVO.setTrancheId("TRANCEID02");
-            ticketProductVO.setTicketName("区块链商品名称");
-            ticketProductVO.setTicketFaceValue("1000");
-            ticketProductVO.setBalance("1000");
-            ticketProductVO.setTicketDesc("区块链商品简介");
-            key = ticketProductVO.getTicketId()+"_"+ticketProductVO.getTrancheId();
-            result.put(key,ticketProductVO);
-
-            ticketProductVO = new TicketProductVO();
-            ticketProductVO.setTicketId("TICKET03");
-            ticketProductVO.setTrancheId("TRANCEID03");
-            ticketProductVO.setTicketName("区块链商品名称");
-            ticketProductVO.setTicketFaceValue("1000");
-            ticketProductVO.setBalance("1000");
-            ticketProductVO.setTicketDesc("区块链商品简介");
-            key = ticketProductVO.getTicketId()+"_"+ticketProductVO.getTrancheId();
-
-
-            ticketProductVO = new TicketProductVO();
-            ticketProductVO.setTicketId("TICKET05");
-            ticketProductVO.setTrancheId("TRANCEID05");
-            ticketProductVO.setTicketName("区块链商品名称");
-            ticketProductVO.setTicketFaceValue("12");
-            ticketProductVO.setBalance("24");
-            ticketProductVO.setTicketDesc("区块链商品简介");
-            key = ticketProductVO.getTicketId()+"_"+ticketProductVO.getTrancheId();
-
-            result.put(key,ticketProductVO);
-        }
-        return result;
-    }
-
-
-    /**
-     * 区块链商品转让
-     * @return
-     * TODO 实现转让接口
-     */
-    public static boolean transferProduct(TicketProductVO ticketProductVO,int number){
-        return true;
     }
 
 

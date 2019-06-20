@@ -1,10 +1,9 @@
-package org.eq.modules.bc.common.util;
+package org.eq.basic.common.util;
 
 import com.alibaba.fastjson.JSONObject;
 import okhttp3.*;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
