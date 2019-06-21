@@ -7,11 +7,13 @@ import org.eq.modules.bc.entity.BcTxRecord;
 import org.eq.modules.bc.entity.BcTxRecordExample;
 import org.eq.modules.bc.enums.BcStatusEnum;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BcTxService {
 	private final BcTxRecordMapper bcTxRecordMapper;

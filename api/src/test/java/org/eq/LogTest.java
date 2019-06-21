@@ -6,10 +6,7 @@ import org.eq.modules.enums.OrderAdStateEnum;
 import org.eq.modules.log.OrderLogService;
 import org.eq.modules.order.entity.OrderAdLog;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
 
@@ -18,9 +15,7 @@ import java.util.Date;
  *
  * @version 2019/6/18
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApiApplication.class)
-public class LogTest {
+public class LogTest extends BaseTest{
     @Autowired
     private OrderLogService logService;
 

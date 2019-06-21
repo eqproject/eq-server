@@ -1,60 +1,56 @@
 package org.eq.modules.bc.biz;
 
 import org.eq.modules.bc.common.ConstantsUtil;
-import org.eq.modules.bc.common.util.RedisUtil;
 import org.eq.modules.bc.entity.InitiatorAcc;
 import org.eq.modules.bc.service.InitiatorService;
+import org.eq.modules.enums.BcAccountTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class InitiatorPoolBiz {
-	
-	private RedisUtil redis = RedisUtil.getRu();
+
+	@Autowired
+	private RedisTemplate redisTemplate;
 	@Autowired
 	private InitiatorService initiatorService;
 	
 	@Value("${pool.account.threshold}")
 	private Integer initiatorPoolSize;
-	
-	private InitiatorAcc buyMiddleAcc;
-	
-	private InitiatorAcc refundMiddleAcc;
-	
-	private InitiatorAcc pickUpMiddleAcc;
-	
-	private InitiatorAcc withdrawMiddleAcc;
-	
-	private InitiatorAcc rewardMiddleAcc;
-	
+
 	private InitiatorAcc activityMiddleAcc;
-	
-	private InitiatorAcc activityRecycleAcc;
-	
+
+	private InitiatorAcc buyMiddleAcc;
+
+	private InitiatorAcc sellMiddleAcc;
+
+	private InitiatorAcc transferMiddleAcc;
+
+	private InitiatorAcc acceptMiddleAcc;
+
 	@PostConstruct
 	public void init(){
-		/*
-		buyMiddleAcc = initiatorService.queryMiddleAccountByType(BcAccountTypeEnum.BUY.getCode());
-		refundMiddleAcc = initiatorService.queryMiddleAccountByType(BcAccountTypeEnum.REFUND.getCode());
-		pickUpMiddleAcc = initiatorService.queryMiddleAccountByType(BcAccountTypeEnum.PICK_UP.getCode());
-		withdrawMiddleAcc = initiatorService.queryMiddleAccountByType(BcAccountTypeEnum.WITHDRAW.getCode());
-		rewardMiddleAcc = initiatorService.queryMiddleAccountByType(BcAccountTypeEnum.REWARD.getCode());
 		activityMiddleAcc = initiatorService.queryMiddleAccountByType(BcAccountTypeEnum.ACTIVITY.getCode());
-		activityRecycleAcc = initiatorService.queryMiddleAccountByType(BcAccountTypeEnum.COUPON_RECYCLE.getCode());
-		*/
+		buyMiddleAcc = initiatorService.queryMiddleAccountByType(BcAccountTypeEnum.BUY.getCode());
+		sellMiddleAcc = initiatorService.queryMiddleAccountByType(BcAccountTypeEnum.SELL.getCode());
+		transferMiddleAcc = initiatorService.queryMiddleAccountByType(BcAccountTypeEnum.TRANSFER.getCode());
+		acceptMiddleAcc = initiatorService.queryMiddleAccountByType(BcAccountTypeEnum.ACCEPT.getCode());
 	}
 
 	
 	public String getInitiator(){
 		//当redis中的缓存账户数小于某个值时 需要重新插入
-		int poolSize = redis.smembers(ConstantsUtil.INITIATOR_LIST_TAG).size();
+		int poolSize = redisTemplate.opsForSet().members(ConstantsUtil.INITIATOR_LIST_TAG).size();
 		if(poolSize < initiatorPoolSize){
 			loadData4RedisCache();
 		}
-		return redis.spop(ConstantsUtil.INITIATOR_LIST_TAG);
+		return (String) redisTemplate.opsForSet().pop(ConstantsUtil.INITIATOR_LIST_TAG);
 	} 
 	
 	
@@ -63,11 +59,11 @@ public class InitiatorPoolBiz {
 		List<String> availableAccAddr = new ArrayList<String>();
 		String accArr[] = {};
 		for (InitiatorAcc acc : accList) {
-			redis.set(ConstantsUtil.INITIATOR_SINGLE_TAG + acc.getAddress(),acc.getAddress());
+			redisTemplate.opsForValue().set(ConstantsUtil.INITIATOR_SINGLE_TAG + acc.getAddress(),acc.getAddress());
 			availableAccAddr.add(acc.getAddress());
 		}
 		String[] accArr1 = availableAccAddr.toArray(accArr);
-		redis.sadd(ConstantsUtil.INITIATOR_LIST_TAG, accArr1);
+		redisTemplate.opsForSet().add(ConstantsUtil.INITIATOR_LIST_TAG, accArr1);
 	}
 	
 	public List<InitiatorAcc> findInitiatorAccAll(){
@@ -77,35 +73,28 @@ public class InitiatorPoolBiz {
 	public InitiatorAcc getInitiatorInfo(String address){
 		return initiatorService.findInitiatorByAddress(address);
 	}
-	
-	public InitiatorAcc getBuyMiddleInfo(){
-		return buyMiddleAcc;
-	}
-	
-	public InitiatorAcc getRefundMiddleInfo(){
-		return refundMiddleAcc;
-	}
-	public InitiatorAcc getPickUpMiddleInfo(){
-		return pickUpMiddleAcc;
-	}
-	
-	public InitiatorAcc getWithdrawMiddleInfo(){
-		return withdrawMiddleAcc;
-	}
-	
-	public InitiatorAcc getRewardMiddleInfo(){
-		return rewardMiddleAcc;
-	}
-	
-	public InitiatorAcc getActivityMiddleInfo(){
+
+	public InitiatorAcc getActivityMiddleAcc() {
 		return activityMiddleAcc;
 	}
-	
-	public InitiatorAcc getActivityRecycleInfo(){
-		return activityRecycleAcc;
+
+	public InitiatorAcc getBuyMiddleAcc() {
+		return buyMiddleAcc;
 	}
-	
-	public void updateKeyStore(String address,String keyStore){
+
+	public InitiatorAcc getSellMiddleAcc() {
+		return sellMiddleAcc;
+	}
+
+	public InitiatorAcc getTransferMiddleAcc() {
+		return transferMiddleAcc;
+	}
+
+	public InitiatorAcc getAcceptMiddleAcc() {
+		return acceptMiddleAcc;
+	}
+
+	public void updateKeyStore(String address, String keyStore){
 		initiatorService.updateKeyStore(address, keyStore);
 	}
 }

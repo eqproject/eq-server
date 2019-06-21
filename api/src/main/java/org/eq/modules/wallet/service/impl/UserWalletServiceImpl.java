@@ -12,7 +12,6 @@ import org.eq.modules.wallet.dao.UserWalletMapper;
 import org.eq.modules.wallet.entity.UserWallet;
 import org.eq.modules.wallet.entity.UserWalletExample;
 import org.eq.modules.wallet.service.UserWalletService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,11 +27,6 @@ import java.util.Map;
 @Transactional
 @AutowiredService
 public class UserWalletServiceImpl extends ServiceImplExtend<UserWalletMapper, UserWallet, UserWalletExample> implements UserWalletService {
-
-	@Autowired
-	public UserWalletServiceImpl(UserWalletMapper mapper){
-		super.setMapper(mapper);
-	}
 
 	@Override
 	public UserWalletExample getExampleFromEntity(UserWallet userWallet, Map<String, Object> params) {
@@ -64,8 +58,8 @@ public class UserWalletServiceImpl extends ServiceImplExtend<UserWalletMapper, U
 		if(userWallet.getUpdateDate()!=null){
 			ca.andUpdateDateEqualTo(userWallet.getUpdateDate());
 		}
-		if(StringLowUtils.isNotBlank(userWallet.getPubilcKey())){
-			ca.andPubilcKeyEqualTo(userWallet.getPubilcKey());
+		if(StringLowUtils.isNotBlank(userWallet.getPublicKey())){
+			ca.andPublicKeyEqualTo(userWallet.getPublicKey());
 		}
 		if(StringLowUtils.isNotBlank(userWallet.getKeyStore())){
 			ca.andKeyStoreEqualTo(userWallet.getKeyStore());

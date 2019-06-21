@@ -10,9 +10,11 @@ import org.eq.modules.bc.biz.InitiatorPoolBiz;
 import org.eq.modules.bc.common.ConstantsUtil;
 import org.eq.modules.bc.common.util.DecimalCalculateUtil;
 import org.eq.modules.bc.common.util.Tools;
+import org.eq.modules.bc.dao.InitiatorAccMapper;
 import org.eq.modules.bc.entity.BcTxRecord;
 import org.eq.modules.bc.entity.BlockchainTx;
 import org.eq.modules.bc.entity.InitiatorAcc;
+import org.eq.modules.bc.entity.InitiatorAccExample;
 import org.eq.modules.bc.enums.BcStatusEnum;
 import org.eq.modules.bc.external.bc.BlockChainManager;
 import org.eq.modules.bc.external.bc.req.BatchSubmitTxReq;
@@ -22,6 +24,7 @@ import org.eq.modules.bc.external.bc.resp.BlobDataResp;
 import org.eq.modules.bc.init.KeyStoreManager;
 import org.eq.modules.bc.service.BcTxService;
 import org.eq.modules.bc.service.BlockChainTxService;
+import org.eq.modules.enums.BcAccountTypeEnum;
 import org.eq.modules.wallet.dao.UserWalletMapper;
 import org.eq.modules.wallet.entity.UserWallet;
 import org.eq.modules.wallet.entity.UserWalletExample;
@@ -30,11 +33,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
+@Component
 public class HandleBcTxTransferJob {
 
 	private static Logger logger = LoggerFactory.getLogger(HandleBcTxTransferJob.class);
@@ -49,6 +52,8 @@ public class HandleBcTxTransferJob {
 	private BlockChainManager blockChainManager;
 	@Autowired
 	private UserWalletMapper userWalletMapper;
+    @Autowired
+    private InitiatorAccMapper initiatorAccMapper;
 
 	@Scheduled(cron = "* 0/1 * * * ?")
 	public void execute(){
@@ -96,13 +101,15 @@ public class HandleBcTxTransferJob {
 		List<BcTransferReq> batchTransferList = new ArrayList<>();
 		
 		List<String> fromAddressList = new ArrayList<>();
-
+		//用户集合
+		HashSet<String> userSingerSet = new HashSet<>();
 		for(BcTxRecord bcTxRecord : bcTxRecordList){
 			//检查是否激活
-			if(!blockChainManager.checkActivated(bcTxRecord.getToAddress())){
-				logger.info("账户未激活:"+bcTxRecord.getToAddress());
-				continue;
-			}
+            if (!bcTxRecord.getBizType().equals(BcAccountTypeEnum.ACTIVITY.getCode())
+                    && !blockChainManager.checkActivated(bcTxRecord.getToAddress())) {
+                logger.info("账户未激活:" + bcTxRecord.getToAddress());
+                continue;
+            }
 			if(!blockChainManager.checkActivated(bcTxRecord.getFromAddress())){
 				logger.info("账户未激活:"+bcTxRecord.getFromAddress());
 				continue;
@@ -113,9 +120,12 @@ public class HandleBcTxTransferJob {
 			String assetIssuer= bcTxRecord.getAssetIssuer();
 			String fromAddress = bcTxRecord.getFromAddress();
 			fromAddressList.add(fromAddress);
+			userSingerSet.add(fromAddress);
 
-			long bcAmount = DecimalCalculateUtil.numberMultiply10Pow4Long(bcTxRecord.getTransferAmount()+"", 0);//资产数量
-			
+			long bcAmount = DecimalCalculateUtil.numberMultiply10Pow4Long(bcTxRecord.getTransferAmount()+"", 2);//资产数量
+			//1000000 = 0.01bu
+			bcAmount = bcAmount * 100000000 /100;
+
 			BcTransferReq bcTransferReq = new BcTransferReq();
 			bcTransferReq.setAmount(bcAmount);
 			bcTransferReq.setFromAddress(fromAddress);
@@ -131,50 +141,44 @@ public class HandleBcTxTransferJob {
 		
 		BlobDataResp blobDataResp = blockChainManager.getBatchOptTransferBlob(batchTransferList, initiatorAddress);
 		//logger.info("生成blob:"+JSON.toJSONString(blobDataResp));
-		/*
+
 		//生成提交人签名
 		List<SignEntity> listSigner = initiatorSignBlob(blobDataResp,initiatorAcc);
-		//中间账户的签名
-		listSigner = middleAccSignBlob(blobDataResp,listSigner,middleSet);
+
 		//普通账户签名
 		listSigner = userSignBlob(blobDataResp,listSigner,userSingerSet);
-		*/
+
 
 		BatchSubmitTxReq submitTxReq = new BatchSubmitTxReq();
 		submitTxReq.setBlob(blobDataResp.getBlob());
-		submitTxReq.setListSigner(getUsersKeystore(fromAddressList,blobDataResp));
+		submitTxReq.setListSigner(listSigner);
 		submitTxReq.setHash(blobDataResp.getHash());
 		submitTxReq.setInitiator(initiatorAddress);
 		return submitTxReq;
 	}
 
-	private List<SignEntity> getUsersKeystore(List<String> fromAddressList,BlobDataResp blobDataResp){
-		List<SignEntity> list = new ArrayList<>();
-		fromAddressList.forEach(o->{
-			UserWallet wallet = getKeystore(o);
-			String privateKey = WalletUtil.getPrivateKey(wallet.getKeyStore());
+	private Map<String,String> getKeystore(String fromAddress){
+	    Map<String,String> map = new HashMap<>(2);
 
-			PrivateKey privateObj = new PrivateKey(privateKey);
-			byte[] signByte = privateObj.sign(HexFormat.hexStringToBytes(blobDataResp.getBlob()));
-			String signBlob = HexFormat.byteToHex(signByte);
-
-			SignEntity entity = new SignEntity();
-			entity.setPublicKey(wallet.getPubilcKey());
-			entity.setSignBlob(signBlob);
-
-			list.add(entity);
-		});
-		return list;
-	}
-
-	private UserWallet getKeystore(String fromAddress){
-		UserWalletExample example = new UserWalletExample();
+	    UserWalletExample example = new UserWalletExample();
 		example.or().andAddressEqualTo(fromAddress);
 		List<UserWallet> list = userWalletMapper.selectByExample(example);
-		if(list==null || list.isEmpty()){
-			return null;
+		if(list!=null && !list.isEmpty()){
+            UserWallet o =  list.get(0);
+            map.put("keystore",o.getKeyStore());
+            map.put("publicKey",o.getPublicKey());
+            return map;
 		}
-		return list.get(0);
+
+        InitiatorAccExample example1 = new InitiatorAccExample();
+        example1.or().andAddressEqualTo(fromAddress);
+        List<InitiatorAcc> list1 = initiatorAccMapper.selectByExample(example1);
+        if(list1!=null && !list1.isEmpty()){
+            InitiatorAcc o =  list1.get(0);
+            map.put("keystore",o.getKeyStore());
+            map.put("publicKey",o.getPublicKey());
+        }
+        return map;
 	}
 
 
@@ -189,24 +193,6 @@ public class HandleBcTxTransferJob {
 		entity.setSignBlob(signBlob);
 		listSigner.add(entity);
 		return listSigner;
-	}
-	
-	private Boolean checkFromAddress(String fromAddress){
-		InitiatorAcc buyMiddleAcc = initiatorPoolBiz.getBuyMiddleInfo();
-		InitiatorAcc pickUpMiddleAcc = initiatorPoolBiz.getPickUpMiddleInfo();
-		InitiatorAcc refundMiddleAcc = initiatorPoolBiz.getRefundMiddleInfo();
-		InitiatorAcc withdrawMiddleAcc = initiatorPoolBiz.getWithdrawMiddleInfo();
-		InitiatorAcc rewardMiddleAcc = initiatorPoolBiz.getRewardMiddleInfo();
-		InitiatorAcc activityMiddleAcc = initiatorPoolBiz.getActivityMiddleInfo();
-		if(fromAddress.equals(withdrawMiddleAcc.getAddress()) 
-				|| fromAddress.equals(buyMiddleAcc.getAddress()) 
-				|| fromAddress.equals(pickUpMiddleAcc.getAddress())
-				|| fromAddress.equals(refundMiddleAcc.getAddress())
-				|| fromAddress.equals(rewardMiddleAcc.getAddress())
-				|| fromAddress.equals(activityMiddleAcc.getAddress())){
-			return true;
-		}
-		return false;
 	}
 	
 	private List<SignEntity> middleAccSignBlob(BlobDataResp blobDataResp,List<SignEntity> listSigner,HashSet<String> middleSetList) throws Exception {
@@ -225,40 +211,29 @@ public class HandleBcTxTransferJob {
 		}
 		return listSigner;
 	}
-	/*
 	private List<SignEntity> userSignBlob(BlobDataResp blobDataResp,List<SignEntity> listSigner,HashSet<String> userSetList) throws Exception {
-//		if(!Tools.isNullByList(userSetList)){
-//			for(String signer : userSetList){
-//				String accessToken = userBiz.getAccountCenterAccessToken();
-//				AccCenterSignBlobResp signBlobResp = accountCenterManager.signBlob(signer, blobDataResp.getBlob(), accessToken);
-//				if(Tools.isNull(signBlobResp)){
-//					throw new APIException(ExceptionEnum.ACCOUNT_CENTER_SIGN_ERROR);
-//				}
-//				SignEntity entity = new SignEntity();
-//				entity.setPublicKey(signBlobResp.getPublicKey());
-//				entity.setSignBlob(signBlobResp.getSignBlob());
-//				listSigner.add(entity);
-//			}
-//		}
-		AccountCenterSignBlobListResp signBlobResp = accountCenterManager.signBlobList(userSetList, blobDataResp.getBlob(), accessToken);
-		if(Tools.isNull(signBlobResp)){
-			throw new APIException(ExceptionEnum.ACCOUNT_CENTER_SIGN_ERROR);
-		}
-		List<ACSignBlobVO> listSignBlob = signBlobResp.getSignBlobList();
-		for(ACSignBlobVO vo : listSignBlob){
+		userSetList.forEach(o->{
+            Map<String,String> map = getKeystore(o);
+			String privateKey = WalletUtil.getPrivateKey(map.get("keystore"));
+
+			PrivateKey privateObj = new PrivateKey(privateKey);
+			byte[] signByte = privateObj.sign(HexFormat.hexStringToBytes(blobDataResp.getBlob()));
+			String signBlob = HexFormat.byteToHex(signByte);
+
 			SignEntity entity = new SignEntity();
-			entity.setPublicKey(vo.getPublicKey());
-			entity.setSignBlob(vo.getSignBlob());
+			entity.setPublicKey(map.get("publicKey"));
+			entity.setSignBlob(signBlob);
+
 			listSigner.add(entity);
-		}
+		});
+
 		return listSigner;
 	}
-	*/
 
 	public static void main(String[] args) {
-		long bcAmount = DecimalCalculateUtil.numberMultiply10Pow4Long("1", 0);
+		long bcAmount = DecimalCalculateUtil.numberMultiply10Pow4Long("0.01", 3);
 		System.out.println(bcAmount);
-		bcAmount = DecimalCalculateUtil.numberMultiply10Pow4Long("1", 0);
+		bcAmount = DecimalCalculateUtil.numberMultiply10Pow4Long("0.01", 3);
 		System.out.println(bcAmount);
 	}
 }

@@ -6,7 +6,7 @@
 	    <result column="address" jdbcType="VARCHAR" property="address" />
 	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
 	    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
-	    <result column="pubilc_key" jdbcType="VARCHAR" property="pubilcKey" />
+	    <result column="public_key" jdbcType="VARCHAR" property="pubilcKey" />
 	    <result column="key_store" jdbcType="VARCHAR" property="keyStore" />
 	    <result column="status" jdbcType="INTEGER" property="status" />
 	    <result column="tx_id" jdbcType="BIGINT" property="txId" />
@@ -73,7 +73,7 @@
     </sql>
 
     <sql id="Base_Column_List">
-        user_id,address,create_date,update_date,pubilc_key,key_store,status,tx_id
+        user_id,address,create_date,update_date,public_key,key_store,status,tx_id
     </sql>
 
     <select id="selectByExample" parameterType="org.eq.modules.wallet.entity.UserWalletExample" resultMap="BaseResultMap">
@@ -111,7 +111,7 @@
     </delete>
 
     <insert id="insert" parameterType="org.eq.modules.wallet.entity.UserWallet">
-        insert into user_wallet (user_id,address,create_date,update_date,pubilc_key,key_store,status,tx_id)
+        insert into user_wallet (user_id,address,create_date,update_date,public_key,key_store,status,tx_id)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
             #{userId,jdbcType=BIGINT},
@@ -126,7 +126,7 @@
     </insert>
 
     <insert id="insertReturnId" parameterType="org.eq.modules.wallet.entity.UserWallet" useGeneratedKeys="true" keyProperty="user_id">
-        insert into user_wallet (user_id,address,create_date,update_date,pubilc_key,key_store,status,tx_id)
+        insert into user_wallet (user_id,address,create_date,update_date,public_key,key_store,status,tx_id)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
             #{userId,jdbcType=BIGINT},
@@ -147,7 +147,7 @@
             address,
             create_date,
             update_date,
-            pubilc_key,
+            public_key,
             key_store,
             status,
             tx_id,
@@ -187,7 +187,7 @@
                 update_date = #{record.updateDate,jdbcType=TIMESTAMP},
             </if>
             <if test="record.pubilcKey != null">
-                pubilc_key = #{record.pubilcKey,jdbcType=VARCHAR},
+                public_key = #{record.pubilcKey,jdbcType=VARCHAR},
             </if>
             <if test="record.keyStore != null">
                 key_store = #{record.keyStore,jdbcType=VARCHAR},
@@ -212,7 +212,7 @@
             address = #{record.address,jdbcType=VARCHAR},
             create_date = #{record.createDate,jdbcType=TIMESTAMP},
             update_date = #{record.updateDate,jdbcType=TIMESTAMP},
-            pubilc_key = #{record.pubilcKey,jdbcType=VARCHAR},
+            public_key = #{record.pubilcKey,jdbcType=VARCHAR},
             key_store = #{record.keyStore,jdbcType=VARCHAR},
             status = #{record.status,jdbcType=INTEGER},
             tx_id = #{record.txId,jdbcType=BIGINT},
@@ -238,7 +238,7 @@
             update_date = #{updateDate,jdbcType=TIMESTAMP},
             </if>
             <if test="pubilcKey != null">
-            pubilc_key = #{pubilcKey,jdbcType=VARCHAR},
+            public_key = #{pubilcKey,jdbcType=VARCHAR},
             </if>
             <if test="keyStore != null">
             key_store = #{keyStore,jdbcType=VARCHAR},
@@ -261,7 +261,7 @@
               address = #{address,jdbcType=VARCHAR},
               create_date = #{createDate,jdbcType=TIMESTAMP},
               update_date = #{updateDate,jdbcType=TIMESTAMP},
-              pubilc_key = #{pubilcKey,jdbcType=VARCHAR},
+              public_key = #{pubilcKey,jdbcType=VARCHAR},
               key_store = #{keyStore,jdbcType=VARCHAR},
               status = #{status,jdbcType=INTEGER},
               tx_id = #{txId,jdbcType=BIGINT},

@@ -1,5 +1,7 @@
 package org.eq.modules.auth.service.impl;
 
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.RandomUtils;
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.StringLowUtils;
@@ -11,7 +13,10 @@ import org.eq.modules.auth.entity.UserIdentityAuth;
 import org.eq.modules.auth.service.UserAccountBindService;
 import org.eq.modules.auth.service.UserIdentityAuthService;
 import org.eq.modules.auth.service.UserService;
+import org.eq.modules.bc.dao.InitiatorAccMapper;
 import org.eq.modules.bc.entity.BcTxRecord;
+import org.eq.modules.bc.entity.InitiatorAcc;
+import org.eq.modules.bc.entity.InitiatorAccExample;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
 import org.eq.modules.enums.BindStatusEnum;
@@ -31,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,32 +48,21 @@ import java.util.Map;
 @Service
 @Transactional
 @AutowiredService
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExample> implements UserService {
-
-
-    public UserServiceImpl(UserMapper mapper) {
-        super.setMapper(mapper);
-    }
-
     private static final String MD5_KEY = "org.eq.modules";
+
+    private final UserWalletService userWalletService;
+    private final BcTxRecordService bcTxRecordService;
+    private final UserIdentityAuthService userIdentityAuthService;
+    private final RedisTemplate redisTemplate;
+    private final UserAccountBindService userAccountBindService;
+    private final InitiatorAccMapper initiatorAccMapper;
 
     @Value("${aes.key}")
     private String aesKey;
 
-    @Autowired
-    private UserWalletService userWalletService;
 
-    @Autowired
-    private BcTxRecordService bcTxRecordService;
-
-    @Autowired
-    private UserIdentityAuthService userIdentityAuthService;
-
-    @Autowired
-    private RedisTemplate redisTemplate;
-
-    @Autowired
-    private UserAccountBindService userAccountBindService;
 
     @Override
     public int insertRecord(User user) {
@@ -212,7 +207,8 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
      * @return
      */
     private Long addBcTxRecord(BcTxRecord bcTxRecord) {
-        bcTxRecord.setFromAddress("平台账户");
+
+        bcTxRecord.setFromAddress(getInitiatorAcc().getAddress());
         bcTxRecord.setTransferAmount("0.01");
         bcTxRecord.setAssetType(2);
         bcTxRecord.setTxStatus(0);
@@ -222,6 +218,15 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         bcTxRecord.setOptMetadata("激活账户");
         bcTxRecordService.insertRecordReturnId(bcTxRecord);
         return bcTxRecord.getId();
+    }
+
+    private InitiatorAcc getInitiatorAcc(){
+        InitiatorAccExample example = new InitiatorAccExample();
+        InitiatorAccExample.Criteria criteria = example.or();
+        criteria.andTypeEqualTo(0);
+        List<InitiatorAcc> list = initiatorAccMapper.selectByExample(example);
+        int index = RandomUtils.nextInt(0,list.size());
+        return list.get(index);
     }
 
     /**

@@ -9,11 +9,13 @@ import org.eq.modules.bc.entity.*;
 import org.eq.modules.bc.enums.BcStatusEnum;
 import org.eq.modules.bc.enums.BcTxExceptionStatusEnum;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
+@Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BlockChainTxService {
 	private final BlockchainTxMapper blockchainTxMapper;

@@ -5,10 +5,12 @@ import org.eq.modules.bc.dao.InitiatorAccMapper;
 import org.eq.modules.bc.entity.InitiatorAcc;
 import org.eq.modules.bc.entity.InitiatorAccExample;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 
+@Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class InitiatorService {
 	private final InitiatorAccMapper initiatorAccMapper;

@@ -16,12 +16,14 @@ import org.eq.modules.bc.service.BlockChainTxService;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 
+@Component
 public class HandleQueryTransferResultJob {
 	
 	private static Logger logger = LoggerFactory.getLogger(HandleQueryTransferResultJob.class);

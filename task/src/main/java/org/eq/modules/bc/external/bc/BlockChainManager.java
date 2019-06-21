@@ -20,11 +20,13 @@ import org.eq.modules.bc.external.bc.req.SignEntity;
 import org.eq.modules.bc.external.bc.resp.BcAssetResp;
 import org.eq.modules.bc.external.bc.resp.BlobDataResp;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Component
 public class BlockChainManager {
 	
 	@Value("${blockchain.node.ip}")
