@@ -69,10 +69,10 @@ public class OrderFinishSnapshotBiz {
         status.add(OrderTradeStateEnum.CANCEL_PAY_TIMEOUT.getState());
         status.add(OrderTradeStateEnum.TRADE_SUCCESS.getState());
         status.add(OrderTradeStateEnum.REFUND_SUCCESS.getState());
-        ca.andStatusIn(status);
+        ca.andStatusInForAll(status);
         TaskTime time = new TaskTime().build();
 
-        ca.andStatusIn(status);
+        ca.andStatusInForAll(status);
         ca.andUpdateDateBetween(time.getStart(), time.getEnd());
         return orderTradeMapper.selectByExample(example);
     }
