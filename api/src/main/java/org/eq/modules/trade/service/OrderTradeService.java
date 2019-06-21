@@ -12,8 +12,6 @@ import org.eq.modules.trade.entity.OrderTradeExample;
 import org.eq.basic.common.base.ServiceExtend;
 import org.eq.modules.trade.vo.*;
 
-import java.util.List;
-
 /**
  * 订单交易Service
  * @author yufei.sun
@@ -78,11 +76,19 @@ public interface OrderTradeService extends ServiceExtend<OrderTrade,OrderTradeEx
 
 
     /**
-     * 获取交易中订单
+     * 交易中订单
      * @param orderTradeListReqVO
      * @return
      */
-    PageResultData<OrderTradeSimpleResVO> pageTradeOrderList(OrderTradeListReqVO orderTradeListReqVO);
+    PageResultData<OrderTradeTradingVO> pageTradingOrderList(OrderTradeListReqVO orderTradeListReqVO);
+
+
+    /**
+     *  催促订单号
+     * @param tradNo
+     * @return
+     */
+    boolean remindTrade(String tradNo);
 
 
 

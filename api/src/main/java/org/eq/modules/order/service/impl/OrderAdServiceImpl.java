@@ -234,7 +234,7 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 			orderTradeExample = new OrderTradeExample();
 			ca = orderTradeExample.or();
 			ca.andAllUserIdEqualTo(orderAd.getUserId());
-			ca.andStatusEqualTo(OrderTradeStateEnum.TRADE_SUCCESS.getState());
+			ca.andStatusEqualToForUpdate(OrderTradeStateEnum.TRADE_SUCCESS.getState());
 			finishNum = orderTradeService.countByExample(orderTradeExample);
 		}catch (Exception e){
 			e.printStackTrace();

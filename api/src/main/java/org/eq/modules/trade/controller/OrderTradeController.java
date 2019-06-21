@@ -261,24 +261,41 @@ public class OrderTradeController extends BaseController {
      * @return
      */
     @PostMapping("/porcessing/list")
-    public ResponseData<PageResultData> porcessingOrderTradeList(OrderTradeListReqVO orderTradeListReqVO) {
+    public ResponseData<PageResultData> porcessingList(OrderTradeListReqVO orderTradeListReqVO) {
         if (orderTradeListReqVO == null) {
-            logger.error("porcessingOrderTradeList 失败，原因是 orderTradeListReqVO is null");
             return ResponseFactory.paramsError("请求参数不能为空");
         }
-        logger.info("porcessingOrderTradeList 请求参数:{}",JSON.toJSONString(orderTradeListReqVO));
-        PageResultData<OrderTradeSimpleResVO> orderTradeListResVOPageResultData;
+        PageResultData<OrderTradeTradingVO> result ;
         try {
-            orderTradeListResVOPageResultData = orderTradeService.pageTradeOrderList(orderTradeListReqVO);
+            result = orderTradeService.pageTradingOrderList(orderTradeListReqVO);
         } catch (BaseServiceException e) {
-            logger.error("porcessingOrderTradeList 失败，原因是:{}",e.getMessage());
             return ResponseFactory.paramsError(e.getMessage());
         } catch (Exception e) {
             logger.error("porcessingOrderTradeList 失败，原因是",e);
             return ResponseFactory.systemError(SYSTEM_ERROR_MSG);
         }
-        logger.info("porcessingOrderTradeList 响应内容:{}",JSON.toJSONString(orderTradeListResVOPageResultData));
-        return ResponseFactory.success(orderTradeListResVOPageResultData);
+        return ResponseFactory.success(result);
+    }
+
+    /**
+     * 催付交易
+     * @param orderTradeSearchVO
+     * @return
+     */
+    @PostMapping("/remind")
+    public ResponseData<String> remind(OrderTradeSearchVO orderTradeSearchVO) {
+        if (orderTradeSearchVO == null) {
+            return ResponseFactory.paramsError("请求参数不能为空");
+        }
+        if(StringUtils.isEmpty(orderTradeSearchVO.getTradeNo())){
+            return ResponseFactory.paramsError("交易单号为空");
+        }
+        try {
+           orderTradeService.remindTrade(orderTradeSearchVO.getTradeNo());
+        }catch (Exception e) {
+            return ResponseFactory.systemError(SYSTEM_ERROR_MSG);
+        }
+        return ResponseFactory.success("成功");
     }
 
 }

@@ -127,33 +127,12 @@ public class OrderTradeExample {
             return (Criteria) this;
         }
 
-        public Criteria andIdEqualTo(Long value) {
+        public Criteria andIdEqualToForAll(Long value) {
             addCriterion("OT.id =", value, "id");
             return (Criteria) this;
         }
-
-        public Criteria andIdNotEqualTo(Long value) {
-            addCriterion("id <>", value, "id");
-            return (Criteria) this;
-        }
-
-        public Criteria andIdGreaterThan(Long value) {
-            addCriterion("id >", value, "id");
-            return (Criteria) this;
-        }
-
-        public Criteria andIdGreaterThanOrEqualTo(Long value) {
-            addCriterion("id >=", value, "id");
-            return (Criteria) this;
-        }
-
-        public Criteria andIdLessThan(Long value) {
-            addCriterion("id <", value, "id");
-            return (Criteria) this;
-        }
-
-        public Criteria andIdLessThanOrEqualTo(Long value) {
-            addCriterion("id <=", value, "id");
+        public Criteria andIdEqualToForUpdate(Long value) {
+            addCriterion("id =", value, "id");
             return (Criteria) this;
         }
 
@@ -398,6 +377,10 @@ public class OrderTradeExample {
 
         public Criteria andTradeNoEqualTo(String value) {
             addCriterion("trade_no =", value, "tradeNo");
+            return (Criteria) this;
+        }
+        public Criteria andTradeNoEqualToForAll(String value) {
+            addCriterion("OT.trade_no =", value, "tradeNo");
             return (Criteria) this;
         }
 
@@ -646,8 +629,12 @@ public class OrderTradeExample {
             return (Criteria) this;
         }
 
-        public Criteria andStatusEqualTo(Integer value) {
+        public Criteria andStatusEqualToForUpdate(Integer value) {
             addCriterion("status =", value, "status");
+            return (Criteria) this;
+        }
+        public Criteria andStatusEqualToForAll(Integer value) {
+            addCriterion("OT.status =", value, "status");
             return (Criteria) this;
         }
 
@@ -656,25 +643,7 @@ public class OrderTradeExample {
             return (Criteria) this;
         }
 
-        public Criteria andStatusGreaterThan(Integer value) {
-            addCriterion("status >", value, "status");
-            return (Criteria) this;
-        }
 
-        public Criteria andStatusGreaterThanOrEqualTo(Integer value) {
-            addCriterion("status >=", value, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusLessThan(Integer value) {
-            addCriterion("status <", value, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusLessThanOrEqualTo(Integer value) {
-            addCriterion("status <=", value, "status");
-            return (Criteria) this;
-        }
 
         public Criteria andStatusInForUpdate(List<Integer> values) {
             addCriterion("status in", values, "status");

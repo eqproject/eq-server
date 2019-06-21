@@ -1509,30 +1509,28 @@
 |errMsg   |string    |错误描述   |
 |data   |object|结果对象 |
 |- total  |int | 订单总记录数|
-|- list |list |交易订单列表                        |
-|--    product |object |商品信息 |
-|---        productImg |string |图片url |
-|---        name |string |名称|
-|---        unitPrice |int |面值(单位:分)|
-|--    user |object |用户信息 |
-|---        sellUserId |long |售卖用户id|
-|---        sellUserNickName | string |卖家昵称|
-|---        buyUserId |long |买家用户id|
-|---        buyUserNickName | string |买家昵称|
-|--    trade |object |交易订单信息 |
-|---        tradeNo |string |交易订单号|
-|---        payNo |string |支付流水号|
-|---        amount |int |商品售卖价格(单位:分)|
-|---        orderNum |int |订单数量|
-|---        salePrice |int |商品售价(单位:分)|
-|---        serviceFee |int |服务费(单位:分)|
-|---        status |int |状态:(4:支付成功;5:支付失败;6:区块链处理中;7:放款中;8:放款失败;)|
-|---        createTime |string |交易时间 |
-|---        payTime |string |支付完成时间 |
+>| list   |Object[]    |商品详情   |
+>Object对象
+>|返回字段|字段类型|说明                              |
+>|:-----   |:------|:-----------------------------   |
+|productImg |string |图片url |
+|productName |string |商品名称|
+|unitPrice |int |面值(单位:分)|
+|userNickName |String |用户昵称|
+|photoHead | string |用户头像|
+|tradeNo |string |交易订单号|
+|amount |int |交易价格(单位:分)|
+|orderNum |int |订单数量|
+|salePrice |int |商品售卖单价(单位:分)|
+|serviceFee |int |服务费(单位:分)|
+|status |int |原始状态|
+|createTime |string |创建时间 |
+|updateTime |string |最后一次交易时间 |
+|remindPay |int | 是否已催 (0:未催 1：已催)  <br />**只有原始状态为 3 或者5且为未催。方可进行电催** |
+|stateRemark |string |状态描述（原型右上角）|
 
 ###### 接口示例
 
-> 地址：[/api/order/trade/porcessing/list)
 ```
 {
 	"errMsg": "",
@@ -1540,35 +1538,28 @@
 	"data":{
 	   "total":1,
 	   "list": [
-				{
-					"product": {
-						"productImg": "http://product.png",
-						"unitPrice": 100,
-						"name": "东券-001"
-					},
-					"trade": {
-						"tradeNo": "100000001",
-						"payNo": "200000001",
-						"amount": 300,
-						"createTime": "2019-05-16 12:30:28",
-						"payTime": "2019-05-16 12:30:28",
-						"orderNum": 3,
-						"salePrice": 100,
-					   "serviceFee":1,
-						"status":4
-					},
-					"user": {
-						"buyUserId": 2,
-					    "buyUserNickName": "买家昵称",
-					    "sellUserNickName": "卖家昵称",
-					    "sellUserId": 1
-					}
-				}
+				 {
+                "tradeNo": "JY20190619201359",
+                "unitPrice": 10000,
+                "amount": 10,
+                "orderNum": 1,
+                "salePrice": 10,
+                "serviceFee": 0,
+                "remindPay": 0,
+                "status": 1,
+                "createTime": "2019-06-19 20:14:00",
+                "updateTime": "2019-06-19 20:14:00",
+                "productImg": "https://gss0.baidu.com/9vo3dSag_xI4khGko9WTAnF6hhy/zhidao/wh%3D600%2C800/sign=6d06d91632a85edffad9f6257964251b/37d3d539b6003af3ebb06c26332ac65c1038b66a.jpg",
+                "productName": "京东E卡",
+                "payTimeOut": 0,
+                "stateRemark": "待付款",
+                "userNickName": "骚情的流氓",
+                "photoHead": "用户头像地址"
+            }
 	 	]
 	}
 }
 ```
-
 
 ##### 4-07\.查询已完成（广告+交易）订单列表接口
 
@@ -1698,7 +1689,43 @@
 }
 
 ```
+##### 4-09\.催支付接口
 
+###### 接口功能
+>   只有在买方未支付或者支付失败的情况下方可有效
+
+###### URL
+> [/api/order/trade/remind](/api/order/trade/remind)
+
+###### 支持格式
+> JSON
+
+###### HTTP请求方式
+> POST
+
+###### 请求参数
+> |参数|必选|类型|说明|
+|:-----  |:-------|:-----|-----|
+|tradeNo      |true    |String  | 交易号|
+|sign       |true    |string   |签名|
+
+###### 返回字段
+> |返回字段|字段类型|说明                              |
+|:-----   |:------|:-----------------------------   |
+|status   |int    |返回结果状态。0：正常；1：错误。   |
+|errMsg   |string    |错误描述   |
+|data   |object|结果对象 |
+|  String  |int | 结果 |
+
+###### 接口示例
+
+```
+{
+	"errMsg": "",
+	"status": 0
+	"data":"成功"
+}
+```
 
 
 #### 5 用户券包

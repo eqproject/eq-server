@@ -19,8 +19,10 @@ import org.eq.modules.bc.dao.BcTxRecordMapper;
 import org.eq.modules.bc.entity.BcTxRecord;
 import org.eq.modules.common.cache.ProductCache;
 import org.eq.modules.common.entitys.PageResultData;
+import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.common.enums.LogTypeEnum;
+import org.eq.modules.common.enums.ResponseStateEnum;
 import org.eq.modules.enums.*;
 import org.eq.modules.log.OrderLogService;
 import org.eq.modules.order.entity.OrderAd;
@@ -35,6 +37,7 @@ import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.service.UserProductStockService;
 import org.eq.modules.product.vo.BSearchProduct;
 import org.eq.modules.product.vo.ProductDetailVO;
+import org.eq.modules.sms.service.SmsService;
 import org.eq.modules.support.dao.SystemConfigMapper;
 import org.eq.modules.support.entity.SystemConfig;
 import org.eq.modules.support.entity.SystemConfigExample;
@@ -42,12 +45,14 @@ import org.eq.modules.trade.dao.OrderTradeMapper;
 import org.eq.modules.trade.entity.*;
 import org.eq.modules.trade.exception.TradeOrderException;
 import org.eq.modules.trade.service.OrderPaymentTradeService;
+import org.eq.modules.trade.service.OrderTradeMapService;
 import org.eq.modules.trade.service.OrderTradeService;
 import org.eq.modules.trade.vo.*;
 import org.eq.modules.utils.ProductUtil;
 import org.eq.modules.wallet.entity.UserWallet;
 import org.eq.modules.wallet.service.UserWalletService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,6 +78,10 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
      */
 	@Autowired
 	OrderLogService orderLogService;
+
+
+	@Autowired
+	private SmsService smsService;
 
     /**
      * 商品服务
@@ -135,6 +144,11 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		}else{
 			example.setOrderByClause("id asc");
 		}
+		if(!StringUtils.isEmpty(orderTrade.getTradeNo())){
+			ca.andTradeNoEqualTo(orderTrade.getTradeNo());
+		}
+
+
 		return example;
 	}
 
@@ -304,8 +318,8 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 
 		OrderTradeExample updateOrderTrade = new OrderTradeExample();
 		OrderTradeExample.Criteria updateOrderCa = updateOrderTrade.or();
-		updateOrderCa.andIdEqualTo(orderTrade.getId());
-		updateOrderCa.andStatusEqualTo(oldStatus);
+		updateOrderCa.andIdEqualToForUpdate(orderTrade.getId());
+		updateOrderCa.andStatusEqualToForUpdate(oldStatus);
 
 		OrderTrade updateObj = new OrderTrade();
 		updateObj.setId(orderTrade.getId());
@@ -344,8 +358,8 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 
 		OrderTradeExample updateOrderTrade = new OrderTradeExample();
 		OrderTradeExample.Criteria updateOrderCa = updateOrderTrade.or();
-		updateOrderCa.andIdEqualTo(orderTrade.getId());
-		updateOrderCa.andStatusEqualTo(oldStatus);
+		updateOrderCa.andIdEqualToForUpdate(orderTrade.getId());
+		updateOrderCa.andStatusEqualToForUpdate(oldStatus);
 
 		OrderTrade updateObj = new OrderTrade();
 		updateObj.setId(orderTrade.getId());
@@ -486,8 +500,8 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		Integer oldStatus = orderTrade.getStatus();
 		OrderTradeExample updateOrderTrade = new OrderTradeExample();
 		OrderTradeExample.Criteria updateOrderCa = updateOrderTrade.or();
-		updateOrderCa.andIdEqualTo(orderTrade.getId());
-		updateOrderCa.andStatusEqualTo(oldStatus);
+		updateOrderCa.andIdEqualToForUpdate(orderTrade.getId());
+		updateOrderCa.andStatusEqualToForUpdate(oldStatus);
 
 		OrderTrade updateObj = new OrderTrade();
 		updateObj.setId(orderTrade.getId());
@@ -523,8 +537,8 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 
         updateOrderTrade = new OrderTradeExample();
         updateOrderCa = updateOrderTrade.or();
-        updateOrderCa.andIdEqualTo(orderTrade.getId());
-        updateOrderCa.andStatusEqualTo(OrderTradeStateEnum.PAY_SUCCESS.getState());
+        updateOrderCa.andIdEqualToForUpdate(orderTrade.getId());
+        updateOrderCa.andStatusEqualToForUpdate(OrderTradeStateEnum.PAY_SUCCESS.getState());
 
         updateObj = new OrderTrade();
         updateObj.setId(orderTrade.getId());
@@ -551,7 +565,6 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 
 		if(orderTradeListReqVO ==null  || orderTradeListReqVO.getUserId()<=0){
 			result.setList(new ArrayList<>());
-			result.setTotal(0);
 			return result;
 		}
 		if(orderTradeListReqVO.getPageSize()<=0 || orderTradeListReqVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
@@ -603,15 +616,16 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 	}
 
 	@Override
-	public PageResultData<OrderTradeSimpleResVO> pageTradeOrderList(OrderTradeListReqVO orderTradeListReqVO) {
-		PageResultData<OrderTradeSimpleResVO> result = new PageResultData<>();
-
+	public PageResultData<OrderTradeTradingVO> pageTradingOrderList(OrderTradeListReqVO orderTradeListReqVO) {
+		PageResultData<OrderTradeTradingVO> result = new PageResultData<>();
+		result.setList(new ArrayList<>());
 		if(orderTradeListReqVO ==null  || orderTradeListReqVO.getUserId()<=0){
-			result.setList(new ArrayList<>());
-			result.setTotal(0);
 			return result;
 		}
-
+		User user = userService.selectByPrimaryKey(orderTradeListReqVO.getUserId());
+		if (user == null) {
+			return result;
+		}
 		if(orderTradeListReqVO.getPageSize()<=0 || orderTradeListReqVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
 			orderTradeListReqVO.setPageSize(StaticEntity.MAX_PAGE_SIZE);
 		}
@@ -630,47 +644,60 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		if(baseTableData==null || CollectionUtils.isEmpty(baseTableData.getData())){
 			return result;
 		}
-		List<OrderTradeSimpleResVO> dataList = new ArrayList<>(baseTableData.getData().size());
-		List<OrderTrade> pList = baseTableData.getData();
-		for(OrderTrade orderTrade : pList){
-			Product product = productService.selectByPrimaryKey(orderTrade.getProductId());
-			if (product == null) {
-				logger.error("tradeOrderDetail 商品ID[{}]记录不存在",orderTrade.getProductId());
+		List<OrderTrade> dataList = baseTableData.getData();
+
+		List<OrderTradeTradingVO> tradingList = new ArrayList<>(dataList.size());
+
+		for(OrderTrade orderTrade : dataList){
+			User otherUser = null;
+			if(user.getId().equals(orderTrade.getBuyUserId())){
+				otherUser = userService.selectByPrimaryKey(orderTrade.getSellUserId());
+			}else{
+				otherUser = userService.selectByPrimaryKey(orderTrade.getBuyUserId());
+			}
+			if(otherUser==null){
 				continue;
 			}
-
-			User buserUser = userService.selectByPrimaryKey(orderTrade.getBuyUserId());
-			if (buserUser == null) {
-				logger.error("pageTradeOrderList 交易订单号[{}] 买家[{}]用户记录不存在",orderTrade.getTradeNo(),orderTrade.getBuyUserId());
-				continue;
-			}
-
-			User sellUser = userService.selectByPrimaryKey(orderTrade.getSellUserId());
-			if (sellUser == null) {
-				logger.error("pageTradeOrderList 交易订单号[{}] 卖家[{}]用户记录不存在",orderTrade.getTradeNo(),orderTrade.getSellUserId());
-				continue;
-			}
-			OrderTradeDetailTrade trade = initTradDetail(orderTrade);
-			trade.setProductImg(product.getProductImg());
-			trade.setProductName(product.getName());
-			OrderTradeUser orderTradeDetailUser = new OrderTradeUser();
-			orderTradeDetailUser.setBuyUserId(orderTrade.getBuyUserId());
-			orderTradeDetailUser.setSellUserId(orderTrade.getSellUserId());
-			orderTradeDetailUser.setBuyUserNickName(buserUser.getNickname());
-
-			orderTradeDetailUser.setSellUserNickName(sellUser.getNickname());
-
-
-			OrderTradeSimpleResVO orderTradeListResVO = new OrderTradeSimpleResVO();
-			orderTradeListResVO.setOrderTradeUser(orderTradeDetailUser);
-
-
-			orderTradeListResVO.setTrade(trade);
-			dataList.add(orderTradeListResVO);
+			OrderTradeTradingVO orderTradeTradingVO = OrderTradeMapService.initTradingVO(orderTrade,user);
+			orderTradeTradingVO.setUserNickName(otherUser.getNickname());
+			orderTradeTradingVO.setPhotoHead(otherUser.getPhotoHead());
+			tradingList.add(orderTradeTradingVO);
 		}
-		result.setList(dataList);
+		result.setList(tradingList);
 		result.setTotal(baseTableData.getRecordsTotal());
 		return result;
+	}
+
+	@Override
+	public boolean remindTrade(String tradNo) {
+		OrderTrade orderTrade = new OrderTrade();
+		orderTrade.setTradeNo(tradNo);
+		orderTrade = selectByRecord(orderTrade);
+		if (orderTrade == null) {
+			return false;
+		}
+		if(orderTrade.getRemindPay()!=null && orderTrade.getRemindPay().equals(1)){
+			return false;
+		}
+		User buyUser = userService.selectByPrimaryKey(orderTrade.getBuyUserId());
+		if(buyUser==null || StringUtils.isEmpty(buyUser.getMobile())){
+			return false;
+		}
+		if(!OrderTradeStateEnum.isRunPay(orderTrade.getStatus())){
+			return false;
+		}
+		ResponseData result = smsService.send(buyUser.getMobile(),6);
+		if(!ResponseStateEnum.SUCCESS.getStatus().equals(result.getStatus())){
+			return false;
+		}
+		OrderTradeExample updateOrderTrade = new OrderTradeExample();
+		OrderTradeExample.Criteria updateOrderCa = updateOrderTrade.or();
+		updateOrderCa.andIdEqualToForUpdate(orderTrade.getId());
+
+		OrderTrade updateObj = new OrderTrade();
+		updateObj.setRemindPay(1);
+		int number  = updateByExampleSelective(updateObj,updateOrderTrade);
+		return number>0?true:false;
 	}
 
 	/**
@@ -696,9 +723,6 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		result.setUnitPrice(orderTrade.getUnitPrice());
 		return result;
 	}
-
-
-
 
 	/**
 	 * 格式化正在交易数据
@@ -959,5 +983,8 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
         orderPaymentTradeLog.setRemarks(remark);
         orderLogService.save(LogTypeEnum.TRADE_PAYMENT,orderPaymentTradeLog);
     }
+
+
+
 
 }
