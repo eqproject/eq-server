@@ -39,6 +39,7 @@ public class ApiInterceptor  implements HandlerInterceptor {
         noSignUrl.add("api/support/legal");
         noSignUrl.add("api/support/buydoc");
         noSignUrl.add("api/support/getConfig");
+        noSignUrl.add("api/test/up");
     }
 
     @Override

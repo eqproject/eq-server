@@ -11,6 +11,7 @@ import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.cache.ProductCache;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
+import org.eq.modules.enums.WalletStateEnum;
 import org.eq.modules.product.service.ProductLoadService;
 import org.eq.modules.utils.PageUtils;
 import org.eq.modules.utils.ProductUtil;
@@ -25,6 +26,8 @@ import org.eq.modules.product.vo.ProductBaseVO;
 import org.eq.modules.product.vo.SearchPageProductVO;
 import org.eq.modules.product.vo.TicketProductVO;
 import org.eq.modules.product.vo.VoucherProductBaseVO;
+import org.eq.modules.wallet.entity.UserWallet;
+import org.eq.modules.wallet.service.UserWalletService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +59,12 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 
 	@Autowired
 	private ProductLoadService productLoadService;
+
+	/**
+	 * 用户钱包
+	 */
+	@Autowired
+	private UserWalletService userWalletService;
 
 	@Override
 	public UserProductStockExample getExampleFromEntity(UserProductStock userProductStock, Map<String, Object> params) {
@@ -138,7 +147,7 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 
 	@Override
 	public UserProductStock getUserProductStock(long productId, User user) {
-		if(productId<=0 || user==null || StringUtils.isEmpty(user.getTxPassword())){
+		if(productId<=0 || user==null || user.getId()<=0){
 			return null;
 		}
 		Product product = productService.selectByPrimaryKey(productId);
@@ -149,7 +158,11 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 		if(StringUtils.isEmpty(ticketKey)){
 			return null;
 		}
-		Map<String,TicketProductVO> ticketMap = productLoadService.getTicketUserProduct(user.getTxPassword());
+		UserWallet userWallet = userWalletService.selectByPrimaryKey(user.getId());
+		if(userWallet ==null || userWallet.getStatus()!= WalletStateEnum.ACTIVE.getState() || StringUtils.isEmpty(userWallet.getAddress())){
+			return null;
+		}
+		Map<String,TicketProductVO> ticketMap = productLoadService.getTicketUserProduct(userWallet.getAddress());
 		if(ticketMap ==null || ticketMap.size()<=0 ){
 			return null;
 		}
@@ -157,12 +170,11 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 		if(ticketProductVO==null){
 			return null;
 		}
-
 		UserProductStock userProductStock = getUserStockLocked(product.getId(),user.getId());
 		if(userProductStock==null){
 			return null;
 		}
-		userProductStock.setStockNum(Integer.valueOf(ticketProductVO.getBalance()));
+		userProductStock.setStockNum(Integer.valueOf(ticketProductVO.getBalance()) - userProductStock.getLockedNum());
 		return userProductStock;
 	}
 
@@ -190,7 +202,11 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 	@Override
 	public List<Long> listUserProdutId(User user) {
 		List<Long> result = new ArrayList<>();
-		Map<String,TicketProductVO> tickMap = productLoadService.getTicketUserProduct(user.getTxPassword());
+		UserWallet userWallet = userWalletService.selectByPrimaryKey(user.getId());
+		if(userWallet ==null || userWallet.getStatus()!= WalletStateEnum.ACTIVE.getState() || StringUtils.isEmpty(userWallet.getAddress())){
+			return result;
+		}
+		Map<String,TicketProductVO> tickMap = productLoadService.getTicketUserProduct(userWallet.getAddress());
 		if(tickMap ==null || tickMap.size()<=0){
 			return result;
 		}
@@ -218,10 +234,14 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 	@Override
 	public PageResultData<VoucherProductBaseVO> pageVoucherProduct(SearchPageProductVO searchPageProductVO, User user) {
 		PageResultData<VoucherProductBaseVO> result = new PageResultData<>();
-		if(user ==null || StringUtils.isEmpty(user.getTxPassword())){
+		if(user ==null || user.getId()<=0){
 			return result;
 		}
-		Map<String,TicketProductVO> tickMap = productLoadService.getTicketUserProduct(user.getTxPassword());
+		UserWallet userWallet = userWalletService.selectByPrimaryKey(user.getId());
+		if(userWallet ==null || userWallet.getStatus()!= WalletStateEnum.ACTIVE.getState() || StringUtils.isEmpty(userWallet.getAddress())){
+			return result;
+		}
+		Map<String,TicketProductVO> tickMap = productLoadService.getTicketUserProduct(userWallet.getAddress());
 		if(tickMap ==null || tickMap.size()<=0){
 			return result;
 		}
@@ -253,7 +273,6 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 			if((tickNum - lockNum)<=0){
 				continue;
 			}
-
 			VoucherProductBaseVO voucherProductBaseVO = ProductUtil.transObjForVoucher(product);
 			voucherProductBaseVO.setNumber(tickNum);
 			voucherProductBaseVO.setLockNumber(lockNum);
@@ -267,6 +286,8 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 		return result;
 	}
 
+
+
 	/**
 	 * 根据商品信息和用户信息获取用户库存数据
 	 * @param productId
@@ -274,29 +295,11 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 	 * @return
 	 */
 	private int getLockedStockNum(long productId, long userId){
-		if(productId<=0 || userId<=0 ){
+		UserProductStock userProductStock = getUserStockLocked(productId,userId);
+		if(userProductStock==null){
 			return 0;
 		}
-		UserProductStock userProductStock = new UserProductStock();
-		userProductStock.setUserId(userId);
-		userProductStock.setProductId(productId);
-		userProductStock = selectByRecord(userProductStock);
-		if(userProductStock!=null){
-			return userProductStock.getLockedNum();
-		}
-		userProductStock = new UserProductStock();
-		userProductStock.setProductId(productId);
-		userProductStock.setUserId(userId);
-		userProductStock.setCreateDate(new Date());
-		userProductStock.setLockedNum(0);
-		userProductStock.setUpdateDate(userProductStock.getCreateDate());
-		int result = insertSelective(userProductStock);
-		int retryNum = 3;
-		while(result<=0 && retryNum>0){
-			result = insertSelective(userProductStock);
-			retryNum--;
-		}
-		return 0;
+		return userProductStock.getLockedNum();
 	}
 
 

@@ -61,11 +61,6 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 
 	@Autowired
 	private OrderLogService orderLogService;
-	/**
-	 * 用户服务
-	 */
-	@Autowired
-	private UserIdentityAuthService userIdentityAuthService;
 
 	@Autowired
 	private OrderTradeService orderTradeService;
@@ -99,12 +94,12 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 	 * @param id
 	 * @return
 	 */
+	@SuppressWarnings("all")
 	public OrderAdExample getExampleFromEntity(int statue,long id) {
 		OrderAdExample example = new OrderAdExample();
 		OrderAdExample.Criteria ca = example.or();
 	    ca.andIdEqualToForUpdate(id);
 	    ca.andStatusEqualToForUpdate(statue);
-
 		return example;
 	}
 
@@ -274,12 +269,12 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 			result.setErrMsg("订单为空，无法取消");
 			return result;
 		}
-		if(OrderAdStateEnum.isOverState(orderAd.getStatus())){
-			result.setErrMsg("订单状态已经为最终状态，无法取消");
-			return result;
-		}
 		if(orderAd.getStatus() == OrderAdStateEnum.ORDER_CANCEL.getState()){
 			result.setErrMsg("订单已为取消状态，无法进行二次取消");
+			return result;
+		}
+		if(OrderAdStateEnum.isOverState(orderAd.getStatus())){
+			result.setErrMsg("订单状态已经为最终状态，无法取消");
 			return result;
 		}
 		OrderAd updateOrder = new OrderAd();
@@ -293,7 +288,7 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		}
 		StringBuilder remarks = new StringBuilder();
 		if(orderAd.getType()==OrderAdTypeEnum.ORDER_SALE.getType()){
-			int number  = orderAd.getProductNum() -orderAd.getTradedNum()  - orderAd.getTradingNum();
+			int number  = orderAd.getProductNum() - orderAd.getTradedNum()  - orderAd.getTradingNum();
 			if(number>0){
 				boolean stockResult  = userProductStockService.updateStock(orderAd.getProductId(),user.getId(),-number);
 				if(stockResult){
@@ -308,9 +303,7 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		}else{
 			remarks.append("取消成功,").append("执行快照为:").append(orderAd.toString());
 		}
-
-		saveLog(orderAd,remarks);
-
+		saveLog(orderAd.getId(),orderAd.getStatus(),OrderAdStateEnum.ORDER_CANCEL.getState(),remarks.toString());
 		result.setData(OrderUtil.transObj(orderAd));
 		return  result ;
 	}
@@ -336,10 +329,10 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 			if(user==null){
 				return result;
 			}
-			List<Long> userProductId = new ArrayList<>();
-			userProductId.add(-1L);
-			userProductId.addAll(userProductStockService.listUserProdutId(user));
-			orderAdExample  = getExampleFromEntityAll(OrderAdTypeEnum.ORDER_BUY.getType(),userProductId);
+			List<Long> userProductList = new ArrayList<>();
+			userProductList.add(-1L);
+			userProductList.addAll(userProductStockService.listUserProdutId(user));
+			orderAdExample  = getExampleFromEntityAll(OrderAdTypeEnum.ORDER_BUY.getType(),userProductList);
 		}else{//我要买
 			orderAdExample  = getExampleFromEntityAll(OrderAdTypeEnum.ORDER_SALE.getType(),null);
 		}
@@ -420,6 +413,9 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 			result = insertSelective(orderAd);
 			retryNum--;
 		}
+		if(result>0){
+			saveLog(orderAd.getId(),-1,OrderAdStateEnum.ORDER_DEFAULT.getState(),"初始化订单");
+		}
 		return result>0?orderAd:null;
 	}
 
@@ -492,13 +488,20 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		return buffer.toString();
 	}
 
-	private void saveLog(OrderAd orderAd,StringBuilder remarks){
+	/**
+	 * 插如广告日志
+	 * @param orderId
+	 * @param oldState
+	 * @param newState
+	 * @param remarks
+	 */
+	private void saveLog(long orderId,int oldState,int newState,String remarks){
 		OrderAdLog orderAdLog = new OrderAdLog();
 		orderAdLog.setCreateDate(new Date());
-		orderAdLog.setNewStatus(OrderAdStateEnum.ORDER_CANCEL.getState());
-		orderAdLog.setOldStatus(orderAd.getStatus());
-		orderAdLog.setOrderAdId(orderAd.getId());
-		orderAdLog.setRemarks(remarks.toString());
+		orderAdLog.setNewStatus(newState);
+		orderAdLog.setOldStatus(oldState);
+		orderAdLog.setOrderAdId(orderId);
+		orderAdLog.setRemarks(remarks);
 		try{
 			orderLogService.save(LogTypeEnum.AD,orderAdLog);
 		}catch (Exception e){
@@ -506,5 +509,4 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 			logger.info("插入订单操作日志记录数据出错 {}",orderAdLog.toString());
 		}
 	}
-
 }

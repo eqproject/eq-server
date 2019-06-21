@@ -141,7 +141,6 @@ public class ProductController extends BaseController {
 		if(!StringUtils.isEmpty(servieReturn.getErrMsg())){
 			return ResponseFactory.signError(servieReturn.getErrMsg());
 		}
-
 		return ResponseFactory.success(servieReturn.getData());
 	}
 

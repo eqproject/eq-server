@@ -21,7 +21,7 @@ public class TicketPlatProductRes  implements Serializable {
     @Data
     public static class TicketData{
 
-        private List<TicketProduct> voucherList;
+        private List<TicketProductVO> voucherList;
 
         private Page page;
 

@@ -68,7 +68,7 @@ public class OrderController extends BaseController {
 
 
 	/**
-	 * 获取平台有效商品信息
+	 * 取消订单
 	 * @return
 	 */
 	@PostMapping("/user/cancel")
@@ -80,7 +80,6 @@ public class OrderController extends BaseController {
 		if(user==null){
 			return ResponseFactory.signError("用户不存在");
 		}
-
 		ServieReturn<ResOrderAdVO>  resOrderAdVO =  orderAdService.cacelResOrderAdVO(searchAdOrderVO,user);
 		if(!StringUtils.isEmpty(resOrderAdVO.getErrMsg())){
 			return ResponseFactory.signError(resOrderAdVO.getErrMsg());
@@ -109,7 +108,7 @@ public class OrderController extends BaseController {
 
 
 	/**
-	 * 集市订单查询
+	 * 获取我的订单
 	 * @return
 	 */
 	@PostMapping("/user/list")
@@ -143,7 +142,6 @@ public class OrderController extends BaseController {
 		}
 		//获取平台求购订单不需要用户
 		User user = getUserInfo(searchPageAdOrderVO.getUserId());
-
 		if(searchPageAdOrderVO.getOrderType()!=1 && searchPageAdOrderVO.getOrderType()!=2){
 			return ResponseFactory.signError("订单类型出错");
 		}
@@ -155,18 +153,5 @@ public class OrderController extends BaseController {
 		}
 		return ResponseFactory.success(pageResult);
 	}
-
-
-
-
-
-	@GetMapping("/list")
-	public String list() {
-	    JSONObject json = success();
-        List<Product> list = productService.findListByExample(null);
-		json.put("list",list);
-		return json.toJSONString();
-	}
-
 
 }

@@ -9,7 +9,9 @@ import org.eq.modules.product.vo.TicketPlatTokenRes;
 import org.eq.modules.product.vo.TicketProductVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 
 @Service
 @SuppressWarnings("all")
@@ -24,43 +28,27 @@ public class ProductLoadService {
 
     private static Logger logger = LoggerFactory.getLogger(ProductLoadService.class);
 
+    /**
+     * Redis 操作
+     */
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     @Value("${tick.url}")
     private  String TICKET_URL;
+
     @Value("${tick.appid}")
     private  String APPID;
+
+
     @Value("${tick.appkey}")
     private  String APPKEY ;
 
 
     /**
-     * 获取token
-     * @return
+     * 存放区块链 TOKEN
      */
-    private  String getToken(){
-        String tokenUrl = TICKET_URL+"/auth/accessToken";
-        JSONObject params = new JSONObject();
-        params.put("appId",APPID);
-        params.put("appKey",APPKEY);
-        String token = "";
-        try{
-            int i = 3;
-            while(i>0 && StringUtil.isEmpty(token)){
-                String result = WebClientUtil.synchPostForPayload(tokenUrl,params);
-                if(StringUtil.isEmpty(result)){
-                    continue;
-                }
-                TicketPlatTokenRes ticketPlatTokenRes = JSONObject.parseObject(result,TicketPlatTokenRes.class);
-                TicketPlatTokenRes.Meta meta = ticketPlatTokenRes==null?null:ticketPlatTokenRes.getMeta();
-                if(meta==null || meta.getCode()==null ||  meta.getCode()!=0){
-                    continue;
-                }
-                token = ticketPlatTokenRes.getData().getAccessToken();
-            }
-        }catch (Exception e){
-            logger.error("获取Token异常",e);
-        }
-        return  token;
-    }
+    private  static final String  PRODUCT_LOAD_TOKEN_KEY = "VOUCHER_TOKEN_KEY";
 
 
     /**
@@ -72,62 +60,66 @@ public class ProductLoadService {
         Map<String,TicketProductVO> result = new HashMap<>();
         if("KAKA".equals(address)){
             TicketProductVO ticketProductVO = new TicketProductVO();
-            ticketProductVO.setTicketId("TICKET01");
+            ticketProductVO.setVoucherId("TICKET01");
             ticketProductVO.setTrancheId("TRANCEID01");
-            ticketProductVO.setTicketName("区块链商品名称");
-            ticketProductVO.setTicketFaceValue("1000");
+            ticketProductVO.setVoucherName("区块链商品名称");
+            ticketProductVO.setFaceValue("1000");
             ticketProductVO.setBalance("1000");
-            ticketProductVO.setTicketDesc("区块链商品简介");
-            String key = ticketProductVO.getTicketId()+"_"+ticketProductVO.getTrancheId();
+            ticketProductVO.setDescription("区块链商品简介");
+            String key = ticketProductVO.getVoucherId()+"_"+ticketProductVO.getTrancheId();
             result.put(key,ticketProductVO);
 
             ticketProductVO = new TicketProductVO();
-            ticketProductVO.setTicketId("TICKET02");
+            ticketProductVO.setVoucherId("TICKET02");
             ticketProductVO.setTrancheId("TRANCEID02");
-            ticketProductVO.setTicketName("区块链商品名称");
-            ticketProductVO.setTicketFaceValue("1000");
+            ticketProductVO.setVoucherName("区块链商品名称");
+            ticketProductVO.setFaceValue("1000");
             ticketProductVO.setBalance("1000");
-            ticketProductVO.setTicketDesc("区块链商品简介");
-            key = ticketProductVO.getTicketId()+"_"+ticketProductVO.getTrancheId();
+            ticketProductVO.setDescription("区块链商品简介");
+            key = ticketProductVO.getVoucherId()+"_"+ticketProductVO.getTrancheId();
             result.put(key,ticketProductVO);
 
             ticketProductVO = new TicketProductVO();
-            ticketProductVO.setTicketId("TICKET03");
+            ticketProductVO.setVoucherId("TICKET03");
             ticketProductVO.setTrancheId("TRANCEID03");
-            ticketProductVO.setTicketName("区块链商品名称");
-            ticketProductVO.setTicketFaceValue("1000");
+            ticketProductVO.setVoucherName("区块链商品名称");
+            ticketProductVO.setFaceValue("1000");
             ticketProductVO.setBalance("1000");
-            ticketProductVO.setTicketDesc("区块链商品简介");
-            key = ticketProductVO.getTicketId()+"_"+ticketProductVO.getTrancheId();
+            ticketProductVO.setDescription("区块链商品简介");
+            key = ticketProductVO.getVoucherId()+"_"+ticketProductVO.getTrancheId();
 
 
             ticketProductVO = new TicketProductVO();
-            ticketProductVO.setTicketId("TICKET05");
+            ticketProductVO.setVoucherId("TICKET05");
             ticketProductVO.setTrancheId("TRANCEID05");
-            ticketProductVO.setTicketName("区块链商品名称");
-            ticketProductVO.setTicketFaceValue("12");
+            ticketProductVO.setVoucherName("区块链商品名称");
+            ticketProductVO.setFaceValue("12");
             ticketProductVO.setBalance("24");
-            ticketProductVO.setTicketDesc("区块链商品简介");
-            key = ticketProductVO.getTicketId()+"_"+ticketProductVO.getTrancheId();
-
+            ticketProductVO.setDescription("区块链商品简介");
+            key = ticketProductVO.getVoucherId()+"_"+ticketProductVO.getTrancheId();
             result.put(key,ticketProductVO);
+        }else{
+            result = loadUserProduct(address);
         }
         return result;
     }
 
-    private Map<String,TicketProductVO> pageList(){
+    /**
+     * 加载用户商品信息
+     * @param address
+     * @return
+     */
+    private Map<String,TicketProductVO> loadUserProduct(String address){
         Map<String,TicketProductVO>  result = new HashMap<>();
         String token = getToken();
         if(StringUtil.isEmpty(token)){
-            logger.error("获取Token 失败");
             return result;
         }
-        System.out.println(token);
-
-        String url = TICKET_URL+"/voucher/v1/list";
+        String url = TICKET_URL+"/voucher/v1/account/balance";
         JSONObject params = new JSONObject();
         params.put("pageSize",10);
         params.put("accessToken",token);
+        params.put("address",address);
         int pageStart =1;
         while(true){
             params.put("pageStart",pageStart);
@@ -149,24 +141,59 @@ public class ProductLoadService {
             if(code.intValue()!=0){
                 break;
             }
-
             TicketPlatProductRes.TicketData  ticketData =  ticketPlatProductRes.getData();
             if(ticketData==null || CollectionUtils.isEmpty(ticketData.getVoucherList())){
                 break;
             }
+            List<TicketProductVO> pageDate = ticketData.getVoucherList();
+            for(TicketProductVO temp : pageDate){
+                String key  = temp.getVoucherId()+"_"+temp.getTrancheId();
+                result.put(key,temp);
+            }
             pageStart++;
         }
         return  result;
-
     }
 
 
-
-
-    public static void main(String[] args) {
-        System.out.println("1");
+    /**
+     * 获取token
+     * @return
+     */
+    private  String getToken(){
+        String tokenKen = (String)redisTemplate.opsForValue().get(PRODUCT_LOAD_TOKEN_KEY);
+        if(!StringUtil.isEmpty(tokenKen)){
+            return tokenKen;
+        }
+        String tokenUrl = TICKET_URL+"/auth/accessToken";
+        JSONObject params = new JSONObject();
+        params.put("appId",APPID);
+        params.put("appKey",APPKEY);
+        int time = 0;
+        try{
+            int i = 3;
+            while(i>0 && StringUtil.isEmpty(tokenKen)){
+                String result = WebClientUtil.synchPostForPayload(tokenUrl,params);
+                if(StringUtil.isEmpty(result)){
+                    continue;
+                }
+                TicketPlatTokenRes ticketPlatTokenRes = JSONObject.parseObject(result,TicketPlatTokenRes.class);
+                TicketPlatTokenRes.Meta meta = ticketPlatTokenRes==null?null:ticketPlatTokenRes.getMeta();
+                if(meta==null || meta.getCode()==null ||  meta.getCode()!=0){
+                    continue;
+                }
+                tokenKen = ticketPlatTokenRes.getData().getAccessToken();
+                time = ticketPlatTokenRes.getData().getExpiresIn();
+            }
+        }catch (Exception e){
+            logger.error("获取Token异常",e);
+        }
+        if(time>0 && !StringUtil.isEmpty(tokenKen)){
+            time = time>100? (time-100) : time;
+            redisTemplate.opsForValue().set(PRODUCT_LOAD_TOKEN_KEY,tokenKen,time, TimeUnit.SECONDS);
+        }
+        return  tokenKen;
     }
-
 
 
 

@@ -22,45 +22,45 @@ public class TicketProductVO{
     /**
      * 券Id
      */
-    private  String ticketId;
+    private  String voucherId;
 
     /**
      * 券名称
      */
-    private  String ticketName;
+    private  String voucherName;
 
     /**
      * 券图片地址
      */
-    private  String ticketIcon;
+    private  String voucherIcon;
 
     /**
      * 券描述
      */
-    private  String ticketDesc;
+    private  String description;
 
 
     /**
      * 发行商
      */
-    private  TicketIssuer ticketIssuer;
+    private  VoucherIssuer voucherIssuer;
 
     /**
      * 承兑商
      */
-    private  TicketAcceptance ticketAcceptance;
+    private  List<VoucherAcceptance> voucherAcceptance;
 
 
     /**
      * 面值
      */
-    private  String ticketFaceValue;
+    private  String faceValue;
 
 
     /**
      * 商品参数
      */
-    private List<param> ticketSpe;
+    private List<param> voucherProperties;
 
     /**
      * 余额
@@ -80,7 +80,7 @@ public class TicketProductVO{
 
 
     @Data
-    class TicketIssuer{
+    class VoucherIssuer{
         /**
          * 发行方区块链地址
          */
@@ -99,7 +99,7 @@ public class TicketProductVO{
     }
 
     @Data
-    class TicketAcceptance{
+    class VoucherAcceptance{
         /**
          * 称对方区块链地址
          */

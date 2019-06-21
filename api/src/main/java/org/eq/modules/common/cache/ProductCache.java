@@ -69,7 +69,6 @@ public class ProductCache implements BaseCache {
         if(productBlockchain==null){
             return  null;
         }
-
         ticketKeyTOProductId.put(ticketKey,String.valueOf(productBlockchain.getProductId()));
         return String.valueOf(productBlockchain.getProductId());
     }
@@ -145,7 +144,6 @@ public class ProductCache implements BaseCache {
         reloadProduct(null);
         Thread thread = new Thread(() -> {
             try{
-                System.out.println("开始执行商品加载");
                 loger.info("定时加载商品信息 任务开始加载 {}", DateUtil.getNowTimeStr());
                 reloadProduct(null);
                 loger.info("定时加载商品信息 任务加载完毕 {}", DateUtil.getNowTimeStr());

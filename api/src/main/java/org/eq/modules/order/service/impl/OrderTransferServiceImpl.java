@@ -16,6 +16,10 @@ import org.eq.modules.bc.entity.BcTxRecord;
 import org.eq.modules.common.cache.ProductCache;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
+import org.eq.modules.common.enums.LogTypeEnum;
+import org.eq.modules.enums.WalletStateEnum;
+import org.eq.modules.log.OrderLogService;
+import org.eq.modules.utils.IdWork;
 import org.eq.modules.utils.OrderUtil;
 import org.eq.modules.utils.ProductUtil;
 import org.eq.modules.enums.OrderTransferStateEnum;
@@ -28,6 +32,8 @@ import org.eq.modules.product.entity.ProductAll;
 import org.eq.modules.product.entity.UserProductStock;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.service.UserProductStockService;
+import org.eq.modules.wallet.entity.UserWallet;
+import org.eq.modules.wallet.service.UserWalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,6 +64,12 @@ public class OrderTransferServiceImpl extends ServiceImplExtend<OrderTransferMap
 
 	@Autowired
 	private ProductCache productCache;
+
+	@Autowired
+	private UserWalletService userWalletService;
+
+	@Autowired
+	private OrderLogService orderLogService ;
 
 	@Override
 	public OrderTransferExample getExampleFromEntity(OrderTransfer orderTransfer, Map<String, Object> params) {
@@ -118,8 +130,15 @@ public class OrderTransferServiceImpl extends ServiceImplExtend<OrderTransferMap
 			result.setErrMsg(volidResult);
 			return result;
 		}
-		if(user==null || StringUtils.isEmpty(user.getAddress())){
-			result.setErrMsg("用户未激活钱包地址，不能进行转账");
+		UserWallet userWallet = userWalletService.selectByPrimaryKey(user.getId());
+		if(user ==null || userWallet ==null || userWallet.getStatus()!= WalletStateEnum.ACTIVE.getState() || StringUtils.isEmpty(userWallet.getAddress())){
+			result.setErrMsg("用户钱包地址未激活");
+			return result;
+		}
+
+		ProductAll productAll = productCache.getProduct(String.valueOf(searchTransOrderVO.getProductId()));
+		if(productAll==null){
+			result.setErrMsg("商品无效");
 			return result;
 		}
 		UserProductStock userProductStock =  userProductStockService.getUserProductStock(searchTransOrderVO.getProductId(),user);
@@ -128,23 +147,20 @@ public class OrderTransferServiceImpl extends ServiceImplExtend<OrderTransferMap
 			return result;
 		}
 		int balance = userProductStock.getStockNum() - userProductStock.getLockedNum();
-		if((balance-searchTransOrderVO.getNumber())<=0){
+		if((balance-searchTransOrderVO.getNumber())<0){
 			result.setErrMsg("可转让库存不足");
 			return result;
 		}
-		ProductAll productAll = productCache.getProduct(String.valueOf(searchTransOrderVO.getProductId()));
-		if(productAll==null){
-			result.setErrMsg("商品无效");
-			return result;
-		}
+
 		OrderTransfer orderTransfer = createTransOrder(searchTransOrderVO,user);
 		OrderTransVO orderTransVO = OrderUtil.transObjForOrderTrans(orderTransfer);
 		if(orderTransVO==null){
 			result.setErrMsg("创建订单失败");
 			return result;
 		}
+
 		BcTxRecord bcTxRecord = new BcTxRecord();
-		bcTxRecord.setFromAddress(user.getAddress());
+		bcTxRecord.setFromAddress(userWallet.getAddress());
         bcTxRecord.setToAddress(searchTransOrderVO.getAddress());
         bcTxRecord.setTransferAmount(String.valueOf(searchTransOrderVO.getNumber()));
         bcTxRecord.setTicketid(productAll.getTicketid());
@@ -245,7 +261,7 @@ public class OrderTransferServiceImpl extends ServiceImplExtend<OrderTransferMap
 		}
 		OrderTransfer orderTransfer = new OrderTransfer();
 		orderTransfer.setUserId(user.getId());
-		orderTransfer.setTransferNo(getOrderNo());
+		orderTransfer.setTransferNo(IdWork.getOrderCode("TS"));
 		orderTransfer.setProductId(searchTransOrderVO.getProductId());
 		orderTransfer.setProductNum(searchTransOrderVO.getNumber());
 		orderTransfer.setStatus(OrderTransferStateEnum.TRANSFER_PADDING.getState());
@@ -267,22 +283,32 @@ public class OrderTransferServiceImpl extends ServiceImplExtend<OrderTransferMap
 			if(!updateStock){
 				logger.error("创建转让订单失败，但是锁定库存成功，释放库存失败，用户id :{} 商品ID:{} 应释放量:{}",searchTransOrderVO.getProductId(),user.getId(),searchTransOrderVO.getNumber());
 			}
-
+		}else{
+			saveLog(orderTransfer.getId(),-1,OrderTransferStateEnum.TRANSFER_PADDING.getState(),"新建转让订单");
 		}
 		return result>0?orderTransfer:null;
 	}
 
-
-
-	private String getOrderNo(){
-		StringBuffer buffer = new StringBuffer("TS");
-		String number = String.valueOf((Math.random()*9+1)*100000);
-		if(number.contains(".")){
-			number=number.substring(0,number.indexOf("."));
+	/**
+	 * 插如广告日志
+	 * @param transId
+	 * @param oldState
+	 * @param newState
+	 * @param remarks
+	 */
+	private void saveLog(long transId,int oldState,int newState,String remarks){
+		OrderTransferLog orderTransferLog = new OrderTransferLog();
+		orderTransferLog.setCreateDate(new Date());
+		orderTransferLog.setNewStatus(newState);
+		orderTransferLog.setOldStatus(oldState);
+		orderTransferLog.setOrderTransferId(transId);
+		orderTransferLog.setRemarks(remarks);
+		try{
+			orderLogService.save(LogTypeEnum.TRANSFER,orderTransferLog);
+		}catch (Exception e){
+			e.printStackTrace();
+			logger.info("插入转让订单日志记录数据出错 {}",orderTransferLog.toString());
 		}
-		buffer.append(DateUtil.getLockNowTime()).append(number);
-		return buffer.toString();
-
 	}
 
 

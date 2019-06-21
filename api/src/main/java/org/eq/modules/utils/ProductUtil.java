@@ -195,9 +195,6 @@ public class ProductUtil  extends ProductBusines {
         return example;
     }
 
-
-
-
     /**
      * 获取基本有效查询条件
      * @return
@@ -224,24 +221,6 @@ public class ProductUtil  extends ProductBusines {
         ca.andProductExpirationEndGreaterThan(DateUtil.getNowTimeStr());
         return example;
     }
-
-
-    /**
-     * 获取区块链平台商品信息
-     * @return
-     * TODO 实现区块链同步商品接口
-     */
-    public List<TicketProductVO> listTicketProduct(){
-        List<TicketProductVO> result = new ArrayList<>();
-        TicketProductVO ticketProductVO = new TicketProductVO();
-        ticketProductVO.setTicketId("TICKET01");
-        ticketProductVO.setTicketName("区块链商品名称");
-        ticketProductVO.setTicketFaceValue("1000");
-        ticketProductVO.setTicketDesc("区块链商品简介");
-        result.add(ticketProductVO);
-        return result;
-    }
-
 
     public static void main(String[] args) {
         ProductAll productAll = new ProductAll();

@@ -181,7 +181,7 @@ public class OrderController extends BaseController {
 
 
     /**
-     * 查询订单数据
+     * 关闭订单
      * @param product
      * @return BaseOpMsg
      */
@@ -210,7 +210,7 @@ public class OrderController extends BaseController {
             result.setCode(StatusCode.CURD_DELETE_FAILURE);
         }
         result.setStatus("success");
-        result.setMsg("查询数据成功！");
+        result.setMsg("操作成功！");
         result.setObject(orderAd);
         return result;
     }

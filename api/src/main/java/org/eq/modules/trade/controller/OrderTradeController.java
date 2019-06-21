@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 订单交易Controller
+ * 交易Controller
  * @author yufei.sun
  * @version 1.0
  */

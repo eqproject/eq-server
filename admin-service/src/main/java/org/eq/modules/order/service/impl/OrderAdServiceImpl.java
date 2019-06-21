@@ -49,6 +49,7 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 	private OrderAdLogService orderAdLogService;
 
 
+
 	@Override
 	public OrderAdExample getExampleFromEntity(OrderAd orderAd, Map<String, Object> params) {
 		OrderAdExample example = new OrderAdExample();
@@ -148,12 +149,13 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		if(orderAd==null){
 			return false;
 		}
-		if(orderAd.getStatus() == OrderAdStateEnum.ORDER_FINISH.getState() || orderAd.getStatus() == OrderAdStateEnum.ORDER_REJECT.getState()){
-			return false;
-		}
 		if(orderAd.getStatus() == OrderAdStateEnum.ORDER_CANCEL.getState()){
 			return true;
 		}
+		if(OrderAdStateEnum.isOverState(orderAd.getStatus())){
+			return false;
+		}
+
 		OrderAd updateOrder = new OrderAd();
 		updateOrder.setStatus(OrderAdStateEnum.ORDER_CANCEL.getState());
 		updateOrder.setUpdateDate(new Date());
@@ -174,6 +176,7 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		}else{
 			remarks.append("取消成功,").append("执行快照为:").append(orderAd.toString());
 		}
+
 		OrderAdLog orderAdLog = new OrderAdLog();
 		orderAdLog.setCreateDate(new Date());
 		orderAdLog.setNewStatus(OrderAdStateEnum.ORDER_CANCEL.getState());
@@ -228,7 +231,7 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		}
 		OrderAdLog orderAdLog = new OrderAdLog();
 		orderAdLog.setCreateDate(new Date());
-		orderAdLog.setNewStatus(OrderAdStateEnum.ORDER_CANCEL.getState());
+		orderAdLog.setNewStatus(newState);
 		orderAdLog.setOldStatus(orderAd.getStatus());
 		orderAdLog.setOrderAdId(orderAd.getId());
 		orderAdLog.setRemarks(remarks.toString());
@@ -259,6 +262,7 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		ca.andStatusEqualToForUpdate(statue);
 		return example;
 	}
+
 
 
 

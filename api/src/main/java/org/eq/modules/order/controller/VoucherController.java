@@ -107,7 +107,7 @@ public class VoucherController extends BaseController {
 
 
 	/**
-	 * 承兑
+	 * 承兑列表
 	 * @return
 	 */
 	@PostMapping("/user/acceptList")

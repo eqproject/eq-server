@@ -10,6 +10,7 @@ import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.DateUtil;
+import org.eq.basic.common.util.IdworkUtil;
 import org.eq.basic.common.util.ParseUtil;
 import org.eq.basic.common.util.StringLowUtils;
 import org.eq.modules.auth.entity.User;
@@ -18,7 +19,12 @@ import org.eq.modules.bc.entity.BcTxRecord;
 import org.eq.modules.common.cache.ProductCache;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
+import org.eq.modules.common.enums.LogTypeEnum;
+import org.eq.modules.enums.OrderTransferStateEnum;
+import org.eq.modules.enums.WalletStateEnum;
+import org.eq.modules.log.OrderLogService;
 import org.eq.modules.product.service.ProductLoadService;
+import org.eq.modules.utils.IdWork;
 import org.eq.modules.utils.OrderUtil;
 import org.eq.modules.utils.PageUtils;
 import org.eq.modules.utils.ProductUtil;
@@ -35,6 +41,8 @@ import org.eq.modules.product.service.ProductAcceptService;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.service.UserProductStockService;
 import org.eq.modules.product.vo.TicketProductVO;
+import org.eq.modules.wallet.entity.UserWallet;
+import org.eq.modules.wallet.service.UserWalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,6 +76,12 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 
 	@Autowired
 	private ProductLoadService productLoadService;
+
+	@Autowired
+	private OrderLogService orderLogService;
+
+	@Autowired
+	private UserWalletService userWalletService;
 
 	@Override
 	public OrderAcceptExample getExampleFromEntity(OrderAccept orderAccept, Map<String, Object> params) {
@@ -119,8 +133,17 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 			result.setErrMsg(volidResult);
 			return result;
 		}
-		if(user==null || StringUtils.isEmpty(user.getAddress())){
-			result.setErrMsg("用户未激活钱包地址，不能进行承兑");
+		if(user == null){
+			result.setErrMsg("用户为空");
+			return result;
+		}
+		UserWallet userWallet = userWalletService.selectByPrimaryKey(user.getId());
+		if(userWallet ==null || userWallet.getStatus()!= WalletStateEnum.ACTIVE.getState() || StringUtils.isEmpty(userWallet.getAddress())){
+			return null;
+		}
+		ProductAll productAll = productCache.getProduct(String.valueOf(searchAcceptOrderVO.getProductId()));
+		if(productAll==null){
+			result.setErrMsg("商品无效");
 			return result;
 		}
 		UserProductStock userProductStock =  userProductStockService.getUserProductStock(searchAcceptOrderVO.getProductId(),user);
@@ -130,12 +153,7 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 		}
 		int balance = userProductStock.getStockNum() - userProductStock.getLockedNum();
 		if((balance-searchAcceptOrderVO.getNumber())<=0){
-			result.setErrMsg("可转让库存不足");
-			return result;
-		}
-		ProductAll productAll = productCache.getProduct(String.valueOf(searchAcceptOrderVO.getProductId()));
-		if(productAll==null){
-			result.setErrMsg("商品无效");
+			result.setErrMsg("可承兑库存不足");
 			return result;
 		}
 		OrderAccept orderAccept = createAcceptOrder(searchAcceptOrderVO,user);
@@ -147,7 +165,7 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 		orderAcceptVO.setProductName(productAll.getName());
 		orderAcceptVO.setImg(productAll.getProductImg());
 		BcTxRecord bcTxRecord = new BcTxRecord();
-		bcTxRecord.setFromAddress(user.getAddress());
+		bcTxRecord.setFromAddress(userWallet.getAddress());
 		bcTxRecord.setToAddress(productAll.getAcceptAddress());
 		bcTxRecord.setTransferAmount(String.valueOf(searchAcceptOrderVO.getNumber()));
 		bcTxRecord.setTicketid(productAll.getTicketid());
@@ -179,6 +197,9 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 	@Override
 	public PageResultData<OrderAcceptVO> pageAcceptOrder(SearchPageAcceptVO searchsPageAcceptVO, User user){
 		PageResultData<OrderAcceptVO> result = new PageResultData<>();
+		if(user==null){
+			return result;
+		}
 		if(searchsPageAcceptVO ==null){
 			searchsPageAcceptVO = new SearchPageAcceptVO();
 		}
@@ -188,9 +209,7 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 		if(searchsPageAcceptVO.getPageNum()<=0){
 			searchsPageAcceptVO.setPageNum(1);
 		}
-		if(user==null){
-			return result;
-		}
+
 		OrderAccept orderAccept = new OrderAccept();
 		orderAccept.setUserId(user.getId());
 		orderAccept.setStatus(OrderAcceptStateEnum.ACCEPT_PADDING.getState());
@@ -224,6 +243,9 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 	@Override
 	public PageResultData<OverdueVO> pageOverdueOrder(SearchPageAcceptVO searchsPageAcceptVO, User user){
 		PageResultData<OverdueVO> result = new PageResultData<>();
+		if(user==null){
+			return result;
+		}
 		if(searchsPageAcceptVO ==null){
 			searchsPageAcceptVO = new SearchPageAcceptVO();
 		}
@@ -233,10 +255,6 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 		if(searchsPageAcceptVO.getPageNum()<=0){
 			searchsPageAcceptVO.setPageNum(1);
 		}
-		if(user==null){
-			return result;
-		}
-
 		OrderAccept orderAccept = new OrderAccept();
 		orderAccept.setUserId(user.getId());
 		orderAccept.setStatus(OrderAcceptStateEnum.ACCEPT_FINISH.getState());
@@ -261,14 +279,17 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 				dataList.add(overdueVO);
 			}
 		}
-		Map<String, TicketProductVO> ticketMap = productLoadService.getTicketUserProduct(user.getTxPassword());
+		UserWallet userWallet = userWalletService.selectByPrimaryKey(user.getId());
+		if(userWallet ==null || userWallet.getStatus()!= WalletStateEnum.ACTIVE.getState() || StringUtils.isEmpty(userWallet.getAddress())){
+			return null;
+		}
+		Map<String, TicketProductVO> ticketMap = productLoadService.getTicketUserProduct(userWallet.getAddress());
 		if(ticketMap!=null && ticketMap.size()>0){
 			Iterator<String> ite = ticketMap.keySet().iterator();
 			while(ite.hasNext()){
 				String key = ite.next();
 				TicketProductVO ticketProductVO = ticketMap.get(key);
 				String productId  = productCache.getProductIdByTicketKey(key);
-
 				if(StringUtils.isEmpty(productId)){
 					continue;
 				}
@@ -380,7 +401,7 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 		}
 		OrderAccept orderAccept = new OrderAccept();
 		orderAccept.setUserId(user.getId());
-		orderAccept.setAcceptNo(getOrderNo());
+		orderAccept.setAcceptNo(IdWork.getOrderCode("AS"));
 		orderAccept.setProductId(searchAcceptOrderVO.getProductId());
 		orderAccept.setProductNum(searchAcceptOrderVO.getNumber());
 		orderAccept.setStatus(OrderAcceptStateEnum.ACCEPT_WAIT.getState());
@@ -406,23 +427,34 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 			if(!updateStock){
 				logger.error("创建承兑订单失败，但是锁定库存成功，释放库存失败，用户id :{} 商品ID:{} 应释放量:{}",searchAcceptOrderVO.getProductId(),user.getId(),searchAcceptOrderVO.getNumber());
 			}
-
+		}else{
+			saveLog(orderAccept.getId(),-1, OrderAcceptStateEnum.ACCEPT_WAIT.getState(),"新建承兑订单");
 		}
 		return result>0?orderAccept:null;
 	}
 
 
-
-	private String getOrderNo(){
-		StringBuffer buffer = new StringBuffer("AS");
-		String number = String.valueOf((Math.random()*9+1)*100000);
-		if(number.contains(".")){
-			number=number.substring(0,number.indexOf("."));
+	/**
+	 * 插如广告日志
+	 * @param acceptId
+	 * @param oldState
+	 * @param newState
+	 * @param remarks
+	 */
+	private void saveLog(long acceptId,int oldState,int newState,String remarks){
+		OrderAcceptLog orderAcceptLog = new OrderAcceptLog();
+		orderAcceptLog.setCreateDate(new Date());
+		orderAcceptLog.setNewStatus(newState);
+		orderAcceptLog.setOldStatus(oldState);
+		orderAcceptLog.setOrderAcceptId(acceptId);
+		orderAcceptLog.setRemarks(remarks);
+		try{
+			orderLogService.save(LogTypeEnum.ACCEPT,orderAcceptLog);
+		}catch (Exception e){
+			e.printStackTrace();
+			logger.info("插入承兑订单日志记录数据出错 {}",orderAcceptLog.toString());
 		}
-		buffer.append(DateUtil.getLockNowTime()).append(number);
-		return buffer.toString();
 	}
-
 
 
 

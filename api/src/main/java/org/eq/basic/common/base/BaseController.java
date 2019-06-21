@@ -22,21 +22,6 @@ public abstract class BaseController extends BaseLog {
     @Autowired
     protected UserService userService;
 
-    @Autowired
-    private UserWalletService userWalletService;
-
-    public JSONObject success() {
-        JSONObject json = new JSONObject();
-        json.put("status", 0);
-        return json;
-    }
-
-    public JSONObject error(String errMsg) {
-        JSONObject json = new JSONObject();
-        json.put("status", 1);
-        return json;
-    }
-
     /**
      * 验证用户是否有效
      * @param userId
@@ -49,9 +34,9 @@ public abstract class BaseController extends BaseLog {
         User user =null;
         try{
             user = userService.selectByPrimaryKey(userId);
-            UserWallet userWallet = userWalletService.selectByPrimaryKey(userId);
-            if(userWallet!=null && userWallet.getStatus()== WalletStateEnum.ACTIVE.getState()){
-                user.setAddress(userWallet.getAddress());
+            if(user!=null && user.getDelFlag() != 0){
+                logger.info("用户ID {} 被封禁",user.getId());
+                user = null;
             }
         }catch (Exception e){
             e.printStackTrace();

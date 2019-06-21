@@ -148,7 +148,7 @@
         </trim>
     </insert>
 
-    <insert id="insertSelective" parameterType="org.eq.modules.order.entity.OrderAd">
+    <insert id="insertSelective" parameterType="org.eq.modules.order.entity.OrderAd" useGeneratedKeys="true" keyProperty="id">
         insert into order_ad
         <trim prefix="(" suffix=")" suffixOverrides=",">
             user_id,

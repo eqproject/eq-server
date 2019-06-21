@@ -32,11 +32,4 @@ public class User implements Serializable {
     protected String remarks; // 备注
     private Integer delFlag; // 删除标记
 
-
-    /**
-     * 券链地址
-     */
-    private String address;
-
-
 }
