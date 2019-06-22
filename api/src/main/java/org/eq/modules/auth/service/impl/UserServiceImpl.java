@@ -289,7 +289,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             user.setPassword(MD5Utils.digestAsHex(content));
             User currUser = selectByRecord(user);
             if (currUser != null) {
-                return ResponseFactory.success(null);
+                return ResponseFactory.success(currUser);
             } else {
                 return ResponseFactory.businessError("登陆失败");
             }
@@ -315,11 +315,20 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 
     @Override
     public ResponseData mobileLogin(String mobile, String captcha) {
+        User user = new User();
+        user.setMobile(mobile);
+        //手机号获取userId
+        User checkUser = selectByRecord(user);
+
+        if (checkUser == null) {
+            return ResponseFactory.businessError("手机号未注册");
+        }
+
         if (!checkCaptcha(mobile, captcha)) {
             return ResponseFactory.businessError("验证码错误");
         }
         clearCaptcha(mobile);
-        return ResponseFactory.success(null);
+        return ResponseFactory.success(checkUser);
     }
 
     @Override
