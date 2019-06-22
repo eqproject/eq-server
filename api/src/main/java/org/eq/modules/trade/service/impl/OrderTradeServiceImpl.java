@@ -192,6 +192,26 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 			result.setErrMsg("广告订单不存在或已下架");
 			return  result;
 		}
+		int tradeNum = orderAd.getProductNum()- orderAd.getTradingNum() - orderAd.getTradedNum();
+		if(tradeNum<orderTradeCreateReqVO.getOrderNum()){
+			result.setErrMsg("超出广告最大交易量");
+			return  result;
+		}
+		if(orderAd.getType() ==OrderAdTypeEnum.ORDER_SALE.getType()){//出售的广告
+			if(orderAd.getPrice()>orderTradeCreateReqVO.getSalePrice()){
+				result.setErrMsg("交易价格低于出售价格");
+				return  result;
+			}
+		}else{//求购
+			if(orderAd.getPrice()<orderTradeCreateReqVO.getSalePrice()){
+				result.setErrMsg("交易价格高于求购价格");
+				return  result;
+			}
+		}
+		if(orderAd.getPrice()>orderTradeCreateReqVO.getSalePrice()){
+			result.setErrMsg("交易价格低于订单价格");
+			return  result;
+		}
 		if(String.valueOf(orderAd.getUserId()).equals(String.valueOf(user.getId()))){
             result.setErrMsg("买卖双方同一人");
             return  result;
@@ -907,9 +927,6 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 			updateOrderAd.setTradingNum(oldTradingNm+addLockNum);
 			int residueNum = orderAd.getProductNum()-orderAd.getTradedNum()-updateOrderAd.getTradingNum();
 			if(residueNum<0){
-				return false;
-			}
-			if(residueNum<addLockNum){
 				return false;
 			}
 		}else{
