@@ -68,8 +68,12 @@ var User;
                         targets: 13,//最后1列
                         render: function (data, type, row, meta) {
                             var option = "";
-                            option += ' <a href="#" id="detail" name="detail" onclick="detail(this);" data-id="' + row.id + '" >查看详情</a>';
-                            option += ' <a href="#" id="detail" name="detail" onclick="getLog(this,\'trade\');" data-id="' + row.id + '" >交易订单日志</a>';
+                            option += ' <a href="#" id="detail" name="detail" onclick="detail(this);" data-id="' + row.id + '" >详情</a>';
+                            if(row.status==7 && row.blockchainStatus == 3){
+                                option += ' <a href="#" id="detail" name="detail" onclick="revoucher(this);" data-id="' + row.id + '" >重试发券</a>';
+                            }
+
+                            option += ' <a href="#" id="detail" name="detail" onclick="getLog(this,\'trade\');" data-id="' + row.id + '" >交易日志</a>';
                             option += ' <a href="#" id="detail" name="detail" onclick="getLog(this,\'pay\');" data-id="' + row.id + '" >支付日志</a>';
                             option += ' <a href="#" id="detail" name="detail" onclick="getLog(this,\'refund\');" data-id="' + row.id + '" >退款日志</a>';
                             return option;
@@ -255,6 +259,19 @@ function getLog(row,type) {
                 //操作失败 弹出提示信息
                 base_alert_time(data.msg, 1000);
             }
+        }
+    });
+}
+
+function revoucher(row){
+    var id = $(row).attr("data-id");
+    $.post(urlPath +"/trade/order/reVoucher",{"tradeId":id},function(data){
+        if(data.code!="10401"){
+            alert(data.msg);
+        }else{
+            alert("重试成功!!");
+            var UserTrade = new User.UserTrade();
+            UserTrade.init();
         }
     });
 }

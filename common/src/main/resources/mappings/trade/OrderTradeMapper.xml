@@ -113,7 +113,7 @@
         select
         <include refid="Base_Column_List" />
         from order_trade  OT left join  platform_product PP on OT.product_id = PP.id
-        where id = #{id,jdbcType=BIGINT}
+        where OT.id = #{id,jdbcType=BIGINT}
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">

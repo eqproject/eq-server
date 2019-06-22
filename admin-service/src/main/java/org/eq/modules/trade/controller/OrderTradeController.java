@@ -8,6 +8,7 @@ import org.eq.basic.common.config.sysUtil.UserUtil;
 import org.eq.basic.common.status.StatusCode;
 import org.eq.basic.common.util.DateUtil;
 import org.eq.basic.modules.sys.entity.SysUser;
+import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.trade.entity.OrderTrade;
 import org.eq.modules.trade.service.OrderTradeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,6 +140,45 @@ public class OrderTradeController extends BaseController {
         }
         return result;
     }
+    /**
+     * 充新放券
+     * @param tradeId
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "reVoucher")
+    public BaseOpMsg reVoucher(long tradeId) {
+        BaseOpMsg<OrderTrade> result = new BaseOpMsg();
+        SysUser user = UserUtil.getInstance().getUser();
+        result.setCode(StatusCode.CURD_UPDATE_FAILURE);
+        if(user==null){
+            result.setMsg("用户不存在");
+            return result;
+        }
+        OrderTrade orderTrade =null;
+        try {
+            if (tradeId > 0) {
+                orderTrade = orderTradeService.selectByPrimaryKey(tradeId);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        if(orderTrade==null){
+            result.setMsg("单号不存在");
+            return result;
+        }
+        boolean voucher = false;
+        try{
+            voucher = orderTradeService.voucherTrade(tradeId,user);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        if(voucher){
+            result.setCode(StatusCode.CURD_UPDATE_SUCCESS);
+        }
+        return result;
+    }
+
 
     /**
      * 保存or修改操作
