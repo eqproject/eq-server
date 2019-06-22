@@ -116,8 +116,8 @@ public class OrderTradePayExpireBiz {
         updateOrderTrade.setFinishTime(new Date());
         OrderTradeExample whereExample = new OrderTradeExample();
         OrderTradeExample.Criteria ca = whereExample.or();
-        ca.andStatusEqualTo(oldStatus);
-        ca.andIdEqualTo(orderTrade.getId());
+        ca.andStatusEqualToForUpdate(oldStatus);
+        ca.andIdEqualToForUpdate(orderTrade.getId());
 
 
         int result = orderTradeMapper.updateByExampleSelective(updateOrderTrade,whereExample);

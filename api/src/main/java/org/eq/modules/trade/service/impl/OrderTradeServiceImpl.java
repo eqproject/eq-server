@@ -10,6 +10,7 @@ import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.DateUtil;
+import org.eq.basic.common.util.IdworkUtil;
 import org.eq.basic.common.util.OrderNoGenerateUtil;
 import org.eq.basic.common.util.StringLowUtils;
 import org.eq.modules.auth.entity.User;
@@ -45,9 +46,11 @@ import org.eq.modules.trade.dao.OrderTradeMapper;
 import org.eq.modules.trade.entity.*;
 import org.eq.modules.trade.exception.TradeOrderException;
 import org.eq.modules.trade.service.OrderPaymentTradeService;
+import org.eq.modules.trade.service.OrderTradeAppealService;
 import org.eq.modules.trade.service.OrderTradeMapService;
 import org.eq.modules.trade.service.OrderTradeService;
 import org.eq.modules.trade.vo.*;
+import org.eq.modules.utils.IdWork;
 import org.eq.modules.utils.ProductUtil;
 import org.eq.modules.wallet.entity.UserWallet;
 import org.eq.modules.wallet.service.UserWalletService;
@@ -122,6 +125,12 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
      */
 	@Autowired
     private UserWalletService userWalletService;
+
+    /**
+     * 交易投诉管理
+     */
+	@Autowired
+    private OrderTradeAppealService orderTradeAppealService;
 
 
 
@@ -700,6 +709,34 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		return number>0?true:false;
 	}
 
+    @Override
+    public boolean appealTrade(OrderTradeSearchVO orderTradeSearchVO) {
+        OrderTrade orderTrade = new OrderTrade();
+        orderTrade.setTradeNo(orderTradeSearchVO.getTradeNo());
+        orderTrade = selectByRecord(orderTrade);
+        if (orderTrade == null) {
+            return false;
+        }
+        OrderTradeAppealExample example = new OrderTradeAppealExample();
+        OrderTradeAppealExample.Criteria ca = example.or();
+        ca.andTradeNoEqualToForAll(orderTradeSearchVO.getTradeNo());
+
+        ca.andStatusEqualToForUpdate(0);
+        List<OrderTradeAppeal> applealList = orderTradeAppealService.findListByExample(example);
+        if(!CollectionUtils.isEmpty(applealList)){
+           return  false;
+        }
+        OrderTradeAppeal orderTradeAppeal = new OrderTradeAppeal();
+        orderTradeAppeal.setAppealNo(IdWork.getOrderCode("AP"));
+        orderTradeAppeal.setTradeNo(orderTradeSearchVO.getTradeNo());
+        orderTradeAppeal.setUserId(orderTradeSearchVO.getUserId());
+        orderTradeAppeal.setStatus(0);
+        orderTradeAppeal.setCrateTime(new Date());
+        orderTradeAppeal.setUpdateTime(new Date());
+        orderTradeAppeal.setRemark("用户点击申诉");
+        int result = orderTradeAppealService.insertRecord(orderTradeAppeal);
+        return result>0?true:false;
+    }
 	/**
 	 * 格式化交易订单数据
 	 * @param orderTrade

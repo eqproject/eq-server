@@ -298,4 +298,25 @@ public class OrderTradeController extends BaseController {
         return ResponseFactory.success("成功");
     }
 
+    /**
+     * 申诉
+     * @param orderTradeSearchVO
+     * @return
+     */
+    @PostMapping("/appeal")
+    public ResponseData<String> appeal(OrderTradeSearchVO orderTradeSearchVO) {
+        if (orderTradeSearchVO == null) {
+            return ResponseFactory.paramsError("请求参数不能为空");
+        }
+        if(StringUtils.isEmpty(orderTradeSearchVO.getTradeNo()) || orderTradeSearchVO.getUserId()<=0){
+            return ResponseFactory.paramsError("交易单号为空");
+        }
+        try {
+            orderTradeService.appealTrade(orderTradeSearchVO);
+        }catch (Exception e) {
+            return ResponseFactory.systemError(SYSTEM_ERROR_MSG);
+        }
+        return ResponseFactory.success("成功");
+    }
+
 }

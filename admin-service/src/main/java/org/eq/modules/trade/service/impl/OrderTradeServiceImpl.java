@@ -58,9 +58,6 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
         } else {
             example.setOrderByClause("id asc");
         }
-        if (orderTrade.getId() != null) {
-            ca.andIdEqualTo(orderTrade.getId());
-        }
         if (orderTrade.getSellUserId() != null) {
             ca.andSellUserIdEqualTo(orderTrade.getSellUserId());
         }
@@ -81,9 +78,6 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
         }
         if (orderTrade.getType() != null) {
             ca.andTypeEqualTo(orderTrade.getType());
-        }
-        if (orderTrade.getStatus() != null) {
-            ca.andStatusEqualTo(orderTrade.getStatus());
         }
         if (orderTrade.getBlockchainStatus() != null) {
             ca.andBlockchainStatusEqualTo(orderTrade.getBlockchainStatus());

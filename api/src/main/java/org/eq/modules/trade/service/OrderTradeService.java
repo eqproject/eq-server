@@ -90,6 +90,12 @@ public interface OrderTradeService extends ServiceExtend<OrderTrade,OrderTradeEx
      */
     boolean remindTrade(String tradNo);
 
+    /**
+     * 申诉
+     * @param orderTradeSearchVO
+     * @return
+     */
+    boolean appealTrade(OrderTradeSearchVO orderTradeSearchVO);
 
 
 }
