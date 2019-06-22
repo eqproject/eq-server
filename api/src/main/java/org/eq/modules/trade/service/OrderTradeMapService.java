@@ -44,6 +44,9 @@ public class OrderTradeMapService {
             isbuy = true;
         }
         result.setStateRemark(getTradingStateRemark(orderTrade.getStatus(),isbuy));
+        if(result.getStateRemark().contains("客服")){
+            result.setAllAppeal(1);
+        }
         return result;
     }
 

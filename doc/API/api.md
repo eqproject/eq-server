@@ -1504,30 +1504,31 @@
 
 ###### 返回字段
 > |返回字段|字段类型|说明                              |
-|:-----   |:------|:-----------------------------   |
-|status   |int    |返回结果状态。0：正常；1：错误。   |
-|errMsg   |string    |错误描述   |
-|data   |object|结果对象 |
-|- total  |int | 订单总记录数|
->| list   |Object[]    |商品详情   |
->Object对象
->|返回字段|字段类型|说明                              |
->|:-----   |:------|:-----------------------------   |
-|productImg |string |图片url |
-|productName |string |商品名称|
-|unitPrice |int |面值(单位:分)|
-|userNickName |String |用户昵称|
-|photoHead | string |用户头像|
-|tradeNo |string |交易订单号|
-|amount |int |交易价格(单位:分)|
-|orderNum |int |订单数量|
-|salePrice |int |商品售卖单价(单位:分)|
-|serviceFee |int |服务费(单位:分)|
-|status |int |原始状态|
-|createTime |string |创建时间 |
-|updateTime |string |最后一次交易时间 |
-|remindPay |int | 是否已催 (0:未催 1：已催)  <br />**只有原始状态为 3 或者5且为未催。方可进行电催** |
-|stateRemark |string |状态描述（原型右上角）|
+> |:-----   |:------|:-----------------------------   |
+> |status   |int    |返回结果状态。0：正常；1：错误。   |
+> |errMsg   |string    |错误描述   |
+> |data   |object|结果对象 |
+> |- total  |int | 订单总记录数|
+> | list   |Object[]    |商品详情   |
+> Object对象
+> |返回字段|字段类型|说明                              |
+> |:-----   |:------|:-----------------------------   |
+> |productImg |string |图片url |
+> |productName |string |商品名称|
+> |unitPrice |int |面值(单位:分)|
+> |userNickName |String |用户昵称|
+> |photoHead | string |用户头像|
+> |tradeNo |string |交易订单号|
+> |amount |int |交易价格(单位:分)|
+> |orderNum |int |订单数量|
+> |salePrice |int |商品售卖单价(单位:分)|
+> |serviceFee |int |服务费(单位:分)|
+> |status |int |原始状态|
+> |createTime |string |创建时间 |
+> |updateTime |string |最后一次交易时间 |
+> |remindPay |int | 是否已催 (0:未催 1：已催)  <br />**只有原始状态为 3 或者5且为未催。方可进行电催** |
+> |stateRemark |string |状态描述（原型右上角）|
+> |allAppeal |int |1为可申诉其他不允许申诉|
 
 ###### 接口示例
 
@@ -1554,7 +1555,8 @@
                 "payTimeOut": 0,
                 "stateRemark": "待付款",
                 "userNickName": "骚情的流氓",
-                "photoHead": "用户头像地址"
+                "photoHead": "用户头像地址"，
+                "AllAppeal":1
             }
 	 	]
 	}

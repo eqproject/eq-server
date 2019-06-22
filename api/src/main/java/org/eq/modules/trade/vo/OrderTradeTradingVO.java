@@ -33,6 +33,11 @@ public class OrderTradeTradingVO extends OrderTradeBaseVO implements Serializabl
      */
     private String photoHead;
 
+    /**
+     * 是否允许申诉
+     */
+    private int allAppeal;
+
 
 
 }
