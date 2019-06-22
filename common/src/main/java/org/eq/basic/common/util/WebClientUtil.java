@@ -42,7 +42,7 @@ public class WebClientUtil {
         if (!response.isSuccessful()){
             throw new IOException("Unexpected code " + response);
         }
-        return response.body().toString();
+        return response.body().string();
     }
 
     /**
