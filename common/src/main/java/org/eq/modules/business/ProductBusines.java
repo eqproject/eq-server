@@ -26,7 +26,7 @@ public class ProductBusines {
         if(StringUtils.isEmpty(product.getExpirationEnd())){
             return true;
         }
-        if(DateUtil.passDateOrNow(product.getExpirationEnd()).getTime()<DateUtil.getNowTime().getTime()){
+        if(DateUtil.paseTimeStr(product.getExpirationEnd()).getTime()<DateUtil.getNowTime().getTime()){
             return false;
         }
         return true;

@@ -99,10 +99,14 @@ public class UserProductStockServiceImpl extends ServiceImplExtend<UserProductSt
 	@Override
 	public PageResultData<ProductBaseVO> pageSimpeProduct(SearchPageProductVO searchPageProductVO, User user) {
 		PageResultData<ProductBaseVO> result = new PageResultData<>();
-		if(user ==null || StringUtils.isEmpty(user.getTxPassword())){
+		if(user ==null){
 			return result;
 		}
-		Map<String,TicketProductVO> tickMap = productLoadService.getTicketUserProduct(user.getTxPassword());
+		UserWallet userWallet = userWalletService.selectByPrimaryKey(user.getId());
+		if(userWallet ==null || userWallet.getStatus()!= WalletStateEnum.ACTIVE.getState() || StringUtils.isEmpty(userWallet.getAddress())){
+			return result;
+		}
+		Map<String,TicketProductVO> tickMap = productLoadService.getTicketUserProduct(userWallet.getAddress());
 		if(tickMap ==null || tickMap.size()<=0){
 			return result;
 		}

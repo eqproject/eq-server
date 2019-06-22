@@ -3,6 +3,7 @@ package org.eq.modules.product.service;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.util.StringUtil;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.util.WebClientUtil;
 import org.eq.modules.product.vo.TicketPlatProductRes;
 import org.eq.modules.product.vo.TicketPlatTokenRes;
@@ -147,7 +148,11 @@ public class ProductLoadService {
             }
             List<TicketProductVO> pageDate = ticketData.getVoucherList();
             for(TicketProductVO temp : pageDate){
-                String key  = temp.getVoucherId()+"_"+temp.getTrancheId();
+                String tranchId  = temp.getTrancheId();
+                if(StringUtils.isEmpty(tranchId)){
+                    tranchId = "0";
+                }
+                String key  = temp.getVoucherId()+"_"+tranchId;
                 result.put(key,temp);
             }
             pageStart++;
@@ -163,7 +168,8 @@ public class ProductLoadService {
     private  String getToken(){
         String tokenKen = (String)redisTemplate.opsForValue().get(PRODUCT_LOAD_TOKEN_KEY);
         if(!StringUtil.isEmpty(tokenKen)){
-            return tokenKen;
+            tokenKen="";
+            //return tokenKen;
         }
         String tokenUrl = TICKET_URL+"/auth/accessToken";
         JSONObject params = new JSONObject();
@@ -190,7 +196,7 @@ public class ProductLoadService {
         }
         if(time>0 && !StringUtil.isEmpty(tokenKen)){
             time = time>100? (time-100) : time;
-            redisTemplate.opsForValue().set(PRODUCT_LOAD_TOKEN_KEY,tokenKen,time, TimeUnit.SECONDS);
+            //redisTemplate.opsForValue().set(PRODUCT_LOAD_TOKEN_KEY,tokenKen,time, TimeUnit.SECONDS);
         }
         return  tokenKen;
     }
