@@ -831,7 +831,7 @@ public class ProductExample {
         }
 
         public Criteria andExpirationEndGreaterThan(String value) {
-            addCriterion("expiration_end >", value, "expirationEnd");
+            addCriterion("( expiration_end is null or expiration_end >'"+value+"' )");
             return (Criteria) this;
         }
 
