@@ -9,6 +9,7 @@ import org.eq.modules.wallet.entity.UserWallet;
 import org.eq.modules.wallet.entity.UserWalletExample;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -18,7 +19,8 @@ import java.util.List;
 public class ActivateAccountCallBack extends AbstractTaskCallBack {
     private static Logger logger = LoggerFactory.getLogger(ActivateAccountCallBack.class);
 
-    private static UserWalletMapper userWalletMapper;
+    @Autowired
+    private UserWalletMapper userWalletMapper;
 
     public ActivateAccountCallBack() {
         super(BcTxRecordBizTypeEnum.ACTIVATE_ACCOUNT.getCode());
@@ -33,7 +35,7 @@ public class ActivateAccountCallBack extends AbstractTaskCallBack {
         }
         boolean updateResult = updateUserWallet(uw, true);
         if (!updateResult) {
-            logger.error("钱包激活成功,userId:{}" + uw.getUserId());
+            logger.error("钱包激活成功,userId:{"+uw.getUserId()+"}");
         }
     }
 
@@ -47,7 +49,7 @@ public class ActivateAccountCallBack extends AbstractTaskCallBack {
 
         boolean updateResult = updateUserWallet(uw, false);
         if (!updateResult) {
-            logger.error("钱包激活失败,userId:{}" + uw.getUserId());
+            logger.error("钱包激活失败,userId:{"+uw.getUserId()+"}");
         }
     }
 

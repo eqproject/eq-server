@@ -375,62 +375,62 @@ public class UserWalletExample {
         }
 
         public Criteria andPublicKeyEqualTo(String value) {
-            addCriterion("public_key =", value, "pubilcKey");
+            addCriterion("public_key =", value, "publicKey");
             return (Criteria) this;
         }
 
         public Criteria andPublicKeyNotEqualTo(String value) {
-            addCriterion("public_key <>", value, "pubilcKey");
+            addCriterion("public_key <>", value, "publicKey");
             return (Criteria) this;
         }
 
         public Criteria andPublicKeyGreaterThan(String value) {
-            addCriterion("public_key >", value, "pubilcKey");
+            addCriterion("public_key >", value, "publicKey");
             return (Criteria) this;
         }
 
         public Criteria andPublicKeyGreaterThanOrEqualTo(String value) {
-            addCriterion("public_key >=", value, "pubilcKey");
+            addCriterion("public_key >=", value, "publicKey");
             return (Criteria) this;
         }
 
         public Criteria andPublicKeyLessThan(String value) {
-            addCriterion("public_key <", value, "pubilcKey");
+            addCriterion("public_key <", value, "publicKey");
             return (Criteria) this;
         }
 
         public Criteria andPublicKeyLessThanOrEqualTo(String value) {
-            addCriterion("public_key <=", value, "pubilcKey");
+            addCriterion("public_key <=", value, "publicKey");
             return (Criteria) this;
         }
 
 		public Criteria andPublicKeyLike(String value) {
-            addCriterion("public_key like", value, "pubilcKey");
+            addCriterion("public_key like", value, "publicKey");
             return (Criteria) this;
         }
 
         public Criteria andPublicKeyNotLike(String value) {
-            addCriterion("public_key not like", value, "pubilcKey");
+            addCriterion("public_key not like", value, "publicKey");
             return (Criteria) this;
         }
 
         public Criteria andPublicKeyIn(List<String> values) {
-            addCriterion("public_key in", values, "pubilcKey");
+            addCriterion("public_key in", values, "publicKey");
             return (Criteria) this;
         }
 
         public Criteria andPublicKeyNotIn(List<String> values) {
-            addCriterion("public_key not in", values, "pubilcKey");
+            addCriterion("public_key not in", values, "publicKey");
             return (Criteria) this;
         }
 
         public Criteria andPublicKeyBetween(String value1, String value2) {
-            addCriterion("public_key between", value1, value2, "pubilcKey");
+            addCriterion("public_key between", value1, value2, "publicKey");
             return (Criteria) this;
         }
 
         public Criteria andPublicKeyNotBetween(String value1, String value2) {
-            addCriterion("public_key not between", value1, value2, "pubilcKey");
+            addCriterion("public_key not between", value1, value2, "publicKey");
             return (Criteria) this;
         }
 

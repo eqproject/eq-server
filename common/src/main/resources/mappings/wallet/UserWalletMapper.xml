@@ -6,7 +6,7 @@
 	    <result column="address" jdbcType="VARCHAR" property="address" />
 	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
 	    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
-	    <result column="public_key" jdbcType="VARCHAR" property="pubilcKey" />
+	    <result column="public_key" jdbcType="VARCHAR" property="publicKey" />
 	    <result column="key_store" jdbcType="VARCHAR" property="keyStore" />
 	    <result column="status" jdbcType="INTEGER" property="status" />
 	    <result column="tx_id" jdbcType="BIGINT" property="txId" />
@@ -118,7 +118,7 @@
             #{address,jdbcType=VARCHAR},
             #{createDate,jdbcType=TIMESTAMP},
             #{updateDate,jdbcType=TIMESTAMP},
-            #{pubilcKey,jdbcType=VARCHAR},
+            #{publicKey,jdbcType=VARCHAR},
             #{keyStore,jdbcType=VARCHAR},
             #{status,jdbcType=INTEGER},
             #{txId,jdbcType=BIGINT},
@@ -133,7 +133,7 @@
             #{address,jdbcType=VARCHAR},
             #{createDate,jdbcType=TIMESTAMP},
             #{updateDate,jdbcType=TIMESTAMP},
-            #{pubilcKey,jdbcType=VARCHAR},
+            #{publicKey,jdbcType=VARCHAR},
             #{keyStore,jdbcType=VARCHAR},
             #{status,jdbcType=INTEGER},
             #{txId,jdbcType=BIGINT},
@@ -157,7 +157,7 @@
             #{address,jdbcType=VARCHAR},
             #{createDate,jdbcType=TIMESTAMP},
             #{updateDate,jdbcType=TIMESTAMP},
-            #{pubilcKey,jdbcType=VARCHAR},
+            #{publicKey,jdbcType=VARCHAR},
             #{keyStore,jdbcType=VARCHAR},
             #{status,jdbcType=INTEGER},
             #{txId,jdbcType=BIGINT},
@@ -186,8 +186,8 @@
             <if test="record.updateDate != null">
                 update_date = #{record.updateDate,jdbcType=TIMESTAMP},
             </if>
-            <if test="record.pubilcKey != null">
-                public_key = #{record.pubilcKey,jdbcType=VARCHAR},
+            <if test="record.publicKey != null">
+                public_key = #{record.publicKey,jdbcType=VARCHAR},
             </if>
             <if test="record.keyStore != null">
                 key_store = #{record.keyStore,jdbcType=VARCHAR},
@@ -212,7 +212,7 @@
             address = #{record.address,jdbcType=VARCHAR},
             create_date = #{record.createDate,jdbcType=TIMESTAMP},
             update_date = #{record.updateDate,jdbcType=TIMESTAMP},
-            public_key = #{record.pubilcKey,jdbcType=VARCHAR},
+            public_key = #{record.publicKey,jdbcType=VARCHAR},
             key_store = #{record.keyStore,jdbcType=VARCHAR},
             status = #{record.status,jdbcType=INTEGER},
             tx_id = #{record.txId,jdbcType=BIGINT},
@@ -237,8 +237,8 @@
             <if test="updateDate != null">
             update_date = #{updateDate,jdbcType=TIMESTAMP},
             </if>
-            <if test="pubilcKey != null">
-            public_key = #{pubilcKey,jdbcType=VARCHAR},
+            <if test="publicKey != null">
+            public_key = #{publicKey,jdbcType=VARCHAR},
             </if>
             <if test="keyStore != null">
             key_store = #{keyStore,jdbcType=VARCHAR},
@@ -261,7 +261,7 @@
               address = #{address,jdbcType=VARCHAR},
               create_date = #{createDate,jdbcType=TIMESTAMP},
               update_date = #{updateDate,jdbcType=TIMESTAMP},
-              public_key = #{pubilcKey,jdbcType=VARCHAR},
+              public_key = #{publicKey,jdbcType=VARCHAR},
               key_store = #{keyStore,jdbcType=VARCHAR},
               status = #{status,jdbcType=INTEGER},
               tx_id = #{txId,jdbcType=BIGINT},
