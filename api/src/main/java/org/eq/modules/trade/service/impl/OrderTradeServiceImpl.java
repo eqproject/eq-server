@@ -550,10 +550,13 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
         updateOrderCa.andStatusEqualToForUpdate(OrderTradeStateEnum.PAY_SUCCESS.getState());
 
         updateObj = new OrderTrade();
-        updateObj.setId(orderTrade.getId());
         updateObj.setStatus(OrderTradeStateEnum.VOUCHER_ING.getState());
         updateObj.setUpdateDate(new Date());
-        updateObj.setTxId(bcTxRecord==null?-1:bcTxRecord.getId());
+        updateObj.setTxId(-1L);
+		if(bcTxRecord!=null){
+			updateObj.setTxId(bcTxRecord.getId());
+			updateObj.setBlockchainStatus(OrderTradeBlockChainStateEnum.PROCESSING.getState());
+		}
         number = updateByExampleSelective(updateObj,updateOrderTrade);
         if(number<=0){
             logger.error("订单支付成功，区块量");
@@ -740,6 +743,49 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
         int result = orderTradeAppealService.insertRecord(orderTradeAppeal);
         return result>0?true:false;
     }
+
+	@Override
+	public boolean loanTrade(OrderTradeLoan orderTradeLoanVO, boolean isSuccess) {
+		OrderTrade orderTrade = new OrderTrade();
+		orderTrade.setTradeNo(orderTradeLoanVO.getTradeNo());
+		orderTrade = selectByRecord(orderTrade);
+		if (orderTrade == null) {
+			return false;
+		}
+		if(orderTrade.getStatus().intValue()!=OrderTradeStateEnum.LOAN_ING.getState()){
+			return false;
+		}
+		int oldState = orderTrade.getStatus();
+		StringBuilder remark = new StringBuilder("执行放款结果回调:");
+
+		OrderTradeExample updateOrderTrade = new OrderTradeExample();
+		OrderTradeExample.Criteria updateOrderCa = updateOrderTrade.or();
+		updateOrderCa.andIdEqualToForUpdate(orderTrade.getId());
+		updateOrderCa.andStatusEqualToForUpdate(oldState);
+
+		OrderTrade updateObj = new OrderTrade();
+		int newState = OrderTradeStateEnum.TRADE_SUCCESS.getState();
+		if(!isSuccess){
+			newState = OrderTradeStateEnum.LOAN_FAIL.getState();
+			remark.append("放款失败,");
+		}else{
+			remark.append("放款成功,");
+		}
+		updateObj.setStatus(newState);
+		updateObj.setUpdateDate(new Date());
+		int number  = updateByExampleSelective(updateObj,updateOrderTrade);
+
+		if(number>0){
+			remark.append("更新数据成功");
+		}else{
+			remark.append("更新数据失败");
+		}
+		insertOrderTradeLog(orderTrade.getId(),oldState,newState,remark.toString());
+		return number>0?true:false;
+	}
+
+
+
 	/**
 	 * 格式化交易订单数据
 	 * @param orderTrade

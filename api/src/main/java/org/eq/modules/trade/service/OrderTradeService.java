@@ -98,4 +98,11 @@ public interface OrderTradeService extends ServiceExtend<OrderTrade,OrderTradeEx
     boolean appealTrade(OrderTradeSearchVO orderTradeSearchVO);
 
 
+    /**
+     * 放款接口
+     * @param orderTradeLoanVO
+     * @param isSuccess
+     * @return
+     */
+    boolean loanTrade(OrderTradeLoan orderTradeLoanVO, boolean isSuccess);
 }

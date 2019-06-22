@@ -18,14 +18,16 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ *
+ * 转让订单回调
  * @author  kaka
  *
  * @version 2019/6/10
  */
 @Component
-public class OrderTradeCallback extends AbstractTaskCallBack {
+public class OrderTransferCallback extends AbstractTaskCallBack {
 
-    private static Logger logger = LoggerFactory.getLogger(OrderTradeCallback.class);
+    private static Logger logger = LoggerFactory.getLogger(OrderTransferCallback.class);
 
 
     @Autowired
@@ -33,7 +35,7 @@ public class OrderTradeCallback extends AbstractTaskCallBack {
     @Autowired
     private static OrderTransferLogMapper orderTransferLogMapper;
 
-    public OrderTradeCallback() {
+    public OrderTransferCallback() {
         super(BcTxRecordBizTypeEnum.TRANSFER.getCode());
     }
 
