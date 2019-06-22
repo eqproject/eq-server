@@ -6,6 +6,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.eq.basic.common.util.WebClientUtil;
 import org.eq.modules.bc.common.log.Logger;
 import org.eq.modules.bc.common.log.LoggerFactory;
+import org.eq.modules.bc.common.util.DateUtil;
 import org.eq.modules.bc.common.util.StringUtil;
 import org.eq.modules.enums.ProductStateEnum;
 import org.eq.modules.product.dao.ProductAcceptMapper;
@@ -21,7 +22,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -150,11 +153,15 @@ public class ProductLoadBiz {
         product.setStatus(ProductStateEnum.DEFAULT.getState());
         product.setCreateDate(new Date());
         product.setUpdateDate(new Date());
+        Calendar foramt = Calendar.getInstance();
+
         if(!"-1".equals(ticketProduct.getStartTime())){
-            product.setExpirationStart(ticketProduct.getStartTime());
+            foramt.setTimeInMillis(Long.valueOf(ticketProduct.getStartTime()));
+            product.setExpirationStart(DateUtil.date2Str(foramt.getTime()));
         }
         if(!"-1".equals(ticketProduct.getEndTime())){
-            product.setExpirationEnd(ticketProduct.getEndTime());
+            foramt.setTimeInMillis(Long.valueOf(ticketProduct.getEndTime()));
+            product.setExpirationEnd(DateUtil.date2Str(foramt.getTime()));
         }
         //{"receive":"京东E卡提货说明","ticketDesc":"E卡说明"}
         JSONObject extend = new JSONObject();

@@ -87,7 +87,7 @@ public class ProductLoadService {
             ticketProductVO.setBalance("1000");
             ticketProductVO.setDescription("区块链商品简介");
             key = ticketProductVO.getVoucherId()+"_"+ticketProductVO.getTrancheId();
-
+            result.put(key,ticketProductVO);
 
             ticketProductVO = new TicketProductVO();
             ticketProductVO.setVoucherId("TICKET05");
