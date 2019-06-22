@@ -27,11 +27,6 @@ import java.util.Map;
 @AutowiredService
 public class OrderRefundTradeServiceImpl extends ServiceImplExtend<OrderRefundTradeMapper, OrderRefundTrade, OrderRefundTradeExample> implements OrderRefundTradeService {
 
-	@Autowired
-	public OrderRefundTradeServiceImpl(OrderRefundTradeMapper orderRefundTradeMapper) {
-		super.setMapper(orderRefundTradeMapper);
-	}
-
 	@Override
 	public OrderRefundTradeExample getExampleFromEntity(OrderRefundTrade orderRefundTrade, Map<String, Object> params) {
 		OrderRefundTradeExample example = new OrderRefundTradeExample();
