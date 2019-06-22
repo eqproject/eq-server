@@ -309,7 +309,7 @@ public class OrderTradeController extends BaseController {
             return ResponseFactory.paramsError("请求参数不能为空");
         }
         if(StringUtils.isEmpty(orderTradeSearchVO.getTradeNo()) || orderTradeSearchVO.getUserId()<=0){
-            return ResponseFactory.paramsError("交易单号为空");
+            return ResponseFactory.paramsError("交易单号或者用户为空");
         }
         try {
             orderTradeService.appealTrade(orderTradeSearchVO);

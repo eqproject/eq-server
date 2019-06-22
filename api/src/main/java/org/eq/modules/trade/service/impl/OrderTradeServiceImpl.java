@@ -717,6 +717,9 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
         if (orderTrade == null) {
             return false;
         }
+        if(!orderTrade.getSellUserId().equals(orderTradeSearchVO.getUserId()) && !orderTrade.getBuyUserId().equals(orderTradeSearchVO.getUserId())){
+        	return false;
+		}
         OrderTradeAppealExample example = new OrderTradeAppealExample();
         OrderTradeAppealExample.Criteria ca = example.or();
         ca.andTradeNoEqualToForAll(orderTradeSearchVO.getTradeNo());
