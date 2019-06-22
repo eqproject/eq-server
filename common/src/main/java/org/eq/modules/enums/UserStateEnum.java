@@ -1,7 +1,7 @@
 package org.eq.modules.enums;
 
 /**
- * 用户订单状态枚举类
+ * 用户认证状态枚举类
  */
 public enum UserStateEnum {
     AUTHENTICATION_NO(1,"未认证"),

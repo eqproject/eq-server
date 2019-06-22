@@ -19,10 +19,9 @@ import org.eq.modules.bc.entity.InitiatorAcc;
 import org.eq.modules.bc.entity.InitiatorAccExample;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
-import org.eq.modules.enums.BindStatusEnum;
-import org.eq.modules.enums.DefaultReceipEnum;
-import org.eq.modules.enums.StateEnum;
+import org.eq.modules.enums.*;
 import org.eq.modules.utils.AESUtils;
+import org.eq.modules.utils.IdentityAuthUtil;
 import org.eq.modules.utils.MD5Utils;
 import org.eq.modules.wallet.entity.UserWallet;
 import org.eq.modules.wallet.service.BcTxRecordService;
@@ -61,7 +60,6 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 
     @Value("${aes.key}")
     private String aesKey;
-
 
 
     @Override
@@ -220,12 +218,12 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         return bcTxRecord.getId();
     }
 
-    private InitiatorAcc getInitiatorAcc(){
+    private InitiatorAcc getInitiatorAcc() {
         InitiatorAccExample example = new InitiatorAccExample();
         InitiatorAccExample.Criteria criteria = example.or();
         criteria.andTypeEqualTo(0);
         List<InitiatorAcc> list = initiatorAccMapper.selectByExample(example);
-        int index = RandomUtils.nextInt(0,list.size());
+        int index = RandomUtils.nextInt(0, list.size());
         return list.get(index);
     }
 
@@ -239,6 +237,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         user.setCreateDate(new Date());
         user.setUpdateDate(new Date());
         user.setDelFlag(StateEnum.VALID.getState());
+        user.setAuthStatus(UserStateEnum.AUTHENTICATION_NO.getState());
         insertRecordReturnId(user);
         return user.getId();
     }
@@ -251,7 +250,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             user.setId(Long.parseLong(userId));
             //AES解密
             String password = AESUtils.decrypt(pwd, aesKey);
-            if(password == null || "".equals(password)){
+            if (password == null || "".equals(password)) {
                 return ResponseFactory.businessError("密码修改失败");
             }
             String content = userId + password + MD5_KEY;
@@ -282,7 +281,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             }
             //AES解密
             String password = AESUtils.decrypt(pwd, aesKey);
-            if(password == null || "".equals(password)){
+            if (password == null || "".equals(password)) {
                 return ResponseFactory.businessError("登陆失败");
             }
             String content = checkUser.getId() + password + MD5_KEY;
@@ -301,16 +300,52 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 
     @Override
     public ResponseData verify(UserIdentityAuth userIdentityAuth) {
+        //验证用户
+        User user = new User();
+        user.setId(userIdentityAuth.getUserId());
+        User checkUser = selectByRecord(user);
+        if (checkUser == null) {
+            return ResponseFactory.businessError("用户不存在");
+        }
+        //检查用户是否已认证
+        UserIdentityAuth checkAuth = userIdentityAuthService.selectByRecord(userIdentityAuth);
+        if (checkAuth != null && IdentityStatusEnum.SUCCESS.getState() == checkAuth.getResultStatus()) {
+            return updateUserAuthStatus(user, UserStateEnum.AUTHENTICATION_YES.getState());
+        }
+
+        //解密身份证号
+        String identityCard = AESUtils.decrypt(userIdentityAuth.getIdentityCard(), aesKey);
+        Boolean match = IdentityAuthUtil.userVerify(identityCard, userIdentityAuth.getIdentityName());
+        if (!match) {
+            return ResponseFactory.businessError("用户认证失败");
+        }
         //实名认证
-        userIdentityAuth.setResultStatus(1);
+        userIdentityAuth.setResultStatus(IdentityStatusEnum.SUCCESS.getState());
+        userIdentityAuth.setResultMsg("认证成功");
         userIdentityAuth.setCreateDate(new Date());
         userIdentityAuth.setUpdateDate(new Date());
         int cnt = userIdentityAuthService.insertRecord(userIdentityAuth);
-        if (cnt > 0) {
-            return ResponseFactory.success(null);
-        } else {
-            return ResponseFactory.businessError("认证失败");
+        if (cnt == 0) {
+            return ResponseFactory.businessError("用户认证失败");
         }
+        //修改User认证状态
+        return updateUserAuthStatus(user, UserStateEnum.AUTHENTICATION_YES.getState());
+    }
+
+    /**
+     * 更新用户认证状态
+     * @param user
+     * @param state
+     * @return
+     */
+    private ResponseData updateUserAuthStatus(User user, int state) {
+        user.setAuthStatus(state);
+        int cnt = updateByPrimaryKeySelective(user);
+
+        if (cnt == 0) {
+            return ResponseFactory.businessError("用户认证状态修改失败");
+        }
+        return ResponseFactory.success(null);
     }
 
     @Override

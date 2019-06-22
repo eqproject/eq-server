@@ -158,8 +158,27 @@
 > 地址： [/api/user/login](/api/user/reset)
 ```
 {
-	"status": 200,
-	"errMsg": ""
+    "status": "200",
+    "errMsg": "",
+    "data": {
+        "id": 10,
+        "name": null,
+        "nickname": null,
+        "password": "a472a2c8713a4cde527c89339439fe91",
+        "txPassword": null,
+        "sex": null,
+        "level": null,
+        "mobile": "17090075661",
+        "authStatus": null,
+        "birthday": null,
+        "photoHead": null,
+        "intro": null,
+        "createDate": "2019-06-16",
+        "updateDate": "2019-06-22",
+        "remarks": null,
+        "delFlag": 0
+    },
+    "datas": null
 }
 ```
 ##### 1-05\.用户实名认证接口
@@ -196,7 +215,7 @@
 > 地址： [/api/user/identity/verify](/api/user/identity/verify)
 ```
 {
-	"status": 0,
+	"status": 200,
 	"errMsg": ""
 }
 ```

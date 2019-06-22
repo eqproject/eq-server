@@ -1,12 +1,11 @@
 package org.eq.modules.enums;
 
 /**
- * 用户性别状态枚举类
+ * 实名认证状态
  */
-public enum UserSexEnum {
-    UNKNOW(0,"未知"),
-    MALE(1,"男"),
-    FEMALE(2,"女");
+public enum IdentityStatusEnum {
+    SUCCESS(1, "成功"),
+    FAIL(2, "失败");
 
     /**
      * 状态
@@ -25,27 +24,27 @@ public enum UserSexEnum {
         return remark;
     }
 
-    private UserSexEnum(int state, String remark){
+    private IdentityStatusEnum(int state, String remark) {
         this.remark = remark;
         this.state = state;
     }
 
     /**
      * 获取枚举类介绍
+     *
      * @param state
      * @return
      */
-    public static String  getRemarkByState(int state){
-        UserSexEnum[] values = UserSexEnum.values();
+    public static String getRemarkByState(int state) {
+        IdentityStatusEnum[] values = IdentityStatusEnum.values();
 
-        for(UserSexEnum temp : values ){
-            if(temp.state == state){
+        for (IdentityStatusEnum temp : values) {
+            if (temp.state == state) {
                 return temp.remark;
             }
         }
         return null;
 
     }
-
 
 }
