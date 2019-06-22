@@ -44,30 +44,6 @@ public class OrderTradeAppealServiceImpl extends ServiceImplExtend<OrderTradeApp
 		}else{
 			example.setOrderByClause("id asc");
 		}
-		if(orderTradeAppeal.getId()!=null){
-			ca.andIdEqualTo(orderTradeAppeal.getId());
-		}
-		if(StringLowUtils.isNotBlank(orderTradeAppeal.getAppealNo())){
-			ca.andAppealNoEqualTo(orderTradeAppeal.getAppealNo());
-		}
-		if(StringLowUtils.isNotBlank(orderTradeAppeal.getTradeNo())){
-			ca.andTradeNoEqualTo(orderTradeAppeal.getTradeNo());
-		}
-		if(orderTradeAppeal.getUserId()!=null){
-			ca.andUserIdEqualTo(orderTradeAppeal.getUserId());
-		}
-		if(orderTradeAppeal.getStatus()!=null){
-			ca.andStatusEqualTo(orderTradeAppeal.getStatus());
-		}
-		if(orderTradeAppeal.getCrateTime()!=null){
-			ca.andCrateTimeEqualTo(orderTradeAppeal.getCrateTime());
-		}
-		if(orderTradeAppeal.getUpdateTime()!=null){
-			ca.andUpdateTimeEqualTo(orderTradeAppeal.getUpdateTime());
-		}
-		if(StringLowUtils.isNotBlank(orderTradeAppeal.getRemark())){
-			ca.andRemarkEqualTo(orderTradeAppeal.getRemark());
-		}
 		return example;
 	}
 
