@@ -64,4 +64,15 @@ public interface OrderAdService extends ServiceExtend<OrderAd, OrderAdExample> {
      */
     PageResultData<OrderAdSimpleVO> pageUserOrderAd(SearchPageAdOrderVO searchPageAdOrderVO, User user);
 
+
+
+
+    /**
+     * 完成广告中部分交易量
+     * @param orderNo
+     * @param number 交易量
+     * @return
+     */
+     boolean finishOrderNum(String orderNo,int number);
+
 }

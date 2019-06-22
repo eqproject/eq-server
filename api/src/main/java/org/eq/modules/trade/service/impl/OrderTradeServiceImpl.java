@@ -85,7 +85,6 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 
 	@Autowired
 	private SmsService smsService;
-
     /**
      * 商品服务
      */
@@ -514,6 +513,9 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		if (orderTrade == null) {
 			throw new TradeOrderException("交易单号记录不存在");
 		}
+		if(orderTrade.getAmount()>orderTradePaymentReqVO.getPayAmout()){
+			throw new TradeOrderException("支付金额小于订单价格");
+		}
 		if(!OrderTradeStateEnum.isPayBack(orderTrade.getStatus())){
             throw new TradeOrderException("非支付回调状态");
         }
@@ -797,6 +799,18 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 
 		if(number>0){
 			remark.append("更新数据成功");
+			boolean updataOrder = false;
+			try{
+				//更新订单表
+				updataOrder = orderAdService.finishOrderNum(orderTrade.getAdNo(),orderTrade.getOrderNum());
+			}catch (Exception e){
+				e.printStackTrace();
+			}
+			if(updataOrder){
+				remark.append(",更新订单状态以及在途交易量成功");
+			}else{
+				remark.append(",更新订单状态以及在途交易量失败。");
+			}
 		}else{
 			remark.append("更新数据失败");
 		}
@@ -943,7 +957,6 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 			return  false;
 		}
 		return true;
-
 	}
 
     /**
@@ -1086,8 +1099,6 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
         orderPaymentTradeLog.setRemarks(remark);
         orderLogService.save(LogTypeEnum.TRADE_PAYMENT,orderPaymentTradeLog);
     }
-
-
 
 
 }

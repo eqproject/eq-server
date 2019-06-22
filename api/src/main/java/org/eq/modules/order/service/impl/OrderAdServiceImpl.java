@@ -378,8 +378,49 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		return result;
 	}
 
+    @Override
+    public boolean finishOrderNum(String orderNo, int number) {
+	    if(StringUtils.isEmpty(orderNo) || number<=0){
+	        return false;
+        }
+        OrderAd orderAd = null;
+        List<OrderAd> list =  findListByExample(getExampleFromUserAndCode(orderNo,0));
+        if(!CollectionUtils.isEmpty(list)){
+            orderAd = list.get(0);
+        }
+        if(orderAd==null){
+           return  false;
+        }
+        if(orderAd.getTradingNum()<number){
+            return false;
+        }
+        OrderAdExample example = new OrderAdExample();
+        OrderAdExample.Criteria ca = example.or();
+        ca.andIdEqualToForUpdate(orderAd.getId());
+        ca.andStatusEqualToForUpdate(orderAd.getStatus());
+        ca.andTradingNumEqualToForUpdate(orderAd.getTradingNum());
 
-	/**
+        OrderAd updateOrder = new OrderAd();
+        updateOrder.setStatus(orderAd.getStatus());
+        if(orderAd.getStatus() == OrderAdStateEnum.ORDER_TRADEING.getState()){
+            if((orderAd.getTradedNum()+number)>=orderAd.getProductNum()){
+                updateOrder.setStatus(OrderAdStateEnum.ORDER_FINISH.getState());
+            }
+        }
+        updateOrder.setTradingNum(orderAd.getTradingNum()-number);
+        updateOrder.setUpdateDate(new Date());
+        int updateResult = updateByExampleSelective(updateOrder,example);
+        if(updateResult<=0){
+           return false;
+        }
+        StringBuilder remarks = new StringBuilder();
+        remarks.append("完成数据交易:").append(number).append(",当前修改快照为").append(updateOrder.toString());
+        saveLog(orderAd.getId(),orderAd.getStatus(),updateOrder.getStatus(),remarks.toString());
+        return true;
+    }
+
+
+    /**
 	 * 创建求购订单
 	 * @param searchAdOrderVO
 	 * @param user
