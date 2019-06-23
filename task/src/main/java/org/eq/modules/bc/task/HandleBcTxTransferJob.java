@@ -116,15 +116,20 @@ public class HandleBcTxTransferJob {
 			}
 			//资产的精度，暂时用不到
 			//Integer assetDecimal = bcTxRecord.getAssetDecimal();
-			String assetCode = bcTxRecord.getAssetCode();
+			String assetCode = bcTxRecord.getTicketid();
 			String assetIssuer= bcTxRecord.getAssetIssuer();
 			String fromAddress = bcTxRecord.getFromAddress();
 			fromAddressList.add(fromAddress);
 			userSingerSet.add(fromAddress);
 
-			long bcAmount = DecimalCalculateUtil.numberMultiply10Pow4Long(bcTxRecord.getTransferAmount()+"", 2);//资产数量
-			//1000000 = 0.01bu
-			bcAmount = bcAmount * 100000000 /100;
+			long bcAmount;
+			if(bcTxRecord.getBizType().equals(BcAccountTypeEnum.ACTIVITY.getCode())){
+				bcAmount = DecimalCalculateUtil.numberMultiply10Pow4Long(bcTxRecord.getTransferAmount()+"", 2);//资产数量
+				//1000000 = 0.01bu
+				bcAmount = bcAmount * 100000000 /100;
+			}else{
+				bcAmount = Long.parseLong(bcTxRecord.getTransferAmount());
+			}
 
 			BcTransferReq bcTransferReq = new BcTransferReq();
 			bcTransferReq.setAmount(bcAmount);
