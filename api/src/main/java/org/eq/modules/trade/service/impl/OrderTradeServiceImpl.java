@@ -857,11 +857,17 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		if(orderTrade ==null){
 			return null;
 		}
+		OrderPaymentTrade orderPaymentTrade = null;
 		OrderTradeDetailTrade result = initTradDetailForWaitPay(orderTrade);
-		OrderPaymentTrade orderPaymentTrade = new OrderPaymentTrade();
+		OrderPaymentTradeExample example = new OrderPaymentTradeExample();
+		OrderPaymentTradeExample.Criteria ca = example.or();
+		example.setOrderByClause("create_date desc ");
+		ca.andTradeNoEqualTo(orderTrade.getTradeNo());
 		try{
-			orderPaymentTrade.setTradeNo(orderTrade.getTradeNo());
-			orderPaymentTrade = orderPaymentTradeService.selectByRecord(orderPaymentTrade);
+			List<OrderPaymentTrade> tempList  = orderPaymentTradeService.findListByExample(example);
+			if(CollectionUtils.isEmpty(tempList)){
+				orderPaymentTrade = tempList.get(0);
+			}
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -1012,6 +1018,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderPaymentTrade.setRemarks("回调");
 		orderPaymentTrade.setCreateDate(new Date());
 		orderPaymentTrade.setUpdateDate(new Date());
+		orderPaymentTrade.setPayTime(new Date());
 		int state = ispass?OrderPaymentTradeStateEnum.PAY_SUCCESS.getState() : OrderPaymentTradeStateEnum.PAY_FAIL.getState();
 		orderPaymentTrade.setStatus(state);
 

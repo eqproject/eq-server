@@ -89,7 +89,7 @@
 
     <sql id="Base_Column_List">
         OT.id,OT.sell_user_id,OT.buy_user_id,OT.ad_no,OT.trade_no,OT.product_id,OT.order_num,OT.type,OT.status,OT.blockchain_status,
-        OT.sale_price,OT.unit_price,OT.amount,OT.remind_pay,OT.finish_time,OT.remarks,OT.cancel_desc,OT.create_date,OT.update_date,OT.tx_id,
+        OT.sale_price,OT.unit_price,OT.amount,OT.service_fee,OT.remind_pay,OT.finish_time,OT.remarks,OT.cancel_desc,OT.create_date,OT.update_date,OT.tx_id,
         PP.name as productName,PP.product_img as productImg
     </sql>
 
@@ -129,7 +129,7 @@
     </delete>
 
     <insert id="insert" parameterType="org.eq.modules.trade.entity.OrderTrade">
-        insert into order_trade (sell_user_id,buy_user_id,ad_no,trade_no,product_id,order_num,type,status,blockchain_status,sale_price,unit_price,amount,remind_pay,finish_time,remarks,cancel_desc,create_date,update_date,tx_id)
+        insert into order_trade (sell_user_id,buy_user_id,ad_no,trade_no,product_id,order_num,type,status,blockchain_status,sale_price,unit_price,amount,service_fee,remind_pay,finish_time,remarks,cancel_desc,create_date,update_date,tx_id)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
             #{sellUserId,jdbcType=BIGINT},
@@ -144,6 +144,7 @@
             #{salePrice,jdbcType=INTEGER},
             #{unitPrice,jdbcType=INTEGER},
             #{amount,jdbcType=INTEGER},
+            #{serviceFee,jdbcType=INTEGER},
             #{remindPay,jdbcType=TINYINT},
             #{finishTime,jdbcType=TIMESTAMP},
             #{remarks,jdbcType=VARCHAR},
@@ -169,6 +170,7 @@
             sale_price,
             unit_price,
             amount,
+            service_fee,
             remind_pay,
             finish_time,
             remarks,
@@ -190,6 +192,7 @@
             #{salePrice,jdbcType=INTEGER},
             #{unitPrice,jdbcType=INTEGER},
             #{amount,jdbcType=INTEGER},
+            #{serviceFee,jdbcType=INTEGER},
             #{remindPay,jdbcType=TINYINT},
             #{finishTime,jdbcType=TIMESTAMP},
             #{remarks,jdbcType=VARCHAR},
@@ -220,6 +223,7 @@
             sale_price,
             unit_price,
             amount,
+            service_fee,
             remind_pay,
             finish_time,
             remarks,
@@ -241,6 +245,7 @@
             #{salePrice,jdbcType=INTEGER},
             #{unitPrice,jdbcType=INTEGER},
             #{amount,jdbcType=INTEGER},
+            #{serviceFee,jdbcType=INTEGER},
             #{remindPay,jdbcType=TINYINT},
             #{finishTime,jdbcType=TIMESTAMP},
             #{remarks,jdbcType=VARCHAR},
@@ -300,6 +305,9 @@
             <if test="record.amount != null">
                 amount = #{record.amount,jdbcType=INTEGER},
             </if>
+            <if test="record.serviceFee != null">
+                service_fee =  #{record.serviceFee,jdbcType=INTEGER},
+            </if>
             <if test="record.remindPay != null">
                 remind_pay = #{record.remindPay,jdbcType=TINYINT},
             </if>
@@ -344,6 +352,7 @@
             sale_price = #{record.salePrice,jdbcType=INTEGER},
             unit_price = #{record.unitPrice,jdbcType=INTEGER},
             amount = #{record.amount,jdbcType=INTEGER},
+            service_fee =  #{record.serviceFee,jdbcType=INTEGER},
             remind_pay = #{record.remindPay,jdbcType=TINYINT},
             finish_time = #{record.finishTime,jdbcType=TIMESTAMP},
             remarks = #{record.remarks,jdbcType=VARCHAR},
@@ -396,6 +405,9 @@
             <if test="amount != null">
             amount = #{amount,jdbcType=INTEGER},
             </if>
+            <if test="serviceFee != null">
+            service_fee =  #{serviceFee,jdbcType=INTEGER},
+            </if>
             <if test="remindPay != null">
             remind_pay = #{remindPay,jdbcType=TINYINT},
             </if>
@@ -437,6 +449,7 @@
               sale_price = #{salePrice,jdbcType=INTEGER},
               unit_price = #{unitPrice,jdbcType=INTEGER},
               amount = #{amount,jdbcType=INTEGER},
+              service_fee =  #{serviceFee,jdbcType=INTEGER},
               remind_pay = #{remindPay,jdbcType=TINYINT},
               finish_time = #{finishTime,jdbcType=TIMESTAMP},
               remarks = #{remarks,jdbcType=VARCHAR},
