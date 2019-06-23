@@ -585,6 +585,10 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
             throw new TradeOrderException("更改交易订单失败");
         }
         insertOrderTradeLog(orderTrade.getId(),OrderTradeStateEnum.PAY_SUCCESS.getState(),updateObj.getStatus(),"支付成功后，状态变更为放券中");
+        // 开始调用成功
+        OrderTradeLoan orderTradeLoanVO = new OrderTradeLoan();
+        orderTradeLoanVO.setTradeNo(orderTrade.getTradeNo());
+        loanTrade(orderTradeLoanVO,true);
 		return result;
 	}
 
@@ -774,9 +778,9 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		if (orderTrade == null) {
 			return false;
 		}
-		if(orderTrade.getStatus().intValue()!=OrderTradeStateEnum.LOAN_ING.getState()){
+		/*if(orderTrade.getStatus().intValue()!=OrderTradeStateEnum.LOAN_ING.getState()){
 			return false;
-		}
+		}*/
 		int oldState = orderTrade.getStatus();
 		StringBuilder remark = new StringBuilder("执行放款结果回调:");
 

@@ -408,6 +408,7 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
             }
         }
         updateOrder.setTradingNum(orderAd.getTradingNum()-number);
+        updateOrder.setTradedNum(orderAd.getTradedNum()+number);
         updateOrder.setUpdateDate(new Date());
         int updateResult = updateByExampleSelective(updateOrder,example);
         if(updateResult<=0){
