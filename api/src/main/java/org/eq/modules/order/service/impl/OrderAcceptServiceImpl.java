@@ -171,7 +171,7 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 		bcTxRecord.setTicketid(productAll.getTicketid());
 		bcTxRecord.setTrancheid(productAll.getTrancheid());
 		bcTxRecord.setAssetCode(productAll.getAssetCode());
-		bcTxRecord.setAssetIssuer(productAll.getAssetIssuer());
+		bcTxRecord.setAssetIssuer(productAll.getAcceptAddress());
 		bcTxRecord.setContractAddress(productAll.getContractAddress());
 		bcTxRecord.setAssetType(1);
 		bcTxRecord.setTxStatus(0);

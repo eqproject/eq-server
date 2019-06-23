@@ -980,7 +980,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		bcTxRecord.setTicketid(productAll.getTicketid());
 		bcTxRecord.setTrancheid(productAll.getTrancheid());
 		bcTxRecord.setAssetCode(productAll.getAssetCode());
-		bcTxRecord.setAssetIssuer(productAll.getAssetIssuer());
+		bcTxRecord.setAssetIssuer(productAll.getIssuerAddress());
 		bcTxRecord.setContractAddress(productAll.getContractAddress());
 		bcTxRecord.setAssetType(1);
 		bcTxRecord.setTxStatus(0);
