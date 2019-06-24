@@ -11,6 +11,7 @@
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
             <pattern>%date{yyyy-MM-dd HH:mm:ss} | %highlight(%-5level) | %boldYellow(%thread) | %boldGreen(%logger) | %msg%n</pattern>
+            <charset>UTF-8</charset>
         </encoder>
     </appender>
 
@@ -18,7 +19,7 @@
     <appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
-            <fileNamePattern>${log_dir}/${server_name}-info-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+            <fileNamePattern>${log_dir}/${server_name}-info-%d{yyyy-MM-dd}.log</fileNamePattern>
             <!-- 日志最大的历史 180天 -->
             <maxHistory>${maxHistory}</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
@@ -29,6 +30,7 @@
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
             <pattern>%date{yyyy-MM-dd HH:mm:ss} | %highlight(%-5level) | %boldYellow(%thread) | %boldGreen(%logger) | %msg%n</pattern>
+            <charset>UTF-8</charset>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <!-- 只打印info日志 -->
@@ -42,7 +44,7 @@
     <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
-            <fileNamePattern>${log_dir}/${server_name}-error-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+            <fileNamePattern>${log_dir}/${server_name}-error-%d{yyyy-MM-dd}.log</fileNamePattern>
             <!-- 日志最大的历史 180天 -->
             <maxHistory>${maxHistory}</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
@@ -53,6 +55,7 @@
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
             <pattern>%date{yyyy-MM-dd HH:mm:ss} | %highlight(%-5level) | %boldYellow(%thread) | %boldGreen(%logger) | %msg%n</pattern>
+            <charset>UTF-8</charset>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <!-- 只打印错误日志 -->
