@@ -18,6 +18,9 @@
 	    <result column="tx_hash" jdbcType="VARCHAR" property="txHash" />
 	    <result column="tx_status" jdbcType="TINYINT" property="txStatus" />
 	    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+
+        <result column="tx_type" jdbcType="TINYINT" property="txType" />
+        <result column="input" jdbcType="VARCHAR" property="input" />
     </resultMap>
 
     <sql id="Example_Where_Clause">
@@ -81,7 +84,7 @@
     </sql>
 
     <sql id="Base_Column_List">
-        asset_code,asset_issuer,asset_type,biz_type,contract_address,create_time,from_address,id,opt_metadata,ticketId,to_address,trancheId,transfer_amount,tx_hash,tx_status,update_time
+        asset_code,asset_issuer,asset_type,biz_type,contract_address,create_time,from_address,id,opt_metadata,ticketId,to_address,trancheId,transfer_amount,tx_hash,tx_status,update_time,tx_type,input
     </sql>
 
     <select id="selectByExample" parameterType="org.eq.modules.bc.entity.BcTxRecordExample" resultMap="BaseResultMap">

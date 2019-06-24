@@ -6,12 +6,12 @@ import io.bumo.blockchain.impl.TransactionServiceImpl;
 import io.bumo.model.request.*;
 import io.bumo.model.request.operation.AssetSendOperation;
 import io.bumo.model.request.operation.BUSendOperation;
+import io.bumo.model.request.operation.ContractInvokeByAssetOperation;
 import io.bumo.model.response.*;
 import io.bumo.model.response.result.TransactionBuildBlobResult;
 import io.bumo.model.response.result.data.AssetInfo;
 import io.bumo.model.response.result.data.Signature;
 import io.bumo.model.response.result.data.TransactionHistory;
-import org.eq.modules.bc.common.util.Tools;
 import org.eq.modules.bc.external.bc.enums.StatusEnum;
 import org.eq.modules.bc.external.bc.req.BatchSubmitTxReq;
 import org.eq.modules.bc.external.bc.req.BcAssetReq;
@@ -19,6 +19,7 @@ import org.eq.modules.bc.external.bc.req.BcTransferReq;
 import org.eq.modules.bc.external.bc.req.SignEntity;
 import org.eq.modules.bc.external.bc.resp.BcAssetResp;
 import org.eq.modules.bc.external.bc.resp.BlobDataResp;
+import org.eq.modules.enums.BcTxTypeEnum;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +39,7 @@ public class BlockChainManager {
 	
 	/**
 	 * 获取转移BU交易Blob
-	 * @param bcTransferBu
+	 * @param bcTransfer
 	 * @return
 	 */
 	public BlobDataResp getTransferBuBlob(BcTransferReq bcTransfer){
@@ -261,28 +262,34 @@ public class BlockChainManager {
         transactionBuildBlobRequest.setNonce(accNonce);
         transactionBuildBlobRequest.setFeeLimit(list.size()*fee);
         transactionBuildBlobRequest.setGasPrice(gasprice);
-        
-        for(BcTransferReq bcTransfer : list){
-        	String issueAddress = bcTransfer.getIssuer();
-        	if(Tools.isNull(issueAddress)){//BU
-        		BUSendOperation buSendOperation = new BUSendOperation();
-                buSendOperation.setSourceAddress(bcTransfer.getFromAddress());
-                buSendOperation.setDestAddress(bcTransfer.getToAddress());
-                buSendOperation.setAmount(bcTransfer.getAmount());
-                buSendOperation.setMetadata(bcTransfer.getMetadata());
-                transactionBuildBlobRequest.addOperation(buSendOperation);
-        	}else{
-        		AssetSendOperation assetSendOperation = new AssetSendOperation();
-        		assetSendOperation.setSourceAddress(bcTransfer.getFromAddress());
-        		assetSendOperation.setDestAddress(bcTransfer.getToAddress());
-        		assetSendOperation.setAmount(bcTransfer.getAmount());
-        		assetSendOperation.setCode(bcTransfer.getCode());
-        		assetSendOperation.setIssuer(bcTransfer.getIssuer());
-        		assetSendOperation.setMetadata(bcTransfer.getMetadata());
-        		transactionBuildBlobRequest.addOperation(assetSendOperation);
-        		
-        	}
-        }
+
+		for(BcTransferReq bcTransfer : list){
+			Integer txType = bcTransfer.getTxType();
+			if(txType.equals(BcTxTypeEnum.BU.getCode())){//BU
+				BUSendOperation buSendOperation = new BUSendOperation();
+				buSendOperation.setSourceAddress(bcTransfer.getFromAddress());
+				buSendOperation.setDestAddress(bcTransfer.getToAddress());
+				buSendOperation.setAmount(bcTransfer.getAmount());
+				buSendOperation.setMetadata(bcTransfer.getMetadata());
+				transactionBuildBlobRequest.addOperation(buSendOperation);
+			}else if(txType.equals(BcTxTypeEnum.ASSET_ATP10.getCode())){
+				AssetSendOperation assetSendOperation = new AssetSendOperation();
+				assetSendOperation.setSourceAddress(bcTransfer.getFromAddress());
+				assetSendOperation.setDestAddress(bcTransfer.getToAddress());
+				assetSendOperation.setAmount(bcTransfer.getAmount());
+				assetSendOperation.setCode(bcTransfer.getCode());
+				assetSendOperation.setIssuer(bcTransfer.getIssuer());
+				assetSendOperation.setMetadata(bcTransfer.getMetadata());
+				transactionBuildBlobRequest.addOperation(assetSendOperation);
+
+			}else if(txType.equals(BcTxTypeEnum.CONTRACT.getCode())){
+				ContractInvokeByAssetOperation operation = new ContractInvokeByAssetOperation();
+				operation.setContractAddress(bcTransfer.getToAddress());
+				operation.setSourceAddress(bcTransfer.getFromAddress());
+				operation.setInput(bcTransfer.getInput());
+				transactionBuildBlobRequest.addOperation(operation);
+			}
+		}
         
         // 获取交易BLob串
         TransactionService transactionService = new TransactionServiceImpl();

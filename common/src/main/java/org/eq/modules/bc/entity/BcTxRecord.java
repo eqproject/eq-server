@@ -35,6 +35,8 @@ public class BcTxRecord {
     private Date createTime;
     private Date updateTime;
     private String optMetadata;        // 交易描述
+    private int txType;
+    private String input;
 
     public  void setId(long id){
         this.id = id;

@@ -4,15 +4,14 @@
  */
 package org.eq.modules.trade.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.DateUtil;
-import org.eq.basic.common.util.IdworkUtil;
 import org.eq.basic.common.util.OrderNoGenerateUtil;
-import org.eq.basic.common.util.StringLowUtils;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.auth.exception.UserNotExistsException;
 import org.eq.modules.auth.service.UserService;
@@ -55,7 +54,6 @@ import org.eq.modules.utils.ProductUtil;
 import org.eq.modules.wallet.entity.UserWallet;
 import org.eq.modules.wallet.service.UserWalletService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -994,8 +992,23 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		bcTxRecord.setCreateTime(new Date());
 		bcTxRecord.setUpdateTime(new Date());
 		bcTxRecord.setOptMetadata("用户地址:"+fromAddress+" 转往"+toAddress);
+		bcTxRecord.setBizType(BcTxTypeEnum.CONTRACT.getCode());
+		bcTxRecord.setInput(buildTranserParam(bcTxRecord));
+		bcTxRecord.setContractAddress(productAll.getContractAddress());
 		bcTxRecordMapper.insertSelective(bcTxRecord);
 		return bcTxRecord;
+	}
+
+	private String buildTranserParam(BcTxRecord bcTxRecord){
+		JSONObject input = new JSONObject();
+		input.put("method", "transfer");
+		JSONObject params = new JSONObject();
+		params.put("skuId", bcTxRecord.getTicketid());
+		params.put("trancheId", bcTxRecord.getTrancheid());
+		params.put("to", bcTxRecord.getToAddress());
+		params.put("value", bcTxRecord.getTransferAmount());
+		input.put("params", params);
+		return input.toJSONString();
 	}
 
 	/**
