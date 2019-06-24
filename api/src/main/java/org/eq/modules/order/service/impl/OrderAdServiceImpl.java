@@ -517,6 +517,8 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 				logger.error("创建订单失败，但是锁定库存成功，释放库存失败，用户id :{} 商品ID:{} 应释放量:{}",searchAdOrderVO.getProductId(),user.getId(),searchAdOrderVO.getNumber());
 			}
 
+		}else{
+			saveLog(orderAd.getId(),-1,OrderAdStateEnum.ORDER_DEFAULT.getState(),"初始化订单");
 		}
 		return result>0?orderAd:null;
 	}
