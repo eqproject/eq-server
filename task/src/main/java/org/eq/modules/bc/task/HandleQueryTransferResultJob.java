@@ -16,6 +16,7 @@ import org.eq.modules.bc.service.BlockChainTxService;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
@@ -40,7 +41,8 @@ public class HandleQueryTransferResultJob {
 	
 	@Value("${blockchain.tx.confirm.result.timeout}")
 	private Integer timeNumber;
-	
+
+	@Scheduled(cron = "* * 0/1 * * ?")
 	public void execute(){
 		try{
 			logger.info("query block  tx result start...");
