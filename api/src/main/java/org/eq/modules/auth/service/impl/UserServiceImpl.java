@@ -159,10 +159,8 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         user.setMobile(mobile);
         //检查是否已注册
         User checkUser = checkDuplicateMobile(user);
-        //已注册直接返回成功
         if (checkUser != null) {
-            dataMap.put("userId", checkUser.getId());
-            return ResponseFactory.success(dataMap);
+            return ResponseFactory.businessError("手机号已注册");
         }
 
         Long userId = saveUser(user);
