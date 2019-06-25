@@ -30,7 +30,7 @@ public class IdentityAuthUtil {
         param.put("realname", realname);
         param.put("key", KEY);
         try {
-            // {"reason":"成功 ","result":{"realname":"王红斌","idcard":"62230119910210809X","res":1},"error_code":0}
+            // {"reason":"成功 ","result":{"realname":"xxx","idcard":"622301********809X","res":1},"error_code":0}
             String result = webClientUtil.syncPostByForm(URL, param);
             Map<String, Object> resultMap = JSONObject.parseObject(result, Map.class);
             if (!REASON.equals(((String) resultMap.get("reason")).trim())) {

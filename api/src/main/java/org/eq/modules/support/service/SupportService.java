@@ -16,11 +16,22 @@ import org.eq.modules.support.vo.ConfigVO;
  * @version 2019-06-02
  */
 public interface SupportService extends ServiceExtend<Support, SupportExample> {
-
+    /**
+     * 获取服务条款
+     * @return
+     */
     ResponseData getTerms();
 
+    /**
+     * 获取法务支持
+     * @return
+     */
     ResponseData getLegal();
 
+    /**
+     * 获取求购文案
+     * @return
+     */
     ResponseData getBuydoc();
 
     /**

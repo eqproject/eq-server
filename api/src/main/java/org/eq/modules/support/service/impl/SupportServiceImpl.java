@@ -75,6 +75,10 @@ public class SupportServiceImpl extends ServiceImplExtend<SupportMapper, Support
         return example;
     }
 
+    /**
+     * 获取服务条款
+     * @return
+     */
     @Override
     public ResponseData getTerms() {
         Support support = new Support();
@@ -90,6 +94,10 @@ public class SupportServiceImpl extends ServiceImplExtend<SupportMapper, Support
 
     }
 
+    /**
+     * 获取法务支持
+     * @return
+     */
     @Override
     public ResponseData getLegal() {
         Support support = new Support();
@@ -104,6 +112,10 @@ public class SupportServiceImpl extends ServiceImplExtend<SupportMapper, Support
         }
     }
 
+    /**
+     * 获取求购文案
+     * @return
+     */
     @Override
     public ResponseData getBuydoc() {
         Support support = new Support();

@@ -138,6 +138,12 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         return example;
     }
 
+    /**
+     * 用户注册
+     * @param mobile
+     * @param captcha
+     * @return
+     */
     @Override
     public ResponseData register(String mobile, String captcha) {
         Map dataMap = new HashMap();
@@ -240,7 +246,13 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         return user.getId();
     }
 
-
+    /**
+     * 用户重置密码
+     * @param mobile
+     * @param pwd
+     * @param captcha
+     * @return
+     */
     @Override
     public ResponseData reset(String mobile, String pwd, String captcha) {
 
@@ -262,11 +274,12 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             if (password == null || "".equals(password)) {
                 return ResponseFactory.businessError("重置密码解密失败");
             }
-            String content = mobile + password + MD5_KEY;
+            String content = user.getId() + password + MD5_KEY;
             user.setPassword(MD5Utils.digestAsHex(content));
             user.setUpdateDate(new Date());
             int cnt = updateByPrimaryKeySelective(user);
             if (cnt > 0) {
+                clearCaptcha(mobile);
                 return ResponseFactory.success(user);
             } else {
                 return ResponseFactory.businessError("重置密码失败");
@@ -278,6 +291,12 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 
     }
 
+    /**
+     * 用户登录
+     * @param mobile
+     * @param pwd
+     * @return
+     */
     @Override
     public ResponseData login(String mobile, String pwd) {
         try {
@@ -299,7 +318,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             if (currUser != null) {
                 return ResponseFactory.success(currUser);
             } else {
-                return ResponseFactory.businessError("手机号未注册");
+                return ResponseFactory.businessError("密码不正确");
             }
         } catch (Exception e) {
             logger.error("登陆失败", e);
@@ -307,6 +326,11 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         }
     }
 
+    /**
+     * 实名认证
+     * @param userIdentityAuth
+     * @return
+     */
     @Override
     public ResponseData verify(UserIdentityAuth userIdentityAuth) {
         //验证用户
@@ -357,6 +381,12 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         return ResponseFactory.success(null);
     }
 
+    /**
+     * 手机验证码登录
+     * @param mobile
+     * @param captcha
+     * @return
+     */
     @Override
     public ResponseData mobileLogin(String mobile, String captcha) {
         User user = new User();
@@ -375,6 +405,11 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         return ResponseFactory.success(checkUser);
     }
 
+    /**
+     * 支付账号绑定
+     * @param userAccountBind
+     * @return
+     */
     @Override
     public ResponseData payBind(UserAccountBind userAccountBind) {
         userAccountBind.setCreateDate(new Date());
