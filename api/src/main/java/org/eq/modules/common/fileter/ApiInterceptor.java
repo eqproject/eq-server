@@ -57,8 +57,6 @@ public class ApiInterceptor  implements HandlerInterceptor {
         url = url.substring(url.indexOf("api"));
 
         Map<String, String[]> map = httpServletRequest.getParameterMap();
-        logger.info("request url:{},params:{}",url, JSON.toJSON(map));
-
         if(noSignUrl.contains(url)){
             return true;
         }
