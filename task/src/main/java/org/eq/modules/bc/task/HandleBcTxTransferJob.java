@@ -55,7 +55,7 @@ public class HandleBcTxTransferJob {
     @Autowired
     private InitiatorAccMapper initiatorAccMapper;
 
-	@Scheduled(cron = "0 0/2 * * * ?")
+	@Scheduled(cron = "0 0/5 * * * ?")
 	public void execute(){
 		//是否设置keyStore密码
 		boolean keyStorePwdFlag = Tools.isNull(KeyStoreManager.getKeyStorePwd());
