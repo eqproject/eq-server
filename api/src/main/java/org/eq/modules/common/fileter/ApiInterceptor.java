@@ -1,5 +1,6 @@
 package org.eq.modules.common.fileter;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
 import org.apache.commons.lang3.StringUtils;
@@ -49,11 +50,14 @@ public class ApiInterceptor  implements HandlerInterceptor {
 
         String url = httpServletRequest.getRequestURL().toString();
         url = url.substring(url.indexOf("api"));
+
+        Map<String, String[]> map = httpServletRequest.getParameterMap();
+        logger.info("request url:{},params:{}",url, JSON.toJSON(map));
+
         if(noSignUrl.contains(url)){
             return true;
         }
 
-        Map<String, String[]> map = httpServletRequest.getParameterMap();
         if(!map.containsKey(SIGN)){
             throw new BizException(ResponseStateEnum.SIGN_NULL);
         }
