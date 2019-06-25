@@ -94,6 +94,7 @@ public class ApiInterceptor implements HandlerInterceptor {
                 .putString(sorted, Charsets.UTF_8)
                 .hash().toString();
 
+        System.out.println(sign);
         if (!reqSign.equalsIgnoreCase(sign)) {
             throw new BizException(ResponseStateEnum.SIGN_INVALID);
         }

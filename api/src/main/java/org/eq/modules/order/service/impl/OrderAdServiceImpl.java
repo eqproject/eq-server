@@ -192,7 +192,7 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 			result.setErrMsg("此商品无效");
 			return result;
 		}
-		int balance = userProductStock.getStockNum() - userProductStock.getLockedNum();
+		int balance = userProductStock.getStockNum();
 		if((balance-searchAdOrderVO.getNumber())<0){
 			result.setErrMsg("可售卖量不足");
 			return result;
