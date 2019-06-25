@@ -444,7 +444,8 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		orderAd.setTradingNum(0);
 		orderAd.setTradedNum(0);
 		orderAd.setType(OrderAdTypeEnum.ORDER_BUY.getType());
-		orderAd.setStatus(OrderAdStateEnum.ORDER_DEFAULT.getState());
+		//orderAd.setStatus(OrderAdStateEnum.ORDER_DEFAULT.getState());
+		orderAd.setStatus(OrderAdStateEnum.ORDER_TRADEING.getState());
 		orderAd.setPrice(searchAdOrderVO.getPrice());
 		orderAd.setAmount(orderAd.getProductNum()*orderAd.getPrice());
 		orderAd.setCreateDate(new Date());
