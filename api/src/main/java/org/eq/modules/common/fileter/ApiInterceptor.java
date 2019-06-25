@@ -27,19 +27,20 @@ import java.util.*;
 
 /**
  * api 拦截器
- * @author  kaka
  *
+ * @author kaka
  */
 
-public class ApiInterceptor  implements HandlerInterceptor {
+public class ApiInterceptor implements HandlerInterceptor {
     private final static String KEY = "1A9585B3C9F0854AD1B73C4ED80F7D31";
     private final static String USER_ID = "userId";
     private final static String SIGN = "sign";
-    public  final static String REQUEST_ID="REQUEST_ID";
+    public final static String REQUEST_ID = "REQUEST_ID";
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private static Set<String> noSignUrl = new HashSet<>();
+
     static {
         noSignUrl.add("api/support/terms");
         noSignUrl.add("api/support/legal");
@@ -53,27 +54,31 @@ public class ApiInterceptor  implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o)
             throws Exception {
 
+        String requestId = getLogId();
+        httpServletResponse.setHeader(REQUEST_ID, requestId);
+
         String url = httpServletRequest.getRequestURL().toString();
         url = url.substring(url.indexOf("api"));
 
         Map<String, String[]> map = httpServletRequest.getParameterMap();
-        if(noSignUrl.contains(url)){
+        logger.info("requestId:{}, url:{} , params:{}", requestId, url, JSON.toJSON(map));
+        if (noSignUrl.contains(url)) {
             return true;
         }
 
-        if(!map.containsKey(SIGN)){
+        if (!map.containsKey(SIGN)) {
             throw new BizException(ResponseStateEnum.SIGN_NULL);
         }
 
         String reqSign = map.get(SIGN)[0];
 
-        if(map.containsKey(USER_ID)){
+        if (map.containsKey(USER_ID)) {
             String userId = map.get(USER_ID)[0];
-            checkUser(userId,httpServletRequest);
+            checkUser(userId, httpServletRequest);
         }
 
         List<String> params = new ArrayList<>(map.size());
-        map.forEach((k,v)->{
+        map.forEach((k, v) -> {
             if (!k.equals(SIGN)) {
                 params.add(k + "=" + v[0]);
             }
@@ -82,23 +87,17 @@ public class ApiInterceptor  implements HandlerInterceptor {
         Collections.sort(params);
         params.add(KEY);
 
-        String sorted = StringUtils.join(params,"&");
+        String sorted = StringUtils.join(params, "&");
+        logger.info("requestId:{},sign params:{}", requestId, sorted);
 
         String sign = Hashing.sha256().newHasher()
                 .putString(sorted, Charsets.UTF_8)
                 .hash().toString();
-        System.out.println(sign);
-        if(!reqSign.equalsIgnoreCase(sign)){
+
+        if (!reqSign.equalsIgnoreCase(sign)) {
             throw new BizException(ResponseStateEnum.SIGN_INVALID);
         }
-        String requestId= "-1" ;
-        String number = String.valueOf((Math.random()*9+1)*100000);
-        if(number.contains(".")){
-            number=number.substring(0,number.indexOf("."));
-        }
-        requestId = System.currentTimeMillis()+number;
-        httpServletResponse.setHeader(REQUEST_ID,requestId);
-        logger.info("requestId:{}, url:{} , sign params:{}",requestId,url,sorted);
+
         return true;
     }
 
@@ -116,19 +115,19 @@ public class ApiInterceptor  implements HandlerInterceptor {
     }
 
     private void checkUser(String userIdStr,
-                           HttpServletRequest httpServletRequest)throws Exception{
+                           HttpServletRequest httpServletRequest) throws Exception {
         UserService userService = SpringContextUtil.getBean(UserService.class);
-        UserWalletService userWalletService =  SpringContextUtil.getBean(UserWalletService.class);
+        UserWalletService userWalletService = SpringContextUtil.getBean(UserWalletService.class);
 
         long userId = Long.parseLong(userIdStr);
         User user = userService.selectByPrimaryKey(userId);
 
-        if(user==null){
+        if (user == null) {
             throw new BizException(ResponseStateEnum.USER_NULL);
         }
 
         //用户API不验证钱包地址
-        if(httpServletRequest.getRequestURI().startsWith("/api/user")){
+        if (httpServletRequest.getRequestURI().startsWith("/api/user")) {
             return;
         }
 
@@ -138,5 +137,14 @@ public class ApiInterceptor  implements HandlerInterceptor {
         if(userWallet==null || userWallet.getStatus()== WalletStateEnum.NO_ACTIVE.getState()){
             throw new BizException(ResponseStateEnum.USER_WALLET_INACTIVE);
         }*/
+    }
+
+    private String getLogId() {
+        String requestId = "-1";
+        String number = String.valueOf((Math.random() * 9 + 1) * 100000);
+        if (number.contains(".")) {
+            number = number.substring(0, number.indexOf("."));
+        }
+        return System.currentTimeMillis() + number;
     }
 }
