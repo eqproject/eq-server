@@ -267,7 +267,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             user.setUpdateDate(new Date());
             int cnt = updateByPrimaryKeySelective(user);
             if (cnt > 0) {
-                return ResponseFactory.success(null);
+                return ResponseFactory.success(user);
             } else {
                 return ResponseFactory.businessError("重置密码失败");
             }
@@ -291,7 +291,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             //AES解密
             String password = AESUtils.decrypt(pwd, aesKey);
             if (password == null || "".equals(password)) {
-                return ResponseFactory.businessError("登陆失败");
+                return ResponseFactory.businessError("密码不正确");
             }
             String content = checkUser.getId() + password + MD5_KEY;
             user.setPassword(MD5Utils.digestAsHex(content));
@@ -299,7 +299,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             if (currUser != null) {
                 return ResponseFactory.success(currUser);
             } else {
-                return ResponseFactory.businessError("登陆失败");
+                return ResponseFactory.businessError("手机号未注册");
             }
         } catch (Exception e) {
             logger.error("登陆失败", e);
