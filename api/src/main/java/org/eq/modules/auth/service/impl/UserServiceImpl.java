@@ -158,7 +158,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         User user = new User();
         user.setMobile(mobile);
         //检查是否已注册
-        User checkUser = checkDuplicateMobile(user);
+        User checkUser = getUserByMobile(user);
         if (checkUser != null) {
             return ResponseFactory.businessError("手机号已注册");
         }
@@ -242,27 +242,38 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 
 
     @Override
-    public ResponseData reset(String userId, String pwd) {
+    public ResponseData reset(String mobile, String pwd, String captcha) {
+
         try {
+            //检查验证码
+            if (!checkCaptcha(mobile, captcha)) {
+                return ResponseFactory.businessError("验证码错误");
+            }
+
             User user = new User();
-            user.setId(Long.parseLong(userId));
+            user.setMobile(mobile);
+            user = getUserByMobile(user);
+            if(user ==null){
+                return ResponseFactory.businessError("手机号未注册");
+            }
+
             //AES解密
             String password = AESUtils.decrypt(pwd, aesKey);
             if (password == null || "".equals(password)) {
-                return ResponseFactory.businessError("密码修改失败");
+                return ResponseFactory.businessError("重置密码解密失败");
             }
-            String content = userId + password + MD5_KEY;
+            String content = mobile + password + MD5_KEY;
             user.setPassword(MD5Utils.digestAsHex(content));
             user.setUpdateDate(new Date());
             int cnt = updateByPrimaryKeySelective(user);
             if (cnt > 0) {
                 return ResponseFactory.success(null);
             } else {
-                return ResponseFactory.businessError("密码修改失败");
+                return ResponseFactory.businessError("重置密码失败");
             }
         } catch (Exception e) {
-            logger.error("密码修改失败", e);
-            return ResponseFactory.businessError("密码修改失败");
+            logger.error("重置密码失败", e);
+            return ResponseFactory.businessError("重置密码失败");
         }
 
     }
@@ -401,13 +412,17 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
     }
 
     /**
-     * 检查手机号重复注册
+     * 根据手机号查询用户
      *
      * @param user
      * @return
      */
-    private User checkDuplicateMobile(User user) {
+    private User getUserByMobile(User user) {
         return selectByRecord(user);
     }
 
+    public static void main(String[] args) throws Exception{
+        String content = 8 + "123456" + MD5_KEY;
+        System.out.println(MD5Utils.digestAsHex(content));
+    }
 }

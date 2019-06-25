@@ -65,7 +65,7 @@
 ###### 请求参数
 > |参数|必选|类型|说明|
 |:-----  |:-------|:-----|-----|
-|userId      |true    |long  | 用户id|
+|mobile      |true    |string  | 手机号       |
 |pwd      |true    |string  | 密码(AES128) |
 |sign       |true    |string   |签名|
 

@@ -49,14 +49,13 @@ public class UserController extends BaseController {
     /**
      * 用户重置密码接口
      *
-     * @param request
+     * @param mobile
+     * @param pwd
      * @return
      */
     @RequestMapping(value = "/reset", method = RequestMethod.POST)
-    public ResponseData reset(HttpServletRequest request) {
-        String userId = request.getParameter("userId");
-        String pwd = request.getParameter("pwd");
-        return userService.reset(userId, pwd);
+    public ResponseData reset(String mobile,String pwd, String captcha) {
+        return userService.reset(mobile, pwd,captcha);
     }
 
     /**
