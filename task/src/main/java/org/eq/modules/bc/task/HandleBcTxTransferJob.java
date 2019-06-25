@@ -55,7 +55,7 @@ public class HandleBcTxTransferJob {
     @Autowired
     private InitiatorAccMapper initiatorAccMapper;
 
-	@Scheduled(cron = "* 0/1 * * * ?")
+	@Scheduled(cron = "0 0/2 * * * ?")
 	public void execute(){
 		//是否设置keyStore密码
 		boolean keyStorePwdFlag = Tools.isNull(KeyStoreManager.getKeyStorePwd());
@@ -116,19 +116,14 @@ public class HandleBcTxTransferJob {
 			}
 			//资产的精度，暂时用不到
 			//Integer assetDecimal = bcTxRecord.getAssetDecimal();
-			String assetCode = bcTxRecord.getTicketid();
 			String assetIssuer= bcTxRecord.getAssetIssuer();
 			String fromAddress = bcTxRecord.getFromAddress();
 			fromAddressList.add(fromAddress);
 			userSingerSet.add(fromAddress);
 
-			long bcAmount;
+			long bcAmount = 0;
 			if(bcTxRecord.getBizType().equals(BcAccountTypeEnum.ACTIVITY.getCode())){
-				bcAmount = DecimalCalculateUtil.numberMultiply10Pow4Long(bcTxRecord.getTransferAmount()+"", 2);//资产数量
-				//1000000 = 0.01bu
-				bcAmount = bcAmount * 100000000 /100;
-			}else{
-				bcAmount = Long.parseLong(bcTxRecord.getTransferAmount());
+				bcAmount = DecimalCalculateUtil.numberMultiply10Pow4Long(bcTxRecord.getTransferAmount()+"", 8);//资产数量
 			}
 
 			BcTransferReq bcTransferReq = new BcTransferReq();
@@ -136,8 +131,9 @@ public class HandleBcTxTransferJob {
 			bcTransferReq.setFromAddress(fromAddress);
 			bcTransferReq.setToAddress(bcTxRecord.getToAddress());
 			bcTransferReq.setIssuer(assetIssuer);
-			bcTransferReq.setCode(assetCode);
 			bcTransferReq.setMetadata(bcTxRecord.getOptMetadata());
+			bcTransferReq.setInput(bcTxRecord.getInput());
+			bcTransferReq.setTxType(bcTxRecord.getTxType());
 			batchTransferList.add(bcTransferReq);
 		}
 		//提交人地址
@@ -236,9 +232,9 @@ public class HandleBcTxTransferJob {
 	}
 
 	public static void main(String[] args) {
-		long bcAmount = DecimalCalculateUtil.numberMultiply10Pow4Long("0.01", 3);
-		System.out.println(bcAmount);
-		bcAmount = DecimalCalculateUtil.numberMultiply10Pow4Long("0.01", 3);
+		long bcAmount = DecimalCalculateUtil.numberMultiply10Pow4Long("0.01", 2);
+		System.out.println(bcAmount * 100000000 /100);
+		bcAmount = DecimalCalculateUtil.numberMultiply10Pow4Long("0.01", 8);
 		System.out.println(bcAmount);
 	}
 }

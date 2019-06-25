@@ -168,7 +168,7 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 			reult.setErrMsg("用户无此商品");
 			return reult;
 		}
-		productAll.setNumber(userProductStock.getStockNum());
+		productAll.setNumber(userProductStock.getStockNum()+userProductStock.getLockedNum());
 		productAll.setLockNumber(userProductStock.getLockedNum());
 		UserProductDetailVO userProductDetailVO = ProductUtil.transObjTOUserProductDetail(productList.get(0));
 		reult.setData(userProductDetailVO);

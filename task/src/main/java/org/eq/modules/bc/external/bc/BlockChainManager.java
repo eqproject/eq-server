@@ -70,79 +70,10 @@ public class BlockChainManager {
 		return blobData;
 	}
 	
-	/**
-	 * 获取转移资产交易Blob
-	 * @param bcTransferAsset
-	 * @return
-	 */
-	public BlobDataResp getTransferAssetBlob(BcTransferReq bcTransfer){
-		BlobDataResp blobData = null;
-		AssetSendOperation assetSendOperation = new AssetSendOperation();
-		assetSendOperation.setSourceAddress(bcTransfer.getFromAddress());
-		assetSendOperation.setDestAddress(bcTransfer.getToAddress());
-		assetSendOperation.setAmount(bcTransfer.getAmount());
-		assetSendOperation.setCode(bcTransfer.getCode());
-		assetSendOperation.setIssuer(bcTransfer.getIssuer());
-		
-        //获取交易nonce
-        long accNonce = getAccountNonce(bcTransfer.getFromAddress())+1;
-        TransactionBuildBlobRequest transactionBuildBlobRequest = new TransactionBuildBlobRequest();
-        transactionBuildBlobRequest.setSourceAddress(bcTransfer.getFromAddress());
-        transactionBuildBlobRequest.setNonce(accNonce);
-        transactionBuildBlobRequest.setFeeLimit(bcTransfer.getFee());
-        transactionBuildBlobRequest.setGasPrice(gasprice);
-        transactionBuildBlobRequest.setMetadata(bcTransfer.getMetadata());
-        
-        //转移BU
-        transactionBuildBlobRequest.addOperation(assetSendOperation);
-        
-  		
-        // 获取交易BLob串
-        TransactionService transactionService = new TransactionServiceImpl();
-        TransactionBuildBlobResponse transactionBuildBlobResponse = transactionService.buildBlob(transactionBuildBlobRequest);
-        if(transactionBuildBlobResponse.getErrorCode()==StatusEnum.SUCCESS.getCode()){
-        	TransactionBuildBlobResult transactionBuildBlobResult = transactionBuildBlobResponse.getResult();
-        	blobData = new BlobDataResp();
-            blobData.setBlob(transactionBuildBlobResult.getTransactionBlob());
-            blobData.setHash(transactionBuildBlobResult.getHash());
-        }
-		return blobData;
-	}
-	
-	public BlobDataResp getTransferAssetBlob4Activated(BcTransferReq bcTransfer){
-		BlobDataResp blobData = null;
-		AssetSendOperation assetSendOperation = new AssetSendOperation();
-		assetSendOperation.setSourceAddress(bcTransfer.getFromAddress());
-		assetSendOperation.setDestAddress(bcTransfer.getToAddress());
-		assetSendOperation.setAmount(bcTransfer.getAmount());
-		assetSendOperation.setCode(bcTransfer.getCode());
-		assetSendOperation.setIssuer(bcTransfer.getIssuer());
-		
-        //获取交易nonce
-        long accNonce = getAccountNonce(bcTransfer.getFromAddress())+1;
-        TransactionBuildBlobRequest transactionBuildBlobRequest = new TransactionBuildBlobRequest();
-        transactionBuildBlobRequest.setSourceAddress(bcTransfer.getFromAddress());
-        transactionBuildBlobRequest.setNonce(accNonce);
-        transactionBuildBlobRequest.setFeeLimit(bcTransfer.getFee());
-        transactionBuildBlobRequest.setGasPrice(gasprice);
-        transactionBuildBlobRequest.setMetadata(bcTransfer.getMetadata());
-        //转移TOKEN
-        transactionBuildBlobRequest.addOperation(assetSendOperation);
-        // 获取交易BLob串
-        TransactionService transactionService = new TransactionServiceImpl();
-        TransactionBuildBlobResponse transactionBuildBlobResponse = transactionService.buildBlob(transactionBuildBlobRequest);
-        if(transactionBuildBlobResponse.getErrorCode()==StatusEnum.SUCCESS.getCode()){
-        	TransactionBuildBlobResult transactionBuildBlobResult = transactionBuildBlobResponse.getResult();
-        	blobData = new BlobDataResp();
-            blobData.setBlob(transactionBuildBlobResult.getTransactionBlob());
-            blobData.setHash(transactionBuildBlobResult.getHash());
-        }
-		return blobData;
-	}
-	
+
 	/**
 	 * 提交交易
-	 * @param transactionSubmitRequest
+	 * @param transactionSubmit
 	 * @throws Exception
 	 */
 	public TransactionSubmitResponse submitTx(TransactionSubmitRequest transactionSubmit) throws Exception{
@@ -277,7 +208,6 @@ public class BlockChainManager {
 				assetSendOperation.setSourceAddress(bcTransfer.getFromAddress());
 				assetSendOperation.setDestAddress(bcTransfer.getToAddress());
 				assetSendOperation.setAmount(bcTransfer.getAmount());
-				assetSendOperation.setCode(bcTransfer.getCode());
 				assetSendOperation.setIssuer(bcTransfer.getIssuer());
 				assetSendOperation.setMetadata(bcTransfer.getMetadata());
 				transactionBuildBlobRequest.addOperation(assetSendOperation);

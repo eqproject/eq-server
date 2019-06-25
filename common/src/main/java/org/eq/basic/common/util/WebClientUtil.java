@@ -100,13 +100,13 @@ public class WebClientUtil {
             JSONObject obj  = new JSONObject();
             obj.put("appId","FC21g7bs1R6N2FZ3");
             obj.put("appKey","n17kLF3EsghE9Vj+P+PZNqNgHPS1tNLIlNVoQNmW2FKS8zOu2W54lg==");
-            String result =  synchPostForPayload("http://dev-api-explore.bumotest.io/auth/accessToken",obj);
+            String result =  synchPostForPayload("http://dev-api-explore.bumocdn.com/auth/accessToken",obj);
             System.out.println(result);
             JSONObject obj2  = new JSONObject();
             obj2.put("pageSize",10);
             obj2.put("accessToken","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6IkZDMjFnN2JzMVI2TjJGWjMiLCJpc3MiOiJidW1vIiwiZXhwIjoxNTYxMDA5NDE1fQ.PjwJumGv1zXsfHBq7RMGdSY5J2b5a4jTL60SrpJU4lk");
             obj2.put("start",1);
-            String result2 =  synchPostForPayload("http://dev-api-explore.bumotest.io/voucher/v1/list",obj2);
+            String result2 =  synchPostForPayload("http://dev-api-explore.bumocdn.com/voucher/v1/list",obj2);
             System.out.println(result2);
 
         }catch (Exception e){

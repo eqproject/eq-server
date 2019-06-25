@@ -17,6 +17,7 @@ import org.eq.modules.auth.exception.UserNotExistsException;
 import org.eq.modules.auth.service.UserService;
 import org.eq.modules.bc.dao.BcTxRecordMapper;
 import org.eq.modules.bc.entity.BcTxRecord;
+import org.eq.modules.business.BcTxRecordInput;
 import org.eq.modules.common.cache.ProductCache;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.ResponseData;
@@ -243,8 +244,8 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 				result.setErrMsg("用户无此商品库存信息");
 				return result;
 			}
-			int balance = userProductStock.getStockNum() - userProductStock.getLockedNum();
-			if((balance-orderTradeCreateReqVO.getOrderNum())<=0){
+			int balance = userProductStock.getStockNum();
+			if((balance-orderTradeCreateReqVO.getOrderNum())<0){
 				result.setErrMsg("可售卖量不足");
 				return result;
 			}
@@ -976,40 +977,26 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
      * @param bizType
      * @return
      */
-	private BcTxRecord insertBx(ProductAll productAll,String fromAddress,String toAddress,int number,int bizType){
+	public BcTxRecord insertBx(ProductAll productAll,String fromAddress,String toAddress,int number,int bizType){
 		BcTxRecord bcTxRecord = new BcTxRecord();
 		bcTxRecord.setFromAddress(fromAddress);
-		bcTxRecord.setToAddress(toAddress);
-		bcTxRecord.setTransferAmount(String.valueOf(number));
-		bcTxRecord.setTicketid(productAll.getTicketid());
-		bcTxRecord.setTrancheid(productAll.getTrancheid());
-		bcTxRecord.setAssetCode(productAll.getAssetCode());
+		bcTxRecord.setToAddress(productAll.getContractAddress());
+		bcTxRecord.setTransferAmount("0");
 		bcTxRecord.setAssetIssuer(productAll.getIssuerAddress());
-		bcTxRecord.setContractAddress(productAll.getContractAddress());
 		bcTxRecord.setAssetType(1);
 		bcTxRecord.setTxStatus(0);
 		bcTxRecord.setBizType(bizType);
 		bcTxRecord.setCreateTime(new Date());
 		bcTxRecord.setUpdateTime(new Date());
 		bcTxRecord.setOptMetadata("用户地址:"+fromAddress+" 转往"+toAddress);
-		bcTxRecord.setBizType(BcTxTypeEnum.CONTRACT.getCode());
-		bcTxRecord.setInput(buildTranserParam(bcTxRecord));
-		bcTxRecord.setContractAddress(productAll.getContractAddress());
+        bcTxRecord.setTxType(BcTxTypeEnum.CONTRACT.getCode());
+
+        bcTxRecord.setInput(BcTxRecordInput.build(productAll,toAddress,number));
 		bcTxRecordMapper.insertSelective(bcTxRecord);
 		return bcTxRecord;
 	}
 
-	private String buildTranserParam(BcTxRecord bcTxRecord){
-		JSONObject input = new JSONObject();
-		input.put("method", "transfer");
-		JSONObject params = new JSONObject();
-		params.put("skuId", bcTxRecord.getTicketid());
-		params.put("trancheId", bcTxRecord.getTrancheid());
-		params.put("to", bcTxRecord.getToAddress());
-		params.put("value", bcTxRecord.getTransferAmount());
-		input.put("params", params);
-		return input.toJSONString();
-	}
+
 
 	/**
 	 * 插入交易流水表数据

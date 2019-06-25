@@ -177,6 +177,11 @@ public class OrderAdExample {
             return (Criteria) this;
         }
 
+        public Criteria andProductNumHavedEqualToForAll() {
+            addCriterion("((OA.product_num - OA.trading_num -  OA.traded_num) >0 )");
+            return (Criteria) this;
+        }
+
         public Criteria andTradingNumEqualToForUpdate(Integer value) {
             addCriterion("trading_num =", value, "tradingNum");
             return (Criteria) this;

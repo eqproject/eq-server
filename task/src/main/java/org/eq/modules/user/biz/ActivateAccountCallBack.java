@@ -1,4 +1,4 @@
-package org.eq.modules.bc.task;
+package org.eq.modules.user.biz;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.eq.modules.bc.enums.BcTxRecordBizTypeEnum;

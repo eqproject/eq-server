@@ -10,7 +10,6 @@ public class BcTransferReq {
 	private Long amount;
 	private Long fee;
 	private String metadata;
-	private String code;
 	private String issuer;
 	private int txType;
 	private String input;

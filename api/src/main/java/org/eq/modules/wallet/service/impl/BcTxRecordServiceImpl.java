@@ -11,7 +11,6 @@ import org.eq.modules.bc.dao.BcTxRecordMapper;
 import org.eq.modules.bc.entity.BcTxRecord;
 import org.eq.modules.bc.entity.BcTxRecordExample;
 import org.eq.modules.wallet.service.BcTxRecordService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,11 +25,6 @@ import java.util.Map;
 @Transactional
 @AutowiredService
 public class BcTxRecordServiceImpl extends ServiceImplExtend<BcTxRecordMapper, BcTxRecord, BcTxRecordExample> implements BcTxRecordService {
-
-	@Autowired
-	public BcTxRecordServiceImpl(BcTxRecordMapper mapper){
-		super.setMapper(mapper);
-	}
 
 	@Override
 	public BcTxRecordExample getExampleFromEntity(BcTxRecord bcTxRecord, Map<String, Object> params) {
@@ -62,14 +56,8 @@ public class BcTxRecordServiceImpl extends ServiceImplExtend<BcTxRecordMapper, B
 		if(StringLowUtils.isNotBlank(bcTxRecord.getTransferAmount())){
 			ca.andTransferAmountEqualTo(bcTxRecord.getTransferAmount());
 		}
-		if(StringLowUtils.isNotBlank(bcTxRecord.getAssetCode())){
-			ca.andAssetCodeEqualTo(bcTxRecord.getAssetCode());
-		}
 		if(StringLowUtils.isNotBlank(bcTxRecord.getAssetIssuer())){
 			ca.andAssetIssuerEqualTo(bcTxRecord.getAssetIssuer());
-		}
-		if(StringLowUtils.isNotBlank(bcTxRecord.getContractAddress())){
-			ca.andContractAddressEqualTo(bcTxRecord.getContractAddress());
 		}
 		if(bcTxRecord.getAssetType()!=null){
 			ca.andAssetTypeEqualTo(bcTxRecord.getAssetType());
@@ -91,6 +79,12 @@ public class BcTxRecordServiceImpl extends ServiceImplExtend<BcTxRecordMapper, B
 		}
 		if(StringLowUtils.isNotBlank(bcTxRecord.getOptMetadata())){
 			ca.andOptMetadataEqualTo(bcTxRecord.getOptMetadata());
+		}
+		if(StringLowUtils.isNotBlank(bcTxRecord.getInput())){
+			ca.andInputEqualTo(bcTxRecord.getInput());
+		}
+		if(bcTxRecord.getTxType()!=null){
+			ca.andTxTypeEqualTo(bcTxRecord.getTxType());
 		}
 		return example;
 	}

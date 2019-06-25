@@ -119,6 +119,7 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		List<Integer> states = new ArrayList<>();
 		states.add(OrderAdStateEnum.ORDER_TRADEING.getState());
 		ca.andStatusInForAll(states);
+		ca.andProductNumHavedEqualToForAll();
 		example.setOrderByClause("sort desc");
 		return example;
 	}
@@ -191,8 +192,8 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 			result.setErrMsg("此商品无效");
 			return result;
 		}
-		int balance = userProductStock.getStockNum() - userProductStock.getLockedNum();
-		if((balance-searchAdOrderVO.getNumber())<=0){
+		int balance = userProductStock.getStockNum();
+		if((balance-searchAdOrderVO.getNumber())<0){
 			result.setErrMsg("可售卖量不足");
 			return result;
 		}
@@ -444,7 +445,8 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		orderAd.setTradingNum(0);
 		orderAd.setTradedNum(0);
 		orderAd.setType(OrderAdTypeEnum.ORDER_BUY.getType());
-		orderAd.setStatus(OrderAdStateEnum.ORDER_DEFAULT.getState());
+		//orderAd.setStatus(OrderAdStateEnum.ORDER_DEFAULT.getState());
+		orderAd.setStatus(OrderAdStateEnum.ORDER_TRADEING.getState());
 		orderAd.setPrice(searchAdOrderVO.getPrice());
 		orderAd.setAmount(orderAd.getProductNum()*orderAd.getPrice());
 		orderAd.setCreateDate(new Date());
