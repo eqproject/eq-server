@@ -1112,4 +1112,15 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
     }
 
 
+	public static void main(String[] args) {
+		JSONObject input = new JSONObject();
+		input.put("method", "transfer");
+		JSONObject params = new JSONObject();
+		params.put("skuId", "676392a18d4b42e790f46f3d6f044ac8");
+		params.put("trancheId", "14a18fa29e3449e4aee6e22cfa4f1e89");
+		params.put("to", "buQqicwV6TDPGR6YSjKjxZt3wFrQ4paA3HKL");
+		params.put("value", "1");
+		input.put("params", params);
+		System.out.println(input.toJSONString());
+	}
 }
