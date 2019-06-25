@@ -3,24 +3,19 @@
 <mapper namespace="org.eq.modules.bc.dao.BcTxRecordMapper">
     <resultMap id="BaseResultMap" type="org.eq.modules.bc.entity.BcTxRecord">
         <id column="id" jdbcType="BIGINT" property="id" />
-        <result column="asset_code" jdbcType="VARCHAR" property="assetCode" />
+        <result column="from_address" jdbcType="VARCHAR" property="fromAddress" />
+        <result column="to_address" jdbcType="VARCHAR" property="toAddress" />
+        <result column="transfer_amount" jdbcType="VARCHAR" property="transferAmount" />
         <result column="asset_issuer" jdbcType="VARCHAR" property="assetIssuer" />
         <result column="asset_type" jdbcType="TINYINT" property="assetType" />
+        <result column="tx_status" jdbcType="TINYINT" property="txStatus" />
+        <result column="tx_hash" jdbcType="VARCHAR" property="txHash" />
         <result column="biz_type" jdbcType="TINYINT" property="bizType" />
-        <result column="contract_address" jdbcType="VARCHAR" property="contractAddress" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-        <result column="from_address" jdbcType="VARCHAR" property="fromAddress" />
-	    <result column="opt_metadata" jdbcType="VARCHAR" property="optMetadata" />
-	    <result column="ticketId" jdbcType="VARCHAR" property="ticketid" />
-	    <result column="to_address" jdbcType="VARCHAR" property="toAddress" />
-	    <result column="trancheId" jdbcType="VARCHAR" property="trancheid" />
-	    <result column="transfer_amount" jdbcType="VARCHAR" property="transferAmount" />
-	    <result column="tx_hash" jdbcType="VARCHAR" property="txHash" />
-	    <result column="tx_status" jdbcType="TINYINT" property="txStatus" />
-	    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-
-        <result column="tx_type" jdbcType="TINYINT" property="txType" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="opt_metadata" jdbcType="VARCHAR" property="optMetadata" />
         <result column="input" jdbcType="VARCHAR" property="input" />
+        <result column="tx_type" jdbcType="TINYINT" property="txType" />
     </resultMap>
 
     <sql id="Example_Where_Clause">
@@ -84,7 +79,7 @@
     </sql>
 
     <sql id="Base_Column_List">
-        asset_code,asset_issuer,asset_type,biz_type,contract_address,create_time,from_address,id,opt_metadata,ticketId,to_address,trancheId,transfer_amount,tx_hash,tx_status,update_time,tx_type,input
+        id,from_address,to_address,transfer_amount,asset_issuer,asset_type,tx_status,tx_hash,biz_type,create_time,update_time,opt_metadata,input,tx_type
     </sql>
 
     <select id="selectByExample" parameterType="org.eq.modules.bc.entity.BcTxRecordExample" resultMap="BaseResultMap">
@@ -122,90 +117,57 @@
     </delete>
 
     <insert id="insert" parameterType="org.eq.modules.bc.entity.BcTxRecord">
-
-        insert into bc_tx_record (asset_code,asset_issuer,asset_type,biz_type,contract_address,create_time,from_address,opt_metadata,ticketId,to_address,trancheId,transfer_amount,tx_hash,tx_status,update_time)
+        insert into bc_tx_record (from_address,to_address,transfer_amount,asset_issuer,asset_type,tx_status,tx_hash,biz_type,create_time,update_time,opt_metadata,input,tx_type)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            #{assetCode,jdbcType=VARCHAR},
+            #{fromAddress,jdbcType=VARCHAR},
+            #{toAddress,jdbcType=VARCHAR},
+            #{transferAmount,jdbcType=VARCHAR},
             #{assetIssuer,jdbcType=VARCHAR},
             #{assetType,jdbcType=TINYINT},
-            #{bizType,jdbcType=TINYINT},
-            #{contractAddress,jdbcType=VARCHAR},
-            #{createTime,jdbcType=TIMESTAMP},
-            #{fromAddress,jdbcType=VARCHAR},
-            #{optMetadata,jdbcType=VARCHAR},
-            #{ticketid,jdbcType=VARCHAR},
-            #{toAddress,jdbcType=VARCHAR},
-            #{trancheid,jdbcType=VARCHAR},
-            #{transferAmount,jdbcType=VARCHAR},
-            #{txHash,jdbcType=VARCHAR},
             #{txStatus,jdbcType=TINYINT},
+            #{txHash,jdbcType=VARCHAR},
+            #{bizType,jdbcType=TINYINT},
+            #{createTime,jdbcType=TIMESTAMP},
             #{updateTime,jdbcType=TIMESTAMP},
+            #{optMetadata,jdbcType=VARCHAR},
+            #{input,jdbcType=VARCHAR},
+            #{txType,jdbcType=TINYINT},
         </trim>
     </insert>
 
-    <insert id="insertReturnId" parameterType="org.eq.modules.bc.entity.BcTxRecord" useGeneratedKeys="true" keyProperty="id">
-        insert into bc_tx_record (asset_code,asset_issuer,asset_type,biz_type,contract_address,create_time,from_address,opt_metadata,ticketId,to_address,trancheId,transfer_amount,tx_hash,tx_status,update_time)
-        values
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            #{assetCode,jdbcType=VARCHAR},
-            #{assetIssuer,jdbcType=VARCHAR},
-            #{assetType,jdbcType=TINYINT},
-            #{bizType,jdbcType=TINYINT},
-            #{contractAddress,jdbcType=VARCHAR},
-            #{createTime,jdbcType=TIMESTAMP},
-            #{fromAddress,jdbcType=VARCHAR},
-            #{optMetadata,jdbcType=VARCHAR},
-            #{ticketid,jdbcType=VARCHAR},
-            #{toAddress,jdbcType=VARCHAR},
-            #{trancheid,jdbcType=VARCHAR},
-            #{transferAmount,jdbcType=VARCHAR},
-            #{txHash,jdbcType=VARCHAR},
-            #{txStatus,jdbcType=TINYINT},
-            #{updateTime,jdbcType=TIMESTAMP},
-        </trim>
-    </insert>
-
-    <insert id="insertSelective" parameterType="org.eq.modules.bc.entity.BcTxRecord" useGeneratedKeys="true" keyProperty="id">
-
+    <insert id="insertSelective" parameterType="org.eq.modules.bc.entity.BcTxRecord">
         insert into bc_tx_record
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            asset_code,
+            from_address,
+            to_address,
+            transfer_amount,
             asset_issuer,
             asset_type,
-            biz_type,
-            contract_address,
-            create_time,
-            from_address,
-            opt_metadata,
-            ticketId,
-            to_address,
-            trancheId,
-            transfer_amount,
-            tx_hash,
             tx_status,
+            tx_hash,
+            biz_type,
+            create_time,
             update_time,
+            opt_metadata,
+            input,
+            tx_type,
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            #{assetCode,jdbcType=VARCHAR},
+            #{fromAddress,jdbcType=VARCHAR},
+            #{toAddress,jdbcType=VARCHAR},
+            #{transferAmount,jdbcType=VARCHAR},
             #{assetIssuer,jdbcType=VARCHAR},
             #{assetType,jdbcType=TINYINT},
-            #{bizType,jdbcType=TINYINT},
-            #{contractAddress,jdbcType=VARCHAR},
-            #{createTime,jdbcType=TIMESTAMP},
-            #{fromAddress,jdbcType=VARCHAR},
-            #{optMetadata,jdbcType=VARCHAR},
-            #{ticketid,jdbcType=VARCHAR},
-            #{toAddress,jdbcType=VARCHAR},
-            #{trancheid,jdbcType=VARCHAR},
-            #{transferAmount,jdbcType=VARCHAR},
-            #{txHash,jdbcType=VARCHAR},
             #{txStatus,jdbcType=TINYINT},
+            #{txHash,jdbcType=VARCHAR},
+            #{bizType,jdbcType=TINYINT},
+            #{createTime,jdbcType=TIMESTAMP},
             #{updateTime,jdbcType=TIMESTAMP},
+            #{optMetadata,jdbcType=VARCHAR},
+            #{input,jdbcType=VARCHAR},
+            #{txType,jdbcType=TINYINT},
         </trim>
-        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
-            SELECT LAST_INSERT_ID()
-        </selectKey>
     </insert>
 
     <select id="countByExample" parameterType="org.eq.modules.bc.entity.BcTxRecordExample" resultType="java.lang.Long">
@@ -218,8 +180,17 @@
     <update id="updateByExampleSelective" parameterType="map">
         update bc_tx_record
         <set>
-            <if test="record.assetCode != null">
-                asset_code = #{record.assetCode,jdbcType=VARCHAR},
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.fromAddress != null">
+                from_address = #{record.fromAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="record.toAddress != null">
+                to_address = #{record.toAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="record.transferAmount != null">
+                transfer_amount = #{record.transferAmount,jdbcType=VARCHAR},
             </if>
             <if test="record.assetIssuer != null">
                 asset_issuer = #{record.assetIssuer,jdbcType=VARCHAR},
@@ -227,44 +198,29 @@
             <if test="record.assetType != null">
                 asset_type = #{record.assetType,jdbcType=TINYINT},
             </if>
-            <if test="record.bizType != null">
-                biz_type = #{record.bizType,jdbcType=TINYINT},
-            </if>
-            <if test="record.contractAddress != null">
-                contract_address = #{record.contractAddress,jdbcType=VARCHAR},
-            </if>
-            <if test="record.createTime != null">
-                create_time = #{record.createTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="record.fromAddress != null">
-                from_address = #{record.fromAddress,jdbcType=VARCHAR},
-            </if>
-            <if test="record.id != null">
-                id = #{record.id,jdbcType=BIGINT},
-            </if>
-            <if test="record.optMetadata != null">
-                opt_metadata = #{record.optMetadata,jdbcType=VARCHAR},
-            </if>
-            <if test="record.ticketid != null">
-                ticketId = #{record.ticketid,jdbcType=VARCHAR},
-            </if>
-            <if test="record.toAddress != null">
-                to_address = #{record.toAddress,jdbcType=VARCHAR},
-            </if>
-            <if test="record.trancheid != null">
-                trancheId = #{record.trancheid,jdbcType=VARCHAR},
-            </if>
-            <if test="record.transferAmount != null">
-                transfer_amount = #{record.transferAmount,jdbcType=VARCHAR},
+            <if test="record.txStatus != null">
+                tx_status = #{record.txStatus,jdbcType=TINYINT},
             </if>
             <if test="record.txHash != null">
                 tx_hash = #{record.txHash,jdbcType=VARCHAR},
             </if>
-            <if test="record.txStatus != null">
-                tx_status = #{record.txStatus,jdbcType=TINYINT},
+            <if test="record.bizType != null">
+                biz_type = #{record.bizType,jdbcType=TINYINT},
+            </if>
+            <if test="record.createTime != null">
+                create_time = #{record.createTime,jdbcType=TIMESTAMP},
             </if>
             <if test="record.updateTime != null">
                 update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.optMetadata != null">
+                opt_metadata = #{record.optMetadata,jdbcType=VARCHAR},
+            </if>
+            <if test="record.input != null">
+                input = #{record.input,jdbcType=VARCHAR},
+            </if>
+            <if test="record.txType != null">
+                tx_type = #{record.txType,jdbcType=TINYINT},
             </if>
         </set>
         <if test="_parameter != null">
@@ -276,22 +232,20 @@
         update bc_tx_record
         set
         <trim  suffixOverrides=",">
-            asset_code = #{record.assetCode,jdbcType=VARCHAR},
+            id = #{record.id,jdbcType=BIGINT},
+            from_address = #{record.fromAddress,jdbcType=VARCHAR},
+            to_address = #{record.toAddress,jdbcType=VARCHAR},
+            transfer_amount = #{record.transferAmount,jdbcType=VARCHAR},
             asset_issuer = #{record.assetIssuer,jdbcType=VARCHAR},
             asset_type = #{record.assetType,jdbcType=TINYINT},
-            biz_type = #{record.bizType,jdbcType=TINYINT},
-            contract_address = #{record.contractAddress,jdbcType=VARCHAR},
-            create_time = #{record.createTime,jdbcType=TIMESTAMP},
-            from_address = #{record.fromAddress,jdbcType=VARCHAR},
-            id = #{record.id,jdbcType=BIGINT},
-            opt_metadata = #{record.optMetadata,jdbcType=VARCHAR},
-            ticketId = #{record.ticketid,jdbcType=VARCHAR},
-            to_address = #{record.toAddress,jdbcType=VARCHAR},
-            trancheId = #{record.trancheid,jdbcType=VARCHAR},
-            transfer_amount = #{record.transferAmount,jdbcType=VARCHAR},
-            tx_hash = #{record.txHash,jdbcType=VARCHAR},
             tx_status = #{record.txStatus,jdbcType=TINYINT},
+            tx_hash = #{record.txHash,jdbcType=VARCHAR},
+            biz_type = #{record.bizType,jdbcType=TINYINT},
+            create_time = #{record.createTime,jdbcType=TIMESTAMP},
             update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+            opt_metadata = #{record.optMetadata,jdbcType=VARCHAR},
+            input = #{record.input,jdbcType=VARCHAR},
+            tx_type = #{record.txType,jdbcType=TINYINT},
         </trim>
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause" />
@@ -301,50 +255,44 @@
     <update id="updateByPrimaryKeySelective" parameterType="org.eq.modules.bc.entity.BcTxRecord">
         update bc_tx_record
         <set>
-            <if test="assetCode != null">
-            asset_code = #{assetCode,jdbcType=VARCHAR},
-            </if>
-            <if test="assetIssuer != null">
-            asset_issuer = #{assetIssuer,jdbcType=VARCHAR},
-            </if>
-            <if test="assetType != null">
-            asset_type = #{assetType,jdbcType=TINYINT},
-            </if>
-            <if test="bizType != null">
-            biz_type = #{bizType,jdbcType=TINYINT},
-            </if>
-            <if test="contractAddress != null">
-            contract_address = #{contractAddress,jdbcType=VARCHAR},
-            </if>
-            <if test="createTime != null">
-            create_time = #{createTime,jdbcType=TIMESTAMP},
-            </if>
             <if test="fromAddress != null">
-            from_address = #{fromAddress,jdbcType=VARCHAR},
-            </if>
-            <if test="optMetadata != null">
-            opt_metadata = #{optMetadata,jdbcType=VARCHAR},
-            </if>
-            <if test="ticketid != null">
-            ticketId = #{ticketid,jdbcType=VARCHAR},
+                from_address = #{fromAddress,jdbcType=VARCHAR},
             </if>
             <if test="toAddress != null">
-            to_address = #{toAddress,jdbcType=VARCHAR},
-            </if>
-            <if test="trancheid != null">
-            trancheId = #{trancheid,jdbcType=VARCHAR},
+                to_address = #{toAddress,jdbcType=VARCHAR},
             </if>
             <if test="transferAmount != null">
-            transfer_amount = #{transferAmount,jdbcType=VARCHAR},
+                transfer_amount = #{transferAmount,jdbcType=VARCHAR},
             </if>
-            <if test="txHash != null">
-            tx_hash = #{txHash,jdbcType=VARCHAR},
+            <if test="assetIssuer != null">
+                asset_issuer = #{assetIssuer,jdbcType=VARCHAR},
+            </if>
+            <if test="assetType != null">
+                asset_type = #{assetType,jdbcType=TINYINT},
             </if>
             <if test="txStatus != null">
-            tx_status = #{txStatus,jdbcType=TINYINT},
+                tx_status = #{txStatus,jdbcType=TINYINT},
+            </if>
+            <if test="txHash != null">
+                tx_hash = #{txHash,jdbcType=VARCHAR},
+            </if>
+            <if test="bizType != null">
+                biz_type = #{bizType,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
             </if>
             <if test="updateTime != null">
-            update_time = #{updateTime,jdbcType=TIMESTAMP},
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="optMetadata != null">
+                opt_metadata = #{optMetadata,jdbcType=VARCHAR},
+            </if>
+            <if test="input != null">
+                input = #{input,jdbcType=VARCHAR},
+            </if>
+            <if test="txType != null">
+                tx_type = #{txType,jdbcType=TINYINT},
             </if>
         </set>
         where id = #{id,jdbcType=BIGINT}
@@ -354,21 +302,19 @@
         update bc_tx_record
         set
         <trim  suffixOverrides=",">
-              asset_code = #{assetCode,jdbcType=VARCHAR},
-              asset_issuer = #{assetIssuer,jdbcType=VARCHAR},
-              asset_type = #{assetType,jdbcType=TINYINT},
-              biz_type = #{bizType,jdbcType=TINYINT},
-              contract_address = #{contractAddress,jdbcType=VARCHAR},
-              create_time = #{createTime,jdbcType=TIMESTAMP},
-              from_address = #{fromAddress,jdbcType=VARCHAR},
-              opt_metadata = #{optMetadata,jdbcType=VARCHAR},
-              ticketId = #{ticketid,jdbcType=VARCHAR},
-              to_address = #{toAddress,jdbcType=VARCHAR},
-              trancheId = #{trancheid,jdbcType=VARCHAR},
-              transfer_amount = #{transferAmount,jdbcType=VARCHAR},
-              tx_hash = #{txHash,jdbcType=VARCHAR},
-              tx_status = #{txStatus,jdbcType=TINYINT},
-              update_time = #{updateTime,jdbcType=TIMESTAMP},
+            from_address = #{fromAddress,jdbcType=VARCHAR},
+            to_address = #{toAddress,jdbcType=VARCHAR},
+            transfer_amount = #{transferAmount,jdbcType=VARCHAR},
+            asset_issuer = #{assetIssuer,jdbcType=VARCHAR},
+            asset_type = #{assetType,jdbcType=TINYINT},
+            tx_status = #{txStatus,jdbcType=TINYINT},
+            tx_hash = #{txHash,jdbcType=VARCHAR},
+            biz_type = #{bizType,jdbcType=TINYINT},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            update_time = #{updateTime,jdbcType=TIMESTAMP},
+            opt_metadata = #{optMetadata,jdbcType=VARCHAR},
+            input = #{input,jdbcType=VARCHAR},
+            tx_type = #{txType,jdbcType=TINYINT},
         </trim>
         where id = #{id,jdbcType=BIGINT}
     </update>

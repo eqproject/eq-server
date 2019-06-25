@@ -161,13 +161,9 @@ public class OrderTransferServiceImpl extends ServiceImplExtend<OrderTransferMap
 
 		BcTxRecord bcTxRecord = new BcTxRecord();
 		bcTxRecord.setFromAddress(userWallet.getAddress());
-        bcTxRecord.setToAddress(searchTransOrderVO.getAddress());
-        bcTxRecord.setTransferAmount(String.valueOf(searchTransOrderVO.getNumber()));
-        bcTxRecord.setTicketid(productAll.getTicketid());
-        bcTxRecord.setTrancheid(productAll.getTrancheid());
-        bcTxRecord.setAssetCode(productAll.getAssetCode());
+        bcTxRecord.setToAddress(productAll.getContractAddress());
+        bcTxRecord.setTransferAmount("0");
         bcTxRecord.setAssetIssuer(productAll.getAcceptAddress());
-        bcTxRecord.setContractAddress(productAll.getContractAddress());
         bcTxRecord.setAssetType(1);
         bcTxRecord.setTxStatus(0);
         bcTxRecord.setBizType(4);

@@ -242,13 +242,9 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
     private BcTxRecord insertBx(ProductBlockchain productBlockchain, String fromAddress, String toAddress, int number, int bizType){
         BcTxRecord bcTxRecord = new BcTxRecord();
         bcTxRecord.setFromAddress(fromAddress);
-        bcTxRecord.setToAddress(toAddress);
+        bcTxRecord.setToAddress(productBlockchain.getContractAddress());
         bcTxRecord.setTransferAmount(String.valueOf(number));
-        bcTxRecord.setTicketid(productBlockchain.getTicketid());
-        bcTxRecord.setTrancheid(productBlockchain.getTrancheid());
-        bcTxRecord.setAssetCode(productBlockchain.getAssetCode());
         bcTxRecord.setAssetIssuer(productBlockchain.getAssetIssuer());
-        bcTxRecord.setContractAddress(productBlockchain.getContractAddress());
         bcTxRecord.setAssetType(1);
         bcTxRecord.setTxStatus(0);
         bcTxRecord.setBizType(bizType);
