@@ -244,8 +244,8 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 				result.setErrMsg("用户无此商品库存信息");
 				return result;
 			}
-			int balance = userProductStock.getStockNum() - userProductStock.getLockedNum();
-			if((balance-orderTradeCreateReqVO.getOrderNum())<=0){
+			int balance = userProductStock.getStockNum();
+			if((balance-orderTradeCreateReqVO.getOrderNum())<0){
 				result.setErrMsg("可售卖量不足");
 				return result;
 			}

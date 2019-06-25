@@ -146,7 +146,7 @@ public class OrderTransferServiceImpl extends ServiceImplExtend<OrderTransferMap
 			result.setErrMsg("此商品无效");
 			return result;
 		}
-		int balance = userProductStock.getStockNum() - userProductStock.getLockedNum();
+		int balance = userProductStock.getStockNum();
 		if((balance-searchTransOrderVO.getNumber())<0){
 			result.setErrMsg("可转让库存不足");
 			return result;

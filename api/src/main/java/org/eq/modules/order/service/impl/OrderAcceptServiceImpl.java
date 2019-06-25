@@ -151,7 +151,7 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 			result.setErrMsg("此商品无效");
 			return result;
 		}
-		int balance = userProductStock.getStockNum() - userProductStock.getLockedNum();
+		int balance = userProductStock.getStockNum();
 		if((balance-searchAcceptOrderVO.getNumber())<=0){
 			result.setErrMsg("可承兑库存不足");
 			return result;
