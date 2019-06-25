@@ -119,6 +119,7 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 		List<Integer> states = new ArrayList<>();
 		states.add(OrderAdStateEnum.ORDER_TRADEING.getState());
 		ca.andStatusInForAll(states);
+		ca.andProductNumHavedEqualToForAll();
 		example.setOrderByClause("sort desc");
 		return example;
 	}
