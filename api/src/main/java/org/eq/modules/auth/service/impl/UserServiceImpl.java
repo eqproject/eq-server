@@ -2,6 +2,7 @@ package org.eq.modules.auth.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.StringLowUtils;
@@ -285,7 +286,6 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             user.setUpdateDate(new Date());
             int cnt = updateByPrimaryKeySelective(user);
             if (cnt > 0) {
-                clearCaptcha(mobile);
                 return ResponseFactory.success(user);
             } else {
                 return ResponseFactory.businessError("重置密码失败");
@@ -293,6 +293,10 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         } catch (Exception e) {
             logger.error("重置密码失败", e);
             return ResponseFactory.businessError("重置密码失败");
+        }finally {
+            if (StringUtils.isNotBlank(mobile)){
+                clearCaptcha(mobile);
+            }
         }
 
     }
