@@ -18,6 +18,19 @@ public interface ServiceExtend<Record, Example> extends BaseService<Record, Exam
     BaseTableData findDataTableByExampleForPage(Example example, Integer pageNum, Integer pageSize);
 
     /**
+     * 根据Example 进行复杂查询并按页码分页 返回dataList 所需数据,API 使用
+     *
+     * @param example
+     *            条件
+     * @param pageNum
+     *            页数
+     * @param pageSize
+     *            每页记录数
+     * @return
+     */
+    BaseTableData findDataListByExampleForPage(Example example, Integer pageNum, Integer pageSize);
+
+    /**
      * 根据Example 进行复杂查询并按页码分页 返回dataTable 所需数据
      *
      * @param record

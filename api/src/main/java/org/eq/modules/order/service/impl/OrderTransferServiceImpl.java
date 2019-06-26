@@ -204,7 +204,7 @@ public class OrderTransferServiceImpl extends ServiceImplExtend<OrderTransferMap
 		orderTransfer.setUserId(user.getId());
 		OrderTransferExample orderTransferExample = getExampleFromEntity(orderTransfer,null);
 
-		BaseTableData baseTableData = findDataTableByExampleForPage(orderTransferExample, searchPageTransVO.getPageNum(), searchPageTransVO.getPageSize());
+		BaseTableData baseTableData = findDataListByExampleForPage(orderTransferExample, searchPageTransVO.getPageNum(), searchPageTransVO.getPageSize());
 		if(baseTableData==null){
 			return result;
 		}

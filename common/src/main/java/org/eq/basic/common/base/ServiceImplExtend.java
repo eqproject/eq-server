@@ -24,6 +24,22 @@ public abstract class ServiceImplExtend<Mapper, Record, Example> extends BaseSer
         return baseTableData;
     }
 
+    /**
+     * API 分页使用
+     * @param example
+     *            条件
+     * @param pageNum
+     *            页数
+     * @param pageSize
+     *            每页记录数
+     * @return
+     */
+    @Override
+    public BaseTableData findDataListByExampleForPage(Example example, Integer pageNum, Integer pageSize) {
+        pageNum = (pageNum - 1) * pageSize;
+        return findDataTableByExampleForPage(example,pageNum,pageSize);
+    }
+
     @Override
     public int deleteVirtualByExample(Example example) {
 

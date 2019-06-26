@@ -106,7 +106,7 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 		if(searchPageProductVO.getPageNum()<=0){
 			searchPageProductVO.setPageNum(1);
 		}
-		BaseTableData baseTableData = findDataTableByExampleForPage(ProductUtil.getBaseEffectExample(), searchPageProductVO.getPageNum(), searchPageProductVO.getPageSize());
+		BaseTableData baseTableData = findDataListByExampleForPage(ProductUtil.getBaseEffectExample(), searchPageProductVO.getPageNum(), searchPageProductVO.getPageSize());
 		if(baseTableData==null || CollectionUtils.isEmpty(baseTableData.getData())){
 			return result;
 		}

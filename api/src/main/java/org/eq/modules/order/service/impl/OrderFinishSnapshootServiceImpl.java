@@ -86,7 +86,7 @@ public class OrderFinishSnapshootServiceImpl extends ServiceImplExtend<OrderFini
 		}
 		OrderFinishSnapshootExample orderFinishSnapshootExample =getExampleFromEntity(user.getId());
 
-		BaseTableData baseTableData = findDataTableByExampleForPage(orderFinishSnapshootExample, searchPageOrderFinishVO.getPageNum(), searchPageOrderFinishVO.getPageSize());
+		BaseTableData baseTableData = findDataListByExampleForPage(orderFinishSnapshootExample, searchPageOrderFinishVO.getPageNum(), searchPageOrderFinishVO.getPageSize());
 		if(baseTableData==null){
 			return result;
 		}

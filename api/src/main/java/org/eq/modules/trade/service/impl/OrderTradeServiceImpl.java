@@ -617,7 +617,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		ca.andStatusInForAll(OrderTradeStateEnum.getRunPay());
 		ca.andBuyUserIdEqualTo(orderTradeListReqVO.getUserId());
 
-		BaseTableData baseTableData = findDataTableByExampleForPage(orderTradeExample,orderTradeListReqVO.getPageNum(), orderTradeListReqVO.getPageSize());
+		BaseTableData baseTableData = findDataListByExampleForPage(orderTradeExample,orderTradeListReqVO.getPageNum(), orderTradeListReqVO.getPageSize());
 		if(baseTableData==null || CollectionUtils.isEmpty(baseTableData.getData())){
 			return result;
 		}
@@ -677,7 +677,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		ca.andBuyUserIdEqualTo(orderTradeListReqVO.getUserId());
 		ca.andNoWaitBuyUserIdForAll(orderTradeListReqVO.getUserId(),OrderTradeStateEnum.getRunPay());
 
-		BaseTableData baseTableData = findDataTableByExampleForPage(orderTradeExample,orderTradeListReqVO.getPageNum(), orderTradeListReqVO.getPageSize());
+		BaseTableData baseTableData = findDataListByExampleForPage(orderTradeExample,orderTradeListReqVO.getPageNum(), orderTradeListReqVO.getPageSize());
 		if(baseTableData==null || CollectionUtils.isEmpty(baseTableData.getData())){
 			return result;
 		}

@@ -211,7 +211,7 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 		orderAccept.setStatus(OrderAcceptStateEnum.ACCEPT_PADDING.getState());
 		OrderAcceptExample orderAcceptExample = getExampleFromEntity(orderAccept,null);
 
-		BaseTableData baseTableData = findDataTableByExampleForPage(orderAcceptExample, searchsPageAcceptVO.getPageNum(), searchsPageAcceptVO.getPageSize());
+		BaseTableData baseTableData = findDataListByExampleForPage(orderAcceptExample, searchsPageAcceptVO.getPageNum(), searchsPageAcceptVO.getPageSize());
 		if(baseTableData==null){
 			return result;
 		}
@@ -258,7 +258,7 @@ public class OrderAcceptServiceImpl extends ServiceImplExtend<OrderAcceptMapper,
 
 		List<OverdueVO> dataList = new ArrayList<>();
 
-		BaseTableData baseTableData = findDataTableByExampleForPage(orderAcceptExample, searchsPageAcceptVO.getPageNum(), searchsPageAcceptVO.getPageSize());
+		BaseTableData baseTableData = findDataListByExampleForPage(orderAcceptExample, searchsPageAcceptVO.getPageNum(), searchsPageAcceptVO.getPageSize());
 		if(baseTableData!=null && !CollectionUtils.isEmpty(baseTableData.getData())){
 			List<OrderAccept> pList = baseTableData.getData();
 			for(OrderAccept p : pList){
