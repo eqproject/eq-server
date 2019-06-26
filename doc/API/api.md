@@ -67,6 +67,7 @@
 |:-----  |:-------|:-----|-----|
 |mobile      |true    |string  | 手机号       |
 |captcha     |true    |string  | 验证码      |
+|userId     |true    |long  | 用户Id,使用userId时，不需要传手机号和验证码   |
 |pwd      |true    |string  | 密码(AES128) |
 |sign       |true    |string   |签名|
 
@@ -76,7 +77,7 @@
 |status   |int    |返回结果状态。200：正常；302：错误。   |
 |errMsg   |string    |错误描述   |
 |data   |object    |  数据 |
-|-userId |long|用户ID|
+|-user |Object|用户信息|
 
 ###### 接口示例
 
@@ -149,7 +150,7 @@
 ###### 请求参数
 > |参数|必选|类型|说明|
 |:-----  |:-------|:-----|-----|
-|mobile      |true    |string  | 用户id|
+|mobile      |true    |string  | 手机号|
 |pwd      |true    |string  | 密码(AES128) |
 |sign       |true    |string   |签名|
 

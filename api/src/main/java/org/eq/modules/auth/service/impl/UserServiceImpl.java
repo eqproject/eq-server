@@ -161,12 +161,13 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         }
 
         // 1.添加用户
-        User user = new User();
-        user.setMobile(mobile);
         //检查是否已注册
-        User checkUser = getUserByMobile(user);
-        if (checkUser != null) {
+        User user = getUserByMobile(mobile);
+        if (user != null) {
             return ResponseFactory.businessError("手机号已注册");
+        }else{
+            user = new User();
+            user.setMobile(mobile);
         }
 
         Long userId = saveUser(user);
@@ -249,23 +250,28 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
     /**
      * 用户重置密码
      * @param mobile
-     * @param pwd
      * @param captcha
+     * @param userId
+     * @param pwd
      * @return
      */
     @Override
-    public ResponseData reset(String mobile, String pwd, String captcha) {
+    public ResponseData reset(String mobile, String captcha,Long userId, String pwd) {
 
         try {
-            //检查验证码
-            if (!checkCaptcha(mobile, captcha)) {
-                return ResponseFactory.businessError("验证码错误");
+            User user;
+            if (userId != null) {
+                user = selectByPrimaryKey(userId);
+            } else {
+                //检查验证码
+                if (!checkCaptcha(mobile, captcha)) {
+                    return ResponseFactory.businessError("验证码错误");
+                }
+
+                user = getUserByMobile(mobile);
             }
 
-            User user = new User();
-            user.setMobile(mobile);
-            user = getUserByMobile(user);
-            if(user ==null){
+            if (user == null) {
                 return ResponseFactory.businessError("手机号未注册");
             }
 
@@ -449,10 +455,12 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
     /**
      * 根据手机号查询用户
      *
-     * @param user
+     * @param mobile
      * @return
      */
-    private User getUserByMobile(User user) {
+    private User getUserByMobile(String mobile) {
+        User user = new User();
+        user.setMobile(mobile);
         return selectByRecord(user);
     }
 

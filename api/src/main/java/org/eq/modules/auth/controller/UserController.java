@@ -54,8 +54,8 @@ public class UserController extends BaseController {
      * @return
      */
     @RequestMapping(value = "/reset", method = RequestMethod.POST)
-    public ResponseData reset(String mobile,String pwd, String captcha) {
-        return userService.reset(mobile, pwd,captcha);
+    public ResponseData reset(String mobile, String captcha,Long userId,String pwd) {
+        return userService.reset(mobile,captcha,userId, pwd);
     }
 
     /**

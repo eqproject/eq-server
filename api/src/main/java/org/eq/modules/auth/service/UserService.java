@@ -24,11 +24,12 @@ public interface UserService extends ServiceExtend<User, UserExample> {
     /**
      * 用户重置密码
      * @param mobile
-     * @param pwd
      * @param captcha
+     * @param userId
+     * @param pwd
      * @return
      */
-    ResponseData reset(String mobile, String pwd, String captcha);
+    ResponseData reset(String mobile, String captcha,Long userId, String pwd);
 
     /**
      * 用户登录
