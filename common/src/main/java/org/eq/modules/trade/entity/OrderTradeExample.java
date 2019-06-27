@@ -1199,8 +1199,12 @@ public class OrderTradeExample {
             return (Criteria) this;
         }
 
-        public Criteria andCreateDateLessThan(Date value) {
+        public Criteria andCreateDateLessThanForUpdate(Date value) {
             addCriterion("create_date <", value, "createDate");
+            return (Criteria) this;
+        }
+        public Criteria andCreateDateLessThanForALL(Date value) {
+            addCriterion("OT.create_date <", value, "createDate");
             return (Criteria) this;
         }
 
@@ -1259,8 +1263,12 @@ public class OrderTradeExample {
             return (Criteria) this;
         }
 
-        public Criteria andUpdateDateLessThan(Date value) {
+        public Criteria andUpdateDateLessThanForUpdate(Date value) {
             addCriterion("update_date <", value, "updateDate");
+            return (Criteria) this;
+        }
+        public Criteria andUpdateDateLessThanForAll(Date value) {
+            addCriterion("OT.update_date <", value, "updateDate");
             return (Criteria) this;
         }
 

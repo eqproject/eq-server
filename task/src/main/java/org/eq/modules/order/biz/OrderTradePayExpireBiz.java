@@ -87,7 +87,7 @@ public class OrderTradePayExpireBiz {
         List<Integer> status = new ArrayList<>();
         status.add(OrderTradeStateEnum.WAIT_PAY.getState());
         ca.andStatusInForAll(status);
-        ca.andCreateDateLessThan(DateUtil.beforeDateHour(DateUtil.getNowTime(),hour));
+        ca.andCreateDateLessThanForALL(DateUtil.beforeDateHour(DateUtil.getNowTime(),hour));
         result.addAll(orderTradeMapper.selectByExample(example));
 
         example = new OrderTradeExample();
@@ -96,7 +96,7 @@ public class OrderTradePayExpireBiz {
         status.add(OrderTradeStateEnum.PAY_ING.getState());
         status.add(OrderTradeStateEnum.PAY_FAIL.getState());
         ca.andStatusInForAll(status);
-        ca.andUpdateDateLessThan(DateUtil.beforeDateHour(DateUtil.getNowTime(),hour));
+        ca.andUpdateDateLessThanForAll(DateUtil.beforeDateHour(DateUtil.getNowTime(),hour));
         result.addAll(orderTradeMapper.selectByExample(example));
         return result;
     }
