@@ -108,14 +108,15 @@
 
 ###### 请求参数
 > |参数|必选|类型|说明|
-|:-----  |:-------|:-----|-----|
-|id      |true    |long  | 用户id|
-|name      |false    |string  | 用户名|
-|nickname   |false    |string   |昵称|
-|birthday   |false    |string   |生日|
-|photoHead   |false    |string   |头像|
-|intro   |false    |string   |简介|
-|sign       |true    |string   |签名|
+> |:-----  |:-------|:-----|-----|
+> |id      |true    |long  | 用户id|
+> |name      |false    |string  | 用户名|
+> |nickname   |false    |string   |昵称|
+> |birthday   |false    |string   |生日|
+> |photoHead   |false    |string   |头像|
+> |sex |false |int |性别|
+> |intro   |false    |string   |简介|
+> |sign       |true    |string   |签名|
 
 ###### 返回字段
 > |返回字段|字段类型|说明                              |

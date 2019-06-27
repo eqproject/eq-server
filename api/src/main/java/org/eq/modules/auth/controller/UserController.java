@@ -1,13 +1,16 @@
 package org.eq.modules.auth.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.base.BaseController;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.auth.entity.UserAccountBind;
 import org.eq.modules.auth.entity.UserIdentityAuth;
+import org.eq.modules.auth.entity.UserVO;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -61,13 +64,33 @@ public class UserController extends BaseController {
     /**
      * 用户信息维护接口
      *
-     * @param user
+     * @param userVO
      * @return
      */
     @RequestMapping(value = "/modify", method = RequestMethod.POST)
-    public ResponseData modify(User user) {
-        user.setUpdateDate(new Date());
-        int cnt = userService.updateByPrimaryKeySelective(user);
+    public ResponseData modify(UserVO userVO) {
+        if(userVO==null || userVO.getId()<=0){
+            return ResponseFactory.paramsError("参数为空");
+        }
+        User  dbUser = null;
+        try{
+            dbUser = userService.selectByPrimaryKey(userVO.getId());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        if(dbUser==null){
+           return ResponseFactory.paramsError("用户不存在");
+        }
+        User updateUser = new User();
+        updateUser.setUpdateDate(new Date());
+        updateUser.setId(dbUser.getId());
+        updateUser.setSex(userVO.getSex());
+        updateUser.setName(userVO.getName());
+        updateUser.setNickname(userVO.getNickname());
+        updateUser.setBirthday(userVO.getBirthday());
+        updateUser.setPhotoHead(userVO.getPhotoHead());
+        updateUser.setIntro(userVO.getIntro());
+        int cnt = userService.updateByPrimaryKeySelective(updateUser);
         if (cnt > 0) {
             return ResponseFactory.success(null);
         } else {
@@ -117,4 +140,11 @@ public class UserController extends BaseController {
         return userService.payBind(userAccountBind);
     }
 
+
+    @RequestMapping(value = "/upload/head")
+    public ResponseData<String> uploadHead(HttpServletRequest httpServletRequest){
+
+        return null;
+
+    }
 }
