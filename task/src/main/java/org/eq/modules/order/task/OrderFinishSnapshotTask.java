@@ -22,7 +22,7 @@ public class OrderFinishSnapshotTask {
     private final OrderFinishSnapshotBiz biz;
 
 
-    @Scheduled(cron = "* 0/1 * * * ?")
+    @Scheduled(cron = "* 0/5 * * * ?")
     public void process() {
         log.info("每分钟执行");
         biz.searchFinishOrderAd().forEach(o->{
