@@ -143,9 +143,6 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
         if (beginCreateDate != null) {
             ca.andCreateDateGreaterThanOrEqualTo(beginCreateDate);
         }
-        if (endCreateDate != null) {
-            ca.andCreateDateLessThan(endCreateDate);
-        }
         if (orderTrade.getProductName() != null) {
             ca.andProductNameLikeForAll(orderTrade.getProductName());
         }
