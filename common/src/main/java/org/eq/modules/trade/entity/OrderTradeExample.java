@@ -1287,8 +1287,13 @@ public class OrderTradeExample {
             return (Criteria) this;
         }
 
-        public Criteria andUpdateDateBetween(Date value1, Date value2) {
+        public Criteria andUpdateDateBetweenForUpdate(Date value1, Date value2) {
             addCriterion("update_date between", value1, value2, "updateDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateDateBetweenForAll(Date value1, Date value2) {
+            addCriterion("OT.update_date between", value1, value2, "updateDate");
             return (Criteria) this;
         }
 
