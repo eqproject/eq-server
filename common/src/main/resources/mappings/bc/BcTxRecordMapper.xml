@@ -116,7 +116,7 @@
         </if>
     </delete>
 
-    <insert id="insert" parameterType="org.eq.modules.bc.entity.BcTxRecord">
+    <insert id="insert" parameterType="org.eq.modules.bc.entity.BcTxRecord" useGeneratedKeys="true" keyProperty="id">
         insert into bc_tx_record (from_address,to_address,transfer_amount,asset_issuer,asset_type,tx_status,tx_hash,biz_type,create_time,update_time,opt_metadata,input,tx_type)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -136,7 +136,7 @@
         </trim>
     </insert>
 
-    <insert id="insertSelective" parameterType="org.eq.modules.bc.entity.BcTxRecord">
+    <insert id="insertSelective" parameterType="org.eq.modules.bc.entity.BcTxRecord" useGeneratedKeys="true" keyProperty="id">
         insert into bc_tx_record
         <trim prefix="(" suffix=")" suffixOverrides=",">
             from_address,
