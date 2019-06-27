@@ -44,14 +44,17 @@ public class ProductLoadTask extends BaseLog {
                 if(productBlockchain!=null){
                     continue;
                 }
-                long productId = productLoadBiz.insertProduct(ticketProduct);
+                long productId = 0;
+                try{
+                    productId = productLoadBiz.insertProduct(ticketProduct);
+                }catch (Exception e){
+                    logger.error("插入商品异常",e);
+                }
                 if(productId<=0){
                     logger.error("ProductLoadTask 商品未插入成功");
                 }else{
                     logger.info("ProductLoadTask 商品插入成功,商品ID为 {} ",productId);
                 }
-
-
 
             }
         } catch (Exception e) {
