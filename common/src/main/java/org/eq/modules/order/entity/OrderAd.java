@@ -120,4 +120,11 @@ public class OrderAd implements Serializable {
 	 */
 	private String productImg;
 
+
+
+	/**
+	 * 商品单价
+	 */
+	private int unitPrice;
+
 }

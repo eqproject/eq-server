@@ -30,6 +30,11 @@ public class OrderAdSimpleVO implements Serializable {
     private String productName;
 
     /**
+     * 商品面值
+     */
+    private int unitPrice;
+
+    /**
      * 商品图片
      */
     private String img;

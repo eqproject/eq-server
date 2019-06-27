@@ -24,6 +24,7 @@
         <result column="sort" jdbcType="INTEGER" property="sort" />
         <result column="productName" jdbcType="VARCHAR" property="productName" />
         <result column="productImg" jdbcType="VARCHAR" property="productImg" />
+        <result column="unitPrice" jdbcType="INTEGER" property="unitPrice" />
     </resultMap>
 
     <sql id="Example_Where_Clause">
@@ -88,7 +89,7 @@
 
     <sql id="Base_Column_List">
         OA.id, OA.user_id, OA.order_no, OA.product_id, OA.title, OA.product_num, OA.trading_num, OA.traded_num, OA.type, OA.status, OA.price, OA.amount, OA.cancel_desc, OA.create_date, OA.update_date, OA.remarks,
-        UU.nickname as nickName, UU.photo_head as photoHead ,UU.auth_status AS authStatus , PP.sort as sort, PP.name as productName , PP.product_img as productImg
+        UU.nickname as nickName, UU.photo_head as photoHead ,UU.auth_status AS authStatus , PP.sort as sort, PP.name as productName , PP.product_img as productImg,PP.unit_price as unitPrice
 
     </sql>
 

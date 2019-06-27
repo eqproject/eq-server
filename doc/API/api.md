@@ -1064,6 +1064,7 @@
 >| productName     | 字符串 | 商品名称     |
 >| orderType     |整型 | 订单类型     |
 >| img             | 字符串 | 商品图片     |
+>| unitPrice | 整形 | 面值 |
 >| price | 整形   | 订单单价 |
 >| orderNumber | 整形   | 订单总量     |
 >|saleedNumber | 整形   |已完成量    |
@@ -1089,6 +1090,7 @@
          "productName": "京东E卡",
          "img": "b66a.jpg",
          "price": 100,
+         "unitPrice": 100,
          "orderNumber": 10,
          "saleedNumber": 4,
          "saleNumber": 6,

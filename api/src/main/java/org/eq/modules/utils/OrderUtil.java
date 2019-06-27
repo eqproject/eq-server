@@ -51,6 +51,7 @@ public class OrderUtil{
         orderAdSimpleVO.setOrderCode(orderAd.getOrderNo());
         orderAdSimpleVO.setProductId(String.valueOf(orderAd.getProductId()));
         orderAdSimpleVO.setProductName(orderAd.getProductName());
+        orderAdSimpleVO.setUnitPrice(orderAd.getUnitPrice());
         orderAdSimpleVO.setImg(orderAd.getProductImg());
         orderAdSimpleVO.setPrice(orderAd.getPrice());
         orderAdSimpleVO.setOrderNumber(orderAd.getProductNum());
