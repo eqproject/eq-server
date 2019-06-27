@@ -37,5 +37,18 @@ public class OrderTradeUser implements Serializable {
     private String buyUserNickName;
 
 
+    /**
+     * 头像
+     */
+    private String phoneHead;
+
+
+    /**
+     * 认证状态
+     * @see org.eq.modules.enums.UserStateEnum
+     */
+    private int authstatus;
+
+
 
 }

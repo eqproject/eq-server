@@ -1428,43 +1428,47 @@
 > [/api/order/trade/paying/list](/api/order/trade/paying/list)
 
 ###### 支持格式
+
 > JSON
 
 ###### HTTP请求方式
 > post
 
 ###### 请求参数
-> |参数|必选|类型|说明|
-|:-----  |:-------|:-----|-----|
-|userId      |true    |long  | 用户Id|
-|pageNum     |true    |int   |页数             |
-|pageSize    |true    |int   |每页显示数量。 |
-|sign       |true    |string   |签名|
+
+> |参数|必选||说明|
+> |:-----  |:-------|:-----|-----|
+> |userId      |true    |long  | 用户Id|
+> |pageNum     |true    |int   |页数             |
+> |pageSize    |true    |int   |每页显示数量。 |
+> |sign       |true    |string   |签名|
 
 ###### 返回字段
 > |返回字段|字段类型|说明                              |
-|:-----   |:------|:-----------------------------   |
-|status   |int    |返回结果状态。0：正常；1：错误。   |
-|errMsg   |string    |错误描述   |
-|data   |Object|返回结果对象|
-|- total  |int | 订单总记录数|
-|- list |list |交易订单列表|
-|--    orderTradeUser |object |用户信息 |
-|---        sellUserId |long |售卖用户id|
-|---        sellUserNickName | string |卖家昵称|
-|--    trade |object |交易订单信息 |
-|---        tradeNo |string |交易订单号|
-|---        payNo |string |支付流水号|
-|---        amount |string |商品售卖价格(单位:分)|
-|---        orderNum |int |订单数量|
-|---        salePrice |int |商品售价(单位:分)|
-|---        status |int |状态:(1:待支付)|
-|---        createTime |string |交易时间 |
-|--         updateTime |string |更新时间() |
-|--        productName |String |商品名称 |
-|----      productImg |String |商品图片 |
-|----      unitPrice |int |面值 |
-|---      payTimeOut |int |交易最大时长(小时) |
+> |:-----   |:------|:-----------------------------   |
+> |status   |int    |返回结果状态。0：正常；1：错误。   |
+> |errMsg   |string    |错误描述   |
+> |data   |Object|返回结果对象|
+> |- total  |int | 订单总记录数|
+> |- list |list |交易订单列表|
+> |--    orderTradeUser |object |用户信息 |
+> |---        sellUserId |long |售卖用户id|
+> |---        sellUserNickName | string |卖家昵称|
+> |---        phoneHead | string |卖家头像|
+> |--         authstatus | int |认证状态 2:已经认证 其他未认证|
+> |--    trade |object |交易订单信息 |
+> |---        tradeNo |string |交易订单号|
+> |---        payNo |string |支付流水号|
+> |---        amount |string |商品售卖价格(单位:分)|
+> |---        orderNum |int |订单数量|
+> |---        salePrice |int |商品售价(单位:分)|
+> |---        status |int |状态:(1:待支付)|
+> |---        createTime |string |交易时间 |
+> |--         updateTime |string |更新时间() |
+> |--        productName |String |商品名称 |
+> |----      productImg |String |商品图片 |
+> |----      unitPrice |int |面值 |
+> |---      payTimeOut |int |交易最大时长(小时) |
 
 ###### 接口示例
 

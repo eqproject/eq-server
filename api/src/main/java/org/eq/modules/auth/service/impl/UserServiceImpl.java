@@ -346,8 +346,8 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         //验证用户
         User user = new User();
         user.setId(userIdentityAuth.getUserId());
-        User checkUser = selectByRecord(user);
-        if (checkUser == null) {
+        user = selectByRecord(user);
+        if (user == null) {
             return ResponseFactory.businessError("用户不存在");
         }
         //检查用户是否已认证
@@ -371,8 +371,12 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         if (cnt == 0) {
             return ResponseFactory.businessError("用户认证失败");
         }
+        User updateUser = new User();
+        updateUser.setId(user.getId());
+        updateUser.setAuthStatus(UserStateEnum.AUTHENTICATION_YES.getState());
+        updateUser.setUpdateDate(new Date());
         //修改User认证状态
-        return updateUserAuthStatus(user, UserStateEnum.AUTHENTICATION_YES.getState());
+        return updateUserAuthStatus(updateUser, UserStateEnum.AUTHENTICATION_YES.getState());
     }
 
     /**
