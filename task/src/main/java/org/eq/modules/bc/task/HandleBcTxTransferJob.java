@@ -49,7 +49,7 @@ public class HandleBcTxTransferJob {
 	private final UserWalletMapper userWalletMapper;
     private final InitiatorAccMapper initiatorAccMapper;
 
-	@Scheduled(cron = "0 0/5 * * * ?")
+	@Scheduled(cron = "0 0/2 * * * ?")
 	public void execute(){
 		//是否设置keyStore密码
 		boolean keyStorePwdFlag = Tools.isNull(KeyStoreManager.getKeyStorePwd());

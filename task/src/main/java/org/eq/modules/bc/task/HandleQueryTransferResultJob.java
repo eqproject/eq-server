@@ -37,7 +37,7 @@ public class HandleQueryTransferResultJob {
 	@Value("${blockchain.tx.confirm.result.timeout}")
 	private Integer timeNumber;
 
-	@Scheduled(cron = "0 0/2 * * * ?")
+	@Scheduled(cron = "0 0/1 * * * ?")
 	public void execute(){
 		try{
 			log.info("query block  tx result start...");
