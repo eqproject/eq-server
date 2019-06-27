@@ -6,6 +6,8 @@ import io.bumo.encryption.crypto.keystore.entity.KeyStoreEty;
 import io.bumo.encryption.key.PrivateKey;
 import io.bumo.encryption.utils.hex.HexFormat;
 import io.bumo.model.response.TransactionSubmitResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.eq.modules.bc.biz.InitiatorPoolBiz;
 import org.eq.modules.bc.common.ConstantsUtil;
 import org.eq.modules.bc.common.util.DecimalCalculateUtil;
@@ -29,31 +31,23 @@ import org.eq.modules.wallet.dao.UserWalletMapper;
 import org.eq.modules.wallet.entity.UserWallet;
 import org.eq.modules.wallet.entity.UserWalletExample;
 import org.eq.modules.wallet.util.WalletUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 
+@Slf4j
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class HandleBcTxTransferJob {
 
-	private static Logger logger = LoggerFactory.getLogger(HandleBcTxTransferJob.class);
-	
-	@Autowired
-	private BcTxService bcTxService;
-	@Autowired
-	private BlockChainTxService blockChainTxService;
-	@Autowired
-	private InitiatorPoolBiz initiatorPoolBiz;
-	@Autowired
-	private BlockChainManager blockChainManager;
-	@Autowired
-	private UserWalletMapper userWalletMapper;
-    @Autowired
-    private InitiatorAccMapper initiatorAccMapper;
+	private final BcTxService bcTxService;
+	private final BlockChainTxService blockChainTxService;
+	private final InitiatorPoolBiz initiatorPoolBiz;
+	private final BlockChainManager blockChainManager;
+	private final UserWalletMapper userWalletMapper;
+    private final InitiatorAccMapper initiatorAccMapper;
 
 	@Scheduled(cron = "0 0/5 * * * ?")
 	public void execute(){
@@ -61,7 +55,7 @@ public class HandleBcTxTransferJob {
 		boolean keyStorePwdFlag = Tools.isNull(KeyStoreManager.getKeyStorePwd());
 		if(!keyStorePwdFlag){
 			try {
-				logger.info("send bc tx start...");
+				log.info("send bc tx start...");
 				//查询发送红包区块链未转账的记录
 				List<BcTxRecord> bcTxRecordList = bcTxService.queryBcTxRecord4Init();
 				if(!Tools.isNullByList(bcTxRecordList)) {
@@ -71,7 +65,7 @@ public class HandleBcTxTransferJob {
 					bcTxService.updateBcTxRecord4BcProcess(bcTxRecordList, submitTxReq.getHash());
 					// 提交到blokchain
 					TransactionSubmitResponse bcResponse = blockChainManager.batchSubmitTx(submitTxReq);
-					logger.info("提交交易返回:"+JSON.toJSONString(bcResponse));
+					log.info("提交交易返回:"+JSON.toJSONString(bcResponse));
 					if(bcResponse.getErrorCode() .equals(ConstantsUtil.BC_SUCCESS) ){
 						//记录到区跨链交易表
 						BlockchainTx blockchainTx = new BlockchainTx();
@@ -83,16 +77,15 @@ public class HandleBcTxTransferJob {
 					}else{
 						//记录到异常表
 						blockChainTxService.addBcTxException(submitTxReq.getHash());
-						logger.error("提交交易到blockchain异常"+bcResponse.getErrorCode()+" Desc:"+bcResponse.getErrorCode());
+						log.error("提交交易到blockchain异常"+bcResponse.getErrorCode()+" Desc:"+bcResponse.getErrorCode());
 					}
 				}
-				logger.info("send bc tx end...");
+				log.info("send bc tx end...");
 			} catch (Exception e) {
-				e.printStackTrace();
-				logger.error("交易上链异常:" + e);
+				log.error("交易上链异常:" + e);
 			}
 		}else{
-			logger.error("keyStore密码未设置 ");
+			log.error("keyStore密码未设置 ");
 		}
 	}
 
@@ -107,11 +100,11 @@ public class HandleBcTxTransferJob {
 			//检查是否激活
             if (!bcTxRecord.getBizType().equals(BcAccountTypeEnum.ACTIVITY.getCode())
                     && !blockChainManager.checkActivated(bcTxRecord.getToAddress())) {
-                logger.info("账户未激活:" + bcTxRecord.getToAddress());
+                log.info("账户未激活:" + bcTxRecord.getToAddress());
                 continue;
             }
 			if(!blockChainManager.checkActivated(bcTxRecord.getFromAddress())){
-				logger.info("账户未激活:"+bcTxRecord.getFromAddress());
+				log.info("账户未激活:"+bcTxRecord.getFromAddress());
 				continue;
 			}
 			//资产的精度，暂时用不到
@@ -141,7 +134,7 @@ public class HandleBcTxTransferJob {
 		InitiatorAcc initiatorAcc = initiatorPoolBiz.getInitiatorInfo(initiatorAddress);
 		
 		BlobDataResp blobDataResp = blockChainManager.getBatchOptTransferBlob(batchTransferList, initiatorAddress);
-		//logger.info("生成blob:"+JSON.toJSONString(blobDataResp));
+		//log.info("生成blob:"+JSON.toJSONString(blobDataResp));
 
 		//生成提交人签名
 		List<SignEntity> listSigner = initiatorSignBlob(blobDataResp,initiatorAcc);

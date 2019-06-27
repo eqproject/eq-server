@@ -1,8 +1,9 @@
 package org.eq.modules.bc.task;
 
 import io.bumo.model.response.result.data.TransactionHistory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.eq.modules.bc.common.ConstantsUtil;
-import org.eq.modules.bc.common.log.LoggerFactory;
 import org.eq.modules.bc.common.util.DateUtil;
 import org.eq.modules.bc.common.util.DecimalCalculateUtil;
 import org.eq.modules.bc.common.util.Tools;
@@ -13,28 +14,22 @@ import org.eq.modules.bc.external.bc.BlockChainManager;
 import org.eq.modules.bc.service.AbstractTaskCallBack;
 import org.eq.modules.bc.service.BcTxService;
 import org.eq.modules.bc.service.BlockChainTxService;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ReflectionUtils;
 
-import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class HandleQueryTransferResultJob {
-	
-	private static Logger logger = LoggerFactory.getLogger(HandleQueryTransferResultJob.class);
-	
-	@Autowired
-	private BlockChainTxService blockChainTxService;
-	@Autowired
-	private BlockChainManager blockChainManager;
-	@Autowired
-	private BcTxService bcTxService;
+
+	private final BlockChainTxService blockChainTxService;
+	private final BlockChainManager blockChainManager;
+	private final BcTxService bcTxService;
 
 	private String defaultFee = "0";
 	private Integer existError = 104;
@@ -45,7 +40,7 @@ public class HandleQueryTransferResultJob {
 	@Scheduled(cron = "0 0/2 * * * ?")
 	public void execute(){
 		try{
-			logger.info("query block  tx result start...");
+			log.info("query block  tx result start...");
 			List<BlockchainTx> bcTXList = blockChainTxService.queryBcTX4Status(BcStatusEnum.INIT.getCode());
 			if(!Tools.isNullByList(bcTXList)){
 				for(BlockchainTx tx : bcTXList){
@@ -79,10 +74,10 @@ public class HandleQueryTransferResultJob {
 					}
 				}
 			}
-			logger.info("query block  tx result end...");
+			log.info("query block  tx result end...");
 		}catch(Exception e){
-			logger.error("定时任务查询交易结果异常");
-			logger.error(e.getMessage(),e);
+			log.error("定时任务查询交易结果异常");
+			log.error(e.getMessage(),e);
 		}
     }	
 	

@@ -991,7 +991,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		bcTxRecord.setBizType(bizType);
 		bcTxRecord.setCreateTime(new Date());
 		bcTxRecord.setUpdateTime(new Date());
-		bcTxRecord.setOptMetadata("用户地址:"+fromAddress+" 转往"+toAddress);
+		bcTxRecord.setOptMetadata("");
         bcTxRecord.setTxType(BcTxTypeEnum.CONTRACT.getCode());
 
         bcTxRecord.setInput(BcTxRecordInput.build(productAll,toAddress,number));

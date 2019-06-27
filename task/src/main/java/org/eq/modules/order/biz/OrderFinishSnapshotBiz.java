@@ -166,9 +166,12 @@ public class OrderFinishSnapshotBiz {
         private Date end;
 
         TaskTime build() {
-            String day = LocalDate.now().toString();
-            String startTime = day + " 00:00:00";
-            String endTime = day + " 23:59:59";
+            LocalDate now = LocalDate.now();
+            String start = now.plusDays(-1).toString();
+            String end = now.toString();
+
+            String startTime = start + " 00:00:00";
+            String endTime = end + " 23:59:59";
             this.setStart(startTime);
             this.setEnd(endTime);
             return this;

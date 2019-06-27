@@ -216,10 +216,11 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         bcTxRecord.setTransferAmount("0.01");
         bcTxRecord.setAssetType(2);
         bcTxRecord.setTxStatus(0);
-        bcTxRecord.setBizType(1);
+        bcTxRecord.setBizType(BcAccountTypeEnum.ACTIVITY.getCode());
         bcTxRecord.setCreateTime(new Date());
         bcTxRecord.setUpdateTime(new Date());
-        bcTxRecord.setOptMetadata("激活账户");
+        bcTxRecord.setOptMetadata("");
+        bcTxRecord.setTxType(BcTxTypeEnum.BU.getCode());
         bcTxRecordService.insertRecordReturnId(bcTxRecord);
         return bcTxRecord.getId();
     }
