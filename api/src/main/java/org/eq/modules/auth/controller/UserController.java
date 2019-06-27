@@ -2,6 +2,7 @@ package org.eq.modules.auth.controller;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.base.BaseController;
+import org.eq.basic.common.util.DateUtil;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.auth.entity.UserAccountBind;
 import org.eq.modules.auth.entity.UserIdentityAuth;
@@ -87,7 +88,9 @@ public class UserController extends BaseController {
         updateUser.setSex(userVO.getSex());
         updateUser.setName(userVO.getName());
         updateUser.setNickname(userVO.getNickname());
-        updateUser.setBirthday(userVO.getBirthday());
+        if(!StringUtils.isEmpty(userVO.getBirthday())){
+            updateUser.setBirthday(DateUtil.passDateOrNow(userVO.getBirthday()));
+        }
         updateUser.setPhotoHead(userVO.getPhotoHead());
         updateUser.setIntro(userVO.getIntro());
         int cnt = userService.updateByPrimaryKeySelective(updateUser);

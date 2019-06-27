@@ -22,7 +22,7 @@ public class UserVO implements Serializable {
 
     private Integer sex;
 
-    private Date birthday;
+    private String birthday;
 
     private String photoHead;
 
