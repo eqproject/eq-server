@@ -81,7 +81,7 @@ public class OrderUtil{
         OrderAdSimpleVO orderAdSimpleVO = transObjForSimple(orderAd);
         if(tradeNum>0){
             orderAdSimpleVO.setTradeNum(tradeNum);
-            orderAdSimpleVO.setTradeRate(new BigDecimal(treadedNum).divide(new BigDecimal(tradeNum)).setScale(2,BigDecimal.ROUND_HALF_DOWN).doubleValue());
+            orderAdSimpleVO.setTradeRate(new BigDecimal(treadedNum).divide(new BigDecimal(tradeNum),2,BigDecimal.ROUND_HALF_DOWN).doubleValue());
         }
         return orderAdSimpleVO;
     }
