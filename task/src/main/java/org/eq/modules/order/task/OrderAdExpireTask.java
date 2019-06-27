@@ -19,7 +19,7 @@ public class OrderAdExpireTask extends BaseLog {
 
     private final OrderAdExpireBiz orderAdExpireBiz;
 
-    //@Scheduled(cron = "0 26 17 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void process() {
         logger.info("OrderAdExpireTask 每天开始执行-开始");
         try {

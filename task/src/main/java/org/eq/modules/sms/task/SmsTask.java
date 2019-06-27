@@ -16,7 +16,7 @@ public class SmsTask extends BaseLog {
      * 迁移30天前的历史记录
      * 每天0:30执行
      */
-    //@Scheduled(cron = "0 30 0 * * ?")
+    @Scheduled(cron = "0 30 0 * * ?")
     public void archiveSmsHistoryLog() {
         logger.info("30天前的短信记录迁移到历史日志表-开始");
         try {
@@ -31,7 +31,7 @@ public class SmsTask extends BaseLog {
      * 更新短信发送状态
      * 频率：
      */
-    //@Scheduled(fixedDelay = 60*1000)
+    @Scheduled(fixedDelay = 60*1000)
     public void getSmsReport(){
         logger.info("更新短信发送状态-开始");
         try {
