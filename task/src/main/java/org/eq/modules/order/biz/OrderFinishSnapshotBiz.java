@@ -65,7 +65,6 @@ public class OrderFinishSnapshotBiz {
 
         List<Integer> status = new ArrayList<>();
         status.add(OrderTradeStateEnum.CANCEL.getState());
-        status.add(OrderTradeStateEnum.PAY_FAIL.getState());
         status.add(OrderTradeStateEnum.CANCEL_PAY_TIMEOUT.getState());
         status.add(OrderTradeStateEnum.TRADE_SUCCESS.getState());
         status.add(OrderTradeStateEnum.REFUND_SUCCESS.getState());
