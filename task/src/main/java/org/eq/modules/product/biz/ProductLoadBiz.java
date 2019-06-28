@@ -156,11 +156,11 @@ public class ProductLoadBiz {
         Calendar foramt = Calendar.getInstance();
 
         if(!"-1".equals(ticketProduct.getStartTime())){
-            foramt.setTimeInMillis(Long.valueOf(ticketProduct.getStartTime()));
+            foramt.setTimeInMillis(Long.valueOf(ticketProduct.getStartTime())/1000L);
             product.setExpirationStart(DateUtil.date2Str(foramt.getTime()));
         }
         if(!"-1".equals(ticketProduct.getEndTime())){
-            foramt.setTimeInMillis(Long.valueOf(ticketProduct.getEndTime()));
+            foramt.setTimeInMillis(Long.valueOf(ticketProduct.getEndTime())/1000L);
             product.setExpirationEnd(DateUtil.date2Str(foramt.getTime()));
         }
         //{"receive":"京东E卡提货说明","ticketDesc":"E卡说明"}
@@ -195,7 +195,7 @@ public class ProductLoadBiz {
             logger.error("获取Token 失败");
             return result;
         }
-        System.out.println(token);
+
 
         String url = TICKET_URL+"/voucher/v1/list";
         JSONObject params = new JSONObject();
@@ -207,6 +207,7 @@ public class ProductLoadBiz {
             TicketPlatProductRes  ticketPlatProductRes = null;
             try{
                 String productResult = WebClientUtil.synchPostForPayload(url,params);
+                System.out.println(productResult);
                 if(!StringUtil.isEmpty(productResult)){
                     ticketPlatProductRes = JSONObject.parseObject(productResult,TicketPlatProductRes.class);
                 }
