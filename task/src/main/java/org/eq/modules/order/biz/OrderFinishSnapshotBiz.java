@@ -109,6 +109,7 @@ public class OrderFinishSnapshotBiz {
         }
 
         o.setOrderNo(order.getOrderNo());
+        o.setTradeNo("");
         o.setProductId(order.getProductId());
         o.setProductName(product.getName());
         o.setUnitPrice(product.getUnitPrice());
@@ -136,6 +137,7 @@ public class OrderFinishSnapshotBiz {
         o.setSellUserId(order.getSellUserId());
         o.setBuyUserId(order.getBuyUserId());
         o.setOrderNo(order.getTradeNo());
+        o.setTradeNo(order.getTradeNo());
         o.setProductId(order.getProductId());
         o.setProductName(product.getName());
         o.setUnitPrice(product.getUnitPrice());
