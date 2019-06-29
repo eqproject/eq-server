@@ -643,7 +643,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 			orderTradeUser.setSellUserId(sellUser.getId());
 			orderTradeUser.setSellUserNickName(sellUser.getNickname());
 			orderTradeUser.setPhoneHead(sellUser.getPhotoHead());
-			orderTradeUser.setAuthstatus(sellUser.getAuthStatus());
+			orderTradeUser.setAuthstatus(sellUser.getAuthStatus() == null ? 0 : sellUser.getAuthStatus());
 
 			temp.setOrderTradeUser(orderTradeUser);
 
