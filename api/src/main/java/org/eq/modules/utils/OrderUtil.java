@@ -3,6 +3,7 @@ package org.eq.modules.utils;
 import org.eq.basic.common.util.DateUtil;
 import org.eq.modules.enums.OrderAcceptStateEnum;
 import org.eq.modules.enums.OrderFinishStateEnum;
+import org.eq.modules.enums.OrderFinishTypeEnum;
 import org.eq.modules.enums.OrderTransferStateEnum;
 import org.eq.modules.order.entity.OrderAccept;
 import org.eq.modules.order.entity.OrderAd;
@@ -117,6 +118,15 @@ public class OrderUtil{
         //todo 待实现订单用户头像和昵稍
         orderFinishSnapshootSimpleVO.setUserHeadImg("");
         orderFinishSnapshootSimpleVO.setUserNickname("");
+
+
+        if (orderFinishSnapshoot.getType() == OrderFinishTypeEnum.ORDER_AD_SALE.getType()
+                || orderFinishSnapshoot.getType() == OrderFinishTypeEnum.ORDER_AD_BUY.getType()) {
+            orderFinishSnapshootSimpleVO.setOrderAdNum(orderFinishSnapshoot.getOrderNum());
+            orderFinishSnapshootSimpleVO.setOrderAdTradeNum(orderFinishSnapshoot.getTradeNum());
+        }else{
+            orderFinishSnapshootSimpleVO.setOrderTradeNum(orderFinishSnapshoot.getTradeNum());
+        }
         return orderFinishSnapshootSimpleVO;
     }
 

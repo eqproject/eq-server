@@ -3,10 +3,7 @@ package org.eq.modules.order.biz;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.eq.basic.common.util.DateUtil;
-import org.eq.modules.enums.OrderAdStateEnum;
-import org.eq.modules.enums.OrderAdTypeEnum;
-import org.eq.modules.enums.OrderFinishStateEnum;
-import org.eq.modules.enums.OrderTradeStateEnum;
+import org.eq.modules.enums.*;
 import org.eq.modules.order.dao.OrderAdMapper;
 import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.order.entity.OrderAdExample;
@@ -115,7 +112,11 @@ public class OrderFinishSnapshotBiz {
         o.setUnitPrice(product.getUnitPrice());
         o.setSaleprice(order.getPrice());
         o.setOrderNum(order.getProductNum());
-        o.setType(order.getType() == OrderAdTypeEnum.ORDER_SALE.getType() ? 1 : 2);
+
+        int type = order.getType() == OrderAdTypeEnum.ORDER_SALE.getType()
+                ? OrderFinishTypeEnum.ORDER_AD_SALE.getType()
+                : OrderFinishTypeEnum.ORDER_AD_BUY.getType();
+        o.setType(type);
         o.setAmount(order.getAmount());
 
         if (order.getStatus() == OrderAdStateEnum.ORDER_CANCEL.getState()) {
@@ -137,14 +138,18 @@ public class OrderFinishSnapshotBiz {
         OrderFinishSnapshoot o = new OrderFinishSnapshoot();
         o.setSellUserId(order.getSellUserId());
         o.setBuyUserId(order.getBuyUserId());
-        o.setOrderNo(order.getTradeNo());
+        o.setOrderNo(order.getAdNo());
         o.setTradeNo(order.getTradeNo());
         o.setProductId(order.getProductId());
         o.setProductName(product.getName());
         o.setUnitPrice(product.getUnitPrice());
         o.setSaleprice(order.getSalePrice());
         o.setOrderNum(order.getOrderNum());
-        o.setType(order.getType() == OrderAdTypeEnum.ORDER_SALE.getType() ? 1 : 2);
+
+        int type = order.getType() == OrderTradeTypeEnum.ORDER_SALE.getType()
+                ? OrderFinishTypeEnum.ORDER_TRADE_SALE.getType()
+                : OrderFinishTypeEnum.ORDER_TRADE_BUY.getType();
+        o.setType(type);
         o.setAmount(order.getAmount());
 
         if (order.getStatus() == OrderTradeStateEnum.CANCEL.getState()) {
