@@ -122,12 +122,16 @@ public class OrderUtil{
 
         if (orderFinishSnapshoot.getType() == OrderFinishTypeEnum.ORDER_AD_SALE.getType()
                 || orderFinishSnapshoot.getType() == OrderFinishTypeEnum.ORDER_AD_BUY.getType()) {
-            orderFinishSnapshootSimpleVO.setOrderAdNum(orderFinishSnapshoot.getOrderNum());
-            orderFinishSnapshootSimpleVO.setOrderAdTradeNum(orderFinishSnapshoot.getTradeNum());
+            orderFinishSnapshootSimpleVO.setOrderAdNum(formateNum(orderFinishSnapshoot.getOrderNum()));
+            orderFinishSnapshootSimpleVO.setOrderAdTradeNum(formateNum(orderFinishSnapshoot.getTradeNum()));
         }else{
-            orderFinishSnapshootSimpleVO.setOrderTradeNum(orderFinishSnapshoot.getTradeNum());
+            orderFinishSnapshootSimpleVO.setOrderTradeNum(formateNum(orderFinishSnapshoot.getTradeNum()));
         }
         return orderFinishSnapshootSimpleVO;
+    }
+
+    private static int formateNum(Integer num) {
+        return num == null ? 0 : num;
     }
 
 
