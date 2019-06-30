@@ -5,6 +5,8 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.ServiceImplExtend;
+import org.eq.basic.common.util.DateUtil;
+import org.eq.basic.common.util.IdCardVerificationUtil;
 import org.eq.basic.common.util.StringLowUtils;
 import org.eq.modules.auth.dao.UserMapper;
 import org.eq.modules.auth.entity.User;
@@ -21,8 +23,9 @@ import org.eq.modules.bc.entity.InitiatorAccExample;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
 import org.eq.modules.enums.*;
+import org.eq.modules.support.entity.SystemConfig;
+import org.eq.modules.support.service.SystemConfigService;
 import org.eq.modules.utils.AESUtils;
-import org.eq.modules.utils.IdentityAuthUtil;
 import org.eq.modules.utils.MD5Utils;
 import org.eq.modules.wallet.entity.UserWallet;
 import org.eq.modules.wallet.service.BcTxRecordService;
@@ -38,6 +41,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 用户管理ServiceImpl
@@ -58,6 +62,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
     private final RedisTemplate redisTemplate;
     private final UserAccountBindService userAccountBindService;
     private final InitiatorAccMapper initiatorAccMapper;
+    private final SystemConfigService systemConfigService;
 
     @Value("${aes.key}")
     private String aesKey;
@@ -141,6 +146,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 
     /**
      * 用户注册
+     *
      * @param mobile
      * @param captcha
      * @return
@@ -166,7 +172,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         User user = getUserByMobile(mobile);
         if (user != null) {
             return ResponseFactory.businessError("手机号已注册");
-        }else{
+        } else {
             user = new User();
             user.setMobile(mobile);
         }
@@ -251,6 +257,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 
     /**
      * 用户重置密码
+     *
      * @param mobile
      * @param captcha
      * @param userId
@@ -258,7 +265,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
      * @return
      */
     @Override
-    public ResponseData reset(String mobile, String captcha,Long userId, String pwd) {
+    public ResponseData reset(String mobile, String captcha, Long userId, String pwd) {
 
         try {
             User user;
@@ -294,8 +301,8 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         } catch (Exception e) {
             logger.error("重置密码失败", e);
             return ResponseFactory.businessError("重置密码失败");
-        }finally {
-            if (StringUtils.isNotBlank(mobile)){
+        } finally {
+            if (StringUtils.isNotBlank(mobile)) {
                 clearCaptcha(mobile);
             }
         }
@@ -304,6 +311,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 
     /**
      * 用户登录
+     *
      * @param mobile
      * @param pwd
      * @return
@@ -339,11 +347,46 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 
     /**
      * 实名认证
+     *
      * @param userIdentityAuth
      * @return
      */
     @Override
     public ResponseData verify(UserIdentityAuth userIdentityAuth) {
+        //验证次数风控
+        String prefix = "verify";
+        String key = prefix + userIdentityAuth.getUserId();
+        String defer = (String) redisTemplate.opsForValue().get(key + "time");
+        if (defer != null) {
+            return ResponseFactory.businessError("请求过于频繁，请稍后再试！");
+        }
+        SystemConfig systemConfig = systemConfigService.getSystemConfigByType(SystemConfigTypeEnum.VERIFY.getType());
+        Integer limit = Integer.parseInt(systemConfig.getValue());
+        Integer count = (Integer) redisTemplate.opsForValue().get(key);
+        System.out.println("User Verify Limit : " + count);
+        System.out.println("User Verify Expire : " + redisTemplate.getExpire(key));
+        if (count != null) {
+            if (count >= limit) {
+                return ResponseFactory.businessError("实名认证次数超过限制,每个用户每天限制" + limit + "次");
+            } else {
+                redisTemplate.opsForValue().increment(key, 1);
+                redisTemplate.opsForValue().set(key + "time", "1", 1, TimeUnit.MINUTES);
+            }
+        } else {
+            redisTemplate.opsForValue().set(key, 1);
+            redisTemplate.opsForValue().set(key + "time", "1", 1, TimeUnit.MINUTES);
+            redisTemplate.expireAt(key, DateUtil.getNextDayTime());
+        }
+
+        //解密身份证号
+        String identityCard = AESUtils.decrypt(userIdentityAuth.getIdentityCard(), aesKey);
+
+        //验证身份证号码是否合法
+        String checkResult = IdCardVerificationUtil.IDCardValidate(identityCard);
+        if (!checkResult.equals(IdCardVerificationUtil.VALIDITY)) {
+            return ResponseFactory.businessError(checkResult);
+        }
+
         //验证用户
         User user = new User();
         user.setId(userIdentityAuth.getUserId());
@@ -357,13 +400,12 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             return updateUserAuthStatus(user, UserStateEnum.AUTHENTICATION_YES.getState());
         }
 
-        //解密身份证号
-        String identityCard = AESUtils.decrypt(userIdentityAuth.getIdentityCard(), aesKey);
-        Boolean match = IdentityAuthUtil.userVerify(identityCard, userIdentityAuth.getIdentityName());
-        if (!match) {
-            return ResponseFactory.businessError("用户认证失败");
-        }
         //实名认证
+        //验证次数不够，暂时不调用认证接口，直接返回认证成功
+//        Boolean match = IdentityAuthUtil.userVerify(identityCard, userIdentityAuth.getIdentityName());
+//        if (!match) {
+//            return ResponseFactory.businessError("用户认证失败");
+//        }
         userIdentityAuth.setResultStatus(IdentityStatusEnum.SUCCESS.getState());
         userIdentityAuth.setResultMsg("认证成功");
         userIdentityAuth.setCreateDate(new Date());
@@ -381,7 +423,18 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
     }
 
     /**
+     * 实名认证风控
+     *
+     * @param key
+     * @return
+     */
+//    private ResponseData checkVerifyLimit(String key) {
+//
+//    }
+
+    /**
      * 更新用户认证状态
+     *
      * @param user
      * @param state
      * @return
@@ -398,6 +451,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 
     /**
      * 手机验证码登录
+     *
      * @param mobile
      * @param captcha
      * @return
@@ -422,6 +476,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 
     /**
      * 支付账号绑定
+     *
      * @param userAccountBind
      * @return
      */
@@ -473,7 +528,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         return selectByRecord(user);
     }
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         String content = 8 + "123456" + MD5_KEY;
         System.out.println(MD5Utils.digestAsHex(content));
     }

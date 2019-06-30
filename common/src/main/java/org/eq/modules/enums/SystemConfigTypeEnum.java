@@ -10,7 +10,8 @@ public enum SystemConfigTypeEnum {
     TRADE_HOUR(1,"交易支付时长"),
     FEE_SERVICE(2,"服务费比例"),
     RISK_SMS(3,"短信风控"),
-    ORDER_CLOSE_HOUR(4,"广告关闭时长");
+    ORDER_CLOSE_HOUR(4,"广告关闭时长"),
+    VERIFY(5, "实名认证风控");
 
 
 
