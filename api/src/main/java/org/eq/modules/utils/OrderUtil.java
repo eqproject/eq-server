@@ -2,6 +2,7 @@ package org.eq.modules.utils;
 
 import org.eq.basic.common.util.DateUtil;
 import org.eq.modules.enums.OrderAcceptStateEnum;
+import org.eq.modules.enums.OrderFinishStateEnum;
 import org.eq.modules.enums.OrderTransferStateEnum;
 import org.eq.modules.order.entity.OrderAccept;
 import org.eq.modules.order.entity.OrderAd;
@@ -110,7 +111,7 @@ public class OrderUtil{
         orderFinishSnapshootSimpleVO.setOrderNum(orderFinishSnapshoot.getOrderNum());
         orderFinishSnapshootSimpleVO.setSalePrice(orderFinishSnapshoot.getSaleprice());
         orderFinishSnapshootSimpleVO.setServiceFee(orderFinishSnapshoot.getAmount() - orderFinishSnapshoot.getSaleprice());
-        orderFinishSnapshootSimpleVO.setStatus(orderFinishSnapshoot.getStatus());
+        orderFinishSnapshootSimpleVO.setStatus(OrderFinishStateEnum.getRemarkByState(orderFinishSnapshoot.getStatus()));
         orderFinishSnapshootSimpleVO.setFinishTime(orderFinishSnapshoot.getCreateDate());
         orderFinishSnapshootSimpleVO.setType(orderFinishSnapshoot.getType());
         return orderFinishSnapshootSimpleVO;

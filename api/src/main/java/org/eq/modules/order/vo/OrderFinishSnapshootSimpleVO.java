@@ -70,7 +70,7 @@ public class OrderFinishSnapshootSimpleVO implements Serializable {
     /**
      * 状态
      */
-    private int status;
+    private String status;
 
 
     /**
