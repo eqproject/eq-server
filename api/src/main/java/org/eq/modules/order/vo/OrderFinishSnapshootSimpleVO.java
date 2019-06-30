@@ -76,12 +76,22 @@ public class OrderFinishSnapshootSimpleVO implements Serializable {
     /**
      * 完成时间
      */
-    private Date finishTime;
+    private String finishTime;
 
     /**
      * 订单类型
      */
     private int type;
+
+    /**
+     * 用户头像
+     */
+    private String userHeadImg;
+
+    /**
+     * 用户呢称
+     */
+    private String userNickname;
 
 
 }

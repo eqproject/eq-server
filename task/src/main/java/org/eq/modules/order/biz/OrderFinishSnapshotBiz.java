@@ -127,6 +127,7 @@ public class OrderFinishSnapshotBiz {
         } else if (order.getStatus() == OrderAdStateEnum.ORDER_REJECT.getState()) {
             o.setStatus(OrderFinishStateEnum.ORDER_CLOSE.getState());
         }
+        o.setCreateDate(order.getUpdateDate());
         return o;
     }
 
@@ -158,6 +159,7 @@ public class OrderFinishSnapshotBiz {
         } else if (order.getStatus() == OrderTradeStateEnum.TRADE_SUCCESS.getState()) {
             o.setStatus(OrderFinishStateEnum.ORDER_FINISH.getState());
         }
+        o.setCreateDate(order.getUpdateDate());
         return o;
     }
 

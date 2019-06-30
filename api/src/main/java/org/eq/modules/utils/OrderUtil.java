@@ -112,8 +112,11 @@ public class OrderUtil{
         orderFinishSnapshootSimpleVO.setSalePrice(orderFinishSnapshoot.getSaleprice());
         orderFinishSnapshootSimpleVO.setServiceFee(orderFinishSnapshoot.getAmount() - orderFinishSnapshoot.getSaleprice());
         orderFinishSnapshootSimpleVO.setStatus(OrderFinishStateEnum.getRemarkByState(orderFinishSnapshoot.getStatus()));
-        orderFinishSnapshootSimpleVO.setFinishTime(orderFinishSnapshoot.getCreateDate());
+        orderFinishSnapshootSimpleVO.setFinishTime(DateUtil.foramtChinaFormat(orderFinishSnapshoot.getCreateDate()));
         orderFinishSnapshootSimpleVO.setType(orderFinishSnapshoot.getType());
+        //todo 待实现订单用户头像和昵稍
+        orderFinishSnapshootSimpleVO.setUserHeadImg("");
+        orderFinishSnapshootSimpleVO.setUserNickname("");
         return orderFinishSnapshootSimpleVO;
     }
 
