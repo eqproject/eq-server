@@ -55,7 +55,7 @@ public enum OrderTradeStateEnum {
 
         allowCancelStatus.add(OrderTradeStateEnum.CANCEL.getState());
         allowCancelStatus.add(OrderTradeStateEnum.PAY_FAIL.getState());
-
+        allowCancelStatus.add(OrderTradeStateEnum.WAIT_PAY.getState());
 
         payBackStatus.add(OrderTradeStateEnum.PAY_ING.getState());
 
