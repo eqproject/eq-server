@@ -73,4 +73,14 @@ public class OrderAccept implements Serializable {
 	 */
 	private String remarks;
 
+	/**
+	 * 商品名称
+	 */
+	private String productName;
+
+	/**
+	 * 用户昵称
+	 */
+	private String userNickName;
+
 }

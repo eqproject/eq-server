@@ -7,6 +7,7 @@ package org.eq.modules.order.controller;
 import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.base.BaseController;
 import org.eq.modules.auth.entity.User;
+import org.eq.modules.auth.service.UserIdentityAuthService;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
@@ -41,6 +42,9 @@ public class VoucherController extends BaseController {
 	@Autowired
 	private UserProductStockService userProductStockService;
 
+	@Autowired
+	private UserIdentityAuthService userIdentityAuthService;
+
 
 	/**
 	 * 券包中可用券
@@ -73,6 +77,10 @@ public class VoucherController extends BaseController {
 		if(user==null){
 			return ResponseFactory.signError("用户不存在");
 		}
+		boolean isAuthentication  = userIdentityAuthService.isAuthentication(user);
+		if(!isAuthentication){
+			return ResponseFactory.noAuthentication("用户未认证");
+		}
 		if(StringUtils.isEmpty(searchTransOrderVO.getAddress())){
 			return ResponseFactory.signError("转出地址为空");
 		}
@@ -97,6 +105,10 @@ public class VoucherController extends BaseController {
 		User user = getUserInfo(searchAcceptOrderVO.getUserId());
 		if(user==null){
 			return ResponseFactory.signError("用户不存在");
+		}
+		boolean isAuthentication  = userIdentityAuthService.isAuthentication(user);
+		if(!isAuthentication){
+			return ResponseFactory.noAuthentication("用户未认证");
 		}
 		ServieReturn<OrderAcceptVO>  resOrderAdVO =  orderAcceptService.createAcceptOrderVO(searchAcceptOrderVO,user);
 		if(!StringUtils.isEmpty(resOrderAdVO.getErrMsg())){

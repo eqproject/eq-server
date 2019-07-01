@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:security="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title>转让管理</title>
+    <meta charset="utf-8"/>
+</head>
+<body>
+<section th:fragment="content">
+    <section class="content-header">
+        <h1>转让管理</h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> 转让订单管理</a></li>
+        </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">转让订单列表</h3>
+                    </div>
+                    <div class="box-body">
+                        <form id="searchForm" class="form-inline" method="post">
+                            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                            <div class="form-group col-md-4 col-sm-12 ">
+                                <label  class="col-md-4 col-sm-4 control-label">订单号：</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input type="text" class="form-control" id="transferNo" name="transferNo" maxlength="50" style="width: 100%;"/>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4 col-sm-12">
+                                <label class="col-sm-4 control-label">状态：</label>
+                                <div class="col-sm-8">
+                                    <select class="select2-type select2-choice" id="status" name="status" style="width: 100%;">
+                                        <option value="">全部</option>
+                                        <option value="1">等待承兑</option>
+                                        <option value="2">承兑中</option>
+                                        <option value="3">承兑完成</option>
+                                        <option value="4">取消承兑</option>
+                                        <option value="5">承兑失败</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4 col-sm-12 "  >
+                                <label  class="col-md-4 col-sm-4 control-label">订单创建开始时间：</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input type="text" class="form-control pull-right" data-provide="datepicker" data-date-format="yyyy-mm-dd"  id="beginCreateDate" name="beginCreateDate" maxlength="50" style="width: 100%;"/>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4 col-sm-12 ">
+                                <label  class="col-md-4 col-sm-4 control-label">订单创建结束时间：</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input type="text" class="form-control" id="endCreateDate" data-provide="datepicker" data-date-format="yyyy-mm-dd"  name="endCreateDate" maxlength="50" style="width: 100%;"/>
+                                </div>
+                            </div>
+                            <div class="text-center operateBox row">
+                                <input id="select" class="btn btn-primary"  type="button" th:if="${#authorization.expression('hasRole(''sys:menu:view'')')}" value="查询"/>
+                            </div>
+                        </form>
+                        <div id="dict_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                            <div class="row">
+                                <div class="col-sm-6"></div>
+                                <div class="col-sm-6"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12" id="tableDiv">
+                                    <table id="orderTable" class="table table-bordered table-hover dataTable"
+                                           role="grid" aria-describedby="menu_info">
+                                        <thead>
+                                        <tr role="row">
+                                            <th>序号</th>
+                                            <th>订单号</th>
+                                            <th>商品数量</th>
+                                            <th>状态</th>
+                                            <th>创建时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="treeTableList"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="lookModal" tabindex="-1" role="dialog" data-backdrop="static">
+        <form id="modifyForm" class="modalForm" role="form" method="post">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span></button>
+                        <h4 class="modal-title" id="modifyModalLabel">订单详情</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input id="id" name="id" type="hidden" value=""/>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">订单编号：</span>
+                                <input type="text" readonly="readonly" class="form-control"  name="transferNo" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">商品名称：</span>
+                                <input type="text" readonly="true"  class="form-control"   name="productName" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">用户昵称：</span>
+                                <input type="text" readonly="true"  class="form-control"  name="userNickName" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">商品数量：</span>
+                                <input type="text" readonly="true"  class="form-control"  name="productNum" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">订单状态:</span>
+                                <input type="text"   readonly="true"    class="form-control" name="orderStatus" maxlength="50"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">目标钱包地址:</span>
+                                <input type="text"   readonly="true"    class="form-control" name="toAddress" maxlength="50"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">创建时间：</span>
+                                <input type="text" readonly="true"   class="form-control" name="createDate" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">备注：</span>
+                                <textarea rows="2" readonly="true"   class="form-control" name="remarks" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                        </div>
+                </div>
+            </div>
+            </div>
+        </form>
+    </div>
+
+</section>
+<script type="text/javascript" src="/admin/c2c/order/transferList.js"></script>
+</body>
+</html>
