@@ -93,6 +93,21 @@ public class ResponseFactory<T> {
         return result;
     }
 
+
+
+    /**
+     * 验证不通过 可包含用户信息
+     * @param errMsg 错误信息
+     * @param <T>
+     * @return
+     */
+    public static <T> ResponseData<T> noAuthentication(String errMsg){
+        ResponseData<T> result = initError(errMsg);
+        result.setStatus(ResponseStateEnum.USER_NO_AUTHENTICATION.getStatus());
+        return result;
+    }
+
+
     /**
      * 系统错误 没有明确的错误情况，使用该返回码
      * @param errMsg

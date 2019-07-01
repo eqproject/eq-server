@@ -4,6 +4,7 @@
  */
 package org.eq.modules.auth.service;
 
+import org.eq.modules.auth.entity.User;
 import org.eq.modules.auth.entity.UserIdentityAuth;
 import org.eq.modules.auth.entity.UserIdentityAuthExample;
 import org.eq.basic.common.base.ServiceExtend;
@@ -15,4 +16,11 @@ import org.eq.basic.common.base.ServiceExtend;
  */
 public interface UserIdentityAuthService extends ServiceExtend<UserIdentityAuth,UserIdentityAuthExample> {
 
+
+    /**
+     * 判定用户是否认证通过
+     * @param user
+     * @return
+     */
+     boolean isAuthentication(User user);
 }

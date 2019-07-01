@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.base.BaseController;
 import org.eq.basic.common.base.BaseServiceException;
 import org.eq.modules.auth.entity.User;
+import org.eq.modules.auth.service.UserIdentityAuthService;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
@@ -37,6 +38,9 @@ public class OrderTradeController extends BaseController {
 	@Autowired
 	private OrderTradeService orderTradeService;
 
+	@Autowired
+    private UserIdentityAuthService userIdentityAuthService;
+
     /**
      * 创建交易订单
      * @param orderTradeCreateReqVO
@@ -52,6 +56,10 @@ public class OrderTradeController extends BaseController {
         User user = getUserInfo(orderTradeCreateReqVO.getUserId());
         if(user==null){
             return ResponseFactory.signError("用户不存在");
+        }
+        boolean isAuthentication  = userIdentityAuthService.isAuthentication(user);
+        if(!isAuthentication){
+            return ResponseFactory.noAuthentication("用户未认证");
         }
         logger.info("createTradeOrder 请求参数:{}",JSON.toJSONString(orderTradeCreateReqVO));
         ServieReturn<OrderTrade> inserResult =  null;

@@ -25,6 +25,8 @@ public enum ResponseStateEnum {
 
     USER_WALLET_INACTIVE("304", "钱包未激活"),
 
+    USER_NO_AUTHENTICATION("305", "用户未认证"),
+
     ERROR_SYSTEM("500", "系统错误"), //遇到不明确的异常，统一为这个错误码
 
     ;

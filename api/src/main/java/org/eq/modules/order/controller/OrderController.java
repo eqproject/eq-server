@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.base.BaseController;
 import org.eq.modules.auth.entity.User;
+import org.eq.modules.auth.service.UserIdentityAuthService;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.entitys.StaticEntity;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.security.auth.message.AuthStatus;
 import java.util.List;
 
 /**
@@ -42,6 +44,9 @@ public class OrderController extends BaseController {
 	@Autowired
 	private OrderAdService orderAdService;
 
+	@Autowired
+	private UserIdentityAuthService userIdentityAuthService;
+
 
 
 
@@ -58,6 +63,10 @@ public class OrderController extends BaseController {
 		User user = getUserInfo(searchAdOrderVO.getUserId());
 		if(user==null){
 			return ResponseFactory.signError("用户不存在");
+		}
+		boolean isAuthentication  = userIdentityAuthService.isAuthentication(user);
+		if(!isAuthentication){
+			return ResponseFactory.noAuthentication("用户未认证");
 		}
 		ServieReturn<ResOrderAdVO>  resOrderAdVO =  orderAdService.createResOrderAdVO(searchAdOrderVO,user);
 		if(!StringUtils.isEmpty(resOrderAdVO.getErrMsg())){

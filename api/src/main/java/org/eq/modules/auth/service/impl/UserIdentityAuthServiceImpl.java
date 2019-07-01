@@ -5,11 +5,13 @@
 package org.eq.modules.auth.service.impl;
 
 import org.eq.basic.common.util.StringLowUtils;
+import org.eq.modules.auth.entity.User;
 import org.eq.modules.auth.entity.UserIdentityAuth;
 import org.eq.modules.auth.dao.UserIdentityAuthMapper;
 import org.eq.modules.auth.entity.UserIdentityAuthExample;
 import org.eq.modules.auth.service.UserIdentityAuthService;
 import org.apache.commons.lang3.StringUtils;
+import org.eq.modules.enums.UserStateEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,4 +79,21 @@ public class UserIdentityAuthServiceImpl extends ServiceImplExtend<UserIdentityA
 		return example;
 	}
 
+	@Override
+	public boolean isAuthentication(User user) {
+		if(user ==null){
+			return false;
+		}
+		if(user.getId()<=0){
+			return false;
+		}
+		if(user.getAuthStatus()==null){
+			return false;
+		}
+		if(UserStateEnum.AUTHENTICATION_YES.getState() == user.getAuthStatus().intValue()){
+			return true;
+		}
+		return false;
+
+	}
 }
