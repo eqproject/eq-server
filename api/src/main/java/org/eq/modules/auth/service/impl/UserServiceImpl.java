@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.DateUtil;
+import org.eq.basic.common.util.IdCardVerificationUtil;
 import org.eq.basic.common.util.StringLowUtils;
 import org.eq.modules.auth.dao.UserMapper;
 import org.eq.modules.auth.entity.User;
@@ -362,8 +363,8 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         SystemConfig systemConfig = systemConfigService.getSystemConfigByType(SystemConfigTypeEnum.VERIFY.getType());
         Integer limit = Integer.parseInt(systemConfig.getValue());
         Integer count = (Integer) redisTemplate.opsForValue().get(key);
-        System.out.println("User Verify Limit : " + count);
-        System.out.println("User Verify Expire : " + redisTemplate.getExpire(key));
+        logger.info("User Verify Limit : " + count);
+        logger.info("User Verify Expire : " + redisTemplate.getExpire(key));
         if (count != null) {
             if (count >= limit) {
                 return ResponseFactory.businessError("实名认证次数超过限制,每个用户每天限制" + limit + "次");
@@ -381,23 +382,25 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         String identityCard = AESUtils.decrypt(userIdentityAuth.getIdentityCard(), aesKey);
 
         //验证身份证号码是否合法
-        /* todo 待提交工具类
+
         String checkResult = IdCardVerificationUtil.IDCardValidate(identityCard);
         if (!checkResult.equals(IdCardVerificationUtil.VALIDITY)) {
             return ResponseFactory.businessError(checkResult);
-        }*/
+        }
 
         //验证用户
         User user = new User();
         user.setId(userIdentityAuth.getUserId());
-        user = selectByRecord(user);
-        if (user == null) {
+        User checkUser = selectByRecord(user);
+        if (checkUser == null) {
             return ResponseFactory.businessError("用户不存在");
         }
-        //检查用户是否已认证
-        UserIdentityAuth checkAuth = userIdentityAuthService.selectByRecord(userIdentityAuth);
+        //检查用户ID查询是否已认证
+        UserIdentityAuth auth = new UserIdentityAuth();
+        auth.setUserId(userIdentityAuth.getUserId());
+        UserIdentityAuth checkAuth = userIdentityAuthService.selectByRecord(auth);
         if (checkAuth != null && IdentityStatusEnum.SUCCESS.getState() == checkAuth.getResultStatus()) {
-            return updateUserAuthStatus(user, UserStateEnum.AUTHENTICATION_YES.getState());
+            return updateUserAuthStatus(checkUser, UserStateEnum.AUTHENTICATION_YES.getState());
         }
 
         //实名认证
