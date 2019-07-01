@@ -1,11 +1,15 @@
 package org.eq.modules.order.biz;
 
 import lombok.extern.slf4j.Slf4j;
+import org.eq.basic.common.util.WebClientUtil;
 import org.eq.modules.bc.enums.BcTxRecordBizTypeEnum;
 import org.eq.modules.bc.service.AbstractTaskCallBack;
 import org.eq.modules.trade.entity.OrderTrade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 出售交易订单回调
@@ -33,6 +37,8 @@ public class OrderTradeSellCallback extends AbstractTaskCallBack {
         boolean updateResult = biz.opTrade(orderTrade,true);
         if(!updateResult){
             log.error("更新售卖交易表数据失败,售卖交易表Id:{}",orderTrade.getId());
+        }else{
+            sendLoan(orderTrade);
         }
     }
 
@@ -45,6 +51,19 @@ public class OrderTradeSellCallback extends AbstractTaskCallBack {
         boolean updateResult = biz.opTrade(orderTrade,false);
         if(!updateResult){
             log.error("更新售卖交易表数据失败,售卖交易表Id:{}",orderTrade.getId());
+        }
+    }
+
+    public void sendLoan(OrderTrade orderTrade){
+        String url= "http://localhost:8001/api/test/loan";
+        Map<String,Object> params = new HashMap<>();
+        params.put("tradeNo",orderTrade.getTradeNo());
+        params.put("state",1);
+        try{
+            String response = WebClientUtil.syncPostByForm(url,params);
+            System.out.println(response);
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 }
