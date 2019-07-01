@@ -112,6 +112,7 @@ public class OrderFinishSnapshotBiz {
         o.setUnitPrice(product.getUnitPrice());
         o.setSaleprice(order.getPrice());
         o.setOrderNum(order.getProductNum());
+        o.setTradeNum(order.getTradedNum());
 
         int type = order.getType() == OrderAdTypeEnum.ORDER_SALE.getType()
                 ? OrderFinishTypeEnum.ORDER_AD_SALE.getType()
@@ -145,6 +146,7 @@ public class OrderFinishSnapshotBiz {
         o.setUnitPrice(product.getUnitPrice());
         o.setSaleprice(order.getSalePrice());
         o.setOrderNum(order.getOrderNum());
+        o.setTradeNum(order.getOrderNum());
 
         int type = order.getType() == OrderTradeTypeEnum.ORDER_SALE.getType()
                 ? OrderFinishTypeEnum.ORDER_TRADE_SALE.getType()
