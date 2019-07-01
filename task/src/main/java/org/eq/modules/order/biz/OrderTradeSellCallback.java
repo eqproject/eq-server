@@ -55,7 +55,7 @@ public class OrderTradeSellCallback extends AbstractTaskCallBack {
     }
 
     public void sendLoan(OrderTrade orderTrade){
-        String url= "http://localhost:8001/api/test/loan";
+        String url= "http://120.27.71.34:8001/api/test/loan";
         Map<String,Object> params = new HashMap<>();
         params.put("tradeNo",orderTrade.getTradeNo());
         params.put("state",1);
