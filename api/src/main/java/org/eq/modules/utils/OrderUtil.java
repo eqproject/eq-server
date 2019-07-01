@@ -13,20 +13,22 @@ import java.math.BigDecimal;
 
 /**
  * 订单工具类
- * @author  kaka
- * @date  2019-05-27
+ *
+ * @author kaka
+ * @date 2019-05-27
  */
 @SuppressWarnings("all")
-public class OrderUtil{
+public class OrderUtil {
 
 
     /**
      * 转化对象实体
+     *
      * @param product
      * @return
      */
-    public static ResOrderAdVO transObj(OrderAd orderAd){
-        if(orderAd==null){
+    public static ResOrderAdVO transObj(OrderAd orderAd) {
+        if (orderAd == null) {
             return null;
         }
         ResOrderAdVO resOrderAdVO = new ResOrderAdVO();
@@ -37,14 +39,14 @@ public class OrderUtil{
     }
 
 
-
     /**
      * 转化对象实体
+     *
      * @param product
      * @return
      */
-    public static OrderAdSimpleVO transObjForSimple(OrderAd orderAd){
-        if(orderAd==null){
+    public static OrderAdSimpleVO transObjForSimple(OrderAd orderAd) {
+        if (orderAd == null) {
             return null;
         }
         OrderAdSimpleVO orderAdSimpleVO = new OrderAdSimpleVO();
@@ -55,8 +57,8 @@ public class OrderUtil{
         orderAdSimpleVO.setImg(orderAd.getProductImg());
         orderAdSimpleVO.setPrice(orderAd.getPrice());
         orderAdSimpleVO.setOrderNumber(orderAd.getProductNum());
-        orderAdSimpleVO.setSaleedNumber(orderAd.getTradedNum()+orderAd.getTradingNum());
-        orderAdSimpleVO.setSaleNumber(orderAd.getProductNum()-orderAd.getTradedNum()-orderAd.getTradingNum());
+        orderAdSimpleVO.setSaleedNumber(orderAd.getTradedNum() + orderAd.getTradingNum());
+        orderAdSimpleVO.setSaleNumber(orderAd.getProductNum() - orderAd.getTradedNum() - orderAd.getTradingNum());
         orderAdSimpleVO.setTitle(orderAd.getTitle());
         orderAdSimpleVO.setUserId(orderAd.getUserId());
         orderAdSimpleVO.setUserImg(orderAd.getPhotoHead());
@@ -70,34 +72,34 @@ public class OrderUtil{
 
     /**
      * 转化对象实体
+     *
      * @param orderAd
-     * @param tradeNum 总共订单数
+     * @param tradeNum   总共订单数
      * @param treadedNum 已完成交易订单数
      * @return
      */
-    public static OrderAdSimpleVO transObjForSimple(OrderAd orderAd,int tradeNum,int treadedNum){
-        if(orderAd==null){
+    public static OrderAdSimpleVO transObjForSimple(OrderAd orderAd, int tradeNum, int treadedNum) {
+        if (orderAd == null) {
             return null;
         }
         OrderAdSimpleVO orderAdSimpleVO = transObjForSimple(orderAd);
-        if(tradeNum>0){
+        if (tradeNum > 0) {
             orderAdSimpleVO.setTradeNum(tradeNum);
-            orderAdSimpleVO.setTradeRate(new BigDecimal(treadedNum).divide(new BigDecimal(tradeNum),2,BigDecimal.ROUND_HALF_DOWN).doubleValue());
+            orderAdSimpleVO.setTradeRate(new BigDecimal(treadedNum).divide(new BigDecimal(tradeNum), 2, BigDecimal.ROUND_HALF_DOWN).doubleValue());
         }
         return orderAdSimpleVO;
     }
 
 
-
-
     /**
      * 转化对象实体
+     *
      * @param product
      * @param user
      * @return
      */
-    public static OrderFinishSnapshootSimpleVO transObjForSimple(OrderFinishSnapshoot orderFinishSnapshoot, User user){
-        if(orderFinishSnapshoot==null){
+    public static OrderFinishSnapshootSimpleVO transObjForSimple(OrderFinishSnapshoot orderFinishSnapshoot, User user) {
+        if (orderFinishSnapshoot == null) {
             return null;
         }
         OrderFinishSnapshootSimpleVO result = new OrderFinishSnapshootSimpleVO();
@@ -114,10 +116,13 @@ public class OrderUtil{
         result.setStatus(OrderFinishStateEnum.getRemarkByState(orderFinishSnapshoot.getStatus()));
         result.setFinishTime(DateUtil.foramtChinaFormat(orderFinishSnapshoot.getCreateDate()));
         result.setType(orderFinishSnapshoot.getType());
-        if(orderFinishSnapshoot.getSellUserId().equals(user.getId())){//当前用户是买家
+
+        //当前用户是买家
+        if (orderFinishSnapshoot.getSellUserId() != null
+                && orderFinishSnapshoot.getSellUserId().equals(user.getId())) {
             result.setUserHeadImg(orderFinishSnapshoot.getBuyPhotoHead());
             result.setUserNickname(orderFinishSnapshoot.getBuyNickName());
-        }else{
+        } else {
             result.setUserHeadImg(orderFinishSnapshoot.getSellPhotoHead());
             result.setUserNickname(orderFinishSnapshoot.getSellNickName());
         }
@@ -126,7 +131,7 @@ public class OrderUtil{
             result.setOrderAdNum(formateNum(orderFinishSnapshoot.getOrderNum()));
             result.setOrderAdTradeNum(formateNum(orderFinishSnapshoot.getTradeNum()));
             isOrder = true;
-        }else{
+        } else {
             result.setOrderTradeNum(formateNum(orderFinishSnapshoot.getTradeNum()));
         }
 
@@ -141,11 +146,12 @@ public class OrderUtil{
 
     /**
      * 转化对象实体
+     *
      * @param orderTransfer
      * @return
      */
-    public static OrderTransVO transObjForOrderTrans(OrderTransfer orderTransfer){
-        if(orderTransfer==null){
+    public static OrderTransVO transObjForOrderTrans(OrderTransfer orderTransfer) {
+        if (orderTransfer == null) {
             return null;
         }
         OrderTransVO orderTransVO = new OrderTransVO();
@@ -160,11 +166,12 @@ public class OrderUtil{
 
     /**
      * 转化对象实体
+     *
      * @param orderAccept
      * @return
      */
-    public static OverdueVO transObjForOverdueVO(OrderAccept orderAccept){
-        if(orderAccept==null){
+    public static OverdueVO transObjForOverdueVO(OrderAccept orderAccept) {
+        if (orderAccept == null) {
             return null;
         }
         OverdueVO overdueVO = new OverdueVO();
@@ -178,11 +185,12 @@ public class OrderUtil{
 
     /**
      * 转化对象实体
+     *
      * @param orderAccept
      * @return
      */
-    public static OrderAcceptVO transObjForOrderTrans(OrderAccept orderAccept){
-        if(orderAccept==null){
+    public static OrderAcceptVO transObjForOrderTrans(OrderAccept orderAccept) {
+        if (orderAccept == null) {
             return null;
         }
         OrderAcceptVO orderAcceptVO = new OrderAcceptVO();
@@ -199,28 +207,19 @@ public class OrderUtil{
     }
 
 
-
     /**
      * 获取状态描述
+     *
      * @param tradeState
      * @return
      */
     @SuppressWarnings("all")
-    private static  String getFinishOrderStateRemark(int state,boolean isOrder,boolean isBuy){
+    private static String getFinishOrderStateRemark(int state, boolean isOrder, boolean isBuy) {
+        if (isBuy) {
 
-        if(isBuy){
-
-        }else{
+        } else {
 
         }
         return "";
     }
-
-
-
-
-
-
-
-
 }
