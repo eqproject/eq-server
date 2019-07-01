@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.DateUtil;
-import org.eq.basic.common.util.IdCardVerificationUtil;
 import org.eq.basic.common.util.StringLowUtils;
 import org.eq.modules.auth.dao.UserMapper;
 import org.eq.modules.auth.entity.User;
@@ -382,10 +381,11 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         String identityCard = AESUtils.decrypt(userIdentityAuth.getIdentityCard(), aesKey);
 
         //验证身份证号码是否合法
+        /* todo 待提交工具类
         String checkResult = IdCardVerificationUtil.IDCardValidate(identityCard);
         if (!checkResult.equals(IdCardVerificationUtil.VALIDITY)) {
             return ResponseFactory.businessError(checkResult);
-        }
+        }*/
 
         //验证用户
         User user = new User();
