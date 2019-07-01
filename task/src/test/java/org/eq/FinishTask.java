@@ -1,6 +1,6 @@
 package org.eq;
 
-import org.eq.modules.order.biz.OrderTradeSellCallback;
+import org.eq.modules.order.task.OrderFinishSnapshotTask;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class FinishTask extends BaseTest {
 
     @Autowired
-    private OrderTradeSellCallback sellCallback;
+    private OrderFinishSnapshotTask task;
     @Test
     public void test(){
-        sellCallback.success("0");
+        task.process();
     }
 }
