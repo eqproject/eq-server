@@ -1149,6 +1149,9 @@
 > | orderType     |整型 | 订单类型     |
 > | img             | 字符串 | 商品图片     |
 > | price | 整形   | 订单单价 |
+> | expirationStart | 字符串 | 有效期开始时间 |
+> | expirationEnd | 字符串 | 有效期结束时间 |
+> | acceptName | 字符串 | 承兑商 |
 > | orderNumber | 整形   | 订单总量     |
 > |saleedNumber | 整形   |已完成量    |
 > |saleNumber | 整形   |可交易量   |
@@ -1172,6 +1175,9 @@
      "productId": "1",
      "productName": "京东E卡",
      "img": "b66a.jpg",
+     "expirationStart": "2019-06-20 16:48:29",
+     "expirationEnd": "2020-06-20 16:48:29",
+      "acceptName": "手机集中处理中心",
      "price": 100,
      "orderNumber": 10,
      "saleedNumber": 4,

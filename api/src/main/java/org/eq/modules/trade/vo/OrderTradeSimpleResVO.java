@@ -1,7 +1,6 @@
 package org.eq.modules.trade.vo;
 
 import lombok.Data;
-import org.eq.modules.product.vo.ProductDetailVO;
 
 import java.io.Serializable;
 

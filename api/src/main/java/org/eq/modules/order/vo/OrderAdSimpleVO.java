@@ -40,6 +40,21 @@ public class OrderAdSimpleVO implements Serializable {
     private String img;
 
     /**
+     * 有效期开始时间
+     */
+    private String expirationStart;
+
+    /**
+     * 有效期结束时间
+     */
+    private String expirationEnd;
+
+    /**
+     * 承兑商名称
+     */
+    private String acceptName;
+
+    /**
      * 销售单价
      */
     private int price;

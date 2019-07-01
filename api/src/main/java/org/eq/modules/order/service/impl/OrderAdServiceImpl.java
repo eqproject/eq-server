@@ -11,6 +11,7 @@ import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.basic.common.util.DateUtil;
 import org.eq.modules.auth.entity.User;
+import org.eq.modules.common.cache.ProductCache;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.common.enums.LogTypeEnum;
@@ -25,6 +26,7 @@ import org.eq.modules.order.entity.OrderAdLog;
 import org.eq.modules.order.service.OrderAdService;
 import org.eq.modules.order.vo.*;
 import org.eq.modules.product.entity.Product;
+import org.eq.modules.product.entity.ProductAll;
 import org.eq.modules.product.entity.UserProductStock;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.service.UserProductStockService;
@@ -64,6 +66,9 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
 
     @Autowired
     private OrderTradeService orderTradeService;
+
+    @Autowired
+    private ProductCache productCache;
 
 
     @Override
@@ -246,11 +251,17 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
         }
 
         OrderAdSimpleVO orderAdSimpleVO = OrderUtil.transObjForSimple(orderAd, allNum, finishNum);
-        if (orderAdSimpleVO != null) {
-            result.setData(orderAdSimpleVO);
+        if(orderAdSimpleVO==null){
+            result.setErrMsg("获取订单失败");
             return result;
         }
-        result.setErrMsg("获取订单失败");
+        ProductAll productAll = productCache.getProduct(String.valueOf(orderAd.getProductId()));
+        if(productAll!=null){
+            orderAdSimpleVO.setExpirationStart(productAll.getExpirationStart());
+            orderAdSimpleVO.setExpirationEnd(productAll.getExpirationEnd());
+            orderAdSimpleVO.setAcceptName(productAll.getAcceptName());
+        }
+        result.setData(orderAdSimpleVO);
         return result;
     }
 
