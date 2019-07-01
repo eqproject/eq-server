@@ -10,6 +10,7 @@ import org.eq.basic.common.base.ServiceImplExtend;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
+import org.eq.modules.enums.OrderTradeStateEnum;
 import org.eq.modules.utils.OrderUtil;
 import org.eq.modules.order.service.OrderFinishSnapshootService;
 import org.eq.modules.order.vo.*;
@@ -93,11 +94,14 @@ public class OrderFinishSnapshootServiceImpl extends ServiceImplExtend<OrderFini
 		List<OrderFinishSnapshootSimpleVO> dataList = new ArrayList<>(baseTableData.getData().size());
 		List<OrderFinishSnapshoot> pList = baseTableData.getData();
 		for(OrderFinishSnapshoot p : pList){
-			dataList.add(OrderUtil.transObjForSimple(p));
+			dataList.add(OrderUtil.transObjForSimple(p,user));
 		}
 		result.setList(dataList);
 		result.setTotal(baseTableData.getRecordsTotal());
 		return result;
 	}
+
+
+
 
 }

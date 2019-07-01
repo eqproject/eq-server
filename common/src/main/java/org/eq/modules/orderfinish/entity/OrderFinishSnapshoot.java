@@ -88,13 +88,25 @@ public class OrderFinishSnapshoot {
     /**
      * 昵称
      */
-    private String nickName;
+    private String sellNickName;
 
 
     /**
      * 头像地址
      */
-    private String photoHead;
+    private String sellPhotoHead;
+
+
+    /**
+     * 昵称
+     */
+    private String buyNickName;
+
+
+    /**
+     * 头像地址
+     */
+    private String buyPhotoHead;
 
     /**
      * 商品图片地址

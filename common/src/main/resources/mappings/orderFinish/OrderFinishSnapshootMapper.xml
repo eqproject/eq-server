@@ -17,8 +17,10 @@
 	    <result column="salePrice" jdbcType="INTEGER" property="saleprice" />
 	    <result column="amount" jdbcType="INTEGER" property="amount" />
 	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
-        <result column="nickName" jdbcType="VARCHAR" property="nickName" />
-        <result column="photoHead" jdbcType="VARCHAR" property="photoHead" />
+        <result column="sellNickName" jdbcType="VARCHAR" property="sellNickName" />
+        <result column="sellPhotoHead" jdbcType="VARCHAR" property="sellPhotoHead" />
+        <result column="buyNickName" jdbcType="VARCHAR" property="buyNickName" />
+        <result column="buyPhotoHead" jdbcType="VARCHAR" property="buyPhotoHead" />
         <result column="productImg" jdbcType="VARCHAR" property="productImg" />
     </resultMap>
 
@@ -84,7 +86,9 @@
 
     <sql id="Base_Column_List">
         OFS.id ,OFS.sell_user_id,OFS.buy_user_id,OFS.order_no,OFS.trade_no,OFS.product_id,OFS.product_name,OFS.unit_price,OFS.order_num,OFS.trade_num,OFS.type,OFS.status,OFS.salePrice,OFS.amount,OFS.create_date,
-        UU.nickname as nickName,UU.photo_head AS photohead,PP.product_img as productImg
+        UUSELL.nickname as sellNickName ,UUSELL.photo_head AS sellPhotoHead,
+        UUBUY.nickname as buyNickName ,UUBUY.photo_head AS buyPhotoHead,
+        PP.product_img as productImg
     </sql>
 
     <select id="selectByExample" parameterType="org.eq.modules.orderfinish.entity.OrderFinishSnapshootExample" resultMap="BaseResultMap">
@@ -93,7 +97,10 @@
             distinct
         </if>
         <include refid="Base_Column_List" />
-        from order_finish_snapshoot as OFS left join user UU on UU.id = OFS.sell_user_id OR  UU.id = OFS.buy_user_id left join platform_product PP on PP.id = OFS.product_id
+        from order_finish_snapshoot as OFS
+             left join user UUSELL on UUSELL.id = OFS.sell_user_id
+             left join user UUBUY on UUBUY.id = OFS.buy_user_id
+             left join platform_product PP on PP.id = OFS.product_id
         <if test="_parameter != null">
             <include refid="Example_Where_Clause" />
         </if>
@@ -105,7 +112,10 @@
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
-        from order_finish_snapshoot  as OFS left join user UU on UU.id = OFS.sell_user_id OR  UU.id = OFS.buy_user_id left join platform_product PP on PP.id = OFS.product_id
+        from order_finish_snapshoot  as OFS
+              left join user UU on UU.id = OFS.sell_user_id
+              left join user UUBUY on UUBUY.id = OFS.buy_user_id
+              left join platform_product PP on PP.id = OFS.product_id
         where OFS.id = #{id,jdbcType=BIGINT}
     </select>
 
