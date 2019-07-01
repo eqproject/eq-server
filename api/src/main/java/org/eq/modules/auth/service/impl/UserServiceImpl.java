@@ -426,16 +426,6 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
     }
 
     /**
-     * 实名认证风控
-     *
-     * @param key
-     * @return
-     */
-//    private ResponseData checkVerifyLimit(String key) {
-//
-//    }
-
-    /**
      * 更新用户认证状态
      *
      * @param user
