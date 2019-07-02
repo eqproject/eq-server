@@ -117,30 +117,65 @@ public class OrderUtil {
         result.setFinishTime(DateUtil.foramtChinaFormat(orderFinishSnapshoot.getCreateDate()));
         result.setType(orderFinishSnapshoot.getType());
 
+        boolean isSell = false;
         //当前用户是买家
         if (orderFinishSnapshoot.getSellUserId() != null
                 && orderFinishSnapshoot.getSellUserId().equals(user.getId())) {
             result.setUserHeadImg(orderFinishSnapshoot.getBuyPhotoHead());
             result.setUserNickname(orderFinishSnapshoot.getBuyNickName());
+            isSell = true;
         } else {
             result.setUserHeadImg(orderFinishSnapshoot.getSellPhotoHead());
             result.setUserNickname(orderFinishSnapshoot.getSellNickName());
         }
         boolean isOrder = false;
         if (orderFinishSnapshoot.getType() == OrderFinishTypeEnum.ORDER_AD_SALE.getType() || orderFinishSnapshoot.getType() == OrderFinishTypeEnum.ORDER_AD_BUY.getType()) {
-            result.setOrderAdNum(formateNum(orderFinishSnapshoot.getOrderNum()));
-            result.setOrderAdTradeNum(formateNum(orderFinishSnapshoot.getTradeNum()));
+            result.setOrderWantNumberRemark(getOrderRemark(orderFinishSnapshoot.getType().intValue(),orderFinishSnapshoot.getOrderNum()));
+            result.setOrderFinishNumberRemark(getOrderTradeRemark(orderFinishSnapshoot.getType().intValue(),orderFinishSnapshoot.getTradeNum()));
             isOrder = true;
         } else {
-            result.setOrderTradeNum(formateNum(orderFinishSnapshoot.getTradeNum()));
+            result.setOrderFinishNumberRemark(getTradeRemark(orderFinishSnapshoot.getType().intValue(),orderFinishSnapshoot.getTradeNum(),isSell));
         }
-
-        //String stateRemark = getFinishOrderStateRemark()
         return result;
     }
 
-    private static int formateNum(Integer num) {
-        return num == null ? 0 : num;
+    private static String getOrderRemark(int orderType,Integer orderNumber) {
+       StringBuilder remark = new StringBuilder();
+       if(orderType != OrderFinishTypeEnum.ORDER_AD_SALE.getType() && orderType != OrderFinishTypeEnum.ORDER_AD_BUY.getType()){
+           return  remark.toString();
+       }
+       if(orderType == OrderFinishTypeEnum.ORDER_AD_SALE.getType()){//售卖广告
+           remark.append("发布出售").append(orderNumber);
+       }else{
+           remark.append("发布求购").append(orderNumber);
+       }
+       return remark.toString();
+    }
+
+    private static String getOrderTradeRemark(int orderType,int tradeNum) {
+        StringBuilder remark = new StringBuilder();
+        if(orderType != OrderFinishTypeEnum.ORDER_AD_SALE.getType() && orderType != OrderFinishTypeEnum.ORDER_AD_BUY.getType()){
+            return  remark.toString();
+        }
+        if(orderType == OrderFinishTypeEnum.ORDER_AD_SALE.getType()){//售卖广告
+            remark.append("已售").append(tradeNum);
+        }else{
+            remark.append("已购").append(tradeNum);
+        }
+        return remark.toString();
+    }
+
+    private static String getTradeRemark(int orderType,int tradeNum,boolean isSell) {
+        StringBuilder remark = new StringBuilder();
+        if(orderType != OrderFinishTypeEnum.ORDER_TRADE_SALE.getType() && orderType != OrderFinishTypeEnum.ORDER_TRADE_BUY.getType()){
+            return  remark.toString();
+        }
+        if(isSell){
+            remark.append("已售").append(tradeNum);
+        }else{
+            remark.append("已购").append(tradeNum);
+        }
+        return remark.toString();
     }
 
 

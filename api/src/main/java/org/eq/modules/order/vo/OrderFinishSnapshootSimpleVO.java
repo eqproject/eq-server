@@ -94,16 +94,12 @@ public class OrderFinishSnapshootSimpleVO implements Serializable {
     private String userNickname;
 
     /**
-     * 广告数量
+     * 广告应交易数量描述
      */
-    private int orderAdNum;
+    private String orderWantNumberRemark;
     /**
-     * 广告中已交易数量
+     * 广告已交易数量描述
      */
-    private int orderAdTradeNum;
+    private String orderFinishNumberRemark;
 
-    /**
-     * 广告数量
-     */
-    private int orderTradeNum;
 }

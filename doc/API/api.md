@@ -1676,6 +1676,8 @@
 |createTime |string |交易时间 |
 |finishTime |string |完成时间 |
 |type |string |订单类型:(1:广告出售订单;2:广告求购订单;3:交易出售订单;4:交易求购订单)|
+|orderWantNumberRemark |String |订单应交易情况    (为空不显示)|
+|orderFinishNumberRemark |String |订单实际交易情况  (为空不显示)|
 
 ###### 接口示例
 
