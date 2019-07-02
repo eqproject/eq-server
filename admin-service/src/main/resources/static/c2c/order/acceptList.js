@@ -51,7 +51,7 @@ var orderStatusObj = {1:'等待承兑',2:'承兑中',3:'承兑完成',4:'取消�
                         render: function (data, type, row, meta) {
                             var option = "";
                             option +='<a href="javascript:void(0);" onclick="look(this);"   name="delete" data-id="' + row.id + '" >查看</a>';
-                            option +='&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="getLog(this,\'ad\');"   name="delete" data-id="' + row.id + '" >查看日志</a>'
+                            option +='&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="getLog(this,\'accept\');" data-id="' + row.id + '" >查看日志</a>'
                             return option;
                         }
                     }

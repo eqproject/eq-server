@@ -51,7 +51,7 @@ var orderStatusObj = {1:'等待确认',2:'转让成功',3:'取消转让',4:'转�
                         render: function (data, type, row, meta) {
                             var option = "";
                             option +='<a href="javascript:void(0);" onclick="look(this);"   name="delete" data-id="' + row.id + '" >查看</a>';
-                            option +='&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="getLog(this,\'ad\');"   name="delete" data-id="' + row.id + '" >查看日志</a>'
+                            option +='&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="getLog(this,\'transfer\');"   name="delete" data-id="' + row.id + '" >查看日志</a>'
                             return option;
                         }
                     }
