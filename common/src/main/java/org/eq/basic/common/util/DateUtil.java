@@ -98,15 +98,32 @@ public class DateUtil {
      * 格式化时间
      *
      * @param timeStr 时间字符串
-     * @param format  格式
      * @return
      */
-    public static Date passDate(String timeStr, String format) {
+    public static Date passDate(String timeStr) {
         if (StringUtils.isEmpty(timeStr)) {
             return null;
         }
         try {
             return simpleFormat.parse(timeStr);
+        } catch (Exception e) {
+        }
+
+        return getNowTime();
+    }
+
+    /**
+     * 格式化时间
+     *
+     * @param timeStr 时间字符串
+     * @return
+     */
+    public static Date passDateTime(String timeStr) {
+        if (StringUtils.isEmpty(timeStr)) {
+            return null;
+        }
+        try {
+            return chinaFormat.parse(timeStr);
         } catch (Exception e) {
         }
 

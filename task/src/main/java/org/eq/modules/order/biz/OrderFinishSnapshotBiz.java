@@ -66,9 +66,8 @@ public class OrderFinishSnapshotBiz {
         status.add(OrderTradeStateEnum.TRADE_SUCCESS.getState());
         status.add(OrderTradeStateEnum.REFUND_SUCCESS.getState());
         ca.andStatusInForAll(status);
-        TaskTime time = new TaskTime().build();
 
-        ca.andStatusInForAll(status);
+        TaskTime time = new TaskTime().build();
         ca.andUpdateDateBetweenForAll(time.getStart(), time.getEnd());
         return orderTradeMapper.selectByExample(example);
     }
@@ -188,11 +187,11 @@ public class OrderFinishSnapshotBiz {
         }
 
         private void setStart(String time) {
-            this.start = DateUtil.passDate(time, DateUtil.DATE_FORMAT_FULL_01);
+            this.start = DateUtil.passDateTime(time);
         }
 
         private void setEnd(String time) {
-            this.end = DateUtil.passDate(time, DateUtil.DATE_FORMAT_FULL_01);
+            this.end = DateUtil.passDateTime(time);
         }
     }
 }
