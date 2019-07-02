@@ -345,10 +345,10 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
             if (user == null) {
                 return result;
             }
-            List<Long> userProductList = new ArrayList<>();
+           /* List<Long> userProductList = new ArrayList<>();
             userProductList.add(-1L);
-            userProductList.addAll(userProductStockService.listUserProdutId(user));
-            orderAdExample = getExampleFromEntityAll(OrderAdTypeEnum.ORDER_BUY.getType(), userProductList);
+            userProductList.addAll(userProductStockService.listUserProdutId(user));*/
+            orderAdExample = getExampleFromEntityAll(OrderAdTypeEnum.ORDER_BUY.getType(), null);
         } else {//我要买
             orderAdExample = getExampleFromEntityAll(OrderAdTypeEnum.ORDER_SALE.getType(), null);
         }
