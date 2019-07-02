@@ -65,6 +65,7 @@ public class OrderFinishSnapshootServiceImpl extends ServiceImplExtend<OrderFini
 		OrderFinishSnapshootExample example = new OrderFinishSnapshootExample();
 		OrderFinishSnapshootExample.Criteria ca = example.or();
 	    ca.andAllUserIdEqualToForAll(userId);
+		example.setOrderByClause("update_time desc");
 		return example;
 	}
 
