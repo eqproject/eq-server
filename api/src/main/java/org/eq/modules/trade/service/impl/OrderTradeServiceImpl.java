@@ -676,7 +676,7 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 		orderTradeExample.setOrderByClause(" create_date desc");
 
 		ca.andStatusInForAll(OrderTradeStateEnum.getRunningStates());
-		ca.andBuyUserIdEqualTo(orderTradeListReqVO.getUserId());
+		ca.andAllUserIdEqualTo(orderTradeListReqVO.getUserId());
 		//ca.andNoWaitBuyUserIdForAll(orderTradeListReqVO.getUserId(),OrderTradeStateEnum.getRunPay());
 
 		BaseTableData baseTableData = findDataListByExampleForPage(orderTradeExample,orderTradeListReqVO.getPageNum(), orderTradeListReqVO.getPageSize());
