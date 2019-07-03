@@ -18,6 +18,7 @@
 	    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
 	    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
 	    <result column="del_flag" jdbcType="INTEGER" property="delFlag" />
+        <result column="client_type" jdbcType="INTEGER" property="clientType" />
     </resultMap>
 
     <sql id="Example_Where_Clause">
@@ -81,7 +82,7 @@
     </sql>
 
     <sql id="Base_Column_List">
-        id,name,nickname,password,tx_password,sex,level,mobile,auth_status,birthday,photo_head,intro,create_date,update_date,remarks,del_flag
+        id,name,nickname,password,tx_password,sex,level,mobile,auth_status,birthday,photo_head,intro,create_date,update_date,remarks,del_flag,client_type
     </sql>
 
     <select id="selectByExample" parameterType="org.eq.modules.auth.entity.UserExample" resultMap="BaseResultMap">
@@ -119,7 +120,7 @@
     </delete>
 
     <insert id="insert" parameterType="org.eq.modules.auth.entity.User">
-        insert into user (name,nickname,password,tx_password,sex,level,mobile,auth_status,birthday,photo_head,intro,create_date,update_date,remarks,del_flag)
+        insert into user (name,nickname,password,tx_password,sex,level,mobile,auth_status,birthday,photo_head,intro,create_date,update_date,remarks,del_flag,client_type)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
             #{name,jdbcType=VARCHAR},
@@ -137,11 +138,12 @@
             #{updateDate,jdbcType=TIMESTAMP},
             #{remarks,jdbcType=VARCHAR},
             #{delFlag,jdbcType=INTEGER},
+            #{clientType,jdbcType=INTEGER},
         </trim>
     </insert>
 
     <insert id="insertReturnId" parameterType="org.eq.modules.auth.entity.User" useGeneratedKeys="true" keyProperty="id">
-        insert into user (name,nickname,password,tx_password,sex,level,mobile,auth_status,birthday,photo_head,intro,create_date,update_date,remarks,del_flag)
+        insert into user (name,nickname,password,tx_password,sex,level,mobile,auth_status,birthday,photo_head,intro,create_date,update_date,remarks,del_flag,client_type)
         values
         <trim prefix="(" suffix=")" suffixOverrides=",">
             #{name,jdbcType=VARCHAR},
@@ -159,6 +161,7 @@
             #{updateDate,jdbcType=TIMESTAMP},
             #{remarks,jdbcType=VARCHAR},
             #{delFlag,jdbcType=INTEGER},
+            #{clientType,jdbcType=INTEGER},
         </trim>
     </insert>
 
@@ -180,6 +183,7 @@
             update_date,
             remarks,
             del_flag,
+            client_type,
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             #{name,jdbcType=VARCHAR},
@@ -197,6 +201,7 @@
             #{updateDate,jdbcType=TIMESTAMP},
             #{remarks,jdbcType=VARCHAR},
             #{delFlag,jdbcType=INTEGER},
+            #{clientType,jdbcType=INTEGER},
         </trim>
     </insert>
 
@@ -258,6 +263,9 @@
             <if test="record.delFlag != null">
                 del_flag = #{record.delFlag,jdbcType=INTEGER},
             </if>
+            <if test="record.clientType != null">
+                client_type = #{record.clientType,jdbcType=INTEGER},
+            </if>
         </set>
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause" />
@@ -284,6 +292,7 @@
             update_date = #{record.updateDate,jdbcType=TIMESTAMP},
             remarks = #{record.remarks,jdbcType=VARCHAR},
             del_flag = #{record.delFlag,jdbcType=INTEGER},
+            client_type = #{record.clientType,jdbcType=INTEGER},
         </trim>
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause" />
@@ -338,6 +347,9 @@
             <if test="delFlag != null">
             del_flag = #{delFlag,jdbcType=INTEGER},
             </if>
+            <if test="clientType != null">
+                client_type = #{clientType,jdbcType=INTEGER},
+            </if>
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
@@ -361,6 +373,7 @@
               update_date = #{updateDate,jdbcType=TIMESTAMP},
               remarks = #{remarks,jdbcType=VARCHAR},
               del_flag = #{delFlag,jdbcType=INTEGER},
+              client_type = #{clientType,jdbcType=INTEGER},
         </trim>
         where id = #{id,jdbcType=BIGINT}
     </update>

@@ -31,5 +31,6 @@ public class User implements Serializable {
     private Date updateDate;// 更新日期
     protected String remarks; // 备注
     private Integer delFlag; // 删除标记
+    private Integer clientType; //客户端类型
 
 }

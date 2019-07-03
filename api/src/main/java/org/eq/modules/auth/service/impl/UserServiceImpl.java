@@ -9,11 +9,9 @@ import org.eq.basic.common.util.DateUtil;
 import org.eq.basic.common.util.IdCardVerificationUtil;
 import org.eq.basic.common.util.StringLowUtils;
 import org.eq.modules.auth.dao.UserMapper;
-import org.eq.modules.auth.entity.User;
-import org.eq.modules.auth.entity.UserAccountBind;
-import org.eq.modules.auth.entity.UserExample;
-import org.eq.modules.auth.entity.UserIdentityAuth;
+import org.eq.modules.auth.entity.*;
 import org.eq.modules.auth.service.UserAccountBindService;
+import org.eq.modules.auth.service.UserClientWhitelistService;
 import org.eq.modules.auth.service.UserIdentityAuthService;
 import org.eq.modules.auth.service.UserService;
 import org.eq.modules.bc.dao.InitiatorAccMapper;
@@ -63,6 +61,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
     private final UserAccountBindService userAccountBindService;
     private final InitiatorAccMapper initiatorAccMapper;
     private final SystemConfigService systemConfigService;
+    private final UserClientWhitelistService userClientWhitelistService;
 
     @Value("${aes.key}")
     private String aesKey;
@@ -176,7 +175,17 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             user = new User();
             user.setMobile(mobile);
         }
-
+        //检查是否是白名单用户
+        UserClientWhitelist userClientWhitelist = new UserClientWhitelist();
+        userClientWhitelist.setMobile(mobile);
+        UserClientWhitelist checkUserWhiteList = userClientWhitelistService.selectByRecord(userClientWhitelist);
+        if (checkUserWhiteList != null) {
+            user.setClientType(ClientTypeEnum.B.getState());
+            checkUserWhiteList.setStatus(UserWhiteListStatusEnum.YES.getState());
+            userClientWhitelistService.updateByPrimaryKey(checkUserWhiteList);
+        } else {
+            user.setClientType(ClientTypeEnum.C.getState());
+        }
         Long userId = saveUser(user);
 
         if (userId == null) {

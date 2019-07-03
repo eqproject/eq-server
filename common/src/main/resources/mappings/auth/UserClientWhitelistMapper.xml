@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.eq.modules.auth.dao.UserClientWhitelistMapper">
+    <resultMap id="BaseResultMap" type="org.eq.modules.auth.entity.UserClientWhitelist">
+        <id column="id" jdbcType="BIGINT" property="id" />
+	    <result column="mobile" jdbcType="VARCHAR" property="mobile" />
+	    <result column="status" jdbcType="TINYINT" property="status" />
+	    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    </resultMap>
+
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_List">
+        id,mobile,status,create_date
+    </sql>
+
+    <select id="selectByExample" parameterType="org.eq.modules.auth.entity.UserClientWhitelistExample" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List" />
+        from user_client_whitelist
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from user_client_whitelist
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from user_client_whitelist
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByExample" parameterType="org.eq.modules.auth.entity.UserClientWhitelistExample">
+        delete from user_client_whitelist
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
+
+    <insert id="insert" parameterType="org.eq.modules.auth.entity.UserClientWhitelist">
+        insert into user_client_whitelist (mobile,status,create_date)
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{mobile,jdbcType=VARCHAR},
+            #{status,jdbcType=TINYINT},
+            #{createDate,jdbcType=TIMESTAMP},
+        </trim>
+    </insert>
+
+    <insert id="insertSelective" parameterType="org.eq.modules.auth.entity.UserClientWhitelist">
+        insert into user_client_whitelist
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            mobile,
+            status,
+            create_date,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{mobile,jdbcType=VARCHAR},
+            #{status,jdbcType=TINYINT},
+            #{createDate,jdbcType=TIMESTAMP},
+        </trim>
+    </insert>
+
+    <select id="countByExample" parameterType="org.eq.modules.auth.entity.UserClientWhitelistExample" resultType="java.lang.Long">
+        select count(*) from user_client_whitelist
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </select>
+
+    <update id="updateByExampleSelective" parameterType="map">
+        update user_client_whitelist
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.mobile != null">
+                mobile = #{record.mobile,jdbcType=VARCHAR},
+            </if>
+            <if test="record.status != null">
+                status = #{record.status,jdbcType=TINYINT},
+            </if>
+            <if test="record.createDate != null">
+                create_date = #{record.createDate,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByExample" parameterType="map">
+        update user_client_whitelist
+        set
+        <trim  suffixOverrides=",">
+            id = #{record.id,jdbcType=BIGINT},
+            mobile = #{record.mobile,jdbcType=VARCHAR},
+            status = #{record.status,jdbcType=TINYINT},
+            create_date = #{record.createDate,jdbcType=TIMESTAMP},
+        </trim>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+
+    <update id="updateByPrimaryKeySelective" parameterType="org.eq.modules.auth.entity.UserClientWhitelist">
+        update user_client_whitelist
+        <set>
+            <if test="mobile != null">
+            mobile = #{mobile,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+            status = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="createDate != null">
+            create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="org.eq.modules.auth.entity.UserClientWhitelist">
+        update user_client_whitelist
+        set
+        <trim  suffixOverrides=",">
+              mobile = #{mobile,jdbcType=VARCHAR},
+              status = #{status,jdbcType=TINYINT},
+              create_date = #{createDate,jdbcType=TIMESTAMP},
+        </trim>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+</mapper>
