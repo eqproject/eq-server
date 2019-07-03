@@ -8,7 +8,7 @@ public enum BcAccountTypeEnum {
     SELL(2, "售卖券"),
     BUY(3, "购买券"),
     TRANSFER(4, "转出"),
-    ACCEPT(4, "承兑");
+    ACCEPT(5, "承兑");
     private Integer code;
     private String name;
 

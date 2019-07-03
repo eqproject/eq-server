@@ -1,5 +1,6 @@
 package org.eq.modules.bc.task;
 
+import com.alibaba.fastjson.JSON;
 import io.bumo.model.response.result.data.TransactionHistory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,7 @@ public class HandleQueryTransferResultJob {
 				for(BlockchainTx tx : bcTXList){
 					String hash = tx.getTxHash();
 					TransactionHistory transactionHistory = blockChainManager.getTransactionByHash(hash);
+					log.info("transaction result:{}", JSON.toJSONString(transactionHistory));
 					if(!Tools.isNull(transactionHistory)){
 						String txFee = DecimalCalculateUtil.divide10Pow(transactionHistory.getActualFee(),8);
 						Integer errorCode = transactionHistory.getErrorCode();
