@@ -1,20 +1,23 @@
 package org.eq.modules.auth.service;
 
+import org.eq.basic.common.base.ServiceExtend;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.auth.entity.UserAccountBind;
 import org.eq.modules.auth.entity.UserExample;
-import org.eq.basic.common.base.ServiceExtend;
 import org.eq.modules.auth.entity.UserIdentityAuth;
 import org.eq.modules.common.entitys.ResponseData;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 用户管理Service
+ *
  * @author hobe
  * @version 2019-0-05-30
  */
 public interface UserService extends ServiceExtend<User, UserExample> {
     /**
      * 用户注册
+     *
      * @param mobile
      * @param captcha
      * @return
@@ -23,16 +26,18 @@ public interface UserService extends ServiceExtend<User, UserExample> {
 
     /**
      * 用户重置密码
+     *
      * @param mobile
      * @param captcha
      * @param userId
      * @param pwd
      * @return
      */
-    ResponseData reset(String mobile, String captcha,Long userId, String pwd);
+    ResponseData reset(String mobile, String captcha, Long userId, String pwd);
 
     /**
      * 用户登录
+     *
      * @param mobile
      * @param pwd
      * @return
@@ -41,6 +46,7 @@ public interface UserService extends ServiceExtend<User, UserExample> {
 
     /**
      * 用户实名认证
+     *
      * @param userIdentityAuth
      * @return
      */
@@ -48,6 +54,7 @@ public interface UserService extends ServiceExtend<User, UserExample> {
 
     /**
      * 用户手机号验证码登录
+     *
      * @param mobile
      * @param captcha
      * @return
@@ -56,6 +63,7 @@ public interface UserService extends ServiceExtend<User, UserExample> {
 
     /**
      * 支付账号绑定
+     *
      * @param userAccountBind
      * @return
      */
@@ -63,8 +71,17 @@ public interface UserService extends ServiceExtend<User, UserExample> {
 
     /**
      * 获取用户信息
+     *
      * @param userId
      * @return
      */
     ResponseData getUserInfo(Long userId);
+
+    /**
+     * 上传用户头像
+     *
+     * @param imgFile
+     * @return
+     */
+    ResponseData<String> uploadHeadImg(MultipartFile imgFile);
 }

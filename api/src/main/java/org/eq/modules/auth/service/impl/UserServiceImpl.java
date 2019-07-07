@@ -1,6 +1,7 @@
 package org.eq.modules.auth.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.annotation.AutowiredService;
@@ -34,7 +35,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +58,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExample> implements UserService {
     private static final String MD5_KEY = "org.eq.modules";
+    private final static String IMG_PATH = "api/src/main/resources/static/upload/images";
 
     private final UserWalletService userWalletService;
     private final BcTxRecordService bcTxRecordService;
@@ -503,6 +509,36 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             return ResponseFactory.success(user);
         } else {
             return ResponseFactory.businessError("用户信息获取失败");
+        }
+    }
+
+    @Override
+    public ResponseData uploadHeadImg(MultipartFile imgFile) {
+        try {
+            String imgFileName = imgFile.getOriginalFilename();
+            if (!(imgFileName.endsWith(".jpg") || imgFileName.endsWith(".png") || imgFileName.endsWith(".gif"))) {
+                return ResponseFactory.businessError("图片格式错误");
+            }
+            String imgType = imgFileName.substring(imgFileName.lastIndexOf("."));
+            String fileName = System.currentTimeMillis() + RandomStringUtils.randomNumeric(6) + imgType;
+            File fileDir = new File(IMG_PATH);
+            if (!fileDir.exists()) {
+                fileDir.mkdirs();
+            }
+            String destFileName = fileDir.getAbsolutePath() + File.separator + fileName;
+            File destFile = new File(destFileName);
+            imgFile.transferTo(destFile);
+
+            Map resultMap = new HashMap();
+            resultMap.put("img", fileName);
+            return ResponseFactory.success(resultMap);
+        } catch (FileNotFoundException e) {
+
+            e.printStackTrace();
+            return ResponseFactory.businessError("上传失败");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseFactory.businessError("上传失败");
         }
     }
 

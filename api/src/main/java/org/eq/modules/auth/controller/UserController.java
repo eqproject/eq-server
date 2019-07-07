@@ -11,8 +11,9 @@ import org.eq.modules.common.entitys.ResponseData;
 import org.eq.modules.common.factory.ResponseFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -26,6 +27,7 @@ import java.util.Date;
 @RestController
 @RequestMapping(value = "/api/user")
 public class UserController extends BaseController {
+
     /**
      * 用户注册接口
      *
@@ -58,8 +60,8 @@ public class UserController extends BaseController {
      * @return
      */
     @RequestMapping(value = "/reset", method = RequestMethod.POST)
-    public ResponseData reset(String mobile, String captcha,Long userId,String pwd) {
-        return userService.reset(mobile,captcha,userId, pwd);
+    public ResponseData reset(String mobile, String captcha, Long userId, String pwd) {
+        return userService.reset(mobile, captcha, userId, pwd);
     }
 
     /**
@@ -70,17 +72,17 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/modify", method = RequestMethod.POST)
     public ResponseData modify(UserVO userVO) {
-        if(userVO==null || userVO.getId()<=0){
+        if (userVO == null || userVO.getId() <= 0) {
             return ResponseFactory.paramsError("参数为空");
         }
-        User  dbUser = null;
-        try{
+        User dbUser = null;
+        try {
             dbUser = userService.selectByPrimaryKey(userVO.getId());
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        if(dbUser==null){
-           return ResponseFactory.paramsError("用户不存在");
+        if (dbUser == null) {
+            return ResponseFactory.paramsError("用户不存在");
         }
         User updateUser = new User();
         updateUser.setUpdateDate(new Date());
@@ -88,7 +90,7 @@ public class UserController extends BaseController {
         updateUser.setSex(userVO.getSex());
         updateUser.setName(userVO.getName());
         updateUser.setNickname(userVO.getNickname());
-        if(!StringUtils.isEmpty(userVO.getBirthday())){
+        if (!StringUtils.isEmpty(userVO.getBirthday())) {
             updateUser.setBirthday(DateUtil.passDateOrNow(userVO.getBirthday()));
         }
         updateUser.setPhotoHead(userVO.getPhotoHead());
@@ -145,9 +147,7 @@ public class UserController extends BaseController {
 
 
     @RequestMapping(value = "/upload/head")
-    public ResponseData<String> uploadHead(HttpServletRequest httpServletRequest){
-
-        return null;
-
+    public ResponseData<String> uploadHead(HttpServletRequest req, @RequestParam("imgFile") MultipartFile imgFile) {
+        return userService.uploadHeadImg(imgFile);
     }
 }
