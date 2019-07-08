@@ -58,8 +58,6 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExample> implements UserService {
     private static final String MD5_KEY = "org.eq.modules";
-    private final static String IMG_PATH = "api/src/main/resources/static/upload/images";
-
     private final UserWalletService userWalletService;
     private final BcTxRecordService bcTxRecordService;
     private final UserIdentityAuthService userIdentityAuthService;
@@ -71,6 +69,9 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
 
     @Value("${aes.key}")
     private String aesKey;
+
+    @Value("${upload.img.path}")
+    private String uploadImgPath;
 
 
     @Override
@@ -521,7 +522,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             }
             String imgType = imgFileName.substring(imgFileName.lastIndexOf("."));
             String fileName = System.currentTimeMillis() + RandomStringUtils.randomNumeric(6) + imgType;
-            File fileDir = new File(IMG_PATH);
+            File fileDir = new File(uploadImgPath);
             if (!fileDir.exists()) {
                 fileDir.mkdirs();
             }
@@ -533,11 +534,10 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             resultMap.put("img", fileName);
             return ResponseFactory.success(resultMap);
         } catch (FileNotFoundException e) {
-
-            e.printStackTrace();
+            logger.error("上传失败",e);
             return ResponseFactory.businessError("上传失败");
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("上传失败",e);
             return ResponseFactory.businessError("上传失败");
         }
     }

@@ -147,7 +147,7 @@ public class UserController extends BaseController {
 
 
     @RequestMapping(value = "/upload/head")
-    public ResponseData<String> uploadHead(HttpServletRequest req, @RequestParam("imgFile") MultipartFile imgFile) {
+    public ResponseData<String> uploadHead(@RequestParam("imgFile") MultipartFile imgFile) {
         return userService.uploadHeadImg(imgFile);
     }
 }
