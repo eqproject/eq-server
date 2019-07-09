@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:security="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title>申诉管理</title>
+    <meta charset="utf-8"/>
+</head>
+<body>
+<section th:fragment="content">
+    <section class="content-header">
+        <h1>申诉管理</h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> 申诉管理</a></li>
+        </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">申诉管理列表</h3>
+                    </div>
+                    <div class="box-body">
+                        <form id="searchForm" class="form-inline" method="post">
+                            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                            <div class="form-group col-md-4 col-sm-12 ">
+                                <label  class="col-md-4 col-sm-4 control-label">申诉单号：</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input type="text" class="form-control" id="appealNo" name="appealNo" maxlength="50" style="width: 100%;"/>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4 col-sm-12 ">
+                                <label  class="col-md-4 col-sm-4 control-label">交易订单号：</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input type="text" class="form-control" id="tradeNo" name="tradeNo" maxlength="50" style="width: 100%;"/>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4 col-sm-12 ">
+                                <label  class="col-md-4 col-sm-4 control-label">用户电话：</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input type="text" class="form-control" id="mobile" name="mobile" maxlength="50" style="width: 100%;"/>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4 col-sm-12">
+                                <label class="col-sm-4 control-label">申诉状态：</label>
+                                <div class="col-sm-8">
+                                    <select class="select2-type select2-choice" id="status" name="status" style="width: 100%;">
+                                        <option value="">全部</option>
+                                        <option value="0">未处理</option>
+                                        <option value="1">已处理</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4 col-sm-12 ">
+                                <label  class="col-md-4 col-sm-4 control-label">创建开始时间：</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input type="text" class="form-control" data-provide="datepicker" data-date-format="yyyy-mm-dd" id="beginCreateDate" name="beginCreateDate" maxlength="50" style="width: 100%;"/>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4 col-sm-12 ">
+                                <label  class="col-md-4 col-sm-4 control-label">创建结束时间：</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input type="text" class="form-control" data-provide="datepicker" data-date-format="yyyy-mm-dd" id="endCreateDate" name="endCreateDate" maxlength="50" style="width: 100%;"/>
+                                </div>
+                            </div>
+                            <div class="text-center operateBox row">
+                                <input id="select" class="btn btn-primary"  type="button" th:if="${#authorization.expression('hasRole(''sys:menu:view'')')}" value="查询"/>
+                            </div>
+                        </form>
+                        <div id="dict_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                            <div class="row">
+                                <div class="col-sm-6"></div>
+                                <div class="col-sm-6"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12" id="tableDiv">
+                                    <table id="orderTable" class="table table-bordered table-hover dataTable"
+                                           role="grid" aria-describedby="menu_info">
+                                        <thead>
+                                        <tr role="row">
+                                            <th>序号</th>
+                                            <th>申诉单号</th>
+                                            <th>交易单号</th>
+                                            <th>昵称</th>
+                                            <th>手机号</th>
+                                            <th>状态</th>
+                                            <th>创建时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="treeTableList"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="modifyModal" tabindex="-1" role="dialog" data-backdrop="static" style="overflow:scroll;">
+        <form id="modifyForm" class="modalForm" role="form" method="post">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"/>
+                            <span>&times;</span></button>
+                        <h4 class="modal-title" id="modifyModalLabel">详情</h4>
+                    </div>
+                    <div class="modal-body">
+                        <!--<input id="id" name="id" type="hidden" value="">-->
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">申诉单号：</span>
+                                <input type="text" class="form-control" name="appealNo" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">交易订单号：</span>
+                                <input type="text" class="form-control" name="tradeNo" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">用户昵称：</span>
+                                <input type="text" class="form-control" name="userNickName" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">用户电话号码：</span>
+                                <input type="text" class="form-control" name="mobile" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">状态：</span>
+                                <input type="text" class="form-control" name="status" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">创建时间：</span>
+                                <input type="text" class="form-control"  name="crateTime" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">更新时间：</span>
+                                <input type="text" class="form-control"  name="updateTime" maxlength="50"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">处理结果：</span>
+                                <textarea rows="2" cols="3" readonly="readonly" type="text" class="form-control"  name="remark" maxlength="50"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-right" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- 操作区域（Modal） -->
+    <div class="modal fade" id="auditModal" tabindex="-1" role="dialog" data-backdrop="static" style="overflow:scroll;">
+        <form  class="auditForm" role="form" method="post">
+            <input th:type="hidden" name="id"/>
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span></button>
+                        <h4 class="modal-title" >操作</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">申诉单号：</span>
+                                <input type="text" class="form-control" readonly="readonly" name="appealNo" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">交易订单号：</span>
+                                <input type="text" class="form-control" readonly="readonly" name="tradeNo" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">用户昵称：</span>
+                                <input type="text" class="form-control" readonly="readonly" name="userNickName" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">用户电话号码：</span>
+                                <input type="text" class="form-control" readonly="readonly" name="mobile" maxlength="50"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">处理结果：</span>
+                                <textarea rows="2" cols="3" type="text" class="form-control"  name="remark" maxlength="50"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" onclick="audit()" class="btn btn-default pull-right" data-dismiss="modal">提交</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+<script type="text/javascript" src="/admin/c2c/trade/appealList.js"></script>
+</body>
+</html>

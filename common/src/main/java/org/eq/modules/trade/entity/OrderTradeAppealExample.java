@@ -4,6 +4,8 @@
  */
 package org.eq.modules.trade.entity;
 
+import org.eq.modules.order.entity.OrderAdExample;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
@@ -126,7 +128,21 @@ public class OrderTradeAppealExample {
         public Criteria andAppealNoEqualToForAll(String value) {
             addCriterion("OT.appeal_no =", value, "appealNo");
             return (Criteria) this;
-        } public Criteria andAppealNoEqualToForUpdate(String value) {
+        }
+        public Criteria andAppealNoLikeForAll(String value) {
+            addCriterion("OT.appeal_no like", "%"+value+"%", "appealNo");
+            return (Criteria) this;
+        }
+        public Criteria andTradeNoLikeForAll(String value) {
+            addCriterion("OT.trade_no like", "%"+value+"%", "tradeNo");
+            return (Criteria) this;
+        }
+        public Criteria andMobileEqualForAll(String value) {
+            addCriterion("UU.mobile like", "%"+value+"%", "tradeNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppealNoEqualToForUpdate(String value) {
             addCriterion("appeal_no =", value, "appealNo");
             return (Criteria) this;
         }
@@ -154,6 +170,16 @@ public class OrderTradeAppealExample {
         }
         public Criteria andStatusEqualToForUpdate(Integer value) {
             addCriterion("status =", value, "status");
+            return (Criteria) this;
+        }
+        public Criteria andCreateDateGreaterThanOrEqualToForAll(Date value) {
+            addCriterion("OT.crate_time >=", value, "crateDate");
+            return (Criteria) this;
+        }
+
+
+        public Criteria andCreateDateLessThanOrEqualToForAll(Date value) {
+            addCriterion("OT.crate_time <=", value, "crateDate");
             return (Criteria) this;
         }
 

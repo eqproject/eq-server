@@ -15,7 +15,7 @@ import java.util.Date;
  * @version 1.0.1
  */
 @Data
-public class OrderTradeAppeal extends BaseEntity {
+public class OrderTradeAppeal{
 
 	private static final long serialVersionUID = 1L;
 	private Long id;
@@ -48,4 +48,6 @@ public class OrderTradeAppeal extends BaseEntity {
 	 * 电话
 	 */
 	private String mobile;
+
+
 }

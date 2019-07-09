@@ -46,7 +46,7 @@ public class OrderTradeController extends BaseController {
     @RequestMapping(value = {"list", ""})
     public String list(HttpServletRequest request, HttpServletResponse response, Model model) {
         //下拉选查询 自定义内容需要手动添加
-        return "modules/c2c/trade/order/list";
+        return "modules/c2c/trade/list";
     }
 
     /**

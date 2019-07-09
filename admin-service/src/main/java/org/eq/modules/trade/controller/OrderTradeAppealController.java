@@ -4,13 +4,18 @@
  */
 package org.eq.modules.trade.controller;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eq.basic.common.base.BaseController;
 import org.eq.basic.common.base.BaseOpMsg;
 import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.config.sysUtil.UserUtil;
 import org.eq.basic.common.status.StatusCode;
+import org.eq.basic.common.util.DateUtil;
 import org.eq.basic.modules.sys.entity.SysUser;
+import org.eq.modules.enums.OrderTradeStateEnum;
 import org.eq.modules.trade.entity.OrderTradeAppeal;
+import org.eq.modules.trade.entity.OrderTradeAppealExample;
 import org.eq.modules.trade.service.OrderTradeAppealService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,56 +36,46 @@ import java.util.Map;
  * @version 1.0.1
  */
 @Controller
-@RequestMapping(value = "/orderTrade/orderTradeAppeal")
+@RequestMapping(value = "/orderTradeAppeal")
 public class OrderTradeAppealController extends BaseController {
 
 	@Autowired
 	private OrderTradeAppealService orderTradeAppealService;
 
-	/**
-	 * List页面
-	 * @param request
-	 * @param response
-	 * @param model
-	 * @return
-	 */
 	@RequestMapping(value = {"list", ""})
 	public String list(HttpServletRequest request, HttpServletResponse response, Model model) {
-		//下拉选查询 自定义内容需要手动添加
-		return "modules/orderTrade/orderTradeAppealList";
+		return "modules/c2c/trade/appealList";
 	}
 
-	/**
-	 * datatable 返回列表数据
-	 {
-		 "draw": 4,
-		 "recordsTotal": 57,
-		 "recordsFiltered": 57,
-		 "data": [
-			 [
-				 "Charde",
-				 "Marshall",
-				 "Regional Director",
-				 "San Francisco",
-				 "16th Oct 08",
-				 "$470,600"
-			 ],[]...
-	 	]
-	 }
-	 *
-	 *
-	 * @param request
-	 * @param response
-	 * @param orderTradeAppeal
-	 * @return
-	 */
+
+	@SuppressWarnings("all")
 	@ResponseBody
 	@RequestMapping(value = {"dataList"})
 	public BaseTableData dataList(HttpServletRequest request, HttpServletResponse response, OrderTradeAppeal orderTradeAppeal) {
 		Map<String,Object> params = new HashMap<>();
-		//取出 request 的参数信息分页信息 排序信息
-		getInfoFromRequest(request,params);
-		//数据的draw自增
+        getInfoFromRequest(request,params);
+        String orderDir = request.getParameter("orderDir");
+        String orderName = request.getParameter("orderName");
+        params.put("orderDir",orderDir);
+        params.put("orderName",orderName);
+        try {
+            Date beginCreateDate = null;
+            Date endCreateDate = null;
+            if (!StringUtils.isEmpty(request.getParameter("beginCreateDate"))) {
+                String temp = request.getParameter("beginCreateDate").trim() + " 00:00:00";
+                beginCreateDate = DateUtil.paseTimeStr(temp);
+            }
+            if (!StringUtils.isEmpty(request.getParameter("endCreateDate"))) {
+                String temp = request.getParameter("endCreateDate").trim() + " 23:59:59";
+                endCreateDate = DateUtil.paseTimeStr(temp);
+
+            }
+            params.put("beginCreateDate", beginCreateDate);
+            params.put("endCreateDate", endCreateDate);
+        } catch (Exception e) {
+            logger.error("OrderTradeAppealController dataList 格式化时间异常", e);
+        }
+
 		baseTableData = orderTradeAppealService.findDataTableByRecordForPage(orderTradeAppeal,params);
 		int draw = Integer.parseInt(request.getParameter("draw")==null?"0":request.getParameter("draw"));
 		baseTableData.setDraw(++draw);
@@ -89,51 +85,77 @@ public class OrderTradeAppealController extends BaseController {
 	/**
      * 根据条件 查询数据 返回页面json数据
      * 条件为空时 查询失败
-     * @param orderTradeAppeal
+     * @param orderId
      * @return BaseOpMsg
      */
     @ResponseBody
-    @RequestMapping(value = "selectOrderTradeAppeal")
-    public BaseOpMsg<OrderTradeAppeal> selectOrderTradeAppeal(OrderTradeAppeal orderTradeAppeal) {
-        BaseOpMsg<OrderTradeAppeal> result = new BaseOpMsg<OrderTradeAppeal>();
-        if (orderTradeAppeal != null) {
-            List<OrderTradeAppeal> orderTradeAppealList = orderTradeAppealService.findListByRecord(orderTradeAppeal);
-            if (orderTradeAppealList != null && orderTradeAppealList.size() > 0) {
-                result.setCode(StatusCode.CURD_SELECT_SUCCESS);
-                result.setStatus("success");
-                result.setMsg("查询数据成功！");
-                result.setList(orderTradeAppealList);//返回查询数据
-            } else {
-                result.setCode(StatusCode.CURD_SELECT_FAILURE);
-                result.setStatus("error");
-                result.setMsg("查询数据失败！");
-                if (logger.isDebugEnabled()) {
-                    result.setDescription(orderTradeAppealService.getErrorInfo());
+    @RequestMapping(value = "selectOrderTrade")
+    public BaseOpMsg<OrderTradeAppeal> selectOrderTradeAppeal(HttpServletRequest request, HttpServletResponse response,  long orderId) {
+        BaseOpMsg<OrderTradeAppeal> result = new BaseOpMsg();
+        OrderTradeAppealExample example = new OrderTradeAppealExample();
+        OrderTradeAppealExample.Criteria ca = example.or();
+
+        OrderTradeAppeal orderTradeAppeal =null;
+        try {
+            if (orderId > 0) {
+                ca.andIdEqualToForAll(orderId);
+                List<OrderTradeAppeal> list  = orderTradeAppealService.findListByExample(example);
+                if(!CollectionUtils.isEmpty(list)){
+                    orderTradeAppeal = list.get(0);
                 }
             }
-        } else {
-            result.setCode(StatusCode.REQUEST_CONTENT_ERROR);
-            result.setStatus("error");
-            result.setMsg("查询数据失败！");
-            if (logger.isDebugEnabled()) {
-                result.setDescription("查询条件为空");
-            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
+        if(orderTradeAppeal!=null){
+            result.setStatus("success");
+            result.setCode(StatusCode.CURD_SELECT_SUCCESS);
+        }else{
+            result.setStatus("faile");
+            result.setCode(StatusCode.REQUEST_CONTENT_ERROR);
+        }
+        result.setMsg("查询数据成功！");
+        result.setObject(orderTradeAppeal);
         return result;
     }
 
 	/**
-     * 保存or修改操作
-     * @param request
-     * @param orderTradeAppeal
-     * @param opType 操作类型
+     * 审核
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = {"modify"})
-    public BaseOpMsg modify(HttpServletRequest request, OrderTradeAppeal orderTradeAppeal, String opType) {
-        SysUser user = UserUtil.getInstance().getUser();
-        BaseOpMsg result = new BaseOpMsg();
+    @RequestMapping(value = "audit")
+    public BaseOpMsg audit( long orderId,String remark) {
+        BaseOpMsg<String> result = new BaseOpMsg();
+        OrderTradeAppealExample example = new OrderTradeAppealExample();
+        OrderTradeAppealExample.Criteria ca = example.or();
+        OrderTradeAppeal orderTradeAppeal =null;
+        try {
+            if (orderId > 0) {
+                ca.andIdEqualToForAll(orderId);
+                List<OrderTradeAppeal> list  = orderTradeAppealService.findListByExample(example);
+                if(!CollectionUtils.isEmpty(list)){
+                    orderTradeAppeal = list.get(0);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        if(orderTradeAppeal==null){
+            result.setMsg("数据为空");
+            return result;
+        }
+        orderTradeAppeal.setRemark(remark);
+        orderTradeAppeal.setStatus(1);
+        orderTradeAppeal.setUpdateTime(new Date());
+        String msg = "处理成功";
+        try{
+            orderTradeAppealService.updateByPrimaryKeySelective(orderTradeAppeal);
+        }catch (Exception e){
+            e.printStackTrace();
+            msg="处理失败";
+        }
+        result.setMsg(msg);
         return result;
     }
 

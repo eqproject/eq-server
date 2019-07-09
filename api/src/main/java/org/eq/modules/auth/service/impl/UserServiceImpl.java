@@ -570,7 +570,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
     }
 
     public static void main(String[] args) throws Exception {
-        String content = 8 + "123456" + MD5_KEY;
+        String content = 36 + "123456" + MD5_KEY;
         System.out.println(MD5Utils.digestAsHex(content));
     }
 }
