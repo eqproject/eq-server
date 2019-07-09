@@ -116,7 +116,7 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
      * @param orderType
      * @return
      */
-    public OrderAdExample getExampleFromEntityAll(int orderType, List<Long> productList) {
+    public OrderAdExample getExampleFromEntityAll(int orderType, List<Long> productList,Long userId) {
         OrderAdExample example = new OrderAdExample();
         OrderAdExample.Criteria ca = example.or();
         ca.andTypeEqualToForAll(orderType);
@@ -127,6 +127,9 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
         states.add(OrderAdStateEnum.ORDER_TRADEING.getState());
         ca.andStatusInForAll(states);
         ca.andProductNumHavedEqualToForAll();
+        if(userId!=null){
+            ca.andUserIdEqualToForAll(userId);
+        }
         example.setOrderByClause("sort desc");
         return example;
     }
@@ -340,6 +343,10 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
             return result;
         }
         OrderAdExample orderAdExample = null;
+        Long userId = null;
+        if(user!=null && user.getClientType()!=null && user.getClientType().intValue() ==2){
+            userId = user.getId();
+        }
         //我要卖 难
         if (searchPageAdOrderVO.getOrderType() == 1) {
             if (user == null) {
@@ -348,9 +355,9 @@ public class OrderAdServiceImpl extends ServiceImplExtend<OrderAdMapper, OrderAd
            /* List<Long> userProductList = new ArrayList<>();
             userProductList.add(-1L);
             userProductList.addAll(userProductStockService.listUserProdutId(user));*/
-            orderAdExample = getExampleFromEntityAll(OrderAdTypeEnum.ORDER_BUY.getType(), null);
+            orderAdExample = getExampleFromEntityAll(OrderAdTypeEnum.ORDER_BUY.getType(), null,userId);
         } else {//我要买
-            orderAdExample = getExampleFromEntityAll(OrderAdTypeEnum.ORDER_SALE.getType(), null);
+            orderAdExample = getExampleFromEntityAll(OrderAdTypeEnum.ORDER_SALE.getType(), null,userId);
         }
         BaseTableData baseTableData = findDataListByExampleForPage(orderAdExample, searchPageAdOrderVO.getPageNum(), searchPageAdOrderVO.getPageSize());
         if (baseTableData == null) {

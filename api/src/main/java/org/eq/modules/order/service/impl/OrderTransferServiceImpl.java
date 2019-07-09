@@ -19,6 +19,10 @@ import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.common.enums.LogTypeEnum;
 import org.eq.modules.enums.WalletStateEnum;
 import org.eq.modules.log.OrderLogService;
+import org.eq.modules.product.entity.ProductBlockchain;
+import org.eq.modules.product.service.ProductBlockchainService;
+import org.eq.modules.product.vo.BSearchProduct;
+import org.eq.modules.product.vo.ProductDetailVO;
 import org.eq.modules.utils.IdWork;
 import org.eq.modules.utils.OrderUtil;
 import org.eq.modules.utils.ProductUtil;
@@ -63,7 +67,7 @@ public class OrderTransferServiceImpl extends ServiceImplExtend<OrderTransferMap
 	private BcTxRecordMapper bcTxRecordMapper;
 
 	@Autowired
-	private ProductCache productCache;
+	private ProductBlockchainService productBlockchainService;
 
 	@Autowired
 	private UserWalletService userWalletService;
@@ -135,12 +139,29 @@ public class OrderTransferServiceImpl extends ServiceImplExtend<OrderTransferMap
 			result.setErrMsg("用户钱包地址未激活");
 			return result;
 		}
+		BSearchProduct bsearchProduct = new BSearchProduct();
+		bsearchProduct.setProductId(searchTransOrderVO.getProductId());
+		ProductDetailVO productDetailVO = productService.getProductAll(bsearchProduct);
+		if(productDetailVO==null){
+			result.setErrMsg("商品不存在");
+			return result;
+		}
+		ProductBlockchain productBlockchain = null;
+		try{
+			productBlockchain = productBlockchainService.selectByPrimaryKey(searchTransOrderVO.getProductId());
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		if(productBlockchain==null){
+			result.setErrMsg("商品合约地址为空");
+			return result;
+		}
 
-		ProductAll productAll = productCache.getProduct(String.valueOf(searchTransOrderVO.getProductId()));
+		/*ProductAll productAll = productCache.getProduct(String.valueOf(searchTransOrderVO.getProductId()));
 		if(productAll==null){
 			result.setErrMsg("商品无效");
 			return result;
-		}
+		}*/
 		UserProductStock userProductStock =  userProductStockService.getUserProductStock(searchTransOrderVO.getProductId(),user);
 		if(userProductStock==null){
 			result.setErrMsg("此商品无效");
@@ -161,9 +182,9 @@ public class OrderTransferServiceImpl extends ServiceImplExtend<OrderTransferMap
 
 		BcTxRecord bcTxRecord = new BcTxRecord();
 		bcTxRecord.setFromAddress(userWallet.getAddress());
-        bcTxRecord.setToAddress(productAll.getContractAddress());
+        bcTxRecord.setToAddress(productBlockchain.getContractAddress());
         bcTxRecord.setTransferAmount("0");
-        bcTxRecord.setAssetIssuer(productAll.getAcceptAddress());
+        bcTxRecord.setAssetIssuer(productDetailVO.getAcceptAddress());
         bcTxRecord.setAssetType(1);
         bcTxRecord.setTxStatus(0);
         bcTxRecord.setBizType(4);
