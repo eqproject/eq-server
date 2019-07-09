@@ -35,17 +35,20 @@
 |errMsg   |string    |错误描述   |
 |data   |object    |  数据 |
 |-userId |long|用户ID|
+|-clientType |string|用户类型(1普通用户，2商户)|
 
 ###### 接口示例
 
 > 地址： [/api/user/register](/api/user/register)
 ```
 {
-	"status": 200,
-	"errMsg": "",
-	"data":{
-		"userId": 1
-	}
+    "status": "200",
+    "errMsg": "",
+    "data": {
+        "clientType": 2,
+        "userId": 37
+    },
+    "datas": null
 }
 ```
 ##### 1-02\.用户重置密码接口
@@ -169,22 +172,23 @@
     "status": "200",
     "errMsg": "",
     "data": {
-        "id": 10,
+        "id": 36,
         "name": null,
         "nickname": null,
-        "password": "a472a2c8713a4cde527c89339439fe91",
+        "password": "336a4bfaea9184d1c800bb3652857e4c",
         "txPassword": null,
         "sex": null,
         "level": null,
-        "mobile": "17090075661",
-        "authStatus": null,
+        "mobile": "18927401913",
+        "authStatus": 1,
         "birthday": null,
         "photoHead": null,
         "intro": null,
-        "createDate": "2019-06-16",
-        "updateDate": "2019-06-22",
+        "createDate": "2019-07-04",
+        "updateDate": "2019-07-09",
         "remarks": null,
-        "delFlag": 0
+        "delFlag": 0,
+        "clientType": 2
     },
     "datas": null
 }
@@ -381,7 +385,13 @@
 }
 ```
 
-##### 
+##### 浏览器请求示例
+
+```
+http://localhost:8001/upload/images/1562686805014206304.jpg
+```
+
+
 
 
 

@@ -70,9 +70,11 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
     @Value("${aes.key}")
     private String aesKey;
 
-    @Value("${upload.img.path}")
+    @Value("${img.upload.path}")
     private String uploadImgPath;
 
+    @Value("${img.upload.dir}")
+    private String uploadImgDir;
 
     @Override
     public int insertRecord(User user) {
@@ -214,6 +216,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
         userWalletService.insertRecordReturnId(wallet);
 
         dataMap.put("userId", userId);
+        dataMap.put("clientType", user.getClientType());
         return ResponseFactory.success(dataMap);
     }
 
@@ -522,7 +525,7 @@ public class UserServiceImpl extends ServiceImplExtend<UserMapper, User, UserExa
             }
             String imgType = imgFileName.substring(imgFileName.lastIndexOf("."));
             String fileName = System.currentTimeMillis() + RandomStringUtils.randomNumeric(6) + imgType;
-            File fileDir = new File(uploadImgPath);
+            File fileDir = new File(uploadImgPath+File.separator+uploadImgDir);
             if (!fileDir.exists()) {
                 fileDir.mkdirs();
             }
