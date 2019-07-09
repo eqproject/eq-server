@@ -26,4 +26,9 @@ public class SearchPageOrderFinishVO extends SearchBase {
      */
     private int pageNum;
 
+    /**
+     * 订单类型
+     */
+    private int orderType;
+
 }

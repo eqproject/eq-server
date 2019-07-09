@@ -11,12 +11,15 @@ import org.eq.modules.auth.entity.User;
 import org.eq.modules.common.entitys.PageResultData;
 import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.enums.OrderTradeStateEnum;
+import org.eq.modules.order.entity.OrderAd;
+import org.eq.modules.order.service.OrderAdService;
 import org.eq.modules.utils.OrderUtil;
 import org.eq.modules.order.service.OrderFinishSnapshootService;
 import org.eq.modules.order.vo.*;
 import org.eq.modules.orderfinish.dao.OrderFinishSnapshootMapper;
 import org.eq.modules.orderfinish.entity.OrderFinishSnapshoot;
 import org.eq.modules.orderfinish.entity.OrderFinishSnapshootExample;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +37,8 @@ import java.util.Map;
 @AutowiredService
 public class OrderFinishSnapshootServiceImpl extends ServiceImplExtend<OrderFinishSnapshootMapper, OrderFinishSnapshoot, OrderFinishSnapshootExample> implements OrderFinishSnapshootService {
 
+	@Autowired
+	private OrderAdService orderAdService;
 	@Override
 	public OrderFinishSnapshootExample getExampleFromEntity(OrderFinishSnapshoot orderFinishSnapshoot, Map<String, Object> params) {
 		OrderFinishSnapshootExample example = new OrderFinishSnapshootExample();
@@ -74,18 +79,30 @@ public class OrderFinishSnapshootServiceImpl extends ServiceImplExtend<OrderFini
 	@Override
 	public PageResultData<OrderFinishSnapshootSimpleVO> pageFinishPlatOrder(SearchPageOrderFinishVO searchPageOrderFinishVO,User user) {
 		PageResultData<OrderFinishSnapshootSimpleVO> result = new PageResultData<>();
+		if(user==null){
+			return result;
+		}
 		if(searchPageOrderFinishVO ==null){
 			searchPageOrderFinishVO = new SearchPageOrderFinishVO();
 		}
+
+		//订单
+		if(searchPageOrderFinishVO.getOrderType()==1){
+			SearchPageAdOrderVO searchPageAdOrderVO = new SearchPageAdOrderVO();
+			searchPageAdOrderVO.setUserId(user.getId());
+			searchPageAdOrderVO.setPageNum(searchPageOrderFinishVO.getPageNum());
+			searchPageAdOrderVO.setPageSize(searchPageOrderFinishVO.getPageSize());
+			PageResultData<OrderAdSimpleVO> orderList =orderAdService.pagePlatOrderAd(searchPageAdOrderVO,user);
+		}
+
+
 		if(searchPageOrderFinishVO.getPageSize()<=0 || searchPageOrderFinishVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
 			searchPageOrderFinishVO.setPageSize(StaticEntity.MAX_PAGE_SIZE);
 		}
 		if(searchPageOrderFinishVO.getPageNum()<=0){
 			searchPageOrderFinishVO.setPageNum(1);
 		}
-		if(user==null){
-			return result;
-		}
+
 		OrderFinishSnapshootExample orderFinishSnapshootExample =getExampleFromEntity(user.getId());
 
 		BaseTableData baseTableData = findDataListByExampleForPage(orderFinishSnapshootExample, searchPageOrderFinishVO.getPageNum(), searchPageOrderFinishVO.getPageSize());
