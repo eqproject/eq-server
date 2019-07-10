@@ -83,6 +83,15 @@ public interface OrderTradeService extends ServiceExtend<OrderTrade,OrderTradeEx
     PageResultData<OrderTradeTradingVO> pageTradingOrderList(OrderTradeListReqVO orderTradeListReqVO);
 
 
+
+    /**
+     * 交易中订单
+     * @param orderTradeListReqVO
+     * @return
+     */
+    PageResultData<OrderTradeFinishVO> pageFinishedOrderList(OrderTradeListReqVO orderTradeListReqVO);
+
+
     /**
      *  催促订单号
      * @param tradNo

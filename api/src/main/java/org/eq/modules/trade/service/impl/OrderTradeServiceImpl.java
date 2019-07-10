@@ -708,6 +708,59 @@ public class OrderTradeServiceImpl extends ServiceImplExtend<OrderTradeMapper, O
 	}
 
 	@Override
+	public PageResultData<OrderTradeFinishVO> pageFinishedOrderList(OrderTradeListReqVO orderTradeListReqVO) {
+		PageResultData<OrderTradeFinishVO> result = new PageResultData<>();
+		result.setList(new ArrayList<>());
+		if(orderTradeListReqVO ==null  || orderTradeListReqVO.getUserId()<=0){
+			return result;
+		}
+		User user = userService.selectByPrimaryKey(orderTradeListReqVO.getUserId());
+		if (user == null) {
+			return result;
+		}
+		if(orderTradeListReqVO.getPageSize()<=0 || orderTradeListReqVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
+			orderTradeListReqVO.setPageSize(StaticEntity.MAX_PAGE_SIZE);
+		}
+		if(orderTradeListReqVO.getPageNum()<=0){
+			orderTradeListReqVO.setPageNum(1);
+		}
+		OrderTradeExample orderTradeExample = new OrderTradeExample();
+		OrderTradeExample.Criteria ca = orderTradeExample.or();
+		orderTradeExample.setOrderByClause(" create_date desc");
+
+		ca.andStatusInForAll(OrderTradeStateEnum.getFinishStates());
+		ca.andAllUserIdEqualTo(orderTradeListReqVO.getUserId());
+
+		BaseTableData baseTableData = findDataListByExampleForPage(orderTradeExample,orderTradeListReqVO.getPageNum(), orderTradeListReqVO.getPageSize());
+		if(baseTableData==null || CollectionUtils.isEmpty(baseTableData.getData())){
+			return result;
+		}
+		List<OrderTrade> dataList = baseTableData.getData();
+
+		List<OrderTradeFinishVO> tradingList = new ArrayList<>(dataList.size());
+
+		for(OrderTrade orderTrade : dataList){
+			User otherUser = null;
+			if(user.getId().equals(orderTrade.getBuyUserId())){
+				otherUser = userService.selectByPrimaryKey(orderTrade.getSellUserId());
+			}else{
+				otherUser = userService.selectByPrimaryKey(orderTrade.getBuyUserId());
+			}
+			if(otherUser==null){
+				continue;
+			}
+			OrderTradeFinishVO orderTradeFinishVO = OrderTradeMapService.initFinishVO(orderTrade,user);
+			orderTradeFinishVO.setUserNickName(otherUser.getNickname());
+			orderTradeFinishVO.setPhotoHead(otherUser.getPhotoHead());
+			tradingList.add(orderTradeFinishVO);
+		}
+		result.setList(tradingList);
+		result.setTotal(baseTableData.getRecordsTotal());
+		return result;
+	}
+
+
+	@Override
 	public boolean remindTrade(String tradNo) {
 		OrderTrade orderTrade = new OrderTrade();
 		orderTrade.setTradeNo(tradNo);

@@ -49,6 +49,11 @@ public enum OrderTradeStateEnum {
      */
     private static Set<Integer> payBackStatus = new HashSet<>();
 
+    /**
+     * 完成的状态集合
+     */
+    private static Set<Integer> finishStatus = new HashSet<>();
+
     static {
         runPayStatus.add(OrderTradeStateEnum.WAIT_PAY.getState());
         runPayStatus.add(OrderTradeStateEnum.PAY_FAIL.getState());
@@ -68,6 +73,10 @@ public enum OrderTradeStateEnum {
         runningStatus.add(OrderTradeStateEnum.LOAN_FAIL.getState());
         runningStatus.add(OrderTradeStateEnum.REFUND_ING.getState());
 
+        finishStatus.add(OrderTradeStateEnum.CANCEL.getState());
+        finishStatus.add(OrderTradeStateEnum.CANCEL_PAY_TIMEOUT.getState());
+        finishStatus.add(OrderTradeStateEnum.TRADE_SUCCESS.getState());
+        finishStatus.add(OrderTradeStateEnum.REFUND_SUCCESS.getState());
     }
 
 
@@ -171,5 +180,13 @@ public enum OrderTradeStateEnum {
         return payBackStatus.contains(state);
     }
 
+
+    /**
+     * 获取完成状态的集合
+     * @return
+     */
+    public static List<Integer> getFinishStates(){
+        return new ArrayList<>(finishStatus);
+    }
 
 }

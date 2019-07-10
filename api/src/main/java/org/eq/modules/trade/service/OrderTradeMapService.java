@@ -4,6 +4,7 @@ import org.eq.basic.common.util.DateUtil;
 import org.eq.modules.auth.entity.User;
 import org.eq.modules.enums.OrderTradeStateEnum;
 import org.eq.modules.trade.entity.OrderTrade;
+import org.eq.modules.trade.vo.OrderTradeFinishVO;
 import org.eq.modules.trade.vo.OrderTradeTradingVO;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,45 @@ public class OrderTradeMapService {
         result.setUpdateTime(DateUtil.foramtChinaFormat(orderTrade.getUpdateDate()));
         result.setProductImg(orderTrade.getProductImg());
         result.setProductName(orderTrade.getProductName());
+        boolean isbuy = false;
+        if(user.getId().equals(orderTrade.getBuyUserId())){
+            isbuy = true;
+        }
+        result.setStateRemark(getTradingStateRemark(orderTrade.getStatus(),isbuy));
+        if(result.getStateRemark().contains("客服")){
+            result.setAllAppeal(1);
+        }
+        return result;
+    }
+
+
+    /**
+     * 格式化基本交易数据
+     * @param orderTrade
+     * @param user
+     * @return
+     */
+    public static OrderTradeFinishVO initFinishVO(OrderTrade orderTrade, User user){
+        if(orderTrade ==null || user ==null ){
+            return null;
+        }
+        OrderTradeFinishVO result = new OrderTradeFinishVO();
+        result.setTradeNo(orderTrade.getTradeNo());
+        result.setAmount(orderTrade.getAmount());
+        result.setOrderNum(orderTrade.getOrderNum());
+        result.setRemindPay(orderTrade.getRemindPay());
+        result.setSalePrice(orderTrade.getSalePrice());
+        result.setStatus(orderTrade.getStatus());
+        result.setServiceFee(orderTrade.getServiceFee()==null?0:orderTrade.getServiceFee());
+        result.setUnitPrice(orderTrade.getUnitPrice());
+        result.setCreateTime(DateUtil.foramtChinaFormat(orderTrade.getCreateDate()));
+        result.setUpdateTime(DateUtil.foramtChinaFormat(orderTrade.getUpdateDate()));
+        result.setProductImg(orderTrade.getProductImg());
+        result.setProductName(orderTrade.getProductName());
+        result.setProductId(orderTrade.getProductId());
+        result.setOrderNo(orderTrade.getAdNo());
+        result.setType(orderTrade.getType());
+        result.setSellUserId(orderTrade.getSellUserId());
         boolean isbuy = false;
         if(user.getId().equals(orderTrade.getBuyUserId())){
             isbuy = true;

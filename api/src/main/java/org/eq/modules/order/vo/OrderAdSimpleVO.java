@@ -124,5 +124,15 @@ public class OrderAdSimpleVO implements Serializable {
      */
     private double tradeRate;
 
+    /**
+     * 订单状态
+     */
+    private int orderState;
+
+    /**
+     * 最后更新时间
+     */
+    private Date updateTime;
+
 
 }

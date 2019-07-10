@@ -4,6 +4,7 @@
  */
 package org.eq.modules.order.service.impl;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.eq.basic.common.annotation.AutowiredService;
 import org.eq.basic.common.base.BaseTableData;
 import org.eq.basic.common.base.ServiceImplExtend;
@@ -13,6 +14,10 @@ import org.eq.modules.common.entitys.StaticEntity;
 import org.eq.modules.enums.OrderTradeStateEnum;
 import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.order.service.OrderAdService;
+import org.eq.modules.trade.service.OrderTradeService;
+import org.eq.modules.trade.vo.OrderTradeFinishVO;
+import org.eq.modules.trade.vo.OrderTradeListReqVO;
+import org.eq.modules.trade.vo.OrderTradeTradingVO;
 import org.eq.modules.utils.OrderUtil;
 import org.eq.modules.order.service.OrderFinishSnapshootService;
 import org.eq.modules.order.vo.*;
@@ -39,6 +44,11 @@ public class OrderFinishSnapshootServiceImpl extends ServiceImplExtend<OrderFini
 
 	@Autowired
 	private OrderAdService orderAdService;
+
+
+	@Autowired
+	private OrderTradeService orderTradeService;
+
 	@Override
 	public OrderFinishSnapshootExample getExampleFromEntity(OrderFinishSnapshoot orderFinishSnapshoot, Map<String, Object> params) {
 		OrderFinishSnapshootExample example = new OrderFinishSnapshootExample();
@@ -85,38 +95,42 @@ public class OrderFinishSnapshootServiceImpl extends ServiceImplExtend<OrderFini
 		if(searchPageOrderFinishVO ==null){
 			searchPageOrderFinishVO = new SearchPageOrderFinishVO();
 		}
-
+		List<OrderFinishSnapshootSimpleVO> dataList = new ArrayList<>();
 		//订单
 		if(searchPageOrderFinishVO.getOrderType()==1){
 			SearchPageAdOrderVO searchPageAdOrderVO = new SearchPageAdOrderVO();
 			searchPageAdOrderVO.setUserId(user.getId());
 			searchPageAdOrderVO.setPageNum(searchPageOrderFinishVO.getPageNum());
 			searchPageAdOrderVO.setPageSize(searchPageOrderFinishVO.getPageSize());
-			PageResultData<OrderAdSimpleVO> orderList =orderAdService.pagePlatOrderAd(searchPageAdOrderVO,user);
-		}
+			PageResultData<OrderAdSimpleVO>  orderPage =orderAdService.pagePlatOrderAd(searchPageAdOrderVO,user);
+			if(orderPage==null || CollectionUtils.isEmpty(orderPage.getList())){
+				return result;
+			}
+			List<OrderAdSimpleVO> pList = orderPage.getList();
+			for(OrderAdSimpleVO p : pList){
+				dataList.add(OrderUtil.transFinishedForOrderAd(p,user));
+			}
+			result.setList(dataList);
+			result.setTotal(orderPage.getTotal());
+			return result;
 
-
-		if(searchPageOrderFinishVO.getPageSize()<=0 || searchPageOrderFinishVO.getPageSize()> StaticEntity.MAX_PAGE_SIZE){
-			searchPageOrderFinishVO.setPageSize(StaticEntity.MAX_PAGE_SIZE);
-		}
-		if(searchPageOrderFinishVO.getPageNum()<=0){
-			searchPageOrderFinishVO.setPageNum(1);
-		}
-
-		OrderFinishSnapshootExample orderFinishSnapshootExample =getExampleFromEntity(user.getId());
-
-		BaseTableData baseTableData = findDataListByExampleForPage(orderFinishSnapshootExample, searchPageOrderFinishVO.getPageNum(), searchPageOrderFinishVO.getPageSize());
-		if(baseTableData==null){
+		}else{
+			OrderTradeListReqVO orderTradeListReqVO = new OrderTradeListReqVO();
+			orderTradeListReqVO.setUserId(user.getId());
+			orderTradeListReqVO.setPageNum(searchPageOrderFinishVO.getPageNum());
+			orderTradeListReqVO.setPageSize(searchPageOrderFinishVO.getPageSize());
+			PageResultData<OrderTradeFinishVO> tradePage = orderTradeService.pageFinishedOrderList(orderTradeListReqVO);
+			if(tradePage==null || CollectionUtils.isEmpty(tradePage.getList())){
+				return result;
+			}
+			List<OrderTradeFinishVO> pList = tradePage.getList();
+			for(OrderTradeFinishVO p : pList){
+				dataList.add(OrderUtil.transFinishOrderForTrade(p,user));
+			}
+			result.setList(dataList);
+			result.setTotal(tradePage.getTotal());
 			return result;
 		}
-		List<OrderFinishSnapshootSimpleVO> dataList = new ArrayList<>(baseTableData.getData().size());
-		List<OrderFinishSnapshoot> pList = baseTableData.getData();
-		for(OrderFinishSnapshoot p : pList){
-			dataList.add(OrderUtil.transObjForSimple(p,user));
-		}
-		result.setList(dataList);
-		result.setTotal(baseTableData.getRecordsTotal());
-		return result;
 	}
 
 

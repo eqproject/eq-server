@@ -1709,6 +1709,7 @@ http://localhost:8001/upload/images/1562686805014206304.jpg
 |pageNum     |true    |int   |页数             |
 |pageSize    |true    |int   |每页显示数量。 |
 |status   |true    |int   |订单状态:(1:已完成)  |
+|orderType |true |int |1: 订单完成量   其他交易完成量 |
 |sign       |true    |string   |签名|
 
 ###### 返回字段

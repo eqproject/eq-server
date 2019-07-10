@@ -8,6 +8,7 @@ import org.eq.modules.order.entity.OrderAd;
 import org.eq.modules.order.entity.OrderTransfer;
 import org.eq.modules.order.vo.*;
 import org.eq.modules.orderfinish.entity.OrderFinishSnapshoot;
+import org.eq.modules.trade.vo.OrderTradeFinishVO;
 
 import java.math.BigDecimal;
 
@@ -65,7 +66,9 @@ public class OrderUtil {
         orderAdSimpleVO.setNickName(orderAd.getNickName());
         orderAdSimpleVO.setUserBoundState(orderAd.getAuthStatus());
         orderAdSimpleVO.setOrderType(orderAd.getType());
+        orderAdSimpleVO.setOrderState(orderAd.getStatus());
         orderAdSimpleVO.setCreateTime(DateUtil.foramtChinaFormat(orderAd.getCreateDate()));
+        orderAdSimpleVO.setUpdateTime(orderAd.getUpdateDate());
         return orderAdSimpleVO;
     }
 
@@ -139,15 +142,85 @@ public class OrderUtil {
         return result;
     }
 
+
+    /**
+     * 转化对象实体
+     *
+     * @param product
+     * @param user
+     * @return
+     */
+    public static OrderFinishSnapshootSimpleVO transFinishedForOrderAd(OrderAdSimpleVO orderAdSimpleVO, User user) {
+        if (orderAdSimpleVO == null) {
+            return null;
+        }
+        OrderFinishSnapshootSimpleVO result = new OrderFinishSnapshootSimpleVO();
+        result.setProductId(Long.valueOf(orderAdSimpleVO.getProductId()));
+        result.setProductImg(orderAdSimpleVO.getImg());
+        result.setProductName(orderAdSimpleVO.getProductName());
+        result.setUnitPrice(orderAdSimpleVO.getUnitPrice());
+        result.setTradeNo("");
+        result.setOrderNo(orderAdSimpleVO.getOrderCode());
+        result.setAmount(orderAdSimpleVO.getPrice()*orderAdSimpleVO.getOrderNumber());
+        result.setOrderNum(orderAdSimpleVO.getTradeNum());//transObjForSimple
+        result.setSalePrice(orderAdSimpleVO.getPrice());
+        result.setServiceFee(0);
+        result.setStatus(OrderAdStateEnum.getRemarkByState(orderAdSimpleVO.getOrderState()));
+        result.setFinishTime(DateUtil.foramtChinaFormat(orderAdSimpleVO.getUpdateTime()));
+        result.setType(orderAdSimpleVO.getOrderType());
+        result.setUserHeadImg(orderAdSimpleVO.getUserImg());
+        result.setUserNickname(orderAdSimpleVO.getNickName());
+        result.setOrderWantNumberRemark(getOrderRemark(orderAdSimpleVO.getOrderType(),orderAdSimpleVO.getOrderNumber()));
+        result.setOrderFinishNumberRemark(getOrderTradeRemark(orderAdSimpleVO.getOrderType(),orderAdSimpleVO.getSaleedNumber()));
+        return result;
+    }
+
+    /**
+     * 转化对象实体
+     *
+     * @param product
+     * @param user
+     * @return
+     */
+    public static OrderFinishSnapshootSimpleVO transFinishOrderForTrade(OrderTradeFinishVO orderTradeFinishVO, User user) {
+        if (orderTradeFinishVO == null) {
+            return null;
+        }
+        OrderFinishSnapshootSimpleVO result = new OrderFinishSnapshootSimpleVO();
+        result.setProductId(orderTradeFinishVO.getProductId());
+        result.setProductImg(orderTradeFinishVO.getProductImg());
+        result.setProductName(orderTradeFinishVO.getProductName());
+        result.setUnitPrice(orderTradeFinishVO.getUnitPrice());
+        result.setTradeNo(orderTradeFinishVO.getTradeNo());
+        result.setOrderNo(orderTradeFinishVO.getOrderNo());
+        result.setAmount(orderTradeFinishVO.getAmount());
+        result.setOrderNum(orderTradeFinishVO.getOrderNum());
+        result.setSalePrice(orderTradeFinishVO.getSalePrice());
+        result.setServiceFee(orderTradeFinishVO.getServiceFee());
+        result.setStatus(OrderTradeStateEnum.getRemarkByState(orderTradeFinishVO.getStatus()));
+        result.setFinishTime(orderTradeFinishVO.getUpdateTime());
+        result.setType(0);
+        result.setUserHeadImg(orderTradeFinishVO.getPhotoHead());
+        result.setUserNickname(orderTradeFinishVO.getUserNickName());
+        boolean isSell = false;
+        if(user!=null && user.getId().longValue() ==orderTradeFinishVO.getSellUserId()){
+            isSell =true;
+        }
+        result.setOrderFinishNumberRemark(getTradeRemark(orderTradeFinishVO.getType(),orderTradeFinishVO.getOrderNum(),isSell));
+
+        return result;
+    }
+
+
     private static String getOrderRemark(int orderType,Integer orderNumber) {
        StringBuilder remark = new StringBuilder();
        if(orderType != OrderFinishTypeEnum.ORDER_AD_SALE.getType() && orderType != OrderFinishTypeEnum.ORDER_AD_BUY.getType()){
            return  remark.toString();
        }
        if(orderType == OrderFinishTypeEnum.ORDER_AD_SALE.getType()){//售卖广告
-           remark.append("发布出售").append(orderNumber);
+           remark.append("发布出售 ").append(orderNumber);
        }else{
-           remark.append("发布求购").append(orderNumber);
+           remark.append("发布求购 ").append(orderNumber);
        }
        return remark.toString();
     }
@@ -158,9 +231,9 @@ public class OrderUtil {
             return  remark.toString();
         }
         if(orderType == OrderFinishTypeEnum.ORDER_AD_SALE.getType()){//售卖广告
-            remark.append("已售").append(tradeNum);
+            remark.append("已售 ").append(tradeNum);
         }else{
-            remark.append("已购").append(tradeNum);
+            remark.append("已购 ").append(tradeNum);
         }
         return remark.toString();
     }
