@@ -13,10 +13,8 @@ import org.eq.basic.common.status.StatusCode;
 import org.eq.basic.modules.sys.entity.SysUser;
 import org.eq.basic.modules.sys.service.SysUserInfoService;
 import org.eq.modules.enums.ProductStateEnum;
-import org.eq.modules.product.entity.Product;
-import org.eq.modules.product.entity.ProductAll;
-import org.eq.modules.product.entity.ProductExample;
-import org.eq.modules.product.entity.Tag;
+import org.eq.modules.product.entity.*;
+import org.eq.modules.product.service.ProductBlockchainService;
 import org.eq.modules.product.service.ProductService;
 import org.eq.modules.product.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +47,9 @@ public class ProductController extends BaseController {
 
     @Autowired
     private SysUserInfoService sysUserInfoService;
+
+    @Autowired
+    private ProductBlockchainService productBlockchainService;
 
 	/**
 	 * List页面
@@ -281,6 +282,12 @@ public class ProductController extends BaseController {
             result.setMsg("商品信息不存在");
             return result;
         }
+        ProductBlockchain productBlockchain = productBlockchainService.selectByPrimaryKey(product.getId());
+        if(productBlockchain==null){
+            result.setCode(StatusCode.CURD_SELECT_FAILURE);
+            result.setMsg("商品扩展信息不存在");
+            return result;
+        }
         int targetState = -1;
         int nowState = product.getStatus();
         if("up".equals(command)){
@@ -288,6 +295,11 @@ public class ProductController extends BaseController {
             if(nowState!=ProductStateEnum.DEFAULT.getState()){
                 result.setCode(StatusCode.CURD_SELECT_FAILURE);
                 result.setMsg("商品为待上架状态才能进行上架操作");
+                return result;
+            }
+            if("0".equals(productBlockchain.getTrancheid())){
+                result.setCode(StatusCode.CURD_SELECT_FAILURE);
+                result.setMsg("商品分组有误，无法上架此商品");
                 return result;
             }
         }else{
