@@ -47,6 +47,9 @@ public interface UserProductStockService extends ServiceExtend<UserProductStock,
      */
     UserProductStock getUserProductStock(long productId,User user);
 
+
+
+
     /**
      * 更改锁定量
      * @param productId

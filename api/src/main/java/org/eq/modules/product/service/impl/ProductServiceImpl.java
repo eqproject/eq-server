@@ -165,11 +165,12 @@ public class ProductServiceImpl extends ServiceImplExtend<ProductMapper, Product
 		ProductAll  productAll = productList.get(0);
 		UserProductStock userProductStock = userProductStockService.getUserProductStock(productAll.getId(),user);
 		if(userProductStock==null){
-			reult.setErrMsg("用户无此商品");
-			return reult;
+			productAll.setNumber(0);
+			productAll.setLockNumber(0);
+		}else{
+			productAll.setNumber(userProductStock.getStockNum()+userProductStock.getLockedNum());
+			productAll.setLockNumber(userProductStock.getLockedNum());
 		}
-		productAll.setNumber(userProductStock.getStockNum()+userProductStock.getLockedNum());
-		productAll.setLockNumber(userProductStock.getLockedNum());
 		UserProductDetailVO userProductDetailVO = ProductUtil.transObjTOUserProductDetail(productList.get(0));
 		reult.setData(userProductDetailVO);
 		return reult ;
