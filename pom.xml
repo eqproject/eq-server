@@ -43,7 +43,7 @@
         <bootstrapvalidator.version>0.5.3</bootstrapvalidator.version>
         <jquery-confirm.version>3.3.2</jquery-confirm.version>
 
-        <common-io.version>2.6</common-io.version>
+        <common-io.version>2.7</common-io.version>
         <commons-pool2.version>2.5.0</commons-pool2.version>
         <commons-beanutils.version>1.9.3</commons-beanutils.version>
         <gson.version>2.6.2</gson.version>
